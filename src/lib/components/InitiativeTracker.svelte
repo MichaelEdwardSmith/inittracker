@@ -286,9 +286,9 @@
 
 					<!-- Remove -->
 					<button
-						onclick={() => combat.remove(c.id)}
+						onclick={() => combat.removeFromCombat(c.id)}
 						class="rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
-						title="Remove from combat"
+						title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"

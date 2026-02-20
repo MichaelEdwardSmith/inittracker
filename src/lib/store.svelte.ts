@@ -25,6 +25,11 @@ function createCombatStore() {
 		syncToServer({ combatants, currentTurnId, round });
 	}
 
+	/** Combatants currently participating in the initiative order. */
+	function activeCombatants() {
+		return combatants.filter((c) => c.inCombat !== false);
+	}
+
 	return {
 		get combatants() {
 			return combatants;
@@ -33,7 +38,7 @@ function createCombatStore() {
 			return combatants.filter((c) => c.type === 'player');
 		},
 		get sorted() {
-			return sortCombatants(combatants);
+			return sortCombatants(activeCombatants());
 		},
 		get currentTurnId() {
 			return currentTurnId;
@@ -75,7 +80,8 @@ function createCombatStore() {
 					currentHp: maxHp,
 					tempHp: 0,
 					statuses: [],
-					initiative: null
+					initiative: null,
+					inCombat: true
 				}
 			];
 			sync();
@@ -93,7 +99,8 @@ function createCombatStore() {
 				statuses: [],
 				initiative: null,
 				templateName: template.name,
-				monsterType: template.monsterType
+				monsterType: template.monsterType,
+				inCombat: true
 			}));
 			combatants = [...combatants, ...newEnemies];
 			sync();
@@ -101,12 +108,40 @@ function createCombatStore() {
 
 		remove(id: string) {
 			if (currentTurnId === id) {
-				const sorted = sortCombatants(combatants);
+				const sorted = sortCombatants(activeCombatants());
 				const idx = sorted.findIndex((c) => c.id === id);
 				const remaining = sorted.filter((c) => c.id !== id);
 				currentTurnId = remaining[idx % remaining.length]?.id ?? null;
 			}
 			combatants = combatants.filter((c) => c.id !== id);
+			sync();
+		},
+
+		/** Remove from the initiative order.
+		 *  Players are kept in the party roster (inCombat → false).
+		 *  Enemies are fully deleted. */
+		removeFromCombat(id: string) {
+			const target = combatants.find((c) => c.id === id);
+			if (!target) return;
+			if (currentTurnId === id) {
+				const sorted = sortCombatants(activeCombatants());
+				const idx = sorted.findIndex((c) => c.id === id);
+				const remaining = sorted.filter((c) => c.id !== id);
+				currentTurnId = remaining[idx % remaining.length]?.id ?? null;
+			}
+			if (target.type === 'enemy') {
+				combatants = combatants.filter((c) => c.id !== id);
+			} else {
+				combatants = combatants.map((c) =>
+					c.id === id ? { ...c, inCombat: false, initiative: null } : c
+				);
+			}
+			sync();
+		},
+
+		/** Re-add a benched player to the initiative order. */
+		addToCombat(id: string) {
+			combatants = combatants.map((c) => (c.id === id ? { ...c, inCombat: true } : c));
 			sync();
 		},
 
@@ -159,7 +194,7 @@ function createCombatStore() {
 		},
 
 		startCombat() {
-			const sorted = sortCombatants(combatants);
+			const sorted = sortCombatants(activeCombatants());
 			if (sorted.length === 0) return;
 			currentTurnId = sorted[0].id;
 			round = 1;
@@ -167,7 +202,7 @@ function createCombatStore() {
 		},
 
 		nextTurn() {
-			const sorted = sortCombatants(combatants);
+			const sorted = sortCombatants(activeCombatants());
 			if (sorted.length === 0) return;
 			if (currentTurnId === null) {
 				currentTurnId = sorted[0].id;
@@ -182,7 +217,7 @@ function createCombatStore() {
 		},
 
 		prevTurn() {
-			const sorted = sortCombatants(combatants);
+			const sorted = sortCombatants(activeCombatants());
 			if (sorted.length === 0) return;
 			if (currentTurnId === null) {
 				currentTurnId = sorted[sorted.length - 1].id;

@@ -26,6 +26,11 @@
 		quantity = 1;
 	}
 
+	function quickAddEnemy(e: EnemyTemplate) {
+		selectedEnemy = e;
+		combat.addEnemies(e, 1);
+	}
+
 	const crOrder = ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 	function crLabel(cr: string) {
 		return `CR ${cr}`;
@@ -57,6 +62,7 @@
 		{#each filtered as enemy (enemy.name)}
 			<button
 				onclick={() => selectEnemy(enemy)}
+				ondblclick={() => quickAddEnemy(enemy)}
 				class="flex w-full items-center gap-2 border-b border-gray-700 px-3 py-2 text-left transition last:border-b-0
 				       {selectedEnemy?.name === enemy.name
 					? 'bg-red-900/40 text-white'

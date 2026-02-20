@@ -122,23 +122,39 @@
 					</div>
 				</div>
 			{:else}
-				<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2.5">
+				<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2.5
+				           {player.inCombat === false ? 'opacity-60' : ''}">
 					<div class="min-w-0 flex-1">
-						<div class="truncate text-sm font-medium text-white">{player.name}</div>
+						<div class="flex min-w-0 items-center gap-1.5">
+							<span class="truncate text-sm font-medium text-white">{player.name}</span>
+							{#if player.inCombat === false}
+								<span class="shrink-0 rounded bg-gray-700 px-1 py-0.5 text-xs text-gray-500">benched</span>
+							{/if}
+						</div>
 						<div class="text-xs text-gray-400">AC {player.ac} &bull; {player.maxHp} HP</div>
 					</div>
-					<button
-						onclick={() => startEdit(player.id, player.name, player.ac, player.maxHp)}
-						class="rounded px-2 py-1 text-xs text-gray-400 transition hover:bg-gray-700 hover:text-white"
-					>
-						Edit
-					</button>
-					<button
-						onclick={() => combat.remove(player.id)}
-						class="rounded px-2 py-1 text-xs text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
-					>
-						Remove
-					</button>
+					<div class="flex shrink-0 flex-col gap-1">
+						{#if player.inCombat === false}
+							<button
+								onclick={() => combat.addToCombat(player.id)}
+								class="rounded px-2 py-0.5 text-xs text-green-400 transition hover:bg-green-900/40 hover:text-green-300"
+							>
+								+ Combat
+							</button>
+						{/if}
+						<button
+							onclick={() => startEdit(player.id, player.name, player.ac, player.maxHp)}
+							class="rounded px-2 py-0.5 text-xs text-gray-400 transition hover:bg-gray-700 hover:text-white"
+						>
+							Edit
+						</button>
+						<button
+							onclick={() => combat.remove(player.id)}
+							class="rounded px-2 py-0.5 text-xs text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
+						>
+							Delete
+						</button>
+					</div>
 				</div>
 			{/if}
 		{/each}

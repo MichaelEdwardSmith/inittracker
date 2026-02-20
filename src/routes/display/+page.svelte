@@ -146,11 +146,11 @@
 					</div>
 				{/if}
 
-				<!-- Name -->
+				<!-- Name — font shrinks to fit; max 4.5rem (player) / 3.75rem (enemy) -->
 				<h1
 					class="mb-2 text-center font-black tracking-widest uppercase leading-none
-					       {current.type === 'player' ? 'text-blue-50 text-7xl' : 'text-red-50 text-6xl'}"
-					style="text-shadow: 0 0 40px {current.type === 'player' ? 'rgba(96,165,250,0.4)' : 'rgba(248,113,113,0.4)'};"
+					       {current.type === 'player' ? 'text-blue-50' : 'text-red-50'}"
+					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {current.type === 'player' ? '4.5rem' : '3.75rem'}); text-shadow: 0 0 40px {current.type === 'player' ? 'rgba(96,165,250,0.4)' : 'rgba(248,113,113,0.4)'};"
 				>
 					{current.name}
 				</h1>
@@ -225,14 +225,14 @@
 						{#each upNext as c, i}
 							{@const pct = hpPercent(c)}
 							{#if i === wrapIndex}
-								<div class="flex shrink-0 items-center gap-2">
+								<div class="hidden sm:flex shrink-0 items-center gap-2">
 									<div class="h-8 w-px bg-gray-700/60"></div>
 									<span class="whitespace-nowrap text-xs font-black tracking-[0.2em] text-amber-500/60 uppercase">Top of the Order</span>
 									<div class="h-8 w-px bg-gray-700/60"></div>
 								</div>
 							{/if}
 							<div
-								class="flex min-w-0 flex-1 items-center gap-3 rounded-lg border px-3 py-2.5
+								class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-2 sm:flex-row sm:gap-3 sm:px-3 sm:py-2.5
 								       {c.type === 'player' ? 'border-blue-900/60 bg-blue-950/30' : 'border-red-900/60 bg-red-950/30'}"
 							>
 								<!-- Avatar token (small) -->
@@ -250,28 +250,28 @@
 									</div>
 								{/if}
 
-								<div class="min-w-0 flex-1">
+								<div class="min-w-0 w-full sm:flex-1">
 									<!-- Name + type -->
-									<div class="flex items-center gap-1.5">
-										<span class="shrink-0 rounded px-1 py-0.5 text-xs font-bold {c.type === 'player' ? 'bg-blue-900/60 text-blue-400' : 'bg-red-900/60 text-red-400'}">
+									<div class="flex items-center justify-center gap-1.5 sm:justify-start">
+										<span class="hidden shrink-0 rounded px-1 py-0.5 text-xs font-bold sm:inline {c.type === 'player' ? 'bg-blue-900/60 text-blue-400' : 'bg-red-900/60 text-red-400'}">
 											{c.type === 'player' ? 'PC' : 'NPC'}
 										</span>
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
 										{#if c.initiative !== null}
-											<span class="ml-auto shrink-0 text-xs text-amber-500">{c.initiative}</span>
+											<span class="ml-auto hidden shrink-0 text-xs text-amber-500 sm:inline">{c.initiative}</span>
 										{/if}
 									</div>
 
 									<!-- Mini HP bar (players only) -->
 									{#if c.type === 'player'}
 										{@const thpPct = Math.min(((c.tempHp ?? 0) / c.maxHp) * 100, Math.max(0, 100 - pct))}
-										<div class="relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-800">
+										<div class="relative mt-1.5 hidden h-1.5 w-full overflow-hidden rounded-full bg-gray-800 sm:block">
 											<div class="absolute inset-y-0 left-0 {hpBarColor(pct)}" style="width: {pct}%;"></div>
 											{#if (c.tempHp ?? 0) > 0}
 												<div class="absolute inset-y-0 bg-yellow-400" style="left: {pct}%; width: {thpPct}%;"></div>
 											{/if}
 										</div>
-										<div class="mt-0.5 flex items-center gap-1.5 text-xs">
+										<div class="mt-0.5 hidden items-center gap-1.5 text-xs sm:flex">
 											<span class="{pct <= 0 ? 'text-gray-600' : pct <= 25 ? 'text-red-400' : pct <= 50 ? 'text-amber-400' : 'text-green-400'}">
 												{c.currentHp}/{c.maxHp} HP
 											</span>
