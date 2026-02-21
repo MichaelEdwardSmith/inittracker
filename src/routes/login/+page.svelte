@@ -2,9 +2,6 @@
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
-
-	let password = $state('');
-	let inputEl: HTMLInputElement;
 </script>
 
 <svelte:head>
@@ -31,12 +28,30 @@
 		<!-- Login card -->
 		<div class="rounded-xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl backdrop-blur">
 			<form method="POST">
-				<label for="password" class="mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase">
+				<label
+					for="email"
+					class="mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+				>
+					Email
+				</label>
+				<input
+					id="email"
+					name="email"
+					type="email"
+					autocomplete="email"
+					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
+					       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
+					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
+					placeholder="dungeon@master.com"
+				/>
+
+				<label
+					for="password"
+					class="mb-2 mt-4 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+				>
 					Password
 				</label>
 				<input
-					bind:this={inputEl}
-					bind:value={password}
 					id="password"
 					name="password"
 					type="password"
@@ -44,7 +59,7 @@
 					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
 					       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
 					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
-					placeholder="Enter DM password"
+					placeholder="••••••••"
 				/>
 
 				{#if form?.error}
@@ -61,8 +76,12 @@
 			</form>
 		</div>
 
-		<p class="mt-6 text-center text-xs text-gray-700">
-			Player display is at <span class="text-gray-500">/display</span>
+		<p class="mt-6 text-center text-xs text-gray-600">
+			New Dungeon Master?
+			<a href="/register" class="text-amber-500 transition hover:text-amber-400">Create an account</a>
+		</p>
+		<p class="mt-3 text-center text-xs text-gray-700">
+			Players join at <a href="/join" class="text-gray-500 transition hover:text-gray-400">/join</a>
 		</p>
 	</div>
 </div>

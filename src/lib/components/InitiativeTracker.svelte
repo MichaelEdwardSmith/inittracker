@@ -142,12 +142,19 @@
 							{#if isActive}
 								<span class="text-amber-400" title="Active turn">▶</span>
 							{/if}
-							<span
-								class="shrink-0 rounded px-1 py-0.5 text-xs font-bold
-								       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}"
-							>
-								{c.type === 'player' ? 'PC' : 'NPC'}
-							</span>
+							<!-- Player avatar (small) -->
+							{#if c.type === 'player' && c.avatarUrl}
+								<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
+									<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
+								</div>
+							{:else}
+								<span
+									class="shrink-0 rounded px-1 py-0.5 text-xs font-bold
+									       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}"
+								>
+									{c.type === 'player' ? 'PC' : 'NPC'}
+								</span>
+							{/if}
 							<span
 								class="truncate text-sm font-medium
 								       {isActive ? 'text-amber-100' : 'text-white'}"

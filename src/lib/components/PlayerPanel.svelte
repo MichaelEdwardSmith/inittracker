@@ -9,6 +9,10 @@
 	let editHp = $state(0);
 	let editName = $state('');
 
+	// Avatar upload state
+	let fileInput: HTMLInputElement;
+	let uploadingFor = $state<string | null>(null);
+
 	function addPlayer() {
 		if (!name.trim()) return;
 		combat.addPlayer(name.trim(), ac, hp);
@@ -29,7 +33,57 @@
 		combat.update(id, { name: editName.trim(), ac: editAc, maxHp: editHp, currentHp: editHp });
 		editingId = null;
 	}
+
+	// Crop and resize the selected image to a 256×256 JPEG data URL
+	function cropAvatar(file: File): Promise<string> {
+		return new Promise((resolve) => {
+			const img = new Image();
+			img.onload = () => {
+				const size = 256;
+				const canvas = document.createElement('canvas');
+				canvas.width = size;
+				canvas.height = size;
+				const ctx = canvas.getContext('2d')!;
+				const s = Math.min(img.naturalWidth, img.naturalHeight);
+				const sx = (img.naturalWidth - s) / 2;
+				const sy = (img.naturalHeight - s) / 2;
+				ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size);
+				URL.revokeObjectURL(img.src);
+				resolve(canvas.toDataURL('image/jpeg', 0.8));
+			};
+			img.src = URL.createObjectURL(file);
+		});
+	}
+
+	function openAvatarPicker(playerId: string) {
+		uploadingFor = playerId;
+		fileInput.value = '';
+		fileInput.click();
+	}
+
+	async function onFileSelected(e: Event) {
+		const id = uploadingFor;
+		uploadingFor = null;
+		if (!id) return;
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (!file) return;
+		const dataUrl = await cropAvatar(file);
+		combat.update(id, { avatarUrl: dataUrl });
+	}
+
+	function removeAvatar(id: string) {
+		combat.update(id, { avatarUrl: undefined });
+	}
 </script>
+
+<!-- Hidden file input (shared across all players) -->
+<input
+	bind:this={fileInput}
+	type="file"
+	accept="image/*"
+	class="hidden"
+	onchange={onFileSelected}
+/>
 
 <div class="flex h-full flex-col gap-3">
 	<h2 class="text-lg font-bold tracking-wide text-amber-400">Party</h2>
@@ -122,13 +176,48 @@
 					</div>
 				</div>
 			{:else}
-				<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2.5
-				           {player.inCombat === false ? 'opacity-60' : ''}">
+				<div
+					class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2.5
+				           {player.inCombat === false ? 'opacity-60' : ''}"
+				>
+					<!-- Avatar circle -->
+					<div class="group relative shrink-0">
+						<button
+							onclick={() => openAvatarPicker(player.id)}
+							title="Upload avatar"
+							class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-600 bg-gray-700 transition hover:border-blue-500"
+						>
+							{#if player.avatarUrl}
+								<img
+									src={player.avatarUrl}
+									alt={player.name}
+									class="h-full w-full object-cover"
+								/>
+							{:else}
+								<span class="text-base leading-none">🛡️</span>
+							{/if}
+						</button>
+						<!-- Remove button (shown on hover when avatar exists) -->
+						{#if player.avatarUrl}
+							<button
+								onclick={() => removeAvatar(player.id)}
+								title="Remove avatar"
+								class="absolute -right-1 -top-1 hidden h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-gray-400 ring-1 ring-gray-600 transition hover:text-red-400 group-hover:flex"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
+						{/if}
+					</div>
+
 					<div class="min-w-0 flex-1">
 						<div class="flex min-w-0 items-center gap-1.5">
 							<span class="truncate text-sm font-medium text-white">{player.name}</span>
 							{#if player.inCombat === false}
-								<span class="shrink-0 rounded bg-gray-700 px-1 py-0.5 text-xs text-gray-500">benched</span>
+								<span class="shrink-0 rounded bg-gray-700 px-1 py-0.5 text-xs text-gray-500"
+									>benched</span
+								>
 							{/if}
 						</div>
 						<div class="text-xs text-gray-400">AC {player.ac} &bull; {player.maxHp} HP</div>

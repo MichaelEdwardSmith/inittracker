@@ -1,23 +1,58 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, MONSTER_TYPES } from '$lib/enemies';
-	import type { EnemyTemplate } from '$lib/types';
+	import type { EnemyTemplate, CustomMonster } from '$lib/types';
 
+	// Extended display type — built-ins have no id/isCustom
+	type DisplayTemplate = EnemyTemplate & { id?: string; isCustom?: boolean };
+
+	// ── Encounter state ──────────────────────────────────────────────────────
 	let search = $state('');
 	let typeFilter = $state('All');
-	let selectedEnemy = $state<EnemyTemplate | null>(null);
+	let selectedEnemy = $state<DisplayTemplate | null>(null);
 	let quantity = $state(1);
 
+	// ── Custom monsters ──────────────────────────────────────────────────────
+	let customMonsters = $state<CustomMonster[]>([]);
+	let showModal = $state(false);
+
+	// Form state (shared between create & edit modes)
+	let formName = $state('');
+	let formAc = $state<number | ''>(10);
+	let formHp = $state<number | ''>(10);
+	let formCr = $state('1');
+	let formType = $state('Humanoid');
+	let editingId = $state<string | null>(null);
+	let formError = $state('');
+	let saving = $state(false);
+
+	// ── Derived lists ────────────────────────────────────────────────────────
+	const allTemplates = $derived<DisplayTemplate[]>([
+		...customMonsters.map((m) => ({ ...m, isCustom: true as const })),
+		...ENEMY_TEMPLATES.map((m) => ({ ...m, isCustom: false as const }))
+	]);
+
 	const filtered = $derived(
-		ENEMY_TEMPLATES.filter(
+		allTemplates.filter(
 			(e) =>
 				e.name.toLowerCase().includes(search.toLowerCase()) &&
 				(typeFilter === 'All' || e.monsterType === typeFilter)
 		)
 	);
 
-	function selectEnemy(e: EnemyTemplate) {
-		selectedEnemy = selectedEnemy?.name === e.name ? null : e;
+	// Monster types for the form select (no "All")
+	const formTypes = $derived(MONSTER_TYPES.filter((t) => t !== 'All'));
+
+	// ── Selection helpers ────────────────────────────────────────────────────
+	function isSameEnemy(a: DisplayTemplate | null, b: DisplayTemplate): boolean {
+		if (!a) return false;
+		if (a.id && b.id) return a.id === b.id;
+		// Both built-in — match by name only
+		return !a.id && !b.id && a.name === b.name;
+	}
+
+	function selectEnemy(e: DisplayTemplate) {
+		selectedEnemy = isSameEnemy(selectedEnemy, e) ? null : e;
 	}
 
 	function addToEncounter() {
@@ -26,19 +61,139 @@
 		quantity = 1;
 	}
 
-	function quickAddEnemy(e: EnemyTemplate) {
+	function quickAddEnemy(e: DisplayTemplate) {
 		selectedEnemy = e;
 		combat.addEnemies(e, 1);
 	}
 
-	const crOrder = ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 	function crLabel(cr: string) {
 		return `CR ${cr}`;
+	}
+
+	// ── Custom monster API ───────────────────────────────────────────────────
+	async function loadCustomMonsters() {
+		try {
+			const res = await fetch('/api/monsters');
+			if (res.ok) customMonsters = await res.json();
+		} catch {
+			// Silently ignore network errors
+		}
+	}
+
+	$effect(() => {
+		loadCustomMonsters();
+	});
+
+	function openCreate() {
+		resetForm();
+		showModal = true;
+	}
+
+	function openEdit(m: CustomMonster) {
+		editingId = m.id;
+		formName = m.name;
+		formAc = m.ac;
+		formHp = m.hp;
+		formCr = m.cr;
+		formType = m.monsterType;
+		formError = '';
+	}
+
+	async function saveMonster() {
+		formError = '';
+		if (!formName.trim()) {
+			formError = 'Name is required.';
+			return;
+		}
+		if (!formAc || Number(formAc) < 1) {
+			formError = 'AC must be at least 1.';
+			return;
+		}
+		if (!formHp || Number(formHp) < 1) {
+			formError = 'HP must be at least 1.';
+			return;
+		}
+
+		saving = true;
+		try {
+			const body = {
+				name: formName.trim(),
+				ac: Number(formAc),
+				hp: Number(formHp),
+				cr: formCr.trim() || '1',
+				monsterType: formType
+			};
+
+			let res: Response;
+			if (editingId) {
+				res = await fetch(`/api/monsters/${editingId}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body)
+				});
+			} else {
+				res = await fetch('/api/monsters', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body)
+				});
+			}
+
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				formError = data.error ?? 'Failed to save.';
+			} else {
+				await loadCustomMonsters();
+				resetForm();
+			}
+		} catch {
+			formError = 'Network error.';
+		} finally {
+			saving = false;
+		}
+	}
+
+	async function deleteMonster(id: string) {
+		try {
+			await fetch(`/api/monsters/${id}`, { method: 'DELETE' });
+			if (selectedEnemy?.id === id) selectedEnemy = null;
+			await loadCustomMonsters();
+		} catch {
+			// Silently ignore
+		}
+	}
+
+	function resetForm() {
+		editingId = null;
+		formName = '';
+		formAc = 10;
+		formHp = 10;
+		formCr = '1';
+		formType = 'Humanoid';
+		formError = '';
+	}
+
+	function closeModal() {
+		showModal = false;
+		resetForm();
 	}
 </script>
 
 <div class="flex h-full flex-col gap-3">
-	<h2 class="text-lg font-bold tracking-wide text-red-400">Enemies</h2>
+	<!-- Header row -->
+	<div class="flex items-center justify-between">
+		<h2 class="text-lg font-bold tracking-wide text-red-400">Enemies</h2>
+		<button
+			onclick={openCreate}
+			title="Manage custom monsters"
+			class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+			</svg>
+			Custom
+		</button>
+	</div>
 
 	<!-- Filters -->
 	<div class="flex flex-col gap-2">
@@ -59,17 +214,22 @@
 
 	<!-- Monster list -->
 	<div class="flex-1 overflow-y-auto rounded-lg border border-gray-700">
-		{#each filtered as enemy (enemy.name)}
+		{#each filtered as enemy (enemy.id ?? enemy.name)}
 			<button
 				onclick={() => selectEnemy(enemy)}
 				ondblclick={() => quickAddEnemy(enemy)}
 				class="flex w-full items-center gap-2 border-b border-gray-700 px-3 py-2 text-left transition last:border-b-0
-				       {selectedEnemy?.name === enemy.name
+				       {isSameEnemy(selectedEnemy, enemy)
 					? 'bg-red-900/40 text-white'
 					: 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white'}"
 			>
 				<div class="min-w-0 flex-1">
-					<div class="truncate text-sm font-medium">{enemy.name}</div>
+					<div class="flex items-center gap-1.5 truncate">
+						{#if enemy.isCustom}
+							<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
+						{/if}
+						<span class="truncate text-sm font-medium">{enemy.name}</span>
+					</div>
 					<div class="text-xs text-gray-500">
 						{enemy.monsterType} &bull; {crLabel(enemy.cr)}
 					</div>
@@ -89,7 +249,12 @@
 	<!-- Add to encounter -->
 	{#if selectedEnemy}
 		<div class="rounded-lg border border-red-700 bg-red-900/20 p-3">
-			<div class="mb-2 text-sm font-semibold text-red-300">{selectedEnemy.name}</div>
+			<div class="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-300">
+				{#if selectedEnemy.isCustom}
+					<span class="text-xs text-amber-400">✦</span>
+				{/if}
+				{selectedEnemy.name}
+			</div>
 			<div class="mb-3 flex items-center gap-2">
 				<span class="text-xs text-gray-400">Quantity</span>
 				<button
@@ -121,3 +286,175 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Custom Monster Management Modal -->
+{#if showModal}
+	<!-- Backdrop -->
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"
+		onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+	>
+		<div class="flex w-full max-w-lg flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: calc(100vh - 5rem);">
+
+			<!-- Modal header -->
+			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
+				<h3 class="font-black tracking-widest text-amber-400 uppercase">Custom Monsters</h3>
+				<button
+					onclick={closeModal}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="flex flex-col gap-5 overflow-y-auto p-5">
+
+				<!-- Create / Edit form -->
+				<div class="rounded-lg border border-gray-700 bg-gray-800/60 p-4">
+					<h4 class="mb-3 text-xs font-bold tracking-widest text-gray-400 uppercase">
+						{editingId ? 'Edit Monster' : 'New Monster'}
+					</h4>
+
+					<div class="flex flex-col gap-3">
+						<!-- Name -->
+						<div>
+							<label for="cm-name" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">Name</label>
+							<input
+								id="cm-name"
+								bind:value={formName}
+								type="text"
+								placeholder="e.g. Oathbreaker Knight"
+								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+							/>
+						</div>
+
+						<!-- AC / HP / CR row -->
+						<div class="flex gap-3">
+							<div class="flex-1">
+								<label for="cm-ac" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">AC</label>
+								<input
+									id="cm-ac"
+									bind:value={formAc}
+									type="number"
+									min="1"
+									max="99"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+								/>
+							</div>
+							<div class="flex-1">
+								<label for="cm-hp" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">HP</label>
+								<input
+									id="cm-hp"
+									bind:value={formHp}
+									type="number"
+									min="1"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+								/>
+							</div>
+							<div class="flex-1">
+								<label for="cm-cr" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">CR</label>
+								<input
+									id="cm-cr"
+									bind:value={formCr}
+									type="text"
+									placeholder="1/4"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+								/>
+							</div>
+						</div>
+
+						<!-- Monster Type -->
+						<div>
+							<label for="cm-type" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">Type</label>
+							<select
+								id="cm-type"
+								bind:value={formType}
+								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+							>
+								{#each formTypes as t}
+									<option value={t}>{t}</option>
+								{/each}
+							</select>
+						</div>
+
+						{#if formError}
+							<p class="text-xs text-red-400">{formError}</p>
+						{/if}
+
+						<div class="flex gap-2">
+							<button
+								onclick={saveMonster}
+								disabled={saving}
+								class="flex-1 rounded bg-amber-600 px-3 py-2 text-sm font-bold text-gray-950 transition hover:bg-amber-500 disabled:opacity-50"
+							>
+								{saving ? 'Saving…' : editingId ? 'Save Changes' : 'Create Monster'}
+							</button>
+							{#if editingId}
+								<button
+									onclick={resetForm}
+									class="rounded border border-gray-600 px-3 py-2 text-sm text-gray-400 transition hover:border-gray-500 hover:text-white"
+								>
+									Cancel Edit
+								</button>
+							{/if}
+						</div>
+					</div>
+				</div>
+
+				<!-- Existing custom monsters -->
+				{#if customMonsters.length > 0}
+					<div>
+						<h4 class="mb-2 text-xs font-bold tracking-widest text-gray-400 uppercase">
+							Your Custom Monsters
+						</h4>
+						<div class="flex flex-col gap-1">
+							{#each customMonsters as m (m.id)}
+								<div
+									class="flex items-center gap-3 rounded-lg border px-3 py-2.5
+									       {editingId === m.id ? 'border-amber-600/60 bg-amber-950/20' : 'border-gray-700 bg-gray-800/50'}"
+								>
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-1.5">
+											<span class="text-xs text-amber-400">✦</span>
+											<span class="truncate text-sm font-medium text-white">{m.name}</span>
+										</div>
+										<div class="text-xs text-gray-500">
+											{m.monsterType} &bull; {crLabel(m.cr)} &bull; AC {m.ac} &bull; {m.hp} HP
+										</div>
+									</div>
+									<div class="flex shrink-0 items-center gap-1">
+										<button
+											onclick={() => openEdit(m)}
+											title="Edit"
+											class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-amber-400"
+										>
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+											</svg>
+										</button>
+										<button
+											onclick={() => deleteMonster(m.id)}
+											title="Delete"
+											class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-red-400"
+										>
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{:else}
+					<p class="text-center text-sm text-gray-600">No custom monsters yet. Create one above.</p>
+				{/if}
+
+			</div>
+		</div>
+	</div>
+{/if}

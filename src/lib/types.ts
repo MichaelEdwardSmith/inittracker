@@ -14,6 +14,8 @@ export interface Combatant {
 	// False means the player is in the party roster but not in the current combat.
 	// Undefined / true means in combat (backwards-compatible with saved state).
 	inCombat?: boolean;
+	// Players only — base64 JPEG data URL set by the DM via avatar upload
+	avatarUrl?: string;
 }
 
 export interface StorageState {
@@ -28,4 +30,8 @@ export interface EnemyTemplate {
 	hp: number;
 	cr: string;
 	monsterType: string;
+}
+
+export interface CustomMonster extends EnemyTemplate {
+	id: string;
 }
