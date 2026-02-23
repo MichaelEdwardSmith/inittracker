@@ -9,6 +9,7 @@
 	// ── Encounter state ──────────────────────────────────────────────────────
 	let search = $state('');
 	let typeFilter = $state('All');
+	let sortBy = $state<'name' | 'type'>('name');
 	let selectedEnemy = $state<DisplayTemplate | null>(null);
 	let quantity = $state(1);
 
@@ -32,13 +33,26 @@
 		...ENEMY_TEMPLATES.map((m) => ({ ...m, isCustom: false as const }))
 	]);
 
-	const filtered = $derived(
-		allTemplates.filter(
-			(e) =>
-				e.name.toLowerCase().includes(search.toLowerCase()) &&
-				(typeFilter === 'All' || e.monsterType === typeFilter)
-		)
-	);
+	const filtered = $derived.by(() => {
+		const matches = (e: DisplayTemplate) =>
+			e.name.toLowerCase().includes(search.toLowerCase()) &&
+			(typeFilter === 'All' || e.monsterType === typeFilter);
+
+		const custom = allTemplates
+			.filter((e) => e.isCustom && matches(e))
+			.sort((a, b) => a.name.localeCompare(b.name));
+
+		const builtin = allTemplates.filter((e) => !e.isCustom && matches(e));
+		if (sortBy === 'type') {
+			builtin.sort((a, b) =>
+				a.monsterType.localeCompare(b.monsterType) || a.name.localeCompare(b.name)
+			);
+		} else {
+			builtin.sort((a, b) => a.name.localeCompare(b.name));
+		}
+
+		return [...custom, ...builtin];
+	});
 
 	// Monster types for the form select (no "All")
 	const formTypes = $derived(MONSTER_TYPES.filter((t) => t !== 'All'));
@@ -97,6 +111,11 @@
 		formCr = m.cr;
 		formType = m.monsterType;
 		formError = '';
+	}
+
+	function openEditFromList(m: CustomMonster) {
+		openEdit(m);
+		showModal = true;
 	}
 
 	async function saveMonster() {
@@ -182,7 +201,7 @@
 <div class="flex h-full flex-col gap-3">
 	<!-- Header row -->
 	<div class="flex items-center justify-between">
-		<h2 class="text-lg font-bold tracking-wide text-red-400">Enemies</h2>
+		<h2 class="text-lg font-bold tracking-wide text-red-400">Enemies / NPCs</h2>
 		<button
 			onclick={openCreate}
 			title="Manage custom monsters"
@@ -202,43 +221,67 @@
 			placeholder="Search monsters..."
 			class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-red-500 focus:outline-none"
 		/>
-		<select
-			bind:value={typeFilter}
-			class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
-		>
-			{#each MONSTER_TYPES as t}
-				<option value={t}>{t}</option>
-			{/each}
-		</select>
+		<div class="flex gap-2">
+			<select
+				bind:value={typeFilter}
+				class="flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
+			>
+				{#each MONSTER_TYPES as t}
+					<option value={t}>{t}</option>
+				{/each}
+			</select>
+			<select
+				bind:value={sortBy}
+				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
+			>
+				<option value="name">A–Z</option>
+				<option value="type">By Type</option>
+			</select>
+		</div>
 	</div>
 
 	<!-- Monster list -->
 	<div class="flex-1 overflow-y-auto rounded-lg border border-gray-700">
 		{#each filtered as enemy (enemy.id ?? enemy.name)}
-			<button
-				onclick={() => selectEnemy(enemy)}
-				ondblclick={() => quickAddEnemy(enemy)}
-				class="flex w-full items-center gap-2 border-b border-gray-700 px-3 py-2 text-left transition last:border-b-0
+			<div
+				class="flex items-center border-b border-gray-700 last:border-b-0
 				       {isSameEnemy(selectedEnemy, enemy)
 					? 'bg-red-900/40 text-white'
-					: 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white'}"
+					: 'bg-gray-800 text-gray-300'}"
 			>
-				<div class="min-w-0 flex-1">
-					<div class="flex items-center gap-1.5 truncate">
-						{#if enemy.isCustom}
-							<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
-						{/if}
-						<span class="truncate text-sm font-medium">{enemy.name}</span>
+				<button
+					onclick={() => selectEnemy(enemy)}
+					ondblclick={() => quickAddEnemy(enemy)}
+					class="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left transition hover:brightness-125"
+				>
+					<div class="min-w-0 flex-1">
+						<div class="flex items-center gap-1.5 truncate">
+							{#if enemy.isCustom}
+								<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
+							{/if}
+							<span class="truncate text-sm font-medium">{enemy.name}</span>
+						</div>
+						<div class="text-xs text-gray-500">
+							{enemy.monsterType} &bull; {crLabel(enemy.cr)}
+						</div>
 					</div>
-					<div class="text-xs text-gray-500">
-						{enemy.monsterType} &bull; {crLabel(enemy.cr)}
+					<div class="shrink-0 text-right text-xs text-gray-400">
+						<div>AC {enemy.ac}</div>
+						<div>{enemy.hp} HP</div>
 					</div>
-				</div>
-				<div class="shrink-0 text-right text-xs text-gray-400">
-					<div>AC {enemy.ac}</div>
-					<div>{enemy.hp} HP</div>
-				</div>
-			</button>
+				</button>
+				{#if enemy.isCustom && enemy.id}
+					<button
+						onclick={() => openEditFromList({ id: enemy.id!, name: enemy.name, ac: enemy.ac, hp: enemy.hp, cr: enemy.cr, monsterType: enemy.monsterType })}
+						title="Edit {enemy.name}"
+						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-amber-400"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+						</svg>
+					</button>
+				{/if}
+			</div>
 		{/each}
 
 		{#if filtered.length === 0}

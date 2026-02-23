@@ -4,7 +4,8 @@
       "WebSearch",
       "WebFetch(domain:docs.ionos.space)",
       "WebFetch(domain:www.ionos.com)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(python3:*)"
     ]
   }
 }

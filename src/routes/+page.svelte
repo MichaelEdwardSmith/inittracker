@@ -7,6 +7,7 @@
 	let { data } = $props();
 
 	let copied = $state(false);
+	let openPanel = $state<'players' | 'enemies' | null>(null);
 
 	function copySessionId() {
 		navigator.clipboard.writeText(data.sessionId).then(() => {
@@ -26,10 +27,9 @@
 	<!-- App header -->
 	<header class="flex shrink-0 items-center border-b border-gray-800 bg-gray-900 px-6 py-3">
 		<span class="text-xl">⚔️</span>
-		<h1 class="ml-3 text-xl font-bold tracking-widest text-amber-400 uppercase">
+		<h1 class="ml-3 hidden text-xl font-bold tracking-widest text-amber-400 uppercase md:block">
 			Initiative Tracker
 		</h1>
-		<span class="ml-2 text-xs text-gray-600">D&amp;D 5e</span>
 
 		<!-- Session ID display -->
 		<div class="ml-6 flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5">
@@ -58,7 +58,7 @@
 				target="_blank"
 				rel="noopener"
 				title="Open Player Display"
-				class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				class="hidden md:flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -74,7 +74,6 @@
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
 					</svg>
-					Log out
 				</button>
 			</form>
 		</div>
@@ -82,8 +81,8 @@
 
 	<!-- Main layout -->
 	<div class="flex min-h-0 flex-1">
-		<!-- Left sidebar: Players -->
-		<aside class="flex w-64 shrink-0 flex-col border-r border-gray-800 bg-gray-900/50 p-4">
+		<!-- Left sidebar: Players (desktop only) -->
+		<aside class="hidden md:flex w-64 shrink-0 flex-col border-r border-gray-800 bg-gray-900/50 p-4">
 			<PlayerPanel />
 		</aside>
 
@@ -92,9 +91,68 @@
 			<InitiativeTracker />
 		</main>
 
-		<!-- Right sidebar: Enemies -->
-		<aside class="flex w-72 shrink-0 flex-col border-l border-gray-800 bg-gray-900/50 p-4">
+		<!-- Right sidebar: Enemies (desktop only) -->
+		<aside class="hidden md:flex w-72 shrink-0 flex-col border-l border-gray-800 bg-gray-900/50 p-4">
 			<EnemyPanel />
 		</aside>
 	</div>
+
+	<!-- Mobile bottom action bar -->
+	<div class="flex shrink-0 items-center justify-around border-t border-gray-800 bg-gray-900 py-2 md:hidden">
+		<button
+			onclick={() => (openPanel = openPanel === 'players' ? null : 'players')}
+			class="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold transition
+			       {openPanel === 'players'
+				? 'bg-amber-600/20 text-amber-300'
+				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+		>
+			<span>🛡️</span>
+			Party
+		</button>
+		<button
+			onclick={() => (openPanel = openPanel === 'enemies' ? null : 'enemies')}
+			class="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold transition
+			       {openPanel === 'enemies'
+				? 'bg-red-600/20 text-red-300'
+				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+		>
+			<span>💀</span>
+			Enemies
+		</button>
+	</div>
 </div>
+
+<!-- Mobile panel overlay -->
+{#if openPanel !== null}
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-40 bg-black/60 md:hidden"
+		onclick={() => (openPanel = null)}
+	></div>
+	<div
+		class="fixed inset-y-0 z-50 flex w-72 flex-col border-gray-800 bg-gray-900 p-4 md:hidden
+		       {openPanel === 'players' ? 'left-0 border-r' : 'right-0 border-l'}"
+	>
+		<div class="mb-3 flex shrink-0 items-center justify-between">
+			<span class="text-sm font-bold tracking-widest text-gray-400 uppercase">
+				{openPanel === 'players' ? 'Party' : 'Enemies'}
+			</span>
+			<button
+				onclick={() => (openPanel = null)}
+				class="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-white"
+				aria-label="Close panel"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+		<div class="min-h-0 flex-1 overflow-y-auto">
+			{#if openPanel === 'players'}
+				<PlayerPanel />
+			{:else}
+				<EnemyPanel />
+			{/if}
+		</div>
+	</div>
+{/if}

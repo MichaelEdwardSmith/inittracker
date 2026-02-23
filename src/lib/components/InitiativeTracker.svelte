@@ -97,14 +97,14 @@
 			</p>
 		</div>
 	{:else}
-		<!-- Column headers -->
+		<!-- Column headers (desktop only) -->
 		<div
-			class="grid items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+			class="hidden md:grid items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
 			style="grid-template-columns: 3.5rem 1fr 3rem 10rem 1fr auto"
 		>
 			<div>Init</div>
 			<div>Name</div>
-			<div class="text-center">AC</div>
+			<div class="text-center">AC/Show</div>
 			<div class="text-center">Hit Points</div>
 			<div>Conditions</div>
 			<div></div>
@@ -117,7 +117,7 @@
 				{@const isActive = c.id === combat.currentTurnId}
 				{@const pct = hpPercent(c)}
 				<div
-					class="grid items-center gap-2 rounded-lg border px-3 py-2 transition-all
+					class="flex flex-col gap-2 rounded-lg border px-3 py-2 transition-all md:grid md:items-center md:gap-2
 					       {isActive
 						? 'border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
 						: isDead
@@ -127,6 +127,26 @@
 								: 'border-red-900/50 bg-gray-800'}"
 					style="grid-template-columns: 3.5rem 1fr 3rem 10rem 1fr auto"
 				>
+					<!-- Mobile name header -->
+					<div class="flex items-center gap-1.5 border-b border-gray-700/50 pb-1.5 md:hidden">
+						{#if isActive}
+							<span class="text-amber-400" title="Active turn">▶</span>
+						{/if}
+						{#if c.type === 'player' && c.avatarUrl}
+							<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
+								<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
+							</div>
+						{:else}
+							<span class="shrink-0 rounded px-1 py-0.5 text-xs font-bold
+							       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}">
+								{c.type === 'player' ? 'PC' : 'NPC'}
+							</span>
+						{/if}
+						<span class="truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-white'}">
+							{c.name}
+						</span>
+					</div>
+
 					<!-- Initiative -->
 					<input
 						type="number"
@@ -137,7 +157,7 @@
 					/>
 
 					<!-- Name + type badge + active indicator -->
-					<div class="min-w-0">
+					<div class="hidden md:block min-w-0">
 						<div class="flex items-center gap-1.5">
 							{#if isActive}
 								<span class="text-amber-400" title="Active turn">▶</span>
@@ -165,7 +185,19 @@
 					</div>
 
 					<!-- AC -->
-					<div class="text-center text-sm font-semibold text-gray-200">{c.ac}</div>
+					<div class="flex items-center justify-end gap-1 pr-3">
+
+						{#if c.type === 'enemy'}
+							<input
+								type="checkbox"
+								checked={c.showAc === true}
+								title="Show AC to players"
+								onchange={(e) => combat.update(c.id, { showAc: e.currentTarget.checked })}
+								class="h-3 w-3 cursor-pointer accent-amber-500"
+							/>
+						{/if}
+						<span class="text-xl font-semibold text-gray-200">{c.ac}</span>
+					</div>
 
 					<!-- HP bar + controls -->
 					<div class="flex flex-col gap-1">

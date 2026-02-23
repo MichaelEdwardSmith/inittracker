@@ -11,6 +11,8 @@ export interface Combatant {
 	// Enemies only — set from the template so display can look up the avatar
 	templateName?: string;
 	monsterType?: string;
+	// Enemies only — whether the AC is visible on the player display (default true)
+	showAc?: boolean;
 	// False means the player is in the party roster but not in the current combat.
 	// Undefined / true means in combat (backwards-compatible with saved state).
 	inCombat?: boolean;
