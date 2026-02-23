@@ -1,7 +1,16 @@
 <script lang="ts">
 	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
 
 	let { form }: { form: ActionData } = $props();
+
+	async function sha256(text: string): Promise<string> {
+		const data = new TextEncoder().encode(text);
+		const hash = await crypto.subtle.digest('SHA-256', data);
+		return Array.from(new Uint8Array(hash))
+			.map((b) => b.toString(16).padStart(2, '0'))
+			.join('');
+	}
 </script>
 
 <svelte:head>
@@ -27,7 +36,13 @@
 
 		<!-- Login card -->
 		<div class="rounded-xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl backdrop-blur">
-			<form method="POST">
+			<form
+			method="POST"
+			use:enhance={async ({ formData }) => {
+				const pw = formData.get('password') as string;
+				if (pw) formData.set('password', await sha256(pw));
+			}}
+		>
 				<label
 					for="email"
 					class="mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
