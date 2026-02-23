@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import type { StorageState } from '$lib/types';
 import { saveCombatState, getCombatState } from '$lib/server/dmModel';
+import { isValidSessionId, validateStorageState } from '$lib/server/validate';
 
 // ---------------------------------------------------------------------------
 // Per-session in-memory state cache and SSE client registry.
@@ -39,7 +40,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const sessionId = cookies.get('dm_auth');
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
-	const state = (await request.json()) as StorageState;
+	const raw = await request.json().catch(() => null);
+	const state = validateStorageState(raw);
+	if (!state) return new Response('Invalid state payload', { status: 400 });
+
 	sessionStates.set(sessionId, state);
 	broadcastToSession(sessionId, state);
 
@@ -75,6 +79,9 @@ export const GET: RequestHandler = async ({ request, url, cookies }) => {
 	const sessionId = url.searchParams.get('session');
 	if (!sessionId) {
 		return new Response('Missing ?session= parameter', { status: 400 });
+	}
+	if (!isValidSessionId(sessionId)) {
+		return new Response('Invalid session ID', { status: 400 });
 	}
 
 	// Pre-load state from cache or DB so the viewer gets immediate data on connect
