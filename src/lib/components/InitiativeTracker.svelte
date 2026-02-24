@@ -7,6 +7,13 @@
 	let openStatusId = $state<string | null>(null);
 	let damageInputs = $state<Record<string, string>>({});
 	let tempHpInputs = $state<Record<string, string>>({});
+	let chronicleSaved = $state(false);
+
+	function handleSaveToChronicle() {
+		combat.saveToChronicle();
+		chronicleSaved = true;
+		setTimeout(() => (chronicleSaved = false), 2000);
+	}
 
 	function handleInitiativeInput(id: string, raw: string) {
 		const val = parseInt(raw);
@@ -75,6 +82,23 @@
 
 			<!-- Utility buttons -->
 			<div class="h-4 w-px bg-gray-700"></div>
+			{#if combat.hasCombatHistory}
+				<button
+					onclick={handleSaveToChronicle}
+					title="Save a snapshot of this combat to Chronicles"
+					class="flex items-center gap-1 rounded border px-2 py-1 text-xs font-semibold transition
+					       {chronicleSaved
+						? 'border-green-700 bg-green-900/40 text-green-300'
+						: 'border-amber-800/60 bg-amber-900/20 text-amber-500 hover:border-amber-600 hover:bg-amber-900/40 hover:text-amber-300'}"
+				>
+					{#if chronicleSaved}
+						✓ Saved
+					{:else}
+						📜 Save
+					{/if}
+				</button>
+				<div class="h-4 w-px bg-gray-700"></div>
+			{/if}
 			<button
 				onclick={() => combat.resetInitiatives()}
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"

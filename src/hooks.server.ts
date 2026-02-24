@@ -7,8 +7,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.sessionId = sessionId;
 	event.locals.dmFirstName = null;
 
-	// Protect the DM dashboard. /display/*, /login, /register, /join, /api/state are open.
-	if (event.url.pathname === '/') {
+	// Protect DM-only pages. /display/*, /login, /register, /join, /api/* are open.
+	const { pathname } = event.url;
+	if (pathname === '/' || pathname === '/history') {
 		if (!sessionId) redirect(303, '/login');
 		const dm = await getDMBySessionId(sessionId);
 		if (!dm) {

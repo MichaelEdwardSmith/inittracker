@@ -8,6 +8,225 @@
 	let combatState: StorageState = $state({ combatants: [], currentTurnId: null, round: 1 });
 	let connected = $state(false);
 
+	// ── Flash overlay ──────────────────────────────────────────────────
+	let flashColor = $state<string | null>(null);
+	let flashKey = $state(0);
+	let flashTimer: ReturnType<typeof setTimeout> | null = null;
+
+	// CSS colors for each condition flash (brighter than the badge bg so they read on a dark screen)
+	const conditionFlashColors: Record<string, string> = {
+		Blinded:        'rgba(107, 114, 128, 1)', // gray-500
+		Charmed:        'rgba(219,  39, 119, 1)', // pink-600
+		Concentrating:  'rgba(  8, 145, 178, 1)', // cyan-600
+		Deafened:       'rgba(202, 138,   4, 1)', // yellow-600
+		Dead:           'rgba( 75,  85,  99, 1)', // gray-600
+		Exhausted:      'rgba(194,  65,  12, 1)', // orange-700
+		Frightened:     'rgba(147,  51, 234, 1)', // purple-600
+		Grappled:       'rgba(234,  88,  12, 1)', // orange-600
+		Incapacitated:  'rgba(220,  38,  38, 1)', // red-600
+		Invisible:      'rgba( 37,  99, 235, 1)', // blue-600
+		Paralyzed:      'rgba(185,  28,  28, 1)', // red-700
+		Petrified:      'rgba(120, 113, 108, 1)', // stone-500
+		Poisoned:       'rgba( 22, 163,  74, 1)', // green-500
+		Prone:          'rgba(161,  98,   7, 1)', // yellow-700
+		Restrained:     'rgba(217, 119,   6, 1)', // amber-600
+		Stunned:        'rgba(234, 179,   8, 1)', // yellow-500
+		Unconscious:    'rgba( 75,  85,  99, 1)', // gray-600
+	};
+
+	// ── Audio ──────────────────────────────────────────────────────────
+	let joined = $state(false);
+	let audioEnabled = $state(true);
+	let audioCtx: AudioContext | null = null;
+
+	function joinSession() {
+		audioCtx = new AudioContext();
+		if (audioCtx.state === 'suspended') audioCtx.resume();
+		joined = true;
+	}
+
+	function toggleAudio() {
+		audioEnabled = !audioEnabled;
+	}
+
+	function playDamageSound(ctx: AudioContext) {
+		const t = ctx.currentTime;
+		// Low-pitched thud sweep
+		const osc = ctx.createOscillator();
+		const oscGain = ctx.createGain();
+		osc.type = 'sawtooth';
+		osc.frequency.setValueAtTime(130, t);
+		osc.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+		oscGain.gain.setValueAtTime(0.65, t);
+		oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+		osc.connect(oscGain);
+		oscGain.connect(ctx.destination);
+		osc.start(t);
+		osc.stop(t + 0.28);
+		// Short noise burst (impact transient)
+		const bufLen = Math.floor(ctx.sampleRate * 0.07);
+		const noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+		const nd = noiseBuf.getChannelData(0);
+		for (let i = 0; i < bufLen; i++) nd[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
+		const noise = ctx.createBufferSource();
+		noise.buffer = noiseBuf;
+		const nf = ctx.createBiquadFilter();
+		nf.type = 'bandpass';
+		nf.frequency.value = 1100;
+		nf.Q.value = 0.6;
+		const ng = ctx.createGain();
+		ng.gain.setValueAtTime(0.35, t);
+		ng.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+		noise.connect(nf);
+		nf.connect(ng);
+		ng.connect(ctx.destination);
+		noise.start(t);
+	}
+
+	function playHealSound(ctx: AudioContext) {
+		// Ascending magical chime (C-E-G-C)
+		[523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+			const t = ctx.currentTime + i * 0.13;
+			const osc = ctx.createOscillator();
+			const gain = ctx.createGain();
+			osc.type = 'sine';
+			osc.frequency.value = freq;
+			gain.gain.setValueAtTime(0, t);
+			gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
+			gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start(t);
+			osc.stop(t + 0.45);
+		});
+	}
+
+	function playConditionSound(ctx: AudioContext) {
+		// Single resonant bell tone — neutral, mystical
+		const t = ctx.currentTime;
+		const osc = ctx.createOscillator();
+		const gain = ctx.createGain();
+		osc.type = 'triangle';
+		osc.frequency.value = 528;
+		gain.gain.setValueAtTime(0, t);
+		gain.gain.linearRampToValueAtTime(0.2, t + 0.02);
+		gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+		osc.connect(gain);
+		gain.connect(ctx.destination);
+		osc.start(t);
+		osc.stop(t + 0.7);
+	}
+
+	function playBattleStartSound(ctx: AudioContext) {
+		// Urgent war-horn call: D4 → A4 → D5 → A5 (faster, tense, minor feel)
+		const notes = [
+			{ freq: 293.66, start: 0.00, dur: 0.09 },
+			{ freq: 440.00, start: 0.10, dur: 0.09 },
+			{ freq: 587.33, start: 0.20, dur: 0.09 },
+			{ freq: 880.00, start: 0.30, dur: 0.55 }
+		];
+		notes.forEach(({ freq, start, dur }) => {
+			const t = ctx.currentTime + start;
+			const osc = ctx.createOscillator();
+			const filter = ctx.createBiquadFilter();
+			const gain = ctx.createGain();
+			osc.type = 'square';
+			osc.frequency.value = freq;
+			filter.type = 'lowpass';
+			filter.frequency.value = 900;
+			filter.Q.value = 1.2;
+			gain.gain.setValueAtTime(0, t);
+			gain.gain.linearRampToValueAtTime(0.28, t + 0.015);
+			gain.gain.setValueAtTime(0.28, t + dur - 0.02);
+			gain.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.07);
+			osc.connect(filter);
+			filter.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start(t);
+			osc.stop(t + dur + 0.08);
+		});
+		// Kick-drum thud at the downbeat
+		const bufLen = Math.floor(ctx.sampleRate * 0.18);
+		const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+		const bd = buf.getChannelData(0);
+		for (let i = 0; i < bufLen; i++) bd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
+		const drum = ctx.createBufferSource();
+		drum.buffer = buf;
+		const df = ctx.createBiquadFilter();
+		df.type = 'lowpass';
+		df.frequency.value = 180;
+		const dg = ctx.createGain();
+		dg.gain.setValueAtTime(0.8, ctx.currentTime);
+		dg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+		drum.connect(df);
+		df.connect(dg);
+		dg.connect(ctx.destination);
+		drum.start(ctx.currentTime);
+	}
+
+	function playFanfareSound(ctx: AudioContext) {
+		// Triumphant brass fanfare: G4 → C5 → E5 → G5 (held)
+		const notes = [
+			{ freq: 392.00, start: 0.00, dur: 0.13 },
+			{ freq: 523.25, start: 0.16, dur: 0.13 },
+			{ freq: 659.25, start: 0.32, dur: 0.13 },
+			{ freq: 783.99, start: 0.48, dur: 0.70 }
+		];
+		notes.forEach(({ freq, start, dur }) => {
+			const t = ctx.currentTime + start;
+			const osc = ctx.createOscillator();
+			const filter = ctx.createBiquadFilter();
+			const gain = ctx.createGain();
+			osc.type = 'sawtooth';
+			osc.frequency.value = freq;
+			filter.type = 'lowpass';
+			filter.frequency.value = 1400;
+			filter.Q.value = 0.8;
+			gain.gain.setValueAtTime(0, t);
+			gain.gain.linearRampToValueAtTime(0.38, t + 0.025);
+			gain.gain.setValueAtTime(0.38, t + dur - 0.03);
+			gain.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.08);
+			osc.connect(filter);
+			filter.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start(t);
+			osc.stop(t + dur + 0.1);
+		});
+	}
+
+	function playTempHpSound(ctx: AudioContext) {
+		// Bright shield-shimmer: C6 + G6 (a fifth apart), quick attack, short decay
+		[1046.5, 1567.98].forEach((freq, i) => {
+			const t = ctx.currentTime + i * 0.05;
+			const osc = ctx.createOscillator();
+			const gain = ctx.createGain();
+			osc.type = 'sine';
+			osc.frequency.value = freq;
+			gain.gain.setValueAtTime(0, t);
+			gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
+			gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start(t);
+			osc.stop(t + 0.45);
+		});
+	}
+
+	function triggerEffect(soundType: 'damage' | 'heal' | 'condition', color: string) {
+		if (flashTimer) clearTimeout(flashTimer);
+		flashColor = color;
+		flashKey++;
+		flashTimer = setTimeout(() => { flashColor = null; }, 750);
+		if (audioEnabled && audioCtx) {
+			if (soundType === 'damage') playDamageSound(audioCtx);
+			else if (soundType === 'heal') playHealSound(audioCtx);
+			else playConditionSound(audioCtx);
+		}
+	}
+
+	// Prevents fanfares from firing when the viewer first loads into an already-active combat
+	let firstMessageReceived = false;
+
 	$effect(() => {
 		const source = new EventSource(`/api/state?session=${data.sessionId}`);
 
@@ -17,7 +236,48 @@
 
 		source.onmessage = (e) => {
 			try {
-				combatState = JSON.parse(e.data) as StorageState;
+				const newState = JSON.parse(e.data) as StorageState;
+
+				if (firstMessageReceived) {
+					// Combat begins (null → active)
+					if (combatState.currentTurnId === null && newState.currentTurnId !== null) {
+						if (audioEnabled && audioCtx) playBattleStartSound(audioCtx);
+					}
+					// Combat ends (active → null)
+					if (combatState.currentTurnId !== null && newState.currentTurnId === null) {
+						if (audioEnabled && audioCtx) playFanfareSound(audioCtx);
+					}
+				}
+				firstMessageReceived = true;
+
+				// Detect changes — skip on the very first message (empty initial state)
+				if (combatState.combatants.length > 0) {
+					let hadDamage = false;
+					let hadHeal = false;
+					let hadTempHp = false;
+					let addedCondition: string | null = null;
+					for (const nc of newState.combatants) {
+						const oc = combatState.combatants.find((c) => c.id === nc.id);
+						if (!oc) continue;
+						const oldEff = oc.currentHp + (oc.tempHp ?? 0);
+						const newEff = nc.currentHp + (nc.tempHp ?? 0);
+						if (newEff < oldEff) hadDamage = true;
+						else if (nc.currentHp > oc.currentHp) hadHeal = true;
+						if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
+						if (!addedCondition) {
+							addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
+						}
+					}
+					if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)');
+					else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)');
+					else if (hadTempHp) { if (audioEnabled && audioCtx) playTempHpSound(audioCtx); }
+					else if (addedCondition) {
+						const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
+						triggerEffect('condition', color);
+					}
+				}
+
+				combatState = newState;
 			} catch {
 				// Malformed message — ignore.
 			}
@@ -38,7 +298,8 @@
 	const upNext = $derived.by<Combatant[]>(() => {
 		if (currentIndex < 0 || sorted.length <= 1) return [];
 		const count = Math.min(4, sorted.length - 1);
-		return Array.from({ length: count }, (_, i) => sorted[(currentIndex + i + 1) % sorted.length]);
+		return Array.from({ length: count }, (_, i) => sorted[(currentIndex + i + 1) % sorted.length])
+			.filter((c) => !(c.type === 'enemy' && c.currentHp <= 0));
 	});
 
 	const wrapIndex = $derived.by<number | null>(() => {
@@ -68,6 +329,38 @@
 </svelte:head>
 
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white">
+	<!-- Join Session gate — satisfies browser autoplay policy -->
+	{#if !joined}
+		<div class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm">
+			<div class="flex flex-col items-center gap-8 px-8 text-center">
+				<div class="text-7xl opacity-60">⚔️</div>
+				<div>
+					<p class="text-3xl font-black tracking-[0.25em] text-amber-400 uppercase">Battle Awaits</p>
+					<p class="mt-3 text-sm tracking-widest text-gray-500 uppercase">Tap to join this session with live audio</p>
+				</div>
+				<button
+					onclick={joinSession}
+					class="rounded-lg border border-amber-600/60 bg-amber-950/60 px-10 py-4 text-base font-bold tracking-widest text-amber-300 uppercase transition hover:border-amber-500 hover:bg-amber-900/60 hover:text-amber-200 active:scale-95"
+				>
+					Join Session
+				</button>
+				<button
+					onclick={() => { joined = true; audioEnabled = false; }}
+					class="text-xs tracking-widest text-gray-700 uppercase underline-offset-2 hover:text-gray-500 hover:underline"
+				>
+					Continue without sound
+				</button>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Full-screen flash overlay -->
+	{#key flashKey}
+		{#if flashColor}
+			<div class="pointer-events-none fixed inset-0 z-50 flash-overlay" style="background: {flashColor};"></div>
+		{/if}
+	{/key}
+
 	<!-- Atmospheric background glow -->
 	{#if current}
 		<div
@@ -95,6 +388,17 @@
 				></span>
 				{connected ? 'Live' : 'Connecting…'}
 			</span>
+			{#if joined}
+				<button
+					onclick={toggleAudio}
+					title={audioEnabled ? 'Mute sounds' : 'Unmute sounds'}
+					class="rounded px-2 py-0.5 text-xs transition {audioEnabled
+						? 'text-amber-400 hover:text-amber-300'
+						: 'text-gray-600 hover:text-gray-400'}"
+				>
+					{audioEnabled ? '🔊' : '🔇'}
+				</button>
+			{/if}
 		</div>
 		{#if combatState.currentTurnId}
 			<div class="flex items-center gap-2">
@@ -396,3 +700,13 @@
 		{/if}
 	{/if}
 </div>
+
+<style>
+	@keyframes flash-effect {
+		0%   { opacity: 0.5; }
+		100% { opacity: 0; }
+	}
+	.flash-overlay {
+		animation: flash-effect 0.75s ease-out forwards;
+	}
+</style>
