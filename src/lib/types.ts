@@ -37,3 +37,43 @@ export interface EnemyTemplate {
 export interface CustomMonster extends EnemyTemplate {
 	id: string;
 }
+
+export interface CombatEvent {
+	type: 'damage' | 'heal' | 'down' | 'condition_add' | 'condition_remove' | 'round_advance';
+	round: number;
+	// Who performed the action (the combatant whose turn it was)
+	actorId?: string;
+	actorName?: string;
+	actorType?: 'player' | 'enemy';
+	// Who was affected
+	combatantId: string;
+	combatantName: string;
+	combatantType: 'player' | 'enemy';
+	value?: number;
+	condition?: string;
+	hpBefore?: number;
+	hpAfter?: number;
+	// Set on damage events when the hit dropped the target to 0 HP
+	causedDown?: boolean;
+}
+
+export interface CombatantSummary {
+	id: string;
+	name: string;
+	type: 'player' | 'enemy';
+	maxHp: number;
+	startHp: number;
+	finalHp: number;
+	totalDamage: number;
+	totalHealing: number;
+	wasSlain: boolean;
+}
+
+export interface CombatRecord {
+	id: string;
+	startedAt: string;
+	endedAt: string;
+	rounds: number;
+	participants: CombatantSummary[];
+	events: CombatEvent[];
+}

@@ -1,6 +1,7 @@
+import bcrypt from 'bcryptjs';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
-import type { StorageState, CustomMonster } from '$lib/types';
+import type { StorageState, CustomMonster, CombatRecord } from '$lib/types';
 
 export interface DM {
 	firstName: string;
@@ -10,6 +11,7 @@ export interface DM {
 	sessionId: string;
 	combatState: StorageState;
 	customMonsters: CustomMonster[];
+	combatHistory: CombatRecord[];
 	createdAt: Date;
 }
 
@@ -48,14 +50,17 @@ export async function createDM(
 		sessionId = randomSessionId();
 	} while (await c.findOne({ sessionId }));
 
+	const passwordHash = await bcrypt.hash(password, 12);
+
 	await c.insertOne({
 		firstName,
 		lastName,
 		email,
-		passwordHash: password,
+		passwordHash,
 		sessionId,
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		customMonsters: [],
+		combatHistory: [],
 		createdAt: new Date()
 	});
 
@@ -69,7 +74,7 @@ export async function loginDM(
 	const c = await col();
 	const dm = await c.findOne({ email });
 	if (!dm) return null;
-	const valid = password === dm.passwordHash;
+	const valid = await bcrypt.compare(password, dm.passwordHash);
 	return valid ? (dm as unknown as WithId<Document> & DM) : null;
 }
 
@@ -128,4 +133,28 @@ export async function updateCustomMonster(
 export async function deleteCustomMonster(sessionId: string, id: string): Promise<void> {
 	const c = await col();
 	await c.updateOne({ sessionId }, { $pull: { customMonsters: { id } } as never });
+}
+
+export async function saveCombatRecord(sessionId: string, record: CombatRecord): Promise<void> {
+	const c = await col();
+	await c.updateOne(
+		{ sessionId },
+		{ $push: { combatHistory: { $each: [record], $slice: -100 } } as never }
+	);
+}
+
+export async function getCombatHistory(sessionId: string): Promise<CombatRecord[]> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId });
+	return (dm?.combatHistory as CombatRecord[]) ?? [];
+}
+
+export async function deleteCombatRecord(sessionId: string, recordId: string): Promise<void> {
+	const c = await col();
+	await c.updateOne({ sessionId }, { $pull: { combatHistory: { id: recordId } } } as never);
+}
+
+export async function clearCombatHistory(sessionId: string): Promise<void> {
+	const c = await col();
+	await c.updateOne({ sessionId }, { $set: { combatHistory: [] } });
 }
