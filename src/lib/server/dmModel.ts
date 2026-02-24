@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
 import type { StorageState, CustomMonster } from '$lib/types';
@@ -48,11 +49,13 @@ export async function createDM(
 		sessionId = randomSessionId();
 	} while (await c.findOne({ sessionId }));
 
+	const passwordHash = await bcrypt.hash(password, 12);
+
 	await c.insertOne({
 		firstName,
 		lastName,
 		email,
-		passwordHash: password,
+		passwordHash,
 		sessionId,
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		customMonsters: [],
@@ -69,7 +72,7 @@ export async function loginDM(
 	const c = await col();
 	const dm = await c.findOne({ email });
 	if (!dm) return null;
-	const valid = password === dm.passwordHash;
+	const valid = await bcrypt.compare(password, dm.passwordHash);
 	return valid ? (dm as unknown as WithId<Document> & DM) : null;
 }
 
