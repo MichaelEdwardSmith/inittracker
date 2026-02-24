@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { getDMBySessionId } from '$lib/server/dmModel';
+import { getDMByGameSessionId } from '$lib/server/dmModel';
 import { isValidSessionId } from '$lib/server/validate';
 
 export const actions: Actions = {
@@ -17,7 +17,7 @@ export const actions: Actions = {
 			return fail(404, { error: 'Session not found. Double-check your session ID.' });
 		}
 
-		const dm = await getDMBySessionId(sessionId);
+		const dm = await getDMByGameSessionId(sessionId);
 		if (!dm) {
 			return fail(404, { error: 'Session not found. Double-check your session ID.' });
 		}

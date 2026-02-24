@@ -5,6 +5,8 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			sessionId: string | null;
+			/** Active game session's public 6-char ID. Set after migration in hooks.server.ts. */
+			gameSessionId: string | null;
 			dmFirstName: string | null;
 		}
 		// interface PageData {}

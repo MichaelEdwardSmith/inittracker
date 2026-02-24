@@ -1,10 +1,29 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { saveCombatRecord, getCombatHistory, deleteCombatRecord, clearCombatHistory } from '$lib/server/dmModel';
+import {
+	saveCombatRecord,
+	getCombatHistory,
+	deleteCombatRecord,
+	clearCombatHistory,
+	getActiveGameSessionPublicId
+} from '$lib/server/dmModel';
+import { authToGameSession } from '$lib/server/sessionCache';
 import type { CombatRecord } from '$lib/types';
 
+async function resolveGameSessionId(authSessionId: string): Promise<string | null> {
+	let gameSessionId = authToGameSession.get(authSessionId) ?? null;
+	if (!gameSessionId) {
+		gameSessionId = await getActiveGameSessionPublicId(authSessionId);
+		if (gameSessionId) authToGameSession.set(authSessionId, gameSessionId);
+	}
+	return gameSessionId;
+}
+
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const sessionId = cookies.get('dm_auth');
-	if (!sessionId) return new Response('Unauthorized', { status: 401 });
+	const authSessionId = cookies.get('dm_auth');
+	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
+
+	const gameSessionId = await resolveGameSessionId(authSessionId);
+	if (!gameSessionId) return new Response('No active session', { status: 400 });
 
 	let record: CombatRecord;
 	try {
@@ -17,27 +36,33 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		return new Response('Invalid record', { status: 400 });
 	}
 
-	await saveCombatRecord(sessionId, record);
+	await saveCombatRecord(gameSessionId, record);
 	return new Response(null, { status: 204 });
 };
 
 export const DELETE: RequestHandler = async ({ url, cookies }) => {
-	const sessionId = cookies.get('dm_auth');
-	if (!sessionId) return new Response('Unauthorized', { status: 401 });
+	const authSessionId = cookies.get('dm_auth');
+	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
+
+	const gameSessionId = await resolveGameSessionId(authSessionId);
+	if (!gameSessionId) return new Response('No active session', { status: 400 });
 
 	const id = url.searchParams.get('id');
 	if (id) {
-		await deleteCombatRecord(sessionId, id);
+		await deleteCombatRecord(gameSessionId, id);
 	} else {
-		await clearCombatHistory(sessionId);
+		await clearCombatHistory(gameSessionId);
 	}
 	return new Response(null, { status: 204 });
 };
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const sessionId = cookies.get('dm_auth');
-	if (!sessionId) return new Response('Unauthorized', { status: 401 });
+	const authSessionId = cookies.get('dm_auth');
+	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
-	const history = await getCombatHistory(sessionId);
+	const gameSessionId = await resolveGameSessionId(authSessionId);
+	if (!gameSessionId) return Response.json([]);
+
+	const history = await getCombatHistory(gameSessionId);
 	return Response.json(history);
 };

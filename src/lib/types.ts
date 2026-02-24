@@ -77,3 +77,9 @@ export interface CombatRecord {
 	participants: CombatantSummary[];
 	events: CombatEvent[];
 }
+
+export interface GameSession {
+	id: string; // UUID — internal identifier
+	sessionId: string; // 6-char public ID — used in viewer URLs
+	name: string; // user-defined name
+}
