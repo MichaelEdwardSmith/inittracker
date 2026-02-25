@@ -1,11 +1,12 @@
 import { MongoClient } from 'mongodb';
-import { MONGODB_URI } from '$env/static/private';
+/*import { MONGODB_URI } from '$env/static/private';*/
+import { env } from '$env/dynamic/private';
 
 let client: MongoClient | null = null;
 
 export async function getDb() {
 	if (!client) {
-		client = new MongoClient(MONGODB_URI);
+		client = new MongoClient(env.MONGODB_URI);
 		await client.connect();
 		// Ensure indexes exist
 		const db = client.db('initiative');
