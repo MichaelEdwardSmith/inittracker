@@ -106,6 +106,12 @@
 				Reset Init
 			</button>
 			<button
+				onclick={() => combat.resetPlayers()}
+				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
+			>
+				Reset Players
+			</button>
+			<button
 				onclick={() => combat.clearEnemies()}
 				class="rounded bg-red-900/60 px-2 py-1 text-xs text-red-300 transition hover:bg-red-800 hover:text-white"
 			>
