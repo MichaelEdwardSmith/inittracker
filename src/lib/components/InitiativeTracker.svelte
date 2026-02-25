@@ -157,42 +157,207 @@
 								: 'border-red-900/50 bg-gray-800'}"
 					style="grid-template-columns: 3.5rem 1fr 3rem 10rem 1fr auto"
 				>
-					<!-- Mobile name header -->
-					<div class="flex items-center gap-1.5 border-b border-gray-700/50 pb-1.5 md:hidden">
+					<!-- ─── MOBILE LAYOUT ───────────────────────────────── -->
+
+					<!-- Mobile: header row (badge + name + remove) -->
+					<div class="flex items-center gap-2 md:hidden">
 						{#if isActive}
 							<span class="text-amber-400" title="Active turn">▶</span>
 						{/if}
 						{#if c.type === 'player' && c.avatarUrl}
-							<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
+							<div class="h-7 w-7 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
 								<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
 							</div>
 						{:else}
-							<span class="shrink-0 rounded px-1 py-0.5 text-xs font-bold
+							<span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold
 							       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}">
 								{c.type === 'player' ? 'PC' : 'NPC'}
 							</span>
 						{/if}
-						<span class="truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-white'}">
+						<span class="flex-1 truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-white'}">
 							{c.name}
 						</span>
+						<button
+							onclick={() => combat.removeFromCombat(c.id)}
+							title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
+							class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
 					</div>
 
-					<!-- Initiative -->
+					<!-- Mobile: stats row (init | hp | ac) -->
+					<div class="grid grid-cols-[auto_1fr_auto] items-start gap-3 md:hidden">
+						<!-- Init -->
+						<div class="flex flex-col items-center gap-0.5">
+							<span class="text-xs uppercase tracking-wide text-gray-500">Init</span>
+							<input
+								type="number"
+								value={c.initiative ?? ''}
+								placeholder="—"
+								oninput={(e) => handleInitiativeInput(c.id, e.currentTarget.value)}
+								class="h-11 w-14 rounded border border-gray-600 bg-gray-900 text-center text-xl font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
+							/>
+						</div>
+						<!-- HP display + bar -->
+						<div class="flex flex-col gap-1.5 pt-5">
+							<div class="flex items-center gap-1.5">
+								<span class="text-base font-bold {hpTextColor(pct)}">{c.currentHp}</span>
+								<span class="text-xs text-gray-600">/</span>
+								<span class="text-sm text-gray-400">{c.maxHp}</span>
+								{#if c.tempHp > 0}
+									<span class="rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300">
+										+{c.tempHp} THP
+									</span>
+								{/if}
+							</div>
+							<div class="relative h-2 w-full rounded-full bg-gray-700">
+								<div
+									class="h-full rounded-full transition-all {hpBarColor(pct)}"
+									style="width: {pct}%"
+								></div>
+								{#if c.tempHp > 0}
+									{@const thpPct = Math.min((c.tempHp / c.maxHp) * 100, Math.max(0, 100 - pct))}
+									<div
+										class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all"
+										style="left: {pct}%; width: {thpPct}%"
+									></div>
+								{/if}
+							</div>
+						</div>
+						<!-- AC -->
+						<div class="flex flex-col items-center gap-0.5">
+							<span class="text-xs uppercase tracking-wide text-gray-500">AC</span>
+							<div class="flex items-center gap-1">
+								{#if c.type === 'enemy'}
+									<input
+										type="checkbox"
+										checked={c.showAc === true}
+										title="Show AC to players"
+										onchange={(e) => combat.update(c.id, { showAc: e.currentTarget.checked })}
+										class="h-3.5 w-3.5 cursor-pointer accent-amber-500"
+									/>
+								{/if}
+								<span class="text-xl font-bold text-gray-200">{c.ac}</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Mobile: damage row -->
+					<div class="flex items-center gap-2 md:hidden">
+						<input
+							type="number"
+							placeholder="amt"
+							min="1"
+							bind:value={damageInputs[c.id]}
+							class="h-11 w-16 rounded border border-gray-600 bg-gray-900 px-2 text-center text-sm text-white focus:border-amber-500 focus:outline-none"
+						/>
+						<button
+							onclick={() => commitDamage(c, -1)}
+							title="Deal damage"
+							class="h-11 flex-1 rounded bg-red-900/60 text-sm font-bold text-red-300 hover:bg-red-800"
+						>
+							− Damage
+						</button>
+						<button
+							onclick={() => commitDamage(c, 1)}
+							title="Heal"
+							class="h-11 flex-1 rounded bg-green-900/60 text-sm font-bold text-green-300 hover:bg-green-800"
+						>
+							+ Heal
+						</button>
+					</div>
+
+					<!-- Mobile: THP row (players only) -->
+					{#if c.type === 'player'}
+						<div class="flex items-center gap-2 md:hidden">
+							<input
+								type="number"
+								placeholder="THP"
+								min="0"
+								bind:value={tempHpInputs[c.id]}
+								onkeydown={(e) => e.key === 'Enter' && commitTempHp(c.id)}
+								class="h-11 w-16 rounded border border-yellow-900/60 bg-gray-900 px-2 text-center text-sm text-yellow-300 placeholder-yellow-900 focus:border-yellow-600 focus:outline-none"
+							/>
+							<button
+								onclick={() => commitTempHp(c.id)}
+								class="h-11 flex-1 rounded bg-yellow-800/50 text-sm font-bold text-yellow-300 hover:bg-yellow-700/60"
+							>
+								Set THP
+							</button>
+							{#if c.tempHp > 0}
+								<button
+									onclick={() => combat.setTempHp(c.id, 0)}
+									class="h-11 w-11 rounded text-gray-600 hover:text-gray-400"
+									title="Clear temp HP"
+								>
+									✕
+								</button>
+							{/if}
+						</div>
+					{/if}
+
+					<!-- Mobile: conditions row -->
+					<div class="relative flex flex-wrap items-start gap-1.5 md:hidden">
+						{#each c.statuses as status}
+							<button
+								onclick={() => combat.toggleStatus(c.id, status)}
+								title="Remove {status}"
+								class="rounded px-2 py-1.5 text-xs font-medium transition hover:opacity-70
+								       {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}"
+							>
+								{status}
+							</button>
+						{/each}
+						<button
+							onclick={() => (openStatusId = openStatusId === c.id ? null : c.id)}
+							class="rounded border border-gray-600 px-2 py-1.5 text-xs text-gray-500 transition hover:border-gray-500 hover:text-gray-300"
+						>
+							+ Condition
+						</button>
+						{#if openStatusId === c.id}
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
+								onmouseleave={() => (openStatusId = null)}
+							>
+								<div class="grid grid-cols-2 gap-1">
+									{#each CONDITIONS as cond}
+										{@const active = c.statuses.includes(cond)}
+										<button
+											onclick={() => combat.toggleStatus(c.id, cond)}
+											class="rounded px-2 py-1 text-left text-xs transition
+											       {active
+												? (conditionColors[cond] ?? 'bg-gray-700 text-white') + ' ring-1 ring-white/20'
+												: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+										>
+											{cond}
+										</button>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					</div>
+
+					<!-- ─── DESKTOP LAYOUT ──────────────────────────────── -->
+
+					<!-- Initiative (desktop) -->
 					<input
 						type="number"
 						value={c.initiative ?? ''}
 						placeholder="—"
 						oninput={(e) => handleInitiativeInput(c.id, e.currentTarget.value)}
-						class="w-full rounded border border-gray-600 bg-gray-900 px-1.5 py-1 text-center text-sm font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
+						class="hidden w-full rounded border border-gray-600 bg-gray-900 px-1.5 py-1 text-center text-sm font-bold text-amber-300 focus:border-amber-500 focus:outline-none md:block"
 					/>
 
-					<!-- Name + type badge + active indicator -->
+					<!-- Name + type badge + active indicator (desktop) -->
 					<div class="hidden md:block min-w-0">
 						<div class="flex items-center gap-1.5">
 							{#if isActive}
 								<span class="text-amber-400" title="Active turn">▶</span>
 							{/if}
-							<!-- Player avatar (small) -->
 							{#if c.type === 'player' && c.avatarUrl}
 								<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
 									<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
@@ -214,9 +379,8 @@
 						</div>
 					</div>
 
-					<!-- AC -->
-					<div class="flex items-center justify-end gap-1 pr-3">
-
+					<!-- AC (desktop) -->
+					<div class="hidden items-center justify-end gap-1 pr-3 md:flex">
 						{#if c.type === 'enemy'}
 							<input
 								type="checkbox"
@@ -229,8 +393,8 @@
 						<span class="text-xl font-semibold text-gray-200">{c.ac}</span>
 					</div>
 
-					<!-- HP bar + controls -->
-					<div class="flex flex-col gap-1">
+					<!-- HP bar + controls (desktop) -->
+					<div class="hidden flex-col gap-1 md:flex">
 						<!-- HP numbers + THP badge -->
 						<div class="flex items-center gap-1.5">
 							<span class="text-sm font-bold {hpTextColor(pct)}">{c.currentHp}</span>
@@ -242,7 +406,7 @@
 								</span>
 							{/if}
 						</div>
-						<!-- HP bar (with optional gold THP extension) -->
+						<!-- HP bar -->
 						<div class="relative h-1.5 w-full rounded-full bg-gray-700">
 							<div
 								class="h-full rounded-full transition-all {hpBarColor(pct)}"
@@ -310,8 +474,8 @@
 						{/if}
 					</div>
 
-					<!-- Conditions -->
-					<div class="relative flex flex-wrap items-start gap-1">
+					<!-- Conditions (desktop) -->
+					<div class="relative hidden flex-wrap items-start gap-1 md:flex">
 						{#each c.statuses as status}
 							<button
 								onclick={() => combat.toggleStatus(c.id, status)}
@@ -328,7 +492,6 @@
 						>
 							+ Condition
 						</button>
-
 						{#if openStatusId === c.id}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
@@ -353,10 +516,10 @@
 						{/if}
 					</div>
 
-					<!-- Remove -->
+					<!-- Remove (desktop) -->
 					<button
 						onclick={() => combat.removeFromCombat(c.id)}
-						class="rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
+						class="hidden rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400 md:block"
 						title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
 					>
 						<svg
