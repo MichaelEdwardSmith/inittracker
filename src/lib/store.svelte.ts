@@ -168,7 +168,7 @@ function createCombatStore() {
 				currentHp: template.hp,
 				tempHp: 0,
 				statuses: [],
-				initiative: null,
+				initiative: quantity > 1 ? Math.floor(Math.random() * 20) + 1 : null,
 				templateName: template.name,
 				monsterType: template.monsterType,
 				inCombat: true
@@ -348,6 +348,15 @@ function createCombatStore() {
 			currentTurnId = null;
 			round = 1;
 			resetTracking();
+			sync();
+		},
+
+		resetPlayers() {
+			combatants = combatants.map((c) =>
+				c.type === 'player'
+					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], initiative: null, inCombat: true }
+					: c
+			);
 			sync();
 		},
 
