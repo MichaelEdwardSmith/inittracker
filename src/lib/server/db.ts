@@ -1,18 +1,44 @@
-import { MongoClient } from 'mongodb';
-/*import { MONGODB_URI } from '$env/static/private';*/
+import { MongoClient, Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
 
 let client: MongoClient | null = null;
+let connectPromise: Promise<MongoClient> | null = null;
+let initPromise: Promise<void> | null = null;
 
-export async function getDb() {
-	if (!client) {
-		client = new MongoClient(env.MONGODB_URI);
-		await client.connect();
-		// Ensure indexes exist
-		const db = client.db('initiative');
-		const col = db.collection('dms');
-		await col.createIndex({ email: 1 }, { unique: true });
-		await col.createIndex({ sessionId: 1 }, { unique: true });
+async function getClient(): Promise<MongoClient> {
+	if (client) return client;
+
+	if (!connectPromise) {
+		const uri = env.MONGODB_URI;
+		if (!uri) throw new Error('MONGODB_URI is not set');
+
+		client = new MongoClient(uri);
+		connectPromise = client.connect().then(() => client!);
 	}
-	return client.db('initiative');
+
+	return connectPromise;
+}
+
+async function ensureIndexes(db: Db) {
+	const col = db.collection('dms');
+
+	// Create indexes once per process startup (safe to call multiple times, but we gate it anyway)
+	await col.createIndex({ email: 1 }, { unique: true });
+	await col.createIndex({ sessionId: 1 }, { unique: true });
+}
+
+export async function getDb(): Promise<Db> {
+	const c = await getClient();
+	const db = c.db('initiative');
+
+	if (!initPromise) {
+		initPromise = ensureIndexes(db).catch((err) => {
+			// If index creation fails, allow retries on next request
+			initPromise = null;
+			throw err;
+		});
+	}
+
+	await initPromise;
+	return db;
 }
