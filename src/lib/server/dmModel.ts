@@ -222,7 +222,8 @@ export async function updateCustomMonster(
 				'customMonsters.$.ac': updates.ac,
 				'customMonsters.$.hp': updates.hp,
 				'customMonsters.$.cr': updates.cr,
-				'customMonsters.$.monsterType': updates.monsterType
+				'customMonsters.$.monsterType': updates.monsterType,
+				'customMonsters.$.imgUrl': updates.imgUrl ?? null
 			}
 		}
 	);

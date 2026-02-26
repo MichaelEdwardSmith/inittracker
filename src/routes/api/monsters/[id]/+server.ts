@@ -17,12 +17,15 @@ export const PUT: RequestHandler = async ({ request, cookies, params }) => {
 	if (!Number.isInteger(ac) || ac < 1) return Response.json({ error: 'AC must be at least 1.' }, { status: 400 });
 	if (!Number.isInteger(hp) || hp < 1) return Response.json({ error: 'HP must be at least 1.' }, { status: 400 });
 
+	const imgUrl = typeof body.imgUrl === 'string' && body.imgUrl ? body.imgUrl : undefined;
+
 	await updateCustomMonster(sessionId, params.id, {
 		name: body.name.trim(),
 		ac,
 		hp,
 		cr: String(body.cr ?? '1').trim().slice(0, 10) || '1',
-		monsterType: String(body.monsterType ?? 'Humanoid').slice(0, 50)
+		monsterType: String(body.monsterType ?? 'Humanoid').slice(0, 50),
+		...(imgUrl !== undefined ? { imgUrl } : { imgUrl: undefined })
 	});
 
 	return new Response(null, { status: 204 });

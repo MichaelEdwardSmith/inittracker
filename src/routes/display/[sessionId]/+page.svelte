@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { conditionColors, sortCombatants, hpPercent, hpBarColor } from '$lib/utils';
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
+	import { getMonsterDetail } from '$lib/enemies';
 	import type { StorageState, Combatant } from '$lib/types';
 
 	let { data } = $props();
@@ -295,6 +296,7 @@
 	const currentIndex = $derived(sorted.findIndex((c) => c.id === combatState.currentTurnId));
 	const current = $derived<Combatant | null>(currentIndex >= 0 ? sorted[currentIndex] : null);
 
+
 	const upNext = $derived.by<Combatant[]>(() => {
 		if (currentIndex < 0 || sorted.length <= 1) return [];
 		const count = Math.min(4, sorted.length - 1);
@@ -425,9 +427,14 @@
 							class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/60 px-4 py-2"
 						>
 							{#if c.type === 'enemy'}
-								<span class="text-lg leading-none"
-									>{getMonsterEmoji(c.templateName, c.monsterType)}</span
-								>
+								{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
+								{#if imgUrl}
+									<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-red-700">
+										<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
+									</div>
+								{:else}
+									<span class="text-lg leading-none">{getMonsterEmoji(c.templateName, c.monsterType)}</span>
+								{/if}
 							{/if}
 							<span
 								class="text-xs font-bold {c.type === 'player' ? 'text-blue-400' : 'text-red-400'}"
@@ -460,15 +467,23 @@
 				<!-- Avatar token -->
 				{#if current.type === 'enemy'}
 					{@const style = getMonsterStyle(current.monsterType)}
-					{@const emoji = getMonsterEmoji(current.templateName, current.monsterType)}
-					<div
-						class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {style.ring}"
-						style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
-					>
-						<span class="select-none" style="font-size: 5rem; line-height: 1;">
-							{emoji}
-						</span>
-					</div>
+					{@const imgUrl = current.imgUrl ?? getMonsterDetail(current.templateName ?? '')?.imgUrl}
+					{#if imgUrl}
+						<div
+							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring}"
+							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
+						>
+							<img src={imgUrl} alt={current.name} class="h-full w-full object-cover object-top" />
+						</div>
+					{:else}
+						{@const emoji = getMonsterEmoji(current.templateName, current.monsterType)}
+						<div
+							class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {style.ring}"
+							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
+						>
+							<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
+						</div>
+					{/if}
 				{:else if current.avatarUrl}
 					<div
 						class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
@@ -600,13 +615,16 @@
 							>
 								{#if c.type === 'enemy'}
 									{@const style = getMonsterStyle(c.monsterType)}
-									<div
-										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}"
-									>
-										<span class="select-none text-xl leading-none">
-											{getMonsterEmoji(c.templateName, c.monsterType)}
-										</span>
-									</div>
+									{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
+									{#if imgUrl}
+										<div class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring}">
+											<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
+										</div>
+									{:else}
+										<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}">
+											<span class="select-none text-xl leading-none">{getMonsterEmoji(c.templateName, c.monsterType)}</span>
+										</div>
+									{/if}
 								{:else if c.avatarUrl}
 									<div
 										class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-blue-700"
