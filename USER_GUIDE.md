@@ -212,7 +212,7 @@ Type an amount in the damage field and click **Heal** (green). HP cannot exceed 
 
 For **players only**, a separate Temp HP section appears on each row:
 
-- Type an amount in the THP field and click **Set THP** to assign temporary hit points
+- Type an amount in the THP field and click **Set Temp HP** to assign temporary hit points
 - Click the **✕** button to clear all temp HP
 - Temp HP is displayed as a yellow **+X THP** badge and as a yellow bar extension on the HP bar
 - Damage reduces temp HP before current HP; healing does not affect temp HP
@@ -244,11 +244,15 @@ Blinded · Charmed · Concentrating · Deafened · Dead · Exhausted · Frighten
 
 Click any condition to apply it. Conditions already active are hidden from the list.
 
+### Viewing a Condition Description
+
+Each active condition badge has a small **ⓘ info icon** on its right edge. Clicking it opens a modal with the condition's name and a summary of its mechanical effects (e.g. what saves it imposes, what it prevents, etc.). This works on both the DM dashboard and the Player Display.
+
 ### Removing a Condition
 
-Click any active condition badge on a combatant row to remove it immediately.
+On the **DM screen**, click the condition name portion of the badge to remove it immediately. The info icon and the remove action are separate — clicking the ⓘ only opens the description, it does not remove the condition.
 
-Conditions are displayed as color-coded badges both on the DM dashboard and on the live player display. Condition changes trigger a visual flash and audio cue on the viewer screen.
+Conditions are displayed as color-coded badges on both the DM dashboard and the live player display. Condition changes trigger a visual flash and audio cue on the viewer screen.
 
 ---
 

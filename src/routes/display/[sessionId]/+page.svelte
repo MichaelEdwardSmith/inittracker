@@ -3,11 +3,13 @@
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
 	import { getMonsterDetail } from '$lib/enemies';
 	import type { StorageState, Combatant } from '$lib/types';
+import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 	let { data } = $props();
 
 	let combatState: StorageState = $state({ combatants: [], currentTurnId: null, round: 1 });
 	let connected = $state(false);
+	let conditionInfo = $state<string | null>(null);
 
 	// ── Flash overlay ──────────────────────────────────────────────────
 	let flashColor = $state<string | null>(null);
@@ -583,12 +585,18 @@
 				{#if current.statuses.length > 0}
 					<div class="mt-5 flex flex-wrap justify-center gap-2">
 						{#each current.statuses as status}
-							<span
-								class="rounded-full px-3 py-1 text-sm font-semibold tracking-wide {conditionColors[status] ??
-									'bg-gray-700 text-gray-200'}"
-							>
-								{status}
-							</span>
+							<div class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[status] ?? 'bg-gray-700 text-gray-200'}">
+								<span class="pl-3 pr-2 py-1">{status}</span>
+								<button
+									onclick={() => (conditionInfo = status)}
+									title="What is {status}?"
+									class="pr-2 py-1 opacity-50 transition hover:opacity-100"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</button>
+							</div>
 						{/each}
 					</div>
 				{/if}
@@ -711,10 +719,18 @@
 									<div class="shrink-0 text-right">
 										<div class="flex flex-wrap justify-end gap-0.5">
 											{#each c.statuses.slice(0, 3) as s}
-												<span
-													class="rounded px-1 py-0.5 text-xs {conditionColors[s] ??
-														'bg-gray-700 text-gray-300'}">{s}</span
-												>
+												<div class="flex items-center rounded text-xs {conditionColors[s] ?? 'bg-gray-700 text-gray-300'}">
+													<span class="pl-1 pr-0.5 py-0.5">{s}</span>
+													<button
+														onclick={() => (conditionInfo = s)}
+														title="What is {s}?"
+														class="pr-0.5 py-0.5 opacity-50 transition hover:opacity-100"
+													>
+														<svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+														</svg>
+													</button>
+												</div>
 											{/each}
 											{#if c.statuses.length > 3}
 												<span class="text-xs text-gray-600">+{c.statuses.length - 3}</span>
@@ -730,6 +746,8 @@
 		{/if}
 	{/if}
 </div>
+
+<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
 
 <style>
 	@keyframes flash-effect {

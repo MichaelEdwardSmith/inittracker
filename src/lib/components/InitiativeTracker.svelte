@@ -4,9 +4,11 @@
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
+	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 	let openStatusId = $state<string | null>(null);
 	let infoMonster = $state<MonsterDetail | null>(null);
+	let conditionInfo = $state<string | null>(null);
 
 	function showMonsterInfo(c: Combatant) {
 		if (c.templateName) infoMonster = getMonsterDetail(c.templateName) ?? null;
@@ -302,7 +304,7 @@
 								onclick={() => commitTempHp(c.id)}
 								class="h-11 flex-1 rounded bg-yellow-800/50 text-sm font-bold text-yellow-300 hover:bg-yellow-700/60"
 							>
-								Set THP
+								Set Temp HP
 							</button>
 							{#if c.tempHp > 0}
 								<button
@@ -319,14 +321,24 @@
 					<!-- Mobile: conditions row -->
 					<div class="relative flex flex-wrap items-start gap-1.5 md:hidden">
 						{#each c.statuses as status}
-							<button
-								onclick={() => combat.toggleStatus(c.id, status)}
-								title="Remove {status}"
-								class="rounded px-2 py-1.5 text-xs font-medium transition hover:opacity-70
-								       {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}"
-							>
-								{status}
-							</button>
+							<div class="flex items-center rounded text-xs font-medium {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}">
+								<button
+									onclick={() => combat.toggleStatus(c.id, status)}
+									title="Remove {status}"
+									class="px-2 py-1.5 transition hover:opacity-70"
+								>
+									{status}
+								</button>
+								<button
+									onclick={() => (conditionInfo = status)}
+									title="What is {status}?"
+									class="border-l border-white/10 px-1.5 py-1.5 opacity-40 transition hover:opacity-100"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</button>
+							</div>
 						{/each}
 						<button
 							onclick={() => (openStatusId = openStatusId === c.id ? null : c.id)}
@@ -476,7 +488,7 @@
 									onclick={() => commitTempHp(c.id)}
 									class="rounded bg-yellow-800/50 px-1.5 py-0.5 text-xs font-bold text-yellow-300 hover:bg-yellow-700/60"
 								>
-									Set THP
+									Set Temp HP
 								</button>
 								{#if c.tempHp > 0}
 									<button
@@ -494,14 +506,24 @@
 					<!-- Conditions (desktop) -->
 					<div class="relative hidden flex-wrap items-start gap-1 md:flex">
 						{#each c.statuses as status}
-							<button
-								onclick={() => combat.toggleStatus(c.id, status)}
-								title="Remove {status}"
-								class="rounded px-1.5 py-0.5 text-xs font-medium transition hover:opacity-70
-								       {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}"
-							>
-								{status}
-							</button>
+							<div class="flex items-center rounded text-xs font-medium {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}">
+								<button
+									onclick={() => combat.toggleStatus(c.id, status)}
+									title="Remove {status}"
+									class="px-1.5 py-0.5 transition hover:opacity-70"
+								>
+									{status}
+								</button>
+								<button
+									onclick={() => (conditionInfo = status)}
+									title="What is {status}?"
+									class="border-l border-white/10 px-1 py-0.5 opacity-40 transition hover:opacity-100"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</button>
+							</div>
 						{/each}
 						<button
 							onclick={() => (openStatusId = openStatusId === c.id ? null : c.id)}
@@ -563,3 +585,4 @@
 </div>
 
 <MonsterInfoModal monster={infoMonster} onclose={() => infoMonster = null} />
+<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
