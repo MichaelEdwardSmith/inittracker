@@ -18,6 +18,8 @@ export interface Combatant {
 	inCombat?: boolean;
 	// Players only — base64 JPEG data URL set by the DM via avatar upload
 	avatarUrl?: string;
+	// Enemies only — avatar image URL (remote for built-ins, base64 for custom monsters)
+	imgUrl?: string;
 }
 
 export interface StorageState {
@@ -34,6 +36,8 @@ export interface EnemyTemplate {
 	monsterType: string;
 	/** Parsed DEX modifier (e.g. +2, -1, 0). Defaults to 0 if not provided. */
 	dexMod?: number;
+	/** Optional avatar — base64 JPEG data URL for custom monsters, or remote URL for built-ins. */
+	imgUrl?: string;
 }
 
 export interface CustomMonster extends EnemyTemplate {

@@ -2,6 +2,7 @@
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail } from '$lib/enemies';
 	import type { EnemyTemplate, CustomMonster, MonsterDetail } from '$lib/types';
+	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 
 	// Extended display type — built-ins have no id/isCustom
 	type DisplayTemplate = EnemyTemplate & { id?: string; isCustom?: boolean };
@@ -33,6 +34,33 @@
 	let editingId = $state<string | null>(null);
 	let formError = $state('');
 	let saving = $state(false);
+	let formImgUrl = $state<string | undefined>(undefined);
+	let avatarInput = $state<HTMLInputElement>();
+
+	async function cropAvatar(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const url = URL.createObjectURL(file);
+			const img = new Image();
+			img.onload = () => {
+				const size = Math.min(img.width, img.height);
+				const canvas = document.createElement('canvas');
+				canvas.width = 256;
+				canvas.height = 256;
+				const ctx = canvas.getContext('2d')!;
+				ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 256, 256);
+				URL.revokeObjectURL(url);
+				resolve(canvas.toDataURL('image/jpeg', 0.8));
+			};
+			img.onerror = reject;
+			img.src = url;
+		});
+	}
+
+	async function onAvatarSelected(e: Event) {
+		const file = (e.currentTarget as HTMLInputElement).files?.[0];
+		if (!file) return;
+		formImgUrl = await cropAvatar(file);
+	}
 
 	// ── Derived lists ────────────────────────────────────────────────────────
 	const allTemplates = $derived<DisplayTemplate[]>([
@@ -117,6 +145,7 @@
 		formHp = m.hp;
 		formCr = m.cr;
 		formType = m.monsterType;
+		formImgUrl = m.imgUrl;
 		formError = '';
 	}
 
@@ -147,7 +176,8 @@
 				ac: Number(formAc),
 				hp: Number(formHp),
 				cr: formCr.trim() || '1',
-				monsterType: formType
+				monsterType: formType,
+				imgUrl: formImgUrl ?? null
 			};
 
 			let res: Response;
@@ -196,6 +226,7 @@
 		formHp = 10;
 		formCr = '1';
 		formType = 'Humanoid';
+		formImgUrl = undefined;
 		formError = '';
 	}
 
@@ -264,7 +295,13 @@
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center gap-1.5 truncate">
 							{#if enemy.isCustom}
-								<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
+								{#if enemy.imgUrl}
+									<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-amber-700">
+										<img src={enemy.imgUrl} alt={enemy.name} class="h-full w-full object-cover" />
+									</div>
+								{:else}
+									<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
+								{/if}
 							{/if}
 							<span class="truncate text-sm font-medium">{enemy.name}</span>
 						</div>
@@ -291,7 +328,7 @@
 				{/if}
 				{#if enemy.isCustom && enemy.id}
 					<button
-						onclick={() => openEditFromList({ id: enemy.id!, name: enemy.name, ac: enemy.ac, hp: enemy.hp, cr: enemy.cr, monsterType: enemy.monsterType })}
+						onclick={() => openEditFromList({ id: enemy.id!, name: enemy.name, ac: enemy.ac, hp: enemy.hp, cr: enemy.cr, monsterType: enemy.monsterType, imgUrl: enemy.imgUrl })}
 						title="Edit {enemy.name}"
 						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-amber-400"
 					>
@@ -443,6 +480,41 @@
 							</select>
 						</div>
 
+						<!-- Avatar upload -->
+						<div>
+							<label class="mb-1 block text-xs uppercase tracking-wider text-gray-500">Avatar (optional)</label>
+							<div class="flex items-center gap-3">
+								{#if formImgUrl}
+									<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-gray-600">
+										<img src={formImgUrl} alt="Preview" class="h-full w-full object-cover" />
+									</div>
+									<button
+										type="button"
+										onclick={() => avatarInput?.click()}
+										class="text-xs text-gray-400 transition hover:text-gray-200"
+									>Change</button>
+									<button
+										type="button"
+										onclick={() => (formImgUrl = undefined)}
+										class="text-xs text-red-500 transition hover:text-red-400"
+									>Remove</button>
+								{:else}
+									<button
+										type="button"
+										onclick={() => avatarInput?.click()}
+										class="rounded border border-gray-600 px-3 py-2 text-xs text-gray-400 transition hover:border-gray-500 hover:text-gray-200"
+									>Choose Image</button>
+								{/if}
+							</div>
+							<input
+								bind:this={avatarInput}
+								type="file"
+								accept="image/*"
+								class="hidden"
+								onchange={onAvatarSelected}
+							/>
+						</div>
+
 						{#if formError}
 							<p class="text-xs text-red-400">{formError}</p>
 						{/if}
@@ -521,126 +593,4 @@
 	</div>
 {/if}
 
-<!-- Monster Info Modal -->
-{#if infoMonster}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-	<div
-		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
-		onclick={(e) => { if (e.target === e.currentTarget) infoMonster = null; }}
-	>
-		<div class="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: calc(100vh - 4rem);">
-
-			<!-- Modal header -->
-			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
-				<div>
-					<h3 class="text-lg font-black tracking-wide text-red-400">{infoMonster.name}</h3>
-					<p class="text-xs italic text-gray-400">{infoMonster.meta}</p>
-				</div>
-				<button onclick={() => infoMonster = null} class="text-gray-500 transition hover:text-white" aria-label="Close">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-					</svg>
-				</button>
-			</div>
-
-			<div class="overflow-y-auto p-5 text-gray-200">
-
-				<!-- Image -->
-				{#if infoMonster.imgUrl}
-					<img src={infoMonster.imgUrl} alt={infoMonster.name} class="mb-4 h-32 w-full rounded-lg object-cover object-top" />
-				{/if}
-
-				<!-- Core stats bar -->
-				<div class="mb-4 flex flex-wrap gap-4 border-b border-gray-700 pb-4 text-sm">
-					<div><span class="text-gray-500">AC</span> <span class="font-bold text-gray-200">{infoMonster.armorClass}</span></div>
-					<div><span class="text-gray-500">HP</span> <span class="font-bold text-gray-200">{infoMonster.hitPoints}</span></div>
-					<div><span class="text-gray-500">Speed</span> <span class="font-bold text-gray-200">{infoMonster.speed}</span></div>
-					<div><span class="text-gray-500">CR</span> <span class="font-bold text-amber-300">{infoMonster.challenge}</span></div>
-				</div>
-
-				<!-- Ability scores -->
-				<div class="mb-4 grid grid-cols-6 gap-2 border-b border-gray-700 pb-4 text-center">
-					{#each [
-						{ label: 'STR', val: infoMonster.str, mod: infoMonster.strMod },
-						{ label: 'DEX', val: infoMonster.dex, mod: infoMonster.dexMod },
-						{ label: 'CON', val: infoMonster.con, mod: infoMonster.conMod },
-						{ label: 'INT', val: infoMonster.int, mod: infoMonster.intMod },
-						{ label: 'WIS', val: infoMonster.wis, mod: infoMonster.wisMod },
-						{ label: 'CHA', val: infoMonster.cha, mod: infoMonster.chaMod },
-					] as stat}
-						<div class="rounded bg-gray-800 px-1 py-2">
-							<div class="text-xs font-bold uppercase tracking-wider text-red-400">{stat.label}</div>
-							<div class="text-sm font-bold text-white">{stat.val}</div>
-							<div class="text-xs text-gray-400">{stat.mod}</div>
-						</div>
-					{/each}
-				</div>
-
-				<!-- Secondary stats -->
-				<div class="mb-4 flex flex-col gap-1 border-b border-gray-700 pb-4 text-sm">
-					{#if infoMonster.savingThrows}
-						<div><span class="text-gray-500">Saving Throws </span><span class="text-gray-200">{infoMonster.savingThrows}</span></div>
-					{/if}
-					{#if infoMonster.skills}
-						<div><span class="text-gray-500">Skills </span><span class="text-gray-200">{infoMonster.skills}</span></div>
-					{/if}
-					{#if infoMonster.damageImmunities}
-						<div><span class="text-gray-500">Damage Immunities </span><span class="text-gray-200">{infoMonster.damageImmunities}</span></div>
-					{/if}
-					{#if infoMonster.damageResistances}
-						<div><span class="text-gray-500">Damage Resistances </span><span class="text-gray-200">{infoMonster.damageResistances}</span></div>
-					{/if}
-					{#if infoMonster.conditionImmunities}
-						<div><span class="text-gray-500">Condition Immunities </span><span class="text-gray-200">{infoMonster.conditionImmunities}</span></div>
-					{/if}
-					{#if infoMonster.senses}
-						<div><span class="text-gray-500">Senses </span><span class="text-gray-200">{infoMonster.senses}</span></div>
-					{/if}
-					{#if infoMonster.languages}
-						<div><span class="text-gray-500">Languages </span><span class="text-gray-200">{infoMonster.languages}</span></div>
-					{/if}
-				</div>
-
-				<!-- Traits -->
-				{#if infoMonster.traits}
-					<div class="mb-4 border-b border-gray-700 pb-4">
-						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
-							{@html infoMonster.traits}
-						</div>
-					</div>
-				{/if}
-
-				<!-- Actions -->
-				{#if infoMonster.actions}
-					<div class="mb-4 border-b border-gray-700 pb-4">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Actions</h4>
-						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
-							{@html infoMonster.actions}
-						</div>
-					</div>
-				{/if}
-
-				<!-- Reactions -->
-				{#if infoMonster.reactions}
-					<div class="mb-4 border-b border-gray-700 pb-4">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Reactions</h4>
-						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
-							{@html infoMonster.reactions}
-						</div>
-					</div>
-				{/if}
-
-				<!-- Legendary Actions -->
-				{#if infoMonster.legendaryActions}
-					<div class="mb-2">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-amber-400">Legendary Actions</h4>
-						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
-							{@html infoMonster.legendaryActions}
-						</div>
-					</div>
-				{/if}
-
-			</div>
-		</div>
-	</div>
-{/if}
+<MonsterInfoModal monster={infoMonster} onclose={() => infoMonster = null} />

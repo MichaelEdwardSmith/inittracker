@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { CONDITIONS } from '$lib/enemies';
+	import { CONDITIONS, getMonsterDetail } from '$lib/enemies';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
-	import type { Combatant } from '$lib/types';
+	import type { Combatant, MonsterDetail } from '$lib/types';
+	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 
 	let openStatusId = $state<string | null>(null);
+	let infoMonster = $state<MonsterDetail | null>(null);
+
+	function showMonsterInfo(c: Combatant) {
+		if (c.templateName) infoMonster = getMonsterDetail(c.templateName) ?? null;
+	}
 	let damageInputs = $state<Record<string, string>>({});
 	let tempHpInputs = $state<Record<string, string>>({});
 	let chronicleSaved = $state(false);
@@ -177,6 +183,17 @@
 						<span class="flex-1 truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-white'}">
 							{c.name}
 						</span>
+						{#if c.type === 'enemy' && getMonsterDetail(c.templateName ?? '')}
+							<button
+								onclick={() => showMonsterInfo(c)}
+								title="View stat block"
+								class="rounded p-2 text-gray-600 transition hover:text-blue-400"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</button>
+						{/if}
 						<button
 							onclick={() => combat.removeFromCombat(c.id)}
 							title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
@@ -516,29 +533,33 @@
 						{/if}
 					</div>
 
-					<!-- Remove (desktop) -->
-					<button
-						onclick={() => combat.removeFromCombat(c.id)}
-						class="hidden rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400 md:block"
-						title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
+					<!-- Info + Remove (desktop) -->
+					<div class="hidden items-center gap-1 md:flex">
+						{#if c.type === 'enemy' && getMonsterDetail(c.templateName ?? '')}
+							<button
+								onclick={() => showMonsterInfo(c)}
+								title="View stat block"
+								class="rounded p-1 text-gray-600 transition hover:text-blue-400"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</button>
+						{/if}
+						<button
+							onclick={() => combat.removeFromCombat(c.id)}
+							class="rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
+							title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
-					</button>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
 				</div>
 			{/each}
 		</div>
 	{/if}
 </div>
+
+<MonsterInfoModal monster={infoMonster} onclose={() => infoMonster = null} />

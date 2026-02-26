@@ -171,6 +171,7 @@ function createCombatStore() {
 				initiative: quantity > 1 ? Math.max(1, Math.floor(Math.random() * 20) + 1 + (template.dexMod ?? 0)) : null,
 				templateName: template.name,
 				monsterType: template.monsterType,
+				imgUrl: template.imgUrl,
 				inCombat: true
 			}));
 			combatants = [...combatants, ...newEnemies];
