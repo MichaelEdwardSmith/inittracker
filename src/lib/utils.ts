@@ -1,5 +1,25 @@
 import type { Combatant } from './types';
 
+export const conditionDescriptions: Record<string, string> = {
+	Blinded:       "Can't see. Automatically fails ability checks requiring sight. Attack rolls against it have advantage; its attack rolls have disadvantage.",
+	Charmed:       "Can't attack the charmer or target them with harmful abilities or magical effects. The charmer has advantage on social ability checks against this creature.",
+	Concentrating: "Maintaining concentration on a spell. Taking damage requires a CON save (DC 10 or half the damage taken, whichever is higher) or the spell ends.",
+	Deafened:      "Can't hear. Automatically fails ability checks that require hearing.",
+	Dead:          "The creature has died and can't take actions, move, or speak.",
+	Exhausted:     "Cumulative (levels 1–6). Lvl 1: Disadvantage on ability checks. Lvl 2: Speed halved. Lvl 3: Disadvantage on attacks & saves. Lvl 4: HP maximum halved. Lvl 5: Speed 0. Lvl 6: Death.",
+	Frightened:    "Disadvantage on ability checks and attack rolls while the source of its fear is in line of sight. Can't willingly move closer to the source of fear.",
+	Grappled:      "Speed becomes 0 and can't benefit from bonuses to speed. Ends if the grappler is incapacitated or the creature is moved beyond the grappler's reach.",
+	Incapacitated: "Can't take actions or reactions.",
+	Invisible:     "Can't be seen without magic or a special sense. Attacks against it have disadvantage; its attacks have advantage. It still makes noise and leaves tracks.",
+	Paralyzed:     "Incapacitated and can't move or speak. Automatically fails STR and DEX saves. Attack rolls against it have advantage. Any attack that hits within 5 ft. is a critical hit.",
+	Petrified:     "Transformed into solid inanimate matter. Incapacitated, unaware of surroundings, weight ×10. Automatically fails STR and DEX saves. Resistance to all damage; immune to poison and disease.",
+	Poisoned:      "Disadvantage on attack rolls and ability checks.",
+	Prone:         "Can only crawl or use half speed to stand up. Disadvantage on attack rolls. Attacks against it from within 5 ft. have advantage; attacks from farther away have disadvantage.",
+	Restrained:    "Speed becomes 0. Attack rolls against it have advantage; its attack rolls have disadvantage. Disadvantage on DEX saving throws.",
+	Stunned:       "Incapacitated, can't move, and can speak only falteringly. Automatically fails STR and DEX saves. Attack rolls against it have advantage.",
+	Unconscious:   "Incapacitated, can't move or speak, unaware of surroundings. Drops held items, falls prone. Automatically fails STR and DEX saves. Attacks have advantage and hits within 5 ft. are critical hits.",
+};
+
 export const conditionColors: Record<string, string> = {
 	Blinded: 'bg-gray-600 text-gray-200',
 	Charmed: 'bg-pink-800 text-pink-200',

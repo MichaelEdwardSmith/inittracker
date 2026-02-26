@@ -292,7 +292,7 @@
 
 				<h3 class="mb-2 mt-5 text-sm font-bold tracking-widest text-gray-200 uppercase">Temporary HP</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					For <strong class="font-semibold text-white">players</strong>, a Temp HP section appears on each row. Type an amount and click <strong class="font-semibold text-yellow-400">Set THP</strong> to assign temporary hit points. Click <strong class="font-semibold text-white">✕</strong> to clear them. Temp HP shows as a yellow badge and a yellow bar extension on the HP meter. Damage reduces temp HP before current HP; healing does not restore temp HP.
+					For <strong class="font-semibold text-white">players</strong>, a Temp HP section appears on each row. Type an amount and click <strong class="font-semibold text-yellow-400">Set Temp HP</strong> to assign temporary hit points. Click <strong class="font-semibold text-white">✕</strong> to clear them. Temp HP shows as a yellow badge and a yellow bar extension on the HP meter. Damage reduces temp HP before current HP; healing does not restore temp HP.
 				</p>
 
 				<h3 class="mb-3 mt-5 text-sm font-bold tracking-widest text-gray-200 uppercase">HP Color Coding</h3>
@@ -326,9 +326,14 @@
 					{/each}
 				</div>
 
+				<h3 class="mb-2 mt-5 text-sm font-bold tracking-widest text-gray-200 uppercase">Viewing a Condition Description</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Every active condition badge has a small <strong class="font-semibold text-white">ⓘ info icon</strong> on its right edge. Clicking it opens a modal showing the condition name and a summary of its mechanical effects — what saves it imposes, what actions it prevents, and any special rules. This works on both the DM dashboard and the Player Display.
+				</p>
+
 				<h3 class="mb-2 mt-5 text-sm font-bold tracking-widest text-gray-200 uppercase">Removing a Condition</h3>
 				<p class="text-sm leading-relaxed">
-					Click any active condition badge on a combatant row to remove it immediately. Condition changes appear as a colored flash and audio cue on the viewer screen.
+					On the <strong class="font-semibold text-white">DM screen</strong>, click the condition name portion of the badge to remove it. The ⓘ icon and the remove action are separate — clicking the icon only opens the description, it does not remove the condition. Condition changes appear as a colored flash and audio cue on the viewer screen.
 				</p>
 			</section>
 
