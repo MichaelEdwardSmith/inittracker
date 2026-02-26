@@ -32,6 +32,8 @@ export interface EnemyTemplate {
 	hp: number;
 	cr: string;
 	monsterType: string;
+	/** Parsed DEX modifier (e.g. +2, -1, 0). Defaults to 0 if not provided. */
+	dexMod?: number;
 }
 
 export interface CustomMonster extends EnemyTemplate {
@@ -82,4 +84,31 @@ export interface GameSession {
 	id: string; // UUID — internal identifier
 	sessionId: string; // 6-char public ID — used in viewer URLs
 	name: string; // user-defined name
+}
+
+export interface MonsterDetail {
+	name: string;
+	meta: string;
+	armorClass: string;
+	hitPoints: string;
+	speed: string;
+	str: number; strMod: string;
+	dex: number; dexMod: string;
+	con: number; conMod: string;
+	int: number; intMod: string;
+	wis: number; wisMod: string;
+	cha: number; chaMod: string;
+	savingThrows?: string;
+	skills?: string;
+	damageImmunities?: string;
+	damageResistances?: string;
+	conditionImmunities?: string;
+	senses?: string;
+	languages?: string;
+	challenge: string;
+	traits?: string;
+	actions?: string;
+	reactions?: string;
+	legendaryActions?: string;
+	imgUrl?: string;
 }

@@ -1,104 +1,133 @@
-import type { EnemyTemplate } from './types';
+import type { EnemyTemplate, MonsterDetail } from './types';
+import rawMonsters from './data/monsters.json';
 
-export const ENEMY_TEMPLATES: EnemyTemplate[] = [
-	// CR 0
-	{ name: 'Bat', ac: 12, hp: 1, cr: '0', monsterType: 'Beast' },
-	{ name: 'Commoner', ac: 10, hp: 4, cr: '0', monsterType: 'Humanoid' },
-	{ name: 'Rat', ac: 10, hp: 1, cr: '0', monsterType: 'Beast' },
-	// CR 1/8
-	{ name: 'Giant Rat', ac: 12, hp: 7, cr: '1/8', monsterType: 'Beast' },
-	{ name: 'Kobold', ac: 12, hp: 5, cr: '1/8', monsterType: 'Humanoid' },
-	{ name: 'Stirge', ac: 14, hp: 2, cr: '1/8', monsterType: 'Beast' },
-	{ name: 'Bandit', ac: 12, hp: 11, cr: '1/8', monsterType: 'Humanoid' },
-	{ name: 'Guard', ac: 16, hp: 11, cr: '1/8', monsterType: 'Humanoid' },
-	// CR 1/4
-	{ name: 'Boar', ac: 11, hp: 11, cr: '1/4', monsterType: 'Beast' },
-	{ name: 'Cultist', ac: 12, hp: 9, cr: '1/8', monsterType: 'Humanoid' },
-	{ name: 'Giant Wolf Spider', ac: 13, hp: 11, cr: '1/4', monsterType: 'Beast' },
-	{ name: 'Goblin', ac: 15, hp: 7, cr: '1/4', monsterType: 'Humanoid' },
-	{ name: 'Skeleton', ac: 13, hp: 13, cr: '1/4', monsterType: 'Undead' },
-	{ name: 'Wolf', ac: 13, hp: 11, cr: '1/4', monsterType: 'Beast' },
-	{ name: 'Zombie', ac: 8, hp: 22, cr: '1/4', monsterType: 'Undead' },
-	{ name: 'Swarm of Rats', ac: 10, hp: 24, cr: '1/4', monsterType: 'Beast' },
-	// CR 1/2
-	{ name: 'Black Bear', ac: 11, hp: 19, cr: '1/2', monsterType: 'Beast' },
-	{ name: 'Crocodile', ac: 12, hp: 19, cr: '1/2', monsterType: 'Beast' },
-	{ name: 'Gnoll', ac: 15, hp: 22, cr: '1/2', monsterType: 'Humanoid' },
-	{ name: 'Hobgoblin', ac: 18, hp: 11, cr: '1/2', monsterType: 'Humanoid' },
-	{ name: 'Lizardfolk', ac: 15, hp: 22, cr: '1/2', monsterType: 'Humanoid' },
-	{ name: 'Orc', ac: 13, hp: 15, cr: '1/2', monsterType: 'Humanoid' },
-	{ name: 'Sahuagin', ac: 12, hp: 22, cr: '1/2', monsterType: 'Humanoid' },
-	// CR 1
-	{ name: 'Brown Bear', ac: 11, hp: 34, cr: '1', monsterType: 'Beast' },
-	{ name: 'Bugbear', ac: 16, hp: 27, cr: '1', monsterType: 'Humanoid' },
-	{ name: 'Dire Wolf', ac: 14, hp: 37, cr: '1', monsterType: 'Beast' },
-	{ name: 'Dryad', ac: 11, hp: 22, cr: '1', monsterType: 'Fey' },
-	{ name: 'Ghoul', ac: 12, hp: 22, cr: '1', monsterType: 'Undead' },
-	{ name: 'Giant Spider', ac: 14, hp: 26, cr: '1', monsterType: 'Beast' },
-	{ name: 'Harpy', ac: 11, hp: 38, cr: '1', monsterType: 'Monstrosity' },
-	{ name: 'Hippogriff', ac: 11, hp: 19, cr: '1', monsterType: 'Monstrosity' },
-	// CR 2
-	{ name: 'Ankheg', ac: 14, hp: 39, cr: '2', monsterType: 'Monstrosity' },
-	{ name: 'Bandit Captain', ac: 15, hp: 65, cr: '2', monsterType: 'Humanoid' },
-	{ name: 'Berserker', ac: 13, hp: 67, cr: '2', monsterType: 'Humanoid' },
-	{ name: 'Ettercap', ac: 13, hp: 44, cr: '2', monsterType: 'Monstrosity' },
-	{ name: 'Gargoyle', ac: 15, hp: 52, cr: '2', monsterType: 'Elemental' },
-	{ name: 'Ghast', ac: 13, hp: 36, cr: '2', monsterType: 'Undead' },
-	{ name: 'Ogre', ac: 11, hp: 59, cr: '2', monsterType: 'Giant' },
-	{ name: 'Sea Hag', ac: 14, hp: 52, cr: '2', monsterType: 'Fey' },
-	{ name: 'Wererat', ac: 12, hp: 33, cr: '2', monsterType: 'Humanoid' },
-	{ name: 'Will-o-Wisp', ac: 19, hp: 22, cr: '2', monsterType: 'Undead' },
-	// CR 3
-	{ name: 'Basilisk', ac: 15, hp: 52, cr: '3', monsterType: 'Monstrosity' },
-	{ name: 'Displacer Beast', ac: 13, hp: 85, cr: '3', monsterType: 'Monstrosity' },
-	{ name: 'Doppelganger', ac: 14, hp: 52, cr: '3', monsterType: 'Monstrosity' },
-	{ name: 'Green Hag', ac: 14, hp: 82, cr: '3', monsterType: 'Fey' },
-	{ name: 'Hell Hound', ac: 15, hp: 45, cr: '3', monsterType: 'Fiend' },
-	{ name: 'Knight', ac: 18, hp: 52, cr: '3', monsterType: 'Humanoid' },
-	{ name: 'Manticore', ac: 14, hp: 68, cr: '3', monsterType: 'Monstrosity' },
-	{ name: 'Mummy', ac: 11, hp: 58, cr: '3', monsterType: 'Undead' },
-	{ name: 'Owlbear', ac: 13, hp: 59, cr: '3', monsterType: 'Monstrosity' },
-	{ name: 'Veteran', ac: 17, hp: 65, cr: '3', monsterType: 'Humanoid' },
-	{ name: 'Wight', ac: 14, hp: 45, cr: '3', monsterType: 'Undead' },
-	{ name: 'Werewolf', ac: 11, hp: 58, cr: '3', monsterType: 'Humanoid' },
-	// CR 4-6
-	{ name: 'Banshee', ac: 12, hp: 58, cr: '4', monsterType: 'Undead' },
-	{ name: 'Chuul', ac: 16, hp: 93, cr: '4', monsterType: 'Aberration' },
-	{ name: 'Ettin', ac: 12, hp: 85, cr: '4', monsterType: 'Giant' },
-	{ name: 'Ghost', ac: 11, hp: 45, cr: '4', monsterType: 'Undead' },
-	{ name: 'Lamia', ac: 13, hp: 97, cr: '4', monsterType: 'Monstrosity' },
-	{ name: 'Succubus/Incubus', ac: 13, hp: 66, cr: '4', monsterType: 'Fiend' },
-	{ name: 'Cyclops', ac: 14, hp: 138, cr: '6', monsterType: 'Giant' },
-	{ name: 'Medusa', ac: 15, hp: 127, cr: '6', monsterType: 'Monstrosity' },
-	{ name: 'Hill Giant', ac: 13, hp: 105, cr: '5', monsterType: 'Giant' },
-	{ name: 'Revenant', ac: 13, hp: 136, cr: '5', monsterType: 'Undead' },
-	{ name: 'Troll', ac: 15, hp: 84, cr: '5', monsterType: 'Giant' },
-	{ name: 'Vampire Spawn', ac: 13, hp: 82, cr: '5', monsterType: 'Undead' },
-	{ name: 'Wraith', ac: 13, hp: 67, cr: '5', monsterType: 'Undead' },
-	// CR 7-10
-	{ name: 'Mind Flayer', ac: 15, hp: 71, cr: '7', monsterType: 'Aberration' },
-	{ name: 'Oni', ac: 16, hp: 110, cr: '7', monsterType: 'Giant' },
-	{ name: 'Stone Giant', ac: 17, hp: 126, cr: '7', monsterType: 'Giant' },
-	{ name: 'Young Black Dragon', ac: 18, hp: 127, cr: '7', monsterType: 'Dragon' },
-	{ name: 'Chain Devil', ac: 16, hp: 85, cr: '8', monsterType: 'Fiend' },
-	{ name: 'Frost Giant', ac: 15, hp: 138, cr: '8', monsterType: 'Giant' },
-	{ name: 'Hydra', ac: 15, hp: 172, cr: '8', monsterType: 'Monstrosity' },
-	{ name: 'Young Blue Dragon', ac: 18, hp: 152, cr: '9', monsterType: 'Dragon' },
-	{ name: 'Young Green Dragon', ac: 18, hp: 136, cr: '8', monsterType: 'Dragon' },
-	{ name: 'Fire Giant', ac: 18, hp: 162, cr: '9', monsterType: 'Giant' },
-	{ name: 'Young Red Dragon', ac: 18, hp: 178, cr: '10', monsterType: 'Dragon' },
-	// CR 11+
-	{ name: 'Archmage', ac: 12, hp: 99, cr: '12', monsterType: 'Humanoid' },
-	{ name: 'Beholder', ac: 18, hp: 180, cr: '13', monsterType: 'Aberration' },
-	{ name: 'Storm Giant', ac: 16, hp: 230, cr: '13', monsterType: 'Giant' },
-	{ name: 'Vampire', ac: 16, hp: 144, cr: '13', monsterType: 'Undead' },
-	{ name: 'Adult Black Dragon', ac: 19, hp: 195, cr: '14', monsterType: 'Dragon' },
-	{ name: 'Adult Green Dragon', ac: 19, hp: 207, cr: '15', monsterType: 'Dragon' },
-	{ name: 'Adult Blue Dragon', ac: 19, hp: 225, cr: '16', monsterType: 'Dragon' },
-	{ name: 'Adult Red Dragon', ac: 19, hp: 256, cr: '17', monsterType: 'Dragon' },
-	{ name: 'Lich', ac: 17, hp: 135, cr: '21', monsterType: 'Undead' },
-	{ name: 'Ancient Red Dragon', ac: 22, hp: 546, cr: '24', monsterType: 'Dragon' },
-];
+// ---------------------------------------------------------------------------
+// Parsing helpers
+// ---------------------------------------------------------------------------
+
+function parseAc(s: string): number {
+	const m = s.match(/\d+/);
+	return m ? parseInt(m[0]) : 10;
+}
+
+function parseHp(s: string): number {
+	const m = s.match(/\d+/);
+	return m ? parseInt(m[0]) : 1;
+}
+
+function parseCr(s: string): string {
+	return s.split('(')[0].trim();
+}
+
+function parseDexMod(dexModStr: string): number {
+	return parseInt(dexModStr.replace(/[()]/g, '')) || 0;
+}
+
+function extractMonsterType(meta: string): string {
+	const beforeComma = meta.split(',')[0].trim().toLowerCase();
+	if (beforeComma.startsWith('swarm')) return 'Beast';
+	const sizes = ['tiny', 'small', 'medium', 'large', 'huge', 'gargantuan'];
+	let t = beforeComma;
+	for (const size of sizes) {
+		if (t.startsWith(size + ' ')) {
+			t = t.slice(size.length + 1);
+			break;
+		}
+	}
+	t = t.replace(/\(.*\)/, '').trim();
+	const word = t.split(' ')[0];
+	return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+// ---------------------------------------------------------------------------
+// Type for raw JSON entries
+// ---------------------------------------------------------------------------
+
+interface RawMonster {
+	name: string;
+	meta: string;
+	'Armor Class': string;
+	'Hit Points': string;
+	Speed: string;
+	STR: string; STR_mod: string;
+	DEX: string; DEX_mod: string;
+	CON: string; CON_mod: string;
+	INT: string; INT_mod: string;
+	WIS: string; WIS_mod: string;
+	CHA: string; CHA_mod: string;
+	'Saving Throws'?: string;
+	Skills?: string;
+	'Damage Immunities'?: string;
+	'Damage Resistances'?: string;
+	'Condition Immunities'?: string;
+	Senses?: string;
+	Languages?: string;
+	Challenge: string;
+	Traits?: string;
+	Actions?: string;
+	Reactions?: string;
+	'Legendary Actions'?: string;
+	img_url?: string;
+}
+
+const monsters = rawMonsters as RawMonster[];
+
+// ---------------------------------------------------------------------------
+// ENEMY_TEMPLATES — the lightweight list used for encounter building
+// ---------------------------------------------------------------------------
+
+export const ENEMY_TEMPLATES: EnemyTemplate[] = monsters.map((m) => ({
+	name: m.name,
+	ac: parseAc(m['Armor Class']),
+	hp: parseHp(m['Hit Points']),
+	cr: parseCr(m.Challenge),
+	monsterType: extractMonsterType(m.meta),
+	dexMod: parseDexMod(m.DEX_mod)
+}));
+
+// ---------------------------------------------------------------------------
+// Monster detail lookup — full stat block for the info modal
+// ---------------------------------------------------------------------------
+
+const detailMap = new Map<string, MonsterDetail>(
+	monsters.map((m) => [
+		m.name,
+		{
+			name: m.name,
+			meta: m.meta,
+			armorClass: m['Armor Class'],
+			hitPoints: m['Hit Points'],
+			speed: m.Speed,
+			str: parseInt(m.STR), strMod: m.STR_mod,
+			dex: parseInt(m.DEX), dexMod: m.DEX_mod,
+			con: parseInt(m.CON), conMod: m.CON_mod,
+			int: parseInt(m.INT), intMod: m.INT_mod,
+			wis: parseInt(m.WIS), wisMod: m.WIS_mod,
+			cha: parseInt(m.CHA), chaMod: m.CHA_mod,
+			savingThrows: m['Saving Throws'],
+			skills: m.Skills,
+			damageImmunities: m['Damage Immunities'],
+			damageResistances: m['Damage Resistances'],
+			conditionImmunities: m['Condition Immunities'],
+			senses: m.Senses,
+			languages: m.Languages,
+			challenge: m.Challenge,
+			traits: m.Traits,
+			actions: m.Actions,
+			reactions: m.Reactions,
+			legendaryActions: m['Legendary Actions'],
+			imgUrl: m.img_url
+		}
+	])
+);
+
+export function getMonsterDetail(name: string): MonsterDetail | undefined {
+	return detailMap.get(name);
+}
+
+// ---------------------------------------------------------------------------
+// Derived lists
+// ---------------------------------------------------------------------------
 
 export const MONSTER_TYPES = ['All', ...new Set(ENEMY_TEMPLATES.map((e) => e.monsterType))].sort();
 

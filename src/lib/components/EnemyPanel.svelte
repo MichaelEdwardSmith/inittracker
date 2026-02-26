@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { ENEMY_TEMPLATES, MONSTER_TYPES } from '$lib/enemies';
-	import type { EnemyTemplate, CustomMonster } from '$lib/types';
+	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail } from '$lib/enemies';
+	import type { EnemyTemplate, CustomMonster, MonsterDetail } from '$lib/types';
 
 	// Extended display type — built-ins have no id/isCustom
 	type DisplayTemplate = EnemyTemplate & { id?: string; isCustom?: boolean };
@@ -12,6 +12,13 @@
 	let sortBy = $state<'name' | 'type'>('name');
 	let selectedEnemy = $state<DisplayTemplate | null>(null);
 	let quantity = $state(1);
+
+	// ── Monster info modal ───────────────────────────────────────────────────
+	let infoMonster = $state<MonsterDetail | null>(null);
+
+	function showInfo(e: DisplayTemplate) {
+		infoMonster = getMonsterDetail(e.name) ?? null;
+	}
 
 	// ── Custom monsters ──────────────────────────────────────────────────────
 	let customMonsters = $state<CustomMonster[]>([]);
@@ -270,6 +277,18 @@
 						<div>{enemy.hp} HP</div>
 					</div>
 				</button>
+				<!-- Info button (built-in monsters only) -->
+				{#if !enemy.isCustom}
+					<button
+						onclick={() => showInfo(enemy)}
+						title="View {enemy.name} stat block"
+						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-blue-400"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+					</button>
+				{/if}
 				{#if enemy.isCustom && enemy.id}
 					<button
 						onclick={() => openEditFromList({ id: enemy.id!, name: enemy.name, ac: enemy.ac, hp: enemy.hp, cr: enemy.cr, monsterType: enemy.monsterType })}
@@ -495,6 +514,130 @@
 					</div>
 				{:else}
 					<p class="text-center text-sm text-gray-600">No custom monsters yet. Create one above.</p>
+				{/if}
+
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Monster Info Modal -->
+{#if infoMonster}
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
+		onclick={(e) => { if (e.target === e.currentTarget) infoMonster = null; }}
+	>
+		<div class="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: calc(100vh - 4rem);">
+
+			<!-- Modal header -->
+			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
+				<div>
+					<h3 class="text-lg font-black tracking-wide text-red-400">{infoMonster.name}</h3>
+					<p class="text-xs italic text-gray-400">{infoMonster.meta}</p>
+				</div>
+				<button onclick={() => infoMonster = null} class="text-gray-500 transition hover:text-white" aria-label="Close">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="overflow-y-auto p-5 text-gray-200">
+
+				<!-- Image -->
+				{#if infoMonster.imgUrl}
+					<img src={infoMonster.imgUrl} alt={infoMonster.name} class="mb-4 h-32 w-full rounded-lg object-cover object-top" />
+				{/if}
+
+				<!-- Core stats bar -->
+				<div class="mb-4 flex flex-wrap gap-4 border-b border-gray-700 pb-4 text-sm">
+					<div><span class="text-gray-500">AC</span> <span class="font-bold text-gray-200">{infoMonster.armorClass}</span></div>
+					<div><span class="text-gray-500">HP</span> <span class="font-bold text-gray-200">{infoMonster.hitPoints}</span></div>
+					<div><span class="text-gray-500">Speed</span> <span class="font-bold text-gray-200">{infoMonster.speed}</span></div>
+					<div><span class="text-gray-500">CR</span> <span class="font-bold text-amber-300">{infoMonster.challenge}</span></div>
+				</div>
+
+				<!-- Ability scores -->
+				<div class="mb-4 grid grid-cols-6 gap-2 border-b border-gray-700 pb-4 text-center">
+					{#each [
+						{ label: 'STR', val: infoMonster.str, mod: infoMonster.strMod },
+						{ label: 'DEX', val: infoMonster.dex, mod: infoMonster.dexMod },
+						{ label: 'CON', val: infoMonster.con, mod: infoMonster.conMod },
+						{ label: 'INT', val: infoMonster.int, mod: infoMonster.intMod },
+						{ label: 'WIS', val: infoMonster.wis, mod: infoMonster.wisMod },
+						{ label: 'CHA', val: infoMonster.cha, mod: infoMonster.chaMod },
+					] as stat}
+						<div class="rounded bg-gray-800 px-1 py-2">
+							<div class="text-xs font-bold uppercase tracking-wider text-red-400">{stat.label}</div>
+							<div class="text-sm font-bold text-white">{stat.val}</div>
+							<div class="text-xs text-gray-400">{stat.mod}</div>
+						</div>
+					{/each}
+				</div>
+
+				<!-- Secondary stats -->
+				<div class="mb-4 flex flex-col gap-1 border-b border-gray-700 pb-4 text-sm">
+					{#if infoMonster.savingThrows}
+						<div><span class="text-gray-500">Saving Throws </span><span class="text-gray-200">{infoMonster.savingThrows}</span></div>
+					{/if}
+					{#if infoMonster.skills}
+						<div><span class="text-gray-500">Skills </span><span class="text-gray-200">{infoMonster.skills}</span></div>
+					{/if}
+					{#if infoMonster.damageImmunities}
+						<div><span class="text-gray-500">Damage Immunities </span><span class="text-gray-200">{infoMonster.damageImmunities}</span></div>
+					{/if}
+					{#if infoMonster.damageResistances}
+						<div><span class="text-gray-500">Damage Resistances </span><span class="text-gray-200">{infoMonster.damageResistances}</span></div>
+					{/if}
+					{#if infoMonster.conditionImmunities}
+						<div><span class="text-gray-500">Condition Immunities </span><span class="text-gray-200">{infoMonster.conditionImmunities}</span></div>
+					{/if}
+					{#if infoMonster.senses}
+						<div><span class="text-gray-500">Senses </span><span class="text-gray-200">{infoMonster.senses}</span></div>
+					{/if}
+					{#if infoMonster.languages}
+						<div><span class="text-gray-500">Languages </span><span class="text-gray-200">{infoMonster.languages}</span></div>
+					{/if}
+				</div>
+
+				<!-- Traits -->
+				{#if infoMonster.traits}
+					<div class="mb-4 border-b border-gray-700 pb-4">
+						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+							{@html infoMonster.traits}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Actions -->
+				{#if infoMonster.actions}
+					<div class="mb-4 border-b border-gray-700 pb-4">
+						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Actions</h4>
+						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+							{@html infoMonster.actions}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Reactions -->
+				{#if infoMonster.reactions}
+					<div class="mb-4 border-b border-gray-700 pb-4">
+						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Reactions</h4>
+						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+							{@html infoMonster.reactions}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Legendary Actions -->
+				{#if infoMonster.legendaryActions}
+					<div class="mb-2">
+						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-amber-400">Legendary Actions</h4>
+						<div class="prose-sm prose-invert [&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+							{@html infoMonster.legendaryActions}
+						</div>
+					</div>
 				{/if}
 
 			</div>

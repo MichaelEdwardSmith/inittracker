@@ -5,7 +5,8 @@
       "WebFetch(domain:docs.ionos.space)",
       "WebFetch(domain:www.ionos.com)",
       "Bash(node:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(pnpm exec tsc:*)"
     ]
   }
 }
