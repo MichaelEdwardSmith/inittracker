@@ -402,12 +402,24 @@
 				</button>
 			{/if}
 		</div>
+		<div class="flex items-center gap-3">
 		{#if combatState.currentTurnId}
 			<div class="flex items-center gap-2">
 				<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
 				<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
 			</div>
 		{/if}
+		<a
+			href="mailto:dm@inittracker.com"
+			title="Contact us"
+			class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+			</svg>
+			<span class="hidden sm:inline">Contact</span>
+		</a>
+	</div>
 	</header>
 
 	{#if !current}

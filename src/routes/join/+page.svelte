@@ -78,5 +78,8 @@
 			Dungeon Master?
 			<a href="/login" class="text-gray-500 transition hover:text-gray-400">Sign in here</a>
 		</p>
+		<p class="mt-3 text-center text-xs text-gray-700">
+			<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400">✉ Contact us</a>
+		</p>
 	</div>
 </div>
