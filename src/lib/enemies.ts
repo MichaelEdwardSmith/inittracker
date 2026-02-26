@@ -136,7 +136,6 @@ export const CONDITIONS = [
 	'Charmed',
 	'Concentrating',
 	'Deafened',
-	'Dead',
 	'Exhausted',
 	'Frightened',
 	'Grappled',
@@ -148,5 +147,4 @@ export const CONDITIONS = [
 	'Prone',
 	'Restrained',
 	'Stunned',
-	'Unconscious',
 ] as const;
