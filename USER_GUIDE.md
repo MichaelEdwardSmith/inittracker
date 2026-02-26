@@ -238,9 +238,11 @@ By default, enemy AC is hidden from the player display. To reveal an enemy's AC 
 
 ### Adding a Condition
 
-Click the **+ Condition** button on any combatant row. A dropdown menu lists all 17 standard D&D 5e conditions:
+Click the **+ Condition** button on any combatant row. A dropdown menu lists 15 conditions:
 
-Blinded · Charmed · Concentrating · Deafened · Dead · Exhausted · Frightened · Grappled · Incapacitated · Invisible · Paralyzed · Petrified · Poisoned · Prone · Restrained · Stunned · Unconscious
+Blinded · Charmed · Concentrating · Deafened · Exhausted · Frightened · Grappled · Incapacitated · Invisible · Paralyzed · Petrified · Poisoned · Prone · Restrained · Stunned
+
+> **Note:** Dead and Unconscious are not in the selectable list. When a **player** reaches 0 HP, they automatically become Unconscious (all other conditions are cleared). Enemies at 0 HP are simply removed from the turn order.
 
 Click any condition to apply it. Conditions already active are hidden from the list.
 

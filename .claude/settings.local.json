@@ -9,7 +9,9 @@
       "Bash(pnpm exec tsc:*)",
       "Bash(echo:*)",
       "Bash(py:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git -C \"C:/Users/mojpo/WebstormProjects/Initiative\" diff --name-only)",
+      "Bash(git -C \"C:/Users/mojpo/WebstormProjects/Initiative\" diff src/lib/enemies.ts src/lib/store.svelte.ts USER_GUIDE.md src/routes/guide/+page.svelte)"
     ]
   }
 }

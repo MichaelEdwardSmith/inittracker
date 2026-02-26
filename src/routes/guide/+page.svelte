@@ -15,9 +15,9 @@
 	];
 
 	const conditions = [
-		'Blinded', 'Charmed', 'Concentrating', 'Deafened', 'Dead', 'Exhausted',
+		'Blinded', 'Charmed', 'Concentrating', 'Deafened', 'Exhausted',
 		'Frightened', 'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed',
-		'Petrified', 'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious',
+		'Petrified', 'Poisoned', 'Prone', 'Restrained', 'Stunned',
 	];
 </script>
 
@@ -318,7 +318,7 @@
 
 				<h3 class="mb-2 mt-5 text-sm font-bold tracking-widest text-gray-200 uppercase">Adding a Condition</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row. A dropdown lists all 17 standard D&amp;D 5e conditions. Click one to apply it — conditions already active are hidden from the list.
+					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row. A dropdown lists all 15 conditions. Click one to apply it — conditions already active are hidden from the list. Dead and Unconscious are not selectable: when a player drops to 0 HP, they automatically become Unconscious (all other conditions cleared). Enemies at 0 HP are simply removed from the turn order.
 				</p>
 				<div class="mb-6 flex flex-wrap gap-2">
 					{#each conditions as c}

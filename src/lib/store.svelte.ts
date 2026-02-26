@@ -79,7 +79,7 @@ function createCombatStore() {
 				finalHp: c.currentHp,
 				totalDamage: stats?.totalDamage ?? 0,
 				totalHealing: stats?.totalHealing ?? 0,
-				wasSlain: c.currentHp <= 0
+				wasSlain: c.type === 'enemy' && c.currentHp <= 0
 			};
 		});
 
@@ -243,6 +243,9 @@ function createCombatStore() {
 					updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
 				}
 				hpAfter = updated.currentHp;
+				if (hpBefore > 0 && hpAfter === 0) {
+					updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
+				}
 				return updated;
 			});
 
@@ -274,7 +277,7 @@ function createCombatStore() {
 						participantStats.set(id, {
 							...stats,
 							totalDamage: stats.totalDamage + dmg,
-							wasSlain: stats.wasSlain || causedDown
+							wasSlain: stats.wasSlain || (causedDown && c.type === 'enemy')
 						});
 					}
 				} else if (actualDelta > 0) {
