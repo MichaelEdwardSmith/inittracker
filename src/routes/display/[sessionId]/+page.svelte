@@ -483,12 +483,12 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 					{@const style = getMonsterStyle(current.monsterType)}
 					{@const imgUrl = current.imgUrl ?? getMonsterDetail(current.templateName ?? '')?.imgUrl}
 					{#if imgUrl}
-						<div
-							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring}"
+						<a href={imgUrl} target="_blank" rel="noopener noreferrer"
+							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring} cursor-pointer"
 							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
 						>
 							<img src={imgUrl} alt={current.name} class="h-full w-full object-cover object-top" />
-						</div>
+						</a>
 					{:else}
 						{@const emoji = getMonsterEmoji(current.templateName, current.monsterType)}
 						<div
@@ -637,9 +637,9 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 									{@const style = getMonsterStyle(c.monsterType)}
 									{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
 									{#if imgUrl}
-										<div class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring}">
+										<a href={imgUrl} target="_blank" rel="noopener noreferrer" class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring} cursor-pointer">
 											<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
-										</div>
+										</a>
 									{:else}
 										<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}">
 											<span class="select-none text-xl leading-none">{getMonsterEmoji(c.templateName, c.monsterType)}</span>
