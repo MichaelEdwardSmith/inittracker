@@ -16,6 +16,7 @@
 	let damageInputs = $state<Record<string, string>>({});
 	let tempHpInputs = $state<Record<string, string>>({});
 	let chronicleSaved = $state(false);
+	let initiativeTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
 	function handleSaveToChronicle() {
 		combat.saveToChronicle();
@@ -24,8 +25,11 @@
 	}
 
 	function handleInitiativeInput(id: string, raw: string) {
-		const val = parseInt(raw);
-		combat.update(id, { initiative: isNaN(val) ? null : val });
+		clearTimeout(initiativeTimers[id]);
+		initiativeTimers[id] = setTimeout(() => {
+			const val = parseInt(raw);
+			combat.update(id, { initiative: isNaN(val) ? null : val });
+		}, 1000);
 	}
 
 	function commitDamage(c: Combatant, sign: 1 | -1) {
