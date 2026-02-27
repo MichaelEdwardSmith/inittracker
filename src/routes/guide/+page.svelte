@@ -362,7 +362,7 @@
 				<p class="mb-3 text-sm leading-relaxed"><strong class="font-semibold text-white">During combat:</strong></p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>Type badge — <strong class="text-blue-400">PLAYER CHARACTER</strong> or <strong class="text-red-400">ENEMY</strong></li>
-					<li>Avatar in a glowing circular frame (uploaded photo or monster artwork/emoji)</li>
+					<li>Avatar in a glowing circular frame (uploaded photo or monster artwork/emoji) — <strong class="font-semibold text-white">click an enemy's avatar</strong> to open the full image in a new tab</li>
 					<li>Name in large responsive text with a colored glow</li>
 					<li>Stats row: Initiative · Armor Class · Hit Points (players only)</li>
 					<li>HP bar with color coding and a yellow temp HP extension (players only)</li>
