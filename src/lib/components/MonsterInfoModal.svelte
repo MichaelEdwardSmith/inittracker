@@ -21,25 +21,43 @@
 		aria-modal="true"
 		aria-label="Monster information"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
-		onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
+		onclick={(e) => {
+			if (e.target === e.currentTarget) onclose();
+		}}
 	>
-		<div class="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: calc(100vh - 4rem);">
-
+		<div
+			class="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
+			style="max-height: calc(100vh - 4rem);"
+		>
 			<!-- Header -->
 			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
 				<div>
 					<h3 class="text-lg font-black tracking-wide text-red-400">{monster.name}</h3>
-					<p class="text-xs italic text-gray-400">{monster.meta}</p>
+					<p class="text-xs text-gray-400 italic">{monster.meta}</p>
 				</div>
-				<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				<button
+					onclick={onclose}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
 
 			<div class="overflow-y-auto p-5 text-gray-200">
-
 				<!-- Image -->
 				{#if monster.imgUrl}
 					<div class="mb-4">
@@ -63,24 +81,31 @@
 
 				<!-- Core stats -->
 				<div class="mb-4 flex flex-wrap gap-4 border-b border-gray-700 pb-4 text-sm">
-					<div><span class="text-gray-500">AC</span> <span class="font-bold text-gray-200">{monster.armorClass}</span></div>
-					<div><span class="text-gray-500">HP</span> <span class="font-bold text-gray-200">{monster.hitPoints}</span></div>
-					<div><span class="text-gray-500">Speed</span> <span class="font-bold text-gray-200">{monster.speed}</span></div>
-					<div><span class="text-gray-500">CR</span> <span class="font-bold text-amber-300">{monster.challenge}</span></div>
+					<div>
+						<span class="text-gray-500">AC</span>
+						<span class="font-bold text-gray-200">{monster.armorClass}</span>
+					</div>
+					<div>
+						<span class="text-gray-500">HP</span>
+						<span class="font-bold text-gray-200">{monster.hitPoints}</span>
+					</div>
+					<div>
+						<span class="text-gray-500">Speed</span>
+						<span class="font-bold text-gray-200">{monster.speed}</span>
+					</div>
+					<div>
+						<span class="text-gray-500">CR</span>
+						<span class="font-bold text-amber-300">{monster.challenge}</span>
+					</div>
 				</div>
 
 				<!-- Ability scores -->
 				<div class="mb-4 grid grid-cols-6 gap-2 border-b border-gray-700 pb-4 text-center">
-					{#each [
-						{ label: 'STR', val: monster.str, mod: monster.strMod },
-						{ label: 'DEX', val: monster.dex, mod: monster.dexMod },
-						{ label: 'CON', val: monster.con, mod: monster.conMod },
-						{ label: 'INT', val: monster.int, mod: monster.intMod },
-						{ label: 'WIS', val: monster.wis, mod: monster.wisMod },
-						{ label: 'CHA', val: monster.cha, mod: monster.chaMod },
-					] as stat}
+					{#each [{ label: 'STR', val: monster.str, mod: monster.strMod }, { label: 'DEX', val: monster.dex, mod: monster.dexMod }, { label: 'CON', val: monster.con, mod: monster.conMod }, { label: 'INT', val: monster.int, mod: monster.intMod }, { label: 'WIS', val: monster.wis, mod: monster.wisMod }, { label: 'CHA', val: monster.cha, mod: monster.chaMod }] as stat}
 						<div class="rounded bg-gray-800 px-1 py-2">
-							<div class="text-xs font-bold uppercase tracking-wider text-red-400">{stat.label}</div>
+							<div class="text-xs font-bold tracking-wider text-red-400 uppercase">
+								{stat.label}
+							</div>
 							<div class="text-sm font-bold text-white">{stat.val}</div>
 							<div class="text-xs text-gray-400">{stat.mod}</div>
 						</div>
@@ -90,19 +115,33 @@
 				<!-- Secondary stats -->
 				<div class="mb-4 flex flex-col gap-1 border-b border-gray-700 pb-4 text-sm">
 					{#if monster.savingThrows}
-						<div><span class="text-gray-500">Saving Throws </span><span>{monster.savingThrows}</span></div>
+						<div>
+							<span class="text-gray-500">Saving Throws </span><span>{monster.savingThrows}</span>
+						</div>
 					{/if}
 					{#if monster.skills}
 						<div><span class="text-gray-500">Skills </span><span>{monster.skills}</span></div>
 					{/if}
 					{#if monster.damageImmunities}
-						<div><span class="text-gray-500">Damage Immunities </span><span>{monster.damageImmunities}</span></div>
+						<div>
+							<span class="text-gray-500">Damage Immunities </span><span
+								>{monster.damageImmunities}</span
+							>
+						</div>
 					{/if}
 					{#if monster.damageResistances}
-						<div><span class="text-gray-500">Damage Resistances </span><span>{monster.damageResistances}</span></div>
+						<div>
+							<span class="text-gray-500">Damage Resistances </span><span
+								>{monster.damageResistances}</span
+							>
+						</div>
 					{/if}
 					{#if monster.conditionImmunities}
-						<div><span class="text-gray-500">Condition Immunities </span><span>{monster.conditionImmunities}</span></div>
+						<div>
+							<span class="text-gray-500">Condition Immunities </span><span
+								>{monster.conditionImmunities}</span
+							>
+						</div>
 					{/if}
 					{#if monster.senses}
 						<div><span class="text-gray-500">Senses </span><span>{monster.senses}</span></div>
@@ -115,7 +154,7 @@
 				<!-- Traits -->
 				{#if monster.traits}
 					<div class="mb-4 border-b border-gray-700 pb-4">
-						<div class="[&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
 							{@html monster.traits}
 						</div>
 					</div>
@@ -124,8 +163,8 @@
 				<!-- Actions -->
 				{#if monster.actions}
 					<div class="mb-4 border-b border-gray-700 pb-4">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Actions</h4>
-						<div class="[&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Actions</h4>
+						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
 							{@html monster.actions}
 						</div>
 					</div>
@@ -134,8 +173,8 @@
 				<!-- Reactions -->
 				{#if monster.reactions}
 					<div class="mb-4 border-b border-gray-700 pb-4">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-red-400">Reactions</h4>
-						<div class="[&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Reactions</h4>
+						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
 							{@html monster.reactions}
 						</div>
 					</div>
@@ -144,13 +183,14 @@
 				<!-- Legendary Actions -->
 				{#if monster.legendaryActions}
 					<div class="mb-2">
-						<h4 class="mb-2 text-xs font-bold uppercase tracking-widest text-amber-400">Legendary Actions</h4>
-						<div class="[&_p]:mb-2 [&_strong]:text-gray-200 [&_em]:text-gray-300">
+						<h4 class="mb-2 text-xs font-bold tracking-widest text-amber-400 uppercase">
+							Legendary Actions
+						</h4>
+						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
 							{@html monster.legendaryActions}
 						</div>
 					</div>
 				{/if}
-
 			</div>
 		</div>
 	</div>

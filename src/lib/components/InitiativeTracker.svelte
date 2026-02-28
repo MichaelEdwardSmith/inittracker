@@ -1,10 +1,18 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { combat } from '$lib/store.svelte';
 	import { CONDITIONS, getMonsterDetail } from '$lib/enemies';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
+	import { tick } from 'svelte';
+
+	async function scrollToActive() {
+		await tick();
+		document
+			.getElementById(`combatant-${combat.currentTurnId}`)
+			?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+	}
 
 	let openStatusId = $state<string | null>(null);
 	let infoMonster = $state<MonsterDetail | null>(null);
@@ -70,14 +78,20 @@
 					</button>
 				{:else}
 					<button
-						onclick={() => combat.prevTurn()}
+						onclick={() => {
+							combat.prevTurn();
+							scrollToActive();
+						}}
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 						title="Previous turn"
 					>
 						◀ Prev
 					</button>
 					<button
-						onclick={() => combat.nextTurn()}
+						onclick={() => {
+							combat.nextTurn();
+							scrollToActive();
+						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
 						Next ▶
@@ -141,7 +155,7 @@
 	{:else}
 		<!-- Column headers (desktop only) -->
 		<div
-			class="hidden md:grid items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+			class="hidden items-center gap-2 px-3 text-xs font-semibold tracking-wider text-gray-500 uppercase md:grid"
 			style="grid-template-columns: 3.5rem 1fr 3rem 10rem 1fr auto"
 		>
 			<div>Init</div>
@@ -159,6 +173,7 @@
 				{@const isActive = c.id === combat.currentTurnId}
 				{@const pct = hpPercent(c)}
 				<div
+					id="combatant-{c.id}"
 					class="flex flex-col gap-2 rounded-lg border px-3 py-2 transition-all md:grid md:items-center md:gap-2
 					       {isActive
 						? 'border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
@@ -168,6 +183,7 @@
 								? 'border-blue-900/50 bg-gray-800'
 								: 'border-red-900/50 bg-gray-800'}"
 					style="grid-template-columns: 3.5rem 1fr 3rem 10rem 1fr auto"
+
 				>
 					<!-- ─── MOBILE LAYOUT ───────────────────────────────── -->
 
@@ -181,12 +197,18 @@
 								<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
 							</div>
 						{:else}
-							<span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold
-							       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}">
+							<span
+								class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold
+							       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}"
+							>
 								{c.type === 'player' ? 'PC' : 'NPC'}
 							</span>
 						{/if}
-						<span class="flex-1 truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-white'}">
+						<span
+							class="flex-1 truncate text-sm font-semibold {isActive
+								? 'text-amber-100'
+								: 'text-white'}"
+						>
 							{c.name}
 						</span>
 						{#if c.type === 'enemy' && getMonsterDetail(c.templateName ?? '')}
@@ -195,18 +217,42 @@
 								title="View stat block"
 								class="rounded p-2 text-gray-600 transition hover:text-blue-400"
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
 								</svg>
 							</button>
 						{/if}
 						<button
 							onclick={() => combat.removeFromCombat(c.id)}
-							title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
+							title={c.type === 'player'
+								? 'Remove from combat (keeps in party)'
+								: 'Remove from combat'}
 							class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
 							</svg>
 						</button>
 					</div>
@@ -215,7 +261,7 @@
 					<div class="grid grid-cols-[auto_1fr_auto] items-start gap-3 md:hidden">
 						<!-- Init -->
 						<div class="flex flex-col items-center gap-0.5">
-							<span class="text-xs uppercase tracking-wide text-gray-500">Init</span>
+							<span class="text-xs tracking-wide text-gray-500 uppercase">Init</span>
 							<input
 								type="number"
 								value={c.initiative ?? ''}
@@ -231,7 +277,9 @@
 								<span class="text-xs text-gray-600">/</span>
 								<span class="text-sm text-gray-400">{c.maxHp}</span>
 								{#if c.tempHp > 0}
-									<span class="rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300">
+									<span
+										class="rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300"
+									>
 										+{c.tempHp} THP
 									</span>
 								{/if}
@@ -252,7 +300,7 @@
 						</div>
 						<!-- AC -->
 						<div class="flex flex-col items-center gap-0.5">
-							<span class="text-xs uppercase tracking-wide text-gray-500">AC</span>
+							<span class="text-xs tracking-wide text-gray-500 uppercase">AC</span>
 							<div class="flex items-center gap-1">
 								{#if c.type === 'enemy'}
 									<input
@@ -325,7 +373,10 @@
 					<!-- Mobile: conditions row -->
 					<div class="relative flex flex-wrap items-start gap-1.5 md:hidden">
 						{#each c.statuses as status}
-							<div class="flex items-center rounded text-xs font-medium {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}">
+							<div
+								class="flex items-center rounded text-xs font-medium {conditionColors[status] ??
+									'bg-gray-700 text-gray-300'}"
+							>
 								<button
 									onclick={() => combat.toggleStatus(c.id, status)}
 									title="Remove {status}"
@@ -338,8 +389,19 @@
 									title="What is {status}?"
 									class="border-l border-white/10 px-1.5 py-1.5 opacity-40 transition hover:opacity-100"
 								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-3 w-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -353,7 +415,7 @@
 						{#if openStatusId === c.id}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
-								class="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
+								class="absolute top-full left-0 z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
 								onmouseleave={() => (openStatusId = null)}
 							>
 								<div class="grid grid-cols-2 gap-1">
@@ -363,7 +425,8 @@
 											onclick={() => combat.toggleStatus(c.id, cond)}
 											class="rounded px-2 py-1 text-left text-xs transition
 											       {active
-												? (conditionColors[cond] ?? 'bg-gray-700 text-white') + ' ring-1 ring-white/20'
+												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
+													' ring-1 ring-white/20'
 												: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 										>
 											{cond}
@@ -386,7 +449,7 @@
 					/>
 
 					<!-- Name + type badge + active indicator (desktop) -->
-					<div class="hidden md:block min-w-0">
+					<div class="hidden min-w-0 md:block">
 						<div class="flex items-center gap-1.5">
 							{#if isActive}
 								<span class="text-amber-400" title="Active turn">▶</span>
@@ -434,7 +497,9 @@
 							<span class="text-xs text-gray-600">/</span>
 							<span class="text-xs text-gray-400">{c.maxHp}</span>
 							{#if c.tempHp > 0}
-								<span class="rounded bg-yellow-800/70 px-1 py-0.5 text-xs font-bold text-yellow-300">
+								<span
+									class="rounded bg-yellow-800/70 px-1 py-0.5 text-xs font-bold text-yellow-300"
+								>
 									+{c.tempHp}
 								</span>
 							{/if}
@@ -510,7 +575,10 @@
 					<!-- Conditions (desktop) -->
 					<div class="relative hidden flex-wrap items-start gap-1 md:flex">
 						{#each c.statuses as status}
-							<div class="flex items-center rounded text-xs font-medium {conditionColors[status] ?? 'bg-gray-700 text-gray-300'}">
+							<div
+								class="flex items-center rounded text-xs font-medium {conditionColors[status] ??
+									'bg-gray-700 text-gray-300'}"
+							>
 								<button
 									onclick={() => combat.toggleStatus(c.id, status)}
 									title="Remove {status}"
@@ -523,8 +591,19 @@
 									title="What is {status}?"
 									class="border-l border-white/10 px-1 py-0.5 opacity-40 transition hover:opacity-100"
 								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-3 w-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -538,7 +617,7 @@
 						{#if openStatusId === c.id}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
-								class="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
+								class="absolute top-full left-0 z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
 								onmouseleave={() => (openStatusId = null)}
 							>
 								<div class="grid grid-cols-2 gap-1">
@@ -548,7 +627,8 @@
 											onclick={() => combat.toggleStatus(c.id, cond)}
 											class="rounded px-2 py-1 text-left text-xs transition
 											       {active
-												? (conditionColors[cond] ?? 'bg-gray-700 text-white') + ' ring-1 ring-white/20'
+												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
+													' ring-1 ring-white/20'
 												: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 										>
 											{cond}
@@ -567,18 +647,42 @@
 								title="View stat block"
 								class="rounded p-1 text-gray-600 transition hover:text-blue-400"
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
 								</svg>
 							</button>
 						{/if}
 						<button
 							onclick={() => combat.removeFromCombat(c.id)}
 							class="rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
-							title={c.type === 'player' ? 'Remove from combat (keeps in party)' : 'Remove from combat'}
+							title={c.type === 'player'
+								? 'Remove from combat (keeps in party)'
+								: 'Remove from combat'}
 						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
 							</svg>
 						</button>
 					</div>
@@ -588,5 +692,5 @@
 	{/if}
 </div>
 
-<MonsterInfoModal monster={infoMonster} onclose={() => infoMonster = null} />
+<MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />

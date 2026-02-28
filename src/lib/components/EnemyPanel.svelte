@@ -47,7 +47,17 @@
 				canvas.width = 256;
 				canvas.height = 256;
 				const ctx = canvas.getContext('2d')!;
-				ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 256, 256);
+				ctx.drawImage(
+					img,
+					(img.width - size) / 2,
+					(img.height - size) / 2,
+					size,
+					size,
+					0,
+					0,
+					256,
+					256
+				);
 				URL.revokeObjectURL(url);
 				resolve(canvas.toDataURL('image/jpeg', 0.8));
 			};
@@ -79,8 +89,8 @@
 
 		const builtin = allTemplates.filter((e) => !e.isCustom && matches(e));
 		if (sortBy === 'type') {
-			builtin.sort((a, b) =>
-				a.monsterType.localeCompare(b.monsterType) || a.name.localeCompare(b.name)
+			builtin.sort(
+				(a, b) => a.monsterType.localeCompare(b.monsterType) || a.name.localeCompare(b.name)
 			);
 		} else {
 			builtin.sort((a, b) => a.name.localeCompare(b.name));
@@ -245,7 +255,13 @@
 			title="Manage custom monsters"
 			class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-3.5 w-3.5"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 			</svg>
 			Custom
@@ -321,19 +337,50 @@
 						title="View {enemy.name} stat block"
 						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-blue-400"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-3.5 w-3.5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
 						</svg>
 					</button>
 				{/if}
 				{#if enemy.isCustom && enemy.id}
 					<button
-						onclick={() => openEditFromList({ id: enemy.id!, name: enemy.name, ac: enemy.ac, hp: enemy.hp, cr: enemy.cr, monsterType: enemy.monsterType, imgUrl: enemy.imgUrl })}
+						onclick={() =>
+							openEditFromList({
+								id: enemy.id!,
+								name: enemy.name,
+								ac: enemy.ac,
+								hp: enemy.hp,
+								cr: enemy.cr,
+								monsterType: enemy.monsterType,
+								imgUrl: enemy.imgUrl
+							})}
 						title="Edit {enemy.name}"
 						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-amber-400"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-3.5 w-3.5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+							/>
 						</svg>
 					</button>
 				{/if}
@@ -394,10 +441,14 @@
 		aria-modal="true"
 		aria-label="Enemy details"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"
-		onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+		onclick={(e) => {
+			if (e.target === e.currentTarget) closeModal();
+		}}
 	>
-		<div class="flex w-full max-w-lg flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: calc(100vh - 5rem);">
-
+		<div
+			class="flex w-full max-w-lg flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
+			style="max-height: calc(100vh - 5rem);"
+		>
 			<!-- Modal header -->
 			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
 				<h3 class="font-black tracking-widest text-amber-400 uppercase">Custom Monsters</h3>
@@ -406,14 +457,24 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
 
 			<div class="flex flex-col gap-5 overflow-y-auto p-5">
-
 				<!-- Create / Edit form -->
 				<div class="rounded-lg border border-gray-700 bg-gray-800/60 p-4">
 					<h4 class="mb-3 text-xs font-bold tracking-widest text-gray-400 uppercase">
@@ -423,58 +484,68 @@
 					<div class="flex flex-col gap-3">
 						<!-- Name -->
 						<div>
-							<label for="cm-name" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">Name</label>
+							<label for="cm-name" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+								>Name</label
+							>
 							<input
 								id="cm-name"
 								bind:value={formName}
 								type="text"
 								placeholder="e.g. Oathbreaker Knight"
-								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 focus:outline-none"
 							/>
 						</div>
 
 						<!-- AC / HP / CR row -->
 						<div class="flex gap-3">
 							<div class="flex-1">
-								<label for="cm-ac" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">AC</label>
+								<label for="cm-ac" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+									>AC</label
+								>
 								<input
 									id="cm-ac"
 									bind:value={formAc}
 									type="number"
 									min="1"
 									max="99"
-									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 focus:outline-none"
 								/>
 							</div>
 							<div class="flex-1">
-								<label for="cm-hp" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">HP</label>
+								<label for="cm-hp" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+									>HP</label
+								>
 								<input
 									id="cm-hp"
 									bind:value={formHp}
 									type="number"
 									min="1"
-									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 focus:outline-none"
 								/>
 							</div>
 							<div class="flex-1">
-								<label for="cm-cr" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">CR</label>
+								<label for="cm-cr" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+									>CR</label
+								>
 								<input
 									id="cm-cr"
 									bind:value={formCr}
 									type="text"
 									placeholder="1/4"
-									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+									class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 focus:outline-none"
 								/>
 							</div>
 						</div>
 
 						<!-- Monster Type -->
 						<div>
-							<label for="cm-type" class="mb-1 block text-xs text-gray-500 uppercase tracking-wider">Type</label>
+							<label for="cm-type" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+								>Type</label
+							>
 							<select
 								id="cm-type"
 								bind:value={formType}
-								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+								class="w-full rounded border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 focus:outline-none"
 							>
 								{#each formTypes as t}
 									<option value={t}>{t}</option>
@@ -484,7 +555,9 @@
 
 						<!-- Avatar upload -->
 						<div>
-							<label class="mb-1 block text-xs uppercase tracking-wider text-gray-500">Avatar (optional)</label>
+							<label class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+								>Avatar (optional)</label
+							>
 							<div class="flex items-center gap-3">
 								{#if formImgUrl}
 									<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-gray-600">
@@ -493,19 +566,20 @@
 									<button
 										type="button"
 										onclick={() => avatarInput?.click()}
-										class="text-xs text-gray-400 transition hover:text-gray-200"
-									>Change</button>
+										class="text-xs text-gray-400 transition hover:text-gray-200">Change</button
+									>
 									<button
 										type="button"
 										onclick={() => (formImgUrl = undefined)}
-										class="text-xs text-red-500 transition hover:text-red-400"
-									>Remove</button>
+										class="text-xs text-red-500 transition hover:text-red-400">Remove</button
+									>
 								{:else}
 									<button
 										type="button"
 										onclick={() => avatarInput?.click()}
 										class="rounded border border-gray-600 px-3 py-2 text-xs text-gray-400 transition hover:border-gray-500 hover:text-gray-200"
-									>Choose Image</button>
+										>Choose Image</button
+									>
 								{/if}
 							</div>
 							<input
@@ -551,7 +625,9 @@
 							{#each customMonsters as m (m.id)}
 								<div
 									class="flex items-center gap-3 rounded-lg border px-3 py-2.5
-									       {editingId === m.id ? 'border-amber-600/60 bg-amber-950/20' : 'border-gray-700 bg-gray-800/50'}"
+									       {editingId === m.id
+										? 'border-amber-600/60 bg-amber-950/20'
+										: 'border-gray-700 bg-gray-800/50'}"
 								>
 									<div class="min-w-0 flex-1">
 										<div class="flex items-center gap-1.5">
@@ -568,8 +644,19 @@
 											title="Edit"
 											class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-amber-400"
 										>
-											<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3.5 w-3.5"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+												/>
 											</svg>
 										</button>
 										<button
@@ -577,8 +664,19 @@
 											title="Delete"
 											class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-red-400"
 										>
-											<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3.5 w-3.5"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+												/>
 											</svg>
 										</button>
 									</div>
@@ -589,10 +687,9 @@
 				{:else}
 					<p class="text-center text-sm text-gray-600">No custom monsters yet. Create one above.</p>
 				{/if}
-
 			</div>
 		</div>
 	</div>
 {/if}
 
-<MonsterInfoModal monster={infoMonster} onclose={() => infoMonster = null} />
+<MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />

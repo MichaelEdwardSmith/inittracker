@@ -73,7 +73,7 @@
 							autocomplete="given-name"
 							value={form?.firstName ?? ''}
 							class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
-							       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40"
+							       transition outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40"
 							placeholder="Elara"
 						/>
 					</div>
@@ -91,7 +91,7 @@
 							autocomplete="family-name"
 							value={form?.lastName ?? ''}
 							class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
-							       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40"
+							       transition outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40"
 							placeholder="Nightwind"
 						/>
 					</div>
@@ -99,7 +99,7 @@
 
 				<label
 					for="email"
-					class="mb-2 mt-4 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+					class="mt-4 mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
 				>
 					Email
 				</label>
@@ -110,14 +110,14 @@
 					autocomplete="email"
 					value={form?.email ?? ''}
 					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
-					       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
+					       transition outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
 					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
 					placeholder="dungeon@master.com"
 				/>
 
 				<label
 					for="password"
-					class="mb-2 mt-4 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+					class="mt-4 mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
 				>
 					Password
 				</label>
@@ -127,14 +127,14 @@
 					type="password"
 					autocomplete="new-password"
 					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
-					       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
+					       transition outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
 					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
 					placeholder="At least 8 characters"
 				/>
 
 				<label
 					for="confirm"
-					class="mb-2 mt-4 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+					class="mt-4 mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
 				>
 					Confirm Password
 				</label>
@@ -144,7 +144,7 @@
 					type="password"
 					autocomplete="new-password"
 					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600
-					       outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
+					       transition outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40
 					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
 					placeholder="••••••••"
 				/>

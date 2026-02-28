@@ -55,7 +55,7 @@
 					autocomplete="off"
 					spellcheck="false"
 					class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-center text-2xl font-black tracking-[0.4em] text-white placeholder-gray-700
-					       outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40
+					       transition outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40
 					       {form?.error ? 'border-red-700 focus:border-red-500 focus:ring-red-500/40' : ''}"
 					placeholder="AB3X9K"
 				/>
@@ -79,7 +79,9 @@
 			<a href="/login" class="text-gray-500 transition hover:text-gray-400">Sign in here</a>
 		</p>
 		<p class="mt-3 text-center text-xs text-gray-700">
-			<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400">✉ Contact us</a>
+			<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400"
+				>✉ Contact us</a
+			>
 		</p>
 	</div>
 </div>
