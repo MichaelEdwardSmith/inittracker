@@ -73,6 +73,8 @@ export interface CombatantSummary {
 	totalDamage: number;
 	totalHealing: number;
 	wasSlain: boolean;
+	/** Challenge Rating string (enemies only, from template lookup) */
+	cr?: string;
 }
 
 export interface CombatRecord {
@@ -82,6 +84,8 @@ export interface CombatRecord {
 	rounds: number;
 	participants: CombatantSummary[];
 	events: CombatEvent[];
+	/** Total XP awarded for slain enemies (sum of D&D 5e XP by CR) */
+	totalXp?: number;
 }
 
 export interface GameSession {

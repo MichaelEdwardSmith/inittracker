@@ -1,6 +1,10 @@
 import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary } from './types';
 import { browser } from '$app/environment';
-import { sortCombatants } from './utils';
+import { crToXp, sortCombatants } from './utils';
+import { ENEMY_TEMPLATES } from './enemies';
+
+// CR lookup by template name — built once at module load
+const crByTemplateName = new Map<string, string>(ENEMY_TEMPLATES.map((t) => [t.name, t.cr]));
 
 // Re-export so existing imports from this module still work.
 export type { StorageState };
@@ -70,6 +74,9 @@ function createCombatStore() {
 	function buildRecord(endedAt: string): CombatRecord {
 		const participants: CombatantSummary[] = combatants.map((c) => {
 			const stats = participantStats.get(c.id);
+			const cr = c.type === 'enemy' && c.templateName
+				? crByTemplateName.get(c.templateName)
+				: undefined;
 			return {
 				id: c.id,
 				name: c.name,
@@ -79,9 +86,14 @@ function createCombatStore() {
 				finalHp: c.currentHp,
 				totalDamage: stats?.totalDamage ?? 0,
 				totalHealing: stats?.totalHealing ?? 0,
-				wasSlain: c.type === 'enemy' && c.currentHp <= 0
+				wasSlain: c.type === 'enemy' && c.currentHp <= 0,
+				cr
 			};
 		});
+
+		const totalXp = participants
+			.filter((p) => p.wasSlain && p.cr !== undefined)
+			.reduce((sum, p) => sum + crToXp(p.cr!), 0);
 
 		return {
 			id: crypto.randomUUID(),
@@ -89,7 +101,8 @@ function createCombatStore() {
 			endedAt,
 			rounds: round,
 			participants,
-			events: [...combatEvents]
+			events: [...combatEvents],
+			totalXp: totalXp > 0 ? totalXp : undefined
 		};
 	}
 
