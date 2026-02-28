@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CombatRecord, CombatEvent } from '$lib/types';
+	import { crToXp } from '$lib/utils';
 
 	let { data } = $props();
 	let expanded = $state<Set<string>>(new Set());
@@ -305,6 +306,12 @@
 									<span>📜</span>
 									{record.events.filter(e => e.type !== 'round_advance').length} events
 								</span>
+								{#if record.totalXp !== undefined}
+									<span class="flex items-center gap-1 text-amber-500">
+										<span>✦</span>
+										{record.totalXp.toLocaleString()} XP
+									</span>
+								{/if}
 							</div>
 						</div>
 
@@ -375,7 +382,39 @@
 								</button>
 
 								{#if isExpanded}
+									{@const slainWithCr = record.participants.filter(p => p.wasSlain && p.cr !== undefined)}
 									<div class="border-t border-gray-800/40 bg-gray-950/60 px-5 py-4">
+										<!-- XP Breakdown -->
+										{#if slainWithCr.length > 0}
+											<div class="mb-5">
+												<div class="mb-2 flex items-center gap-2">
+													<span class="text-xs font-bold tracking-widest text-amber-700/80 uppercase">Experience</span>
+													<div class="h-px flex-1 bg-amber-900/20"></div>
+												</div>
+												<div class="flex flex-col gap-1 pl-2">
+													{#each slainWithCr as p}
+														<div class="flex items-center gap-2 text-xs">
+															<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+															<span class="flex-1 text-gray-400">{p.name}</span>
+															<span class="text-gray-600">CR {p.cr}</span>
+															<span class="w-20 text-right font-mono text-amber-500/80">{crToXp(p.cr!).toLocaleString()} XP</span>
+														</div>
+													{/each}
+													<div class="mt-1.5 flex items-center gap-2 border-t border-gray-800/60 pt-1.5 text-xs">
+														<span class="w-4 shrink-0"></span>
+														<span class="flex-1 font-semibold text-amber-400">Total XP</span>
+														<span class="w-20 text-right font-mono font-bold text-amber-400">{record.totalXp!.toLocaleString()} XP</span>
+													</div>
+													{#if players.length > 1}
+														<div class="flex items-center gap-2 text-xs text-gray-600">
+															<span class="w-4 shrink-0"></span>
+															<span class="flex-1">Split {players.length} ways</span>
+															<span class="w-20 text-right font-mono">{Math.floor(record.totalXp! / players.length).toLocaleString()} XP ea.</span>
+														</div>
+													{/if}
+												</div>
+											</div>
+										{/if}
 										{#each [...grouped.entries()].sort(([a], [b]) => a - b) as [roundNum, events]}
 											<div class="mb-4 last:mb-0">
 												<!-- Round divider -->
