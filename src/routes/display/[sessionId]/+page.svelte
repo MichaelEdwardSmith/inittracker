@@ -3,7 +3,7 @@
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
 	import { getMonsterDetail } from '$lib/enemies';
 	import type { StorageState, Combatant } from '$lib/types';
-import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
+	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 	let { data } = $props();
 
@@ -18,23 +18,23 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 	// CSS colors for each condition flash (brighter than the badge bg so they read on a dark screen)
 	const conditionFlashColors: Record<string, string> = {
-		Blinded:        'rgba(107, 114, 128, 1)', // gray-500
-		Charmed:        'rgba(219,  39, 119, 1)', // pink-600
-		Concentrating:  'rgba(  8, 145, 178, 1)', // cyan-600
-		Deafened:       'rgba(202, 138,   4, 1)', // yellow-600
-		Dead:           'rgba( 75,  85,  99, 1)', // gray-600
-		Exhausted:      'rgba(194,  65,  12, 1)', // orange-700
-		Frightened:     'rgba(147,  51, 234, 1)', // purple-600
-		Grappled:       'rgba(234,  88,  12, 1)', // orange-600
-		Incapacitated:  'rgba(220,  38,  38, 1)', // red-600
-		Invisible:      'rgba( 37,  99, 235, 1)', // blue-600
-		Paralyzed:      'rgba(185,  28,  28, 1)', // red-700
-		Petrified:      'rgba(120, 113, 108, 1)', // stone-500
-		Poisoned:       'rgba( 22, 163,  74, 1)', // green-500
-		Prone:          'rgba(161,  98,   7, 1)', // yellow-700
-		Restrained:     'rgba(217, 119,   6, 1)', // amber-600
-		Stunned:        'rgba(234, 179,   8, 1)', // yellow-500
-		Unconscious:    'rgba( 75,  85,  99, 1)', // gray-600
+		Blinded: 'rgba(107, 114, 128, 1)', // gray-500
+		Charmed: 'rgba(219,  39, 119, 1)', // pink-600
+		Concentrating: 'rgba(  8, 145, 178, 1)', // cyan-600
+		Deafened: 'rgba(202, 138,   4, 1)', // yellow-600
+		Dead: 'rgba( 75,  85,  99, 1)', // gray-600
+		Exhausted: 'rgba(194,  65,  12, 1)', // orange-700
+		Frightened: 'rgba(147,  51, 234, 1)', // purple-600
+		Grappled: 'rgba(234,  88,  12, 1)', // orange-600
+		Incapacitated: 'rgba(220,  38,  38, 1)', // red-600
+		Invisible: 'rgba( 37,  99, 235, 1)', // blue-600
+		Paralyzed: 'rgba(185,  28,  28, 1)', // red-700
+		Petrified: 'rgba(120, 113, 108, 1)', // stone-500
+		Poisoned: 'rgba( 22, 163,  74, 1)', // green-500
+		Prone: 'rgba(161,  98,   7, 1)', // yellow-700
+		Restrained: 'rgba(217, 119,   6, 1)', // amber-600
+		Stunned: 'rgba(234, 179,   8, 1)', // yellow-500
+		Unconscious: 'rgba( 75,  85,  99, 1)' // gray-600
 	};
 
 	// ── Audio ──────────────────────────────────────────────────────────
@@ -123,10 +123,10 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	function playBattleStartSound(ctx: AudioContext) {
 		// Urgent war-horn call: D4 → A4 → D5 → A5 (faster, tense, minor feel)
 		const notes = [
-			{ freq: 293.66, start: 0.00, dur: 0.09 },
-			{ freq: 440.00, start: 0.10, dur: 0.09 },
-			{ freq: 587.33, start: 0.20, dur: 0.09 },
-			{ freq: 880.00, start: 0.30, dur: 0.55 }
+			{ freq: 293.66, start: 0.0, dur: 0.09 },
+			{ freq: 440.0, start: 0.1, dur: 0.09 },
+			{ freq: 587.33, start: 0.2, dur: 0.09 },
+			{ freq: 880.0, start: 0.3, dur: 0.55 }
 		];
 		notes.forEach(({ freq, start, dur }) => {
 			const t = ctx.currentTime + start;
@@ -152,7 +152,8 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 		const bufLen = Math.floor(ctx.sampleRate * 0.18);
 		const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
 		const bd = buf.getChannelData(0);
-		for (let i = 0; i < bufLen; i++) bd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
+		for (let i = 0; i < bufLen; i++)
+			bd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
 		const drum = ctx.createBufferSource();
 		drum.buffer = buf;
 		const df = ctx.createBiquadFilter();
@@ -170,10 +171,10 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	function playFanfareSound(ctx: AudioContext) {
 		// Triumphant brass fanfare: G4 → C5 → E5 → G5 (held)
 		const notes = [
-			{ freq: 392.00, start: 0.00, dur: 0.13 },
+			{ freq: 392.0, start: 0.0, dur: 0.13 },
 			{ freq: 523.25, start: 0.16, dur: 0.13 },
 			{ freq: 659.25, start: 0.32, dur: 0.13 },
-			{ freq: 783.99, start: 0.48, dur: 0.70 }
+			{ freq: 783.99, start: 0.48, dur: 0.7 }
 		];
 		notes.forEach(({ freq, start, dur }) => {
 			const t = ctx.currentTime + start;
@@ -219,7 +220,9 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 		if (flashTimer) clearTimeout(flashTimer);
 		flashColor = color;
 		flashKey++;
-		flashTimer = setTimeout(() => { flashColor = null; }, 750);
+		flashTimer = setTimeout(() => {
+			flashColor = null;
+		}, 750);
 		if (audioEnabled && audioCtx) {
 			if (soundType === 'damage') playDamageSound(audioCtx);
 			else if (soundType === 'heal') playHealSound(audioCtx);
@@ -273,8 +276,9 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 					}
 					if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)');
 					else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)');
-					else if (hadTempHp) { if (audioEnabled && audioCtx) playTempHpSound(audioCtx); }
-					else if (addedCondition) {
+					else if (hadTempHp) {
+						if (audioEnabled && audioCtx) playTempHpSound(audioCtx);
+					} else if (addedCondition) {
 						const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
 						triggerEffect('condition', color);
 					}
@@ -298,12 +302,13 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	const currentIndex = $derived(sorted.findIndex((c) => c.id === combatState.currentTurnId));
 	const current = $derived<Combatant | null>(currentIndex >= 0 ? sorted[currentIndex] : null);
 
-
 	const upNext = $derived.by<Combatant[]>(() => {
 		if (currentIndex < 0 || sorted.length <= 1) return [];
 		const count = Math.min(4, sorted.length - 1);
-		return Array.from({ length: count }, (_, i) => sorted[(currentIndex + i + 1) % sorted.length])
-			.filter((c) => !(c.type === 'enemy' && c.currentHp <= 0));
+		return Array.from(
+			{ length: count },
+			(_, i) => sorted[(currentIndex + i + 1) % sorted.length]
+		).filter((c) => !(c.type === 'enemy' && c.currentHp <= 0));
 	});
 
 	const wrapIndex = $derived.by<number | null>(() => {
@@ -335,12 +340,18 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white">
 	<!-- Join Session gate — satisfies browser autoplay policy -->
 	{#if !joined}
-		<div class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm">
+		<div
+			class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm"
+		>
 			<div class="flex flex-col items-center gap-8 px-8 text-center">
 				<div class="text-7xl opacity-60">⚔️</div>
 				<div>
-					<p class="text-3xl font-black tracking-[0.25em] text-amber-400 uppercase">Battle Awaits</p>
-					<p class="mt-3 text-sm tracking-widest text-gray-500 uppercase">Tap to join this session with live audio</p>
+					<p class="text-3xl font-black tracking-[0.25em] text-amber-400 uppercase">
+						Battle Awaits
+					</p>
+					<p class="mt-3 text-sm tracking-widest text-gray-500 uppercase">
+						Tap to join this session with live audio
+					</p>
 				</div>
 				<button
 					onclick={joinSession}
@@ -349,7 +360,10 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 					Join Session
 				</button>
 				<button
-					onclick={() => { joined = true; audioEnabled = false; }}
+					onclick={() => {
+						joined = true;
+						audioEnabled = false;
+					}}
 					class="text-xs tracking-widest text-gray-700 uppercase underline-offset-2 hover:text-gray-500 hover:underline"
 				>
 					Continue without sound
@@ -361,7 +375,10 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	<!-- Full-screen flash overlay -->
 	{#key flashKey}
 		{#if flashColor}
-			<div class="pointer-events-none fixed inset-0 z-50 flash-overlay" style="background: {flashColor};"></div>
+			<div
+				class="flash-overlay pointer-events-none fixed inset-0 z-50"
+				style="background: {flashColor};"
+			></div>
 		{/if}
 	{/key}
 
@@ -386,9 +403,7 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 				class="flex items-center gap-1.5 text-xs {connected ? 'text-green-500' : 'text-gray-600'}"
 			>
 				<span
-					class="inline-block h-1.5 w-1.5 rounded-full {connected
-						? 'bg-green-500'
-						: 'bg-gray-600'}"
+					class="inline-block h-1.5 w-1.5 rounded-full {connected ? 'bg-green-500' : 'bg-gray-600'}"
 				></span>
 				{connected ? 'Live' : 'Connecting…'}
 			</span>
@@ -405,23 +420,34 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 			{/if}
 		</div>
 		<div class="flex items-center gap-3">
-		{#if combatState.currentTurnId}
-			<div class="flex items-center gap-2">
-				<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
-				<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
-			</div>
-		{/if}
-		<a
-			href="mailto:dm@inittracker.com"
-			title="Contact us"
-			class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-			</svg>
-			<span class="hidden sm:inline">Contact</span>
-		</a>
-	</div>
+			{#if combatState.currentTurnId}
+				<div class="flex items-center gap-2">
+					<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
+					<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
+				</div>
+			{/if}
+			<a
+				href="mailto:dm@inittracker.com"
+				title="Contact us"
+				class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3.5 w-3.5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
+				</svg>
+				<span class="hidden sm:inline">Contact</span>
+			</a>
+		</div>
 	</header>
 
 	{#if !current}
@@ -447,7 +473,9 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 										<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
 									</div>
 								{:else}
-									<span class="text-lg leading-none">{getMonsterEmoji(c.templateName, c.monsterType)}</span>
+									<span class="text-lg leading-none"
+										>{getMonsterEmoji(c.templateName, c.monsterType)}</span
+									>
 								{/if}
 							{/if}
 							<span
@@ -465,7 +493,7 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 		<!-- Active combatant display -->
 		{#key current.id}
 			{@const pct = hpPercent(current)}
-		{@const showAc = current.type === 'player' || current.showAc === true}
+			{@const showAc = current.type === 'player' || current.showAc === true}
 			<main class="relative z-10 flex flex-1 flex-col items-center justify-center px-12 pb-4">
 				<!-- Type label -->
 				<div class="mb-5 flex items-center gap-3">
@@ -483,7 +511,10 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 					{@const style = getMonsterStyle(current.monsterType)}
 					{@const imgUrl = current.imgUrl ?? getMonsterDetail(current.templateName ?? '')?.imgUrl}
 					{#if imgUrl}
-						<a href={imgUrl} target="_blank" rel="noopener noreferrer"
+						<a
+							href={imgUrl}
+							target="_blank"
+							rel="noopener noreferrer"
 							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring} cursor-pointer"
 							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
 						>
@@ -509,7 +540,7 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 				<!-- Name -->
 				<h1
-					class="mb-2 text-center font-black tracking-widest uppercase leading-none
+					class="mb-2 text-center leading-none font-black tracking-widest uppercase
 					       {current.type === 'player' ? 'text-blue-50' : 'text-red-50'}"
 					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {current.type === 'player'
 						? '4.5rem'
@@ -561,9 +592,7 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 				<!-- HP bar + THP extension (players only) -->
 				{#if current.type === 'player'}
-					<div
-						class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner"
-					>
+					<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
 						<div
 							class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
 							style="width: {pct}%;"
@@ -585,15 +614,30 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 				{#if current.statuses.length > 0}
 					<div class="mt-5 flex flex-wrap justify-center gap-2">
 						{#each current.statuses as status}
-							<div class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[status] ?? 'bg-gray-700 text-gray-200'}">
-								<span class="pl-3 pr-2 py-1">{status}</span>
+							<div
+								class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[
+									status
+								] ?? 'bg-gray-700 text-gray-200'}"
+							>
+								<span class="py-1 pr-2 pl-3">{status}</span>
 								<button
 									onclick={() => (conditionInfo = status)}
 									title="What is {status}?"
-									class="pr-2 py-1 opacity-50 transition hover:opacity-100"
+									class="py-1 pr-2 opacity-50 transition hover:opacity-100"
 								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -618,17 +662,19 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 						{#each upNext as c, i}
 							{@const pct = hpPercent(c)}
 							{#if i === wrapIndex}
-								<div class="hidden sm:flex shrink-0 items-center gap-2">
+								<div class="hidden shrink-0 items-center gap-2 sm:flex">
 									<div class="h-8 w-px bg-gray-700/60"></div>
 									<span
-										class="whitespace-nowrap text-xs font-black tracking-[0.2em] text-amber-500/60 uppercase"
+										class="text-xs font-black tracking-[0.2em] whitespace-nowrap text-amber-500/60 uppercase"
 										>Top of the Order</span
 									>
 									<div class="h-8 w-px bg-gray-700/60"></div>
 								</div>
 							{/if}
 							<div
-								class="{i > 0 ? 'hidden sm:flex' : 'flex'} min-w-0 flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-2 sm:flex-row sm:gap-3 sm:px-3 sm:py-2.5
+								class="{i > 0
+									? 'hidden sm:flex'
+									: 'flex'} min-w-0 flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-2 sm:flex-row sm:gap-3 sm:px-3 sm:py-2.5
 								       {c.type === 'player'
 									? 'border-blue-900/60 bg-blue-950/30'
 									: 'border-red-900/60 bg-red-950/30'}"
@@ -637,29 +683,40 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 									{@const style = getMonsterStyle(c.monsterType)}
 									{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
 									{#if imgUrl}
-										<a href={imgUrl} target="_blank" rel="noopener noreferrer" class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring} cursor-pointer">
-											<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
+										<a
+											href={imgUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring} cursor-pointer"
+										>
+											<img
+												src={imgUrl}
+												alt={c.name}
+												class="h-full w-full object-cover object-top"
+											/>
 										</a>
 									{:else}
-										<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}">
-											<span class="select-none text-xl leading-none">{getMonsterEmoji(c.templateName, c.monsterType)}</span>
+										<div
+											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}"
+										>
+											<span class="text-xl leading-none select-none"
+												>{getMonsterEmoji(c.templateName, c.monsterType)}</span
+											>
 										</div>
 									{/if}
 								{:else if c.avatarUrl}
-									<div
-										class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-blue-700"
-									>
+									<div class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-blue-700">
 										<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
 									</div>
 								{:else}
 									<div
 										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 ring-2 ring-blue-700"
 									>
-										<span class="select-none text-xl leading-none">🛡️</span>
+										<span class="text-xl leading-none select-none">🛡️</span>
 									</div>
 								{/if}
 
-								<div class="min-w-0 w-full sm:flex-1">
+								<div class="w-full min-w-0 sm:flex-1">
 									<div class="flex items-center justify-center gap-1.5 sm:justify-start">
 										<span
 											class="hidden shrink-0 rounded px-1 py-0.5 text-xs font-bold sm:inline {c.type ===
@@ -698,13 +755,13 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 										</div>
 										<div class="mt-0.5 hidden items-center gap-1.5 text-xs sm:flex">
 											<span
-												class="{pct <= 0
+												class={pct <= 0
 													? 'text-gray-600'
 													: pct <= 25
 														? 'text-red-400'
 														: pct <= 50
 															? 'text-amber-400'
-															: 'text-green-400'}"
+															: 'text-green-400'}
 											>
 												{c.currentHp}/{c.maxHp} HP
 											</span>
@@ -719,15 +776,29 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 									<div class="shrink-0 text-right">
 										<div class="flex flex-wrap justify-end gap-0.5">
 											{#each c.statuses.slice(0, 3) as s}
-												<div class="flex items-center rounded text-xs {conditionColors[s] ?? 'bg-gray-700 text-gray-300'}">
-													<span class="pl-1 pr-0.5 py-0.5">{s}</span>
+												<div
+													class="flex items-center rounded text-xs {conditionColors[s] ??
+														'bg-gray-700 text-gray-300'}"
+												>
+													<span class="py-0.5 pr-0.5 pl-1">{s}</span>
 													<button
 														onclick={() => (conditionInfo = s)}
 														title="What is {s}?"
-														class="pr-0.5 py-0.5 opacity-50 transition hover:opacity-100"
+														class="py-0.5 pr-0.5 opacity-50 transition hover:opacity-100"
 													>
-														<svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-2.5 w-2.5"
+															fill="none"
+															viewBox="0 0 24 24"
+															stroke="currentColor"
+														>
+															<path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+															/>
 														</svg>
 													</button>
 												</div>
@@ -751,8 +822,12 @@ import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 
 <style>
 	@keyframes flash-effect {
-		0%   { opacity: 0.5; }
-		100% { opacity: 0; }
+		0% {
+			opacity: 0.5;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 	.flash-overlay {
 		animation: flash-effect 0.75s ease-out forwards;
