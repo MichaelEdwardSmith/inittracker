@@ -85,7 +85,11 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 						title="Previous turn"
 					>
-						◀ Prev
+						<span class="hidden md:inline">◀ Prev</span>
+					<span class="flex flex-col items-center md:hidden">
+						<span>◀</span>
+						<span>Prev</span>
+					</span>
 					</button>
 					<button
 						onclick={() => {
@@ -94,14 +98,22 @@
 						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
-						Next ▶
+						<span class="hidden md:inline">Next ▶</span>
+					<span class="flex flex-col items-center md:hidden">
+						<span>▶</span>
+						<span>Next</span>
+					</span>
 					</button>
 					<button
 						onclick={() => combat.endCombat()}
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-600 hover:text-gray-300"
 						title="End combat"
 					>
-						■ End
+						<span class="hidden md:inline">■ End</span>
+					<span class="flex flex-col items-center md:hidden">
+						<span>■</span>
+						<span>End</span>
+					</span>
 					</button>
 				{/if}
 			{/if}
