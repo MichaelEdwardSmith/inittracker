@@ -293,8 +293,10 @@
 
 <!-- Mobile panel overlay -->
 {#if openPanel !== null}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
+		role="button"
+		aria-label="Close panel"
+		tabindex="-1"
 		class="fixed inset-0 z-40 bg-black/60 md:hidden"
 		onclick={() => (openPanel = null)}
 	></div>
@@ -330,12 +332,14 @@
      Session Manager Modal
      ========================================================================= -->
 {#if showSessionManager}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
+		role="dialog"
+		aria-modal="true"
+		aria-label="Session manager"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
 		onclick={(e) => { if (e.target === e.currentTarget) closeSessionManager(); }}
 	>
-		<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" onclick={(e) => e.stopPropagation()}>
+		<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 			<!-- Modal header -->
 			<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 				<div class="flex items-center gap-2">

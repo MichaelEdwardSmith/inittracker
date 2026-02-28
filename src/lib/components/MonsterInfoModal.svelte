@@ -16,8 +16,10 @@
 </script>
 
 {#if monster}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
+		role="dialog"
+		aria-modal="true"
+		aria-label="Monster information"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
 		onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
 	>
