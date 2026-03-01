@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, type Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
 
 let client: MongoClient | null = null;

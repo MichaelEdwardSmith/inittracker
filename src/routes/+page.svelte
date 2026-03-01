@@ -2,6 +2,7 @@
 	import PlayerPanel from '$lib/components/PlayerPanel.svelte';
 	import EnemyPanel from '$lib/components/EnemyPanel.svelte';
 	import InitiativeTracker from '$lib/components/InitiativeTracker.svelte';
+	import { untrack } from 'svelte';
 	import { combat } from '$lib/store.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import type { GameSession } from '$lib/types';
@@ -13,8 +14,8 @@
 
 	// Session manager state
 	let showSessionManager = $state(false);
-	let sessions = $state<GameSession[]>(data.sessions);
-	let activeSession = $state<GameSession>(data.activeSession);
+	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
+	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
 	let sessionManagerBusy = $state(false);
 	let renamingId = $state<string | null>(null);
 	let renameValue = $state('');
@@ -397,6 +398,7 @@
 		tabindex="-1"
 		class="fixed inset-0 z-40 bg-black/60 md:hidden"
 		onclick={() => (openPanel = null)}
+		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (openPanel = null)}
 	></div>
 	<div
 		class="fixed inset-y-0 z-50 flex w-72 flex-col border-gray-800 bg-gray-900 p-4 md:hidden
@@ -446,8 +448,12 @@
 		aria-modal="true"
 		aria-label="Session manager"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+		tabindex="-1"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) closeSessionManager();
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') closeSessionManager();
 		}}
 	>
 		<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
@@ -678,6 +684,7 @@
 							Create
 						</button>
 						<button
+							aria-label="Cancel"
 							onclick={() => {
 								showNewSessionInput = false;
 								newSessionName = '';

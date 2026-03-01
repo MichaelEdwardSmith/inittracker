@@ -17,7 +17,9 @@
       "Bash(powershell -Command:*)",
       "Bash(powershell -File:*)",
       "Bash(pnpm exec prettier:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(pnpm build:*)"
     ]
   }
 }
