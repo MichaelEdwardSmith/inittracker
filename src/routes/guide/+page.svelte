@@ -560,9 +560,10 @@
 					{/each}
 				</div>
 				<p class="mb-4 text-sm leading-relaxed">
-					The four <strong class="font-semibold text-white">Adv / Disadv</strong> conditions are
-					DM-side reminders only — they are not visible on the player display. Use them to track
-					situational modifiers such as the effects of spells, terrain, or class abilities.
+					The four <strong class="font-semibold text-white">Adv / Disadv</strong> conditions behave
+					like any other condition — they appear as color-coded badges on both the DM dashboard and
+					the player display. Use them to track situational modifiers such as the effects of spells,
+					terrain, or class abilities that grant or impose advantage or disadvantage.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">

@@ -34,7 +34,11 @@
 		Prone: 'rgba(161,  98,   7, 1)', // yellow-700
 		Restrained: 'rgba(217, 119,   6, 1)', // amber-600
 		Stunned: 'rgba(234, 179,   8, 1)', // yellow-500
-		Unconscious: 'rgba( 75,  85,  99, 1)' // gray-600
+		Unconscious:          'rgba( 75,  85,  99, 1)', // gray-600
+		'Advantage For':      'rgba( 16, 185, 129, 1)', // emerald-500
+		'Advantage Against':  'rgba(225,  29,  72, 1)', // rose-600
+		'Disadvantage For':   'rgba(234,  88,  12, 1)', // orange-600
+		'Disadvantage Against': 'rgba( 20, 184, 166, 1)'  // teal-500
 	};
 
 	// ── Audio ──────────────────────────────────────────────────────────
