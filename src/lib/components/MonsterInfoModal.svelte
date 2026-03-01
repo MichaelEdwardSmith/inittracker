@@ -21,8 +21,12 @@
 		aria-modal="true"
 		aria-label="Monster information"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
+		tabindex="-1"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) onclose();
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') onclose();
 		}}
 	>
 		<div

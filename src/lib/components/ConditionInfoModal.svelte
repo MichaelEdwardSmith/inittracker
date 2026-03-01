@@ -15,8 +15,12 @@
 		aria-modal="true"
 		aria-label="Condition information"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+		tabindex="-1"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) onclose();
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') onclose();
 		}}
 	>
 		<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { CombatRecord, CombatEvent } from '$lib/types';
 	import { crToXp } from '$lib/utils';
 
@@ -154,7 +155,7 @@
 		}
 	}
 
-	let records = $state<CombatRecord[]>(data.records);
+	let records = $state<CombatRecord[]>(untrack(() => data.records));
 	let confirmDeleteId = $state<string | null>(null);
 	let confirmClearAll = $state(false);
 	let confirmTimer: ReturnType<typeof setTimeout> | null = null;

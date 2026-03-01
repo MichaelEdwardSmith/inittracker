@@ -441,8 +441,12 @@
 		aria-modal="true"
 		aria-label="Enemy details"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"
+		tabindex="-1"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) closeModal();
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') closeModal();
 		}}
 	>
 		<div
@@ -555,7 +559,7 @@
 
 						<!-- Avatar upload -->
 						<div>
-							<label class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
+							<label for="avatar-upload" class="mb-1 block text-xs tracking-wider text-gray-500 uppercase"
 								>Avatar (optional)</label
 							>
 							<div class="flex items-center gap-3">
@@ -583,6 +587,7 @@
 								{/if}
 							</div>
 							<input
+								id="avatar-upload"
 								bind:this={avatarInput}
 								type="file"
 								accept="image/*"
