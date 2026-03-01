@@ -3,6 +3,7 @@
 	import EnemyPanel from '$lib/components/EnemyPanel.svelte';
 	import InitiativeTracker from '$lib/components/InitiativeTracker.svelte';
 	import { untrack } from 'svelte';
+	import GuidePopover from '$lib/components/GuidePopover.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import type { GameSession } from '$lib/types';
@@ -252,6 +253,7 @@
 				<span class="hidden md:inline">Chronicle</span>
 			</a>
 			<a
+				id="guide-link"
 				href="/guide"
 				title="User Guide"
 				class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -733,3 +735,5 @@
 		</div>
 	</div>
 {/if}
+
+<GuidePopover />

@@ -31,6 +31,13 @@
 		'Restrained',
 		'Stunned'
 	];
+
+	const advConditions = [
+		'Advantage For',
+		'Advantage Against',
+		'Disadvantage For',
+		'Disadvantage Against'
+	];
 </script>
 
 <!-- Reusable snippets -->
@@ -435,6 +442,18 @@
 					<strong class="font-semibold text-white">Combat Chronicles</strong>.
 				</p>
 
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Combatant Notes
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Every combatant row has a <strong class="font-semibold text-white">pencil icon</strong>
+					beside the remove (✕) button. Click it to open a notes modal where you can type any
+					freeform text — spell concentration reminders, loot notes, roleplay hooks, etc. When a
+					note has been saved the icon glows
+					<strong class="font-semibold text-amber-300">amber</strong>
+					as a visual reminder. Notes persist with the rest of the combat state.
+				</p>
+
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Utility Buttons
 				</h3>
@@ -499,8 +518,10 @@
 				<p class="text-sm leading-relaxed">
 					Enemy AC is hidden from the player display by default. Check the <strong
 						class="font-semibold text-white">Show AC</strong
-					> checkbox on an enemy row to reveal it to players. Players always see their own character's
-					AC.
+					> checkbox on an enemy row to reveal it to players. If there are multiple enemies of the
+					same type (e.g. three Goblins), toggling the checkbox on any one of them automatically
+					applies the same setting to all others of that type. Players always see their own
+					character's AC.
 				</p>
 			</section>
 
@@ -512,13 +533,15 @@
 					Adding a Condition
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row. A
-					dropdown lists all 15 conditions. Click one to apply it — conditions already active are hidden
-					from the list. Dead and Unconscious are not selectable: when a player drops to 0 HP, they automatically
-					become Unconscious (all other conditions cleared). Enemies at 0 HP are simply removed from the
-					turn order.
+					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row.
+					A dropdown lists all conditions in two sections. Click one to apply it — the badge appears
+					immediately on the row. Dead and Unconscious are not selectable: when a player drops to 0
+					HP they automatically become Unconscious (all other conditions cleared). Enemies at 0 HP
+					are simply removed from the turn order.
 				</p>
-				<div class="mb-6 flex flex-wrap gap-2">
+
+				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Standard conditions</p>
+				<div class="mb-4 flex flex-wrap gap-2">
 					{#each conditions as c}
 						<span
 							class="rounded-full border border-gray-700 bg-gray-800 px-3 py-1 text-xs text-gray-300"
@@ -526,6 +549,21 @@
 						>
 					{/each}
 				</div>
+
+				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Advantage / Disadvantage</p>
+				<div class="mb-6 flex flex-wrap gap-2">
+					{#each advConditions as c}
+						<span
+							class="rounded-full border border-gray-700 bg-gray-800 px-3 py-1 text-xs text-gray-300"
+							>{c}</span
+						>
+					{/each}
+				</div>
+				<p class="mb-4 text-sm leading-relaxed">
+					The four <strong class="font-semibold text-white">Adv / Disadv</strong> conditions are
+					DM-side reminders only — they are not visible on the player display. Use them to track
+					situational modifiers such as the effects of spells, terrain, or class abilities.
+				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Viewing a Condition Description
@@ -767,6 +805,18 @@
 					The <strong class="font-semibold text-white">participants grid</strong> shows every
 					combatant with a dual-layer HP bar (ghost starting HP + current HP) and a
 					<strong class="font-semibold text-white">☠ Slain</strong> label if they died.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Experience Points
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					When the chronicle is generated, the XP total for the encounter is automatically
+					calculated from each <strong class="font-semibold text-white">slain enemy's Challenge
+					Rating</strong> using the standard D&amp;D 5e XP-by-CR table. Expand a record to see the
+					full breakdown — each slain enemy listed with its CR and XP value, a total, and an
+					<strong class="font-semibold text-white">even split per player</strong> if your party is
+					listed.
 				</p>
 
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
