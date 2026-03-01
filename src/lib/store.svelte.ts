@@ -238,6 +238,14 @@ function createCombatStore() {
 			sync();
 		},
 
+		/** Set showAc for every enemy sharing the same templateName in one sync. */
+		setShowAcForTemplate(templateName: string, showAc: boolean) {
+			combatants = combatants.map((c) =>
+				c.type === 'enemy' && c.templateName === templateName ? { ...c, showAc } : c
+			);
+			sync();
+		},
+
 		adjustHp(id: string, delta: number) {
 			let hpBefore = 0;
 			let hpAfter = 0;

@@ -148,3 +148,10 @@ export const CONDITIONS = [
 	'Restrained',
 	'Stunned',
 ] as const;
+
+export const ADV_CONDITIONS = [
+	'Advantage For',
+	'Advantage Against',
+	'Disadvantage For',
+	'Disadvantage Against',
+] as const;

@@ -1,9 +1,10 @@
 ﻿<script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { CONDITIONS, getMonsterDetail } from '$lib/enemies';
+	import { CONDITIONS, ADV_CONDITIONS, getMonsterDetail } from '$lib/enemies';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
+	import CombatantNoteModal from '$lib/components/CombatantNoteModal.svelte';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	import { tick } from 'svelte';
 
@@ -17,6 +18,7 @@
 	let openStatusId = $state<string | null>(null);
 	let infoMonster = $state<MonsterDetail | null>(null);
 	let conditionInfo = $state<string | null>(null);
+	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
 
 	function showMonsterInfo(c: Combatant) {
 		if (c.templateName) infoMonster = getMonsterDetail(c.templateName) ?? null;
@@ -246,6 +248,15 @@
 							</button>
 						{/if}
 						<button
+							onclick={() => (noteTarget = c)}
+							title="Notes"
+							class="rounded p-2 transition {c.note ? 'text-amber-300 [filter:drop-shadow(0_0_5px_theme(colors.amber.400))] hover:text-amber-200' : 'text-gray-600 hover:text-gray-400'}"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+							</svg>
+						</button>
+						<button
 							onclick={() => combat.removeFromCombat(c.id)}
 							title={c.type === 'player'
 								? 'Remove from combat (keeps in party)'
@@ -319,7 +330,7 @@
 										type="checkbox"
 										checked={c.showAc === true}
 										title="Show AC to players"
-										onchange={(e) => combat.update(c.id, { showAc: e.currentTarget.checked })}
+										onchange={(e) => combat.setShowAcForTemplate(c.templateName ?? c.id, e.currentTarget.checked)}
 										class="h-3.5 w-3.5 cursor-pointer accent-amber-500"
 									/>
 								{/if}
@@ -445,6 +456,24 @@
 										</button>
 									{/each}
 								</div>
+								<div class="my-1.5 flex items-center gap-1.5 border-t border-gray-700 pt-1.5">
+									<span class="text-[10px] font-semibold tracking-wider text-gray-600 uppercase">Adv / Disadv</span>
+								</div>
+								<div class="grid grid-cols-1 gap-1">
+									{#each ADV_CONDITIONS as cond}
+										{@const active = c.statuses.includes(cond)}
+										<button
+											onclick={() => combat.toggleStatus(c.id, cond)}
+											class="rounded px-2 py-1 text-left text-xs transition
+											       {active
+												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
+													' ring-1 ring-white/20'
+												: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+										>
+											{cond}
+										</button>
+									{/each}
+								</div>
 							</div>
 						{/if}
 					</div>
@@ -494,7 +523,7 @@
 								type="checkbox"
 								checked={c.showAc === true}
 								title="Show AC to players"
-								onchange={(e) => combat.update(c.id, { showAc: e.currentTarget.checked })}
+								onchange={(e) => combat.setShowAcForTemplate(c.templateName ?? c.id, e.currentTarget.checked)}
 								class="h-3 w-3 cursor-pointer accent-amber-500"
 							/>
 						{/if}
@@ -647,6 +676,24 @@
 										</button>
 									{/each}
 								</div>
+								<div class="my-1.5 flex items-center gap-1.5 border-t border-gray-700 pt-1.5">
+									<span class="text-[10px] font-semibold tracking-wider text-gray-600 uppercase">Adv / Disadv</span>
+								</div>
+								<div class="grid grid-cols-1 gap-1">
+									{#each ADV_CONDITIONS as cond}
+										{@const active = c.statuses.includes(cond)}
+										<button
+											onclick={() => combat.toggleStatus(c.id, cond)}
+											class="rounded px-2 py-1 text-left text-xs transition
+											       {active
+												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
+													' ring-1 ring-white/20'
+												: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+										>
+											{cond}
+										</button>
+									{/each}
+								</div>
 							</div>
 						{/if}
 					</div>
@@ -675,6 +722,15 @@
 								</svg>
 							</button>
 						{/if}
+						<button
+							onclick={() => (noteTarget = c)}
+							title="Notes"
+							class="rounded p-1 transition {c.note ? 'text-amber-300 [filter:drop-shadow(0_0_5px_theme(colors.amber.400))] hover:text-amber-200' : 'text-gray-600 hover:text-gray-400'}"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+							</svg>
+						</button>
 						<button
 							onclick={() => combat.removeFromCombat(c.id)}
 							class="rounded p-1 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
@@ -706,3 +762,8 @@
 
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
+<CombatantNoteModal
+	combatant={noteTarget}
+	onclose={() => (noteTarget = null)}
+	onsave={(id, note) => combat.update(id, { note })}
+/>

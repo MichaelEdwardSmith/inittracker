@@ -20,6 +20,8 @@ export interface Combatant {
 	avatarUrl?: string;
 	// Enemies only — avatar image URL (remote for built-ins, base64 for custom monsters)
 	imgUrl?: string;
+	// DM-only freeform notes
+	note?: string;
 }
 
 export interface StorageState {

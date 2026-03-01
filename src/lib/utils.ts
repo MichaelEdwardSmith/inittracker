@@ -17,7 +17,11 @@ export const conditionDescriptions: Record<string, string> = {
 	Prone:         "Can only crawl or use half speed to stand up. Disadvantage on attack rolls. Attacks against it from within 5 ft. have advantage; attacks from farther away have disadvantage.",
 	Restrained:    "Speed becomes 0. Attack rolls against it have advantage; its attack rolls have disadvantage. Disadvantage on DEX saving throws.",
 	Stunned:       "Incapacitated, can't move, and can speak only falteringly. Automatically fails STR and DEX saves. Attack rolls against it have advantage.",
-	Unconscious:   "Incapacitated, can't move or speak, unaware of surroundings. Drops held items, falls prone. Automatically fails STR and DEX saves. Attacks have advantage and hits within 5 ft. are critical hits.",
+	Unconscious:          "Incapacitated, can't move or speak, unaware of surroundings. Drops held items, falls prone. Automatically fails STR and DEX saves. Attacks have advantage and hits within 5 ft. are critical hits.",
+	'Advantage For':      "This creature has advantage on its attack rolls or ability checks (DM-tracked reminder).",
+	'Advantage Against':  "Attack rolls against this creature have advantage (DM-tracked reminder).",
+	'Disadvantage For':   "This creature has disadvantage on its attack rolls or ability checks (DM-tracked reminder).",
+	'Disadvantage Against': "Attack rolls against this creature have disadvantage (DM-tracked reminder).",
 };
 
 export const conditionColors: Record<string, string> = {
@@ -37,7 +41,11 @@ export const conditionColors: Record<string, string> = {
 	Prone: 'bg-yellow-900 text-yellow-300',
 	Restrained: 'bg-amber-800 text-amber-200',
 	Stunned: 'bg-yellow-700 text-yellow-100',
-	Unconscious: 'bg-gray-800 text-gray-500'
+	Unconscious: 'bg-gray-800 text-gray-500',
+	'Advantage For':      'bg-emerald-700 text-emerald-100',
+	'Advantage Against':  'bg-rose-800 text-rose-200',
+	'Disadvantage For':   'bg-orange-800 text-orange-200',
+	'Disadvantage Against': 'bg-teal-700 text-teal-100',
 };
 
 export function sortCombatants(list: Combatant[]): Combatant[] {
