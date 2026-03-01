@@ -1,3 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text y=".9em" font-size="90">⚔️</text>
+  <!-- Dark rounded background -->
+  <rect width="100" height="100" rx="20" fill="#111827"/>
+
+  <!-- Sword 1: blade tip upper-left (18,18), pommel lower-right (86,86) -->
+  <!-- Handle -->
+  <line x1="53" y1="53" x2="83" y2="83" stroke="#78350f" stroke-width="6" stroke-linecap="round"/>
+  <!-- Guard (perpendicular: NE–SW) -->
+  <line x1="61" y1="39" x2="39" y2="61" stroke="#d97706" stroke-width="6" stroke-linecap="round"/>
+  <!-- Blade (tapered triangle) -->
+  <polygon points="18,18 51,49 49,51" fill="#fbbf24"/>
+  <!-- Pommel -->
+  <circle cx="86" cy="86" r="6" fill="#d97706"/>
+
+  <!-- Sword 2: blade tip upper-right (82,18), pommel lower-left (14,86) -->
+  <!-- Handle -->
+  <line x1="47" y1="53" x2="17" y2="83" stroke="#78350f" stroke-width="6" stroke-linecap="round"/>
+  <!-- Guard (perpendicular: NW–SE) -->
+  <line x1="39" y1="39" x2="61" y2="61" stroke="#d97706" stroke-width="6" stroke-linecap="round"/>
+  <!-- Blade (tapered triangle) -->
+  <polygon points="82,18 51,51 49,49" fill="#fbbf24"/>
+  <!-- Pommel -->
+  <circle cx="14" cy="86" r="6" fill="#d97706"/>
 </svg>
