@@ -185,6 +185,7 @@ function createCombatStore() {
 				templateName: template.name,
 				monsterType: template.monsterType,
 				imgUrl: template.imgUrl,
+				...(template.source ? { source: template.source } : {}),
 				inCombat: true
 			}));
 			combatants = [...combatants, ...newEnemies];

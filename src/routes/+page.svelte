@@ -6,12 +6,45 @@
 	import GuidePopover from '$lib/components/GuidePopover.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import type { GameSession } from '$lib/types';
 
 	let { data } = $props();
 
 	let copied = $state(false);
 	let openPanel = $state<'players' | 'enemies' | null>(null);
+
+	// Right sidebar resize
+	const SIDEBAR_MIN = 200;
+	const SIDEBAR_MAX = 520;
+	const SIDEBAR_DEFAULT = 288; // w-72
+	let sidebarWidth = $state(
+		browser
+			? Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, parseInt(localStorage.getItem('enemy-panel-width') ?? '') || SIDEBAR_DEFAULT))
+			: SIDEBAR_DEFAULT
+	);
+
+	function startResize(e: MouseEvent) {
+		e.preventDefault();
+		const startX = e.clientX;
+		const startWidth = sidebarWidth;
+
+		const onMove = (mv: MouseEvent) => {
+			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + (startX - mv.clientX)));
+		};
+		const onUp = () => {
+			document.removeEventListener('mousemove', onMove);
+			document.removeEventListener('mouseup', onUp);
+			document.body.style.userSelect = '';
+			document.body.style.cursor = '';
+			if (browser) localStorage.setItem('enemy-panel-width', String(sidebarWidth));
+		};
+
+		document.body.style.userSelect = 'none';
+		document.body.style.cursor = 'col-resize';
+		document.addEventListener('mousemove', onMove);
+		document.addEventListener('mouseup', onUp);
+	}
 
 	// Session manager state
 	let showSessionManager = $state(false);
@@ -357,10 +390,18 @@
 			<InitiativeTracker />
 		</main>
 
-		<!-- Right sidebar: Enemies (desktop only) -->
+		<!-- Right sidebar: Enemies (desktop only, resizable) -->
 		<aside
-			class="hidden w-72 shrink-0 flex-col border-l border-gray-800 bg-gray-900/50 p-4 md:flex"
+			class="relative hidden shrink-0 flex-col border-l border-gray-800 bg-gray-900/50 p-4 md:flex"
+			style="width: {sidebarWidth}px"
 		>
+			<!-- Drag handle — left edge -->
+			<div
+				class="absolute inset-y-0 left-0 z-10 w-1.5 cursor-col-resize transition-colors hover:bg-blue-500/30"
+				onmousedown={startResize}
+				role="separator"
+				aria-label="Drag to resize panel"
+			></div>
 			<EnemyPanel />
 		</aside>
 	</div>
@@ -392,20 +433,9 @@
 	</div>
 </div>
 
-<!-- Mobile panel overlay -->
+<!-- Mobile panel overlay (full screen) -->
 {#if openPanel !== null}
-	<div
-		role="button"
-		aria-label="Close panel"
-		tabindex="-1"
-		class="fixed inset-0 z-40 bg-black/60 md:hidden"
-		onclick={() => (openPanel = null)}
-		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (openPanel = null)}
-	></div>
-	<div
-		class="fixed inset-y-0 z-50 flex w-72 flex-col border-gray-800 bg-gray-900 p-4 md:hidden
-		       {openPanel === 'players' ? 'left-0 border-r' : 'right-0 border-l'}"
-	>
+	<div class="fixed inset-0 z-50 flex flex-col bg-gray-900 p-4 md:hidden">
 		<div class="mb-3 flex shrink-0 items-center justify-between">
 			<span class="text-sm font-bold tracking-widest text-gray-400 uppercase">
 				{openPanel === 'players' ? 'Party' : 'Enemies'}

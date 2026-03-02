@@ -3,9 +3,10 @@
 	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail } from '$lib/enemies';
 	import type { EnemyTemplate, CustomMonster, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
+	import ImportBestiaryModal from '$lib/components/ImportBestiaryModal.svelte';
 
-	// Extended display type — built-ins have no id/isCustom
-	type DisplayTemplate = EnemyTemplate & { id?: string; isCustom?: boolean };
+	// Extended display type — built-ins have no id/isCustom/detail
+	type DisplayTemplate = EnemyTemplate & { id?: string; isCustom?: boolean; detail?: MonsterDetail };
 
 	// ── Encounter state ──────────────────────────────────────────────────────
 	let search = $state('');
@@ -18,12 +19,13 @@
 	let infoMonster = $state<MonsterDetail | null>(null);
 
 	function showInfo(e: DisplayTemplate) {
-		infoMonster = getMonsterDetail(e.name) ?? null;
+		infoMonster = e.detail ?? getMonsterDetail(e.name) ?? null;
 	}
 
 	// ── Custom monsters ──────────────────────────────────────────────────────
 	let customMonsters = $state<CustomMonster[]>([]);
 	let showModal = $state(false);
+	let showImportModal = $state(false);
 
 	// Form state (shared between create & edit modes)
 	let formName = $state('');
@@ -250,22 +252,34 @@
 	<!-- Header row -->
 	<div class="flex items-center justify-between">
 		<h2 class="text-lg font-bold tracking-wide text-red-400">Enemies / NPCs</h2>
-		<button
-			onclick={openCreate}
-			title="Manage custom monsters"
-			class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-3.5 w-3.5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
+		<div class="flex items-center gap-1.5">
+			<button
+				onclick={() => (showImportModal = true)}
+				title="Import monsters from a 5etools bestiary JSON"
+				class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-indigo-600 hover:text-indigo-300"
 			>
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-			</svg>
-			Custom
-		</button>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+				</svg>
+				Import
+			</button>
+			<button
+				onclick={openCreate}
+				title="Manage custom monsters"
+				class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3.5 w-3.5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+				</svg>
+				Custom
+			</button>
+		</div>
 	</div>
 
 	<!-- Filters -->
@@ -320,6 +334,11 @@
 								{/if}
 							{/if}
 							<span class="truncate text-sm font-medium">{enemy.name}</span>
+							{#if enemy.source}
+								<span class="shrink-0 rounded bg-indigo-900/60 px-1 py-0.5 text-[10px] font-semibold text-indigo-300 leading-none">
+									{enemy.source}
+								</span>
+							{/if}
 						</div>
 						<div class="text-xs text-gray-500">
 							{enemy.monsterType} &bull; {crLabel(enemy.cr)}
@@ -330,8 +349,8 @@
 						<div>{enemy.hp} HP</div>
 					</div>
 				</button>
-				<!-- Info button (built-in monsters only) -->
-				{#if !enemy.isCustom}
+				<!-- Info button (built-ins and imported monsters with stat blocks) -->
+				{#if !enemy.isCustom || enemy.detail}
 					<button
 						onclick={() => showInfo(enemy)}
 						title="View {enemy.name} stat block"
@@ -698,3 +717,5 @@
 {/if}
 
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
+
+<ImportBestiaryModal bind:open={showImportModal} onImport={loadCustomMonsters} />

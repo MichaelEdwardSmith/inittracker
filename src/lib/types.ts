@@ -20,6 +20,8 @@ export interface Combatant {
 	avatarUrl?: string;
 	// Enemies only — avatar image URL (remote for built-ins, base64 for custom monsters)
 	imgUrl?: string;
+	// Enemies only — source abbreviation for bestiary-imported monsters (e.g. "IDRotF")
+	source?: string;
 	// DM-only freeform notes
 	note?: string;
 }
@@ -40,10 +42,14 @@ export interface EnemyTemplate {
 	dexMod?: number;
 	/** Optional avatar — base64 JPEG data URL for custom monsters, or remote URL for built-ins. */
 	imgUrl?: string;
+	/** Source abbreviation for bestiary-imported monsters (e.g. "IDRotF"). */
+	source?: string;
 }
 
 export interface CustomMonster extends EnemyTemplate {
 	id: string;
+	/** Full stat block for monsters imported from 5etools bestiaries. */
+	detail?: MonsterDetail;
 }
 
 export interface CombatEvent {
@@ -110,6 +116,7 @@ export interface MonsterDetail {
 	cha: number; chaMod: string;
 	savingThrows?: string;
 	skills?: string;
+	damageVulnerabilities?: string;
 	damageImmunities?: string;
 	damageResistances?: string;
 	conditionImmunities?: string;
@@ -121,4 +128,8 @@ export interface MonsterDetail {
 	reactions?: string;
 	legendaryActions?: string;
 	imgUrl?: string;
+	/** Source abbreviation for bestiary-imported monsters (e.g. "IDRotF") */
+	source?: string;
+	/** Page number in the source book */
+	page?: number;
 }

@@ -33,6 +33,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const monsterType = String(body.monsterType ?? 'Humanoid').slice(0, 50);
 
 	const imgUrl = typeof body.imgUrl === 'string' && body.imgUrl ? body.imgUrl : undefined;
+	const source = typeof body.source === 'string' && body.source ? body.source.slice(0, 30) : undefined;
 
 	const monster: CustomMonster = {
 		id: crypto.randomUUID(),
@@ -41,7 +42,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		hp,
 		cr,
 		monsterType,
-		...(imgUrl ? { imgUrl } : {})
+		...(imgUrl ? { imgUrl } : {}),
+		...(source ? { source } : {})
 	};
 
 	await addCustomMonster(sessionId, monster);

@@ -38,6 +38,11 @@
 				<div>
 					<h3 class="text-lg font-black tracking-wide text-red-400">{monster.name}</h3>
 					<p class="text-xs text-gray-400 italic">{monster.meta}</p>
+					{#if monster.source}
+						<p class="mt-0.5 text-xs text-gray-500">
+							<span class="rounded bg-indigo-900/60 px-1 py-0.5 font-semibold text-indigo-300">{monster.source}</span>{#if monster.page}&nbsp;p.&nbsp;{monster.page}{/if}
+						</p>
+					{/if}
 				</div>
 				<button
 					onclick={onclose}
@@ -126,7 +131,14 @@
 					{#if monster.skills}
 						<div><span class="text-gray-500">Skills </span><span>{monster.skills}</span></div>
 					{/if}
-					{#if monster.damageImmunities}
+					{#if monster.damageVulnerabilities}
+					<div>
+						<span class="text-gray-500">Damage Vulnerabilities </span><span
+							>{monster.damageVulnerabilities}</span
+						>
+					</div>
+				{/if}
+				{#if monster.damageImmunities}
 						<div>
 							<span class="text-gray-500">Damage Immunities </span><span
 								>{monster.damageImmunities}</span
