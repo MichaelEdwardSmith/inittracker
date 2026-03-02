@@ -229,9 +229,19 @@
 						{#if player.inCombat === false}
 							<button
 								onclick={() => combat.addToCombat(player.id)}
-								class="rounded px-2 py-0.5 text-xs text-green-400 transition hover:bg-green-900/40 hover:text-green-300"
+								title="Add to Combat"
+								class="rounded p-1 text-green-400 transition hover:bg-green-900/40 hover:text-green-300"
 							>
-								+ Combat
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2.5"
+								>
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+								</svg>
 							</button>
 						{/if}
 						<button

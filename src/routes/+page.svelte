@@ -14,7 +14,7 @@
 	let copied = $state(false);
 	let openPanel = $state<'players' | 'enemies' | null>(null);
 
-	// Right sidebar resize
+	// Right sidebar resize (enemy panel)
 	const SIDEBAR_MIN = 200;
 	const SIDEBAR_MAX = 520;
 	const SIDEBAR_DEFAULT = 288; // w-72
@@ -38,6 +38,38 @@
 			document.body.style.userSelect = '';
 			document.body.style.cursor = '';
 			if (browser) localStorage.setItem('enemy-panel-width', String(sidebarWidth));
+		};
+
+		document.body.style.userSelect = 'none';
+		document.body.style.cursor = 'col-resize';
+		document.addEventListener('mousemove', onMove);
+		document.addEventListener('mouseup', onUp);
+	}
+
+	// Left sidebar resize (player panel)
+	const PLAYER_MIN = 180;
+	const PLAYER_MAX = 480;
+	const PLAYER_DEFAULT = 256; // w-64
+	let playerWidth = $state(
+		browser
+			? Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, parseInt(localStorage.getItem('player-panel-width') ?? '') || PLAYER_DEFAULT))
+			: PLAYER_DEFAULT
+	);
+
+	function startResizePlayer(e: MouseEvent) {
+		e.preventDefault();
+		const startX = e.clientX;
+		const startWidth = playerWidth;
+
+		const onMove = (mv: MouseEvent) => {
+			playerWidth = Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, startWidth + (mv.clientX - startX)));
+		};
+		const onUp = () => {
+			document.removeEventListener('mousemove', onMove);
+			document.removeEventListener('mouseup', onUp);
+			document.body.style.userSelect = '';
+			document.body.style.cursor = '';
+			if (browser) localStorage.setItem('player-panel-width', String(playerWidth));
 		};
 
 		document.body.style.userSelect = 'none';
@@ -378,10 +410,18 @@
 
 	<!-- Main layout -->
 	<div class="flex min-h-0 flex-1">
-		<!-- Left sidebar: Players (desktop only) -->
+		<!-- Left sidebar: Players (desktop only, resizable) -->
 		<aside
-			class="hidden w-64 shrink-0 flex-col border-r border-gray-800 bg-gray-900/50 p-4 md:flex"
+			class="relative hidden shrink-0 flex-col border-r border-gray-800 bg-gray-900/50 p-4 md:flex"
+			style="width: {playerWidth}px"
 		>
+			<!-- Drag handle — right edge -->
+			<div
+				class="absolute inset-y-0 right-0 z-10 w-1.5 cursor-col-resize transition-colors hover:bg-blue-500/30"
+				onmousedown={startResizePlayer}
+				role="separator"
+				aria-label="Drag to resize panel"
+			></div>
 			<PlayerPanel />
 		</aside>
 
