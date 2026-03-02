@@ -15,6 +15,7 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 - **Game sessions** — run multiple campaigns from one account; each session has its own combat state, history, and 6-character share code
 - **Combat chronicles** — permanent encounter history with round-by-round event logs and automatic XP calculation by CR
 - **Combatant notes** — per-combatant freeform text for DM-only reminders (concentration, loot, etc.)
+- **Player-to-DM messaging** — players on the viewer screen can send a private message to the DM; choose which party member you are, type your message, and hit Send. The DM sees a live unread count badge on the Messages button in the header (and on the mobile hamburger menu) and can read the full inbox at any time
 - **Resizable panels** — drag the left edge of the enemy panel on desktop to make it wider or narrower; preference is saved in localStorage
 
 ## Tech stack

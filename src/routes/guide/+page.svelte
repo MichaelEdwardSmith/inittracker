@@ -11,7 +11,8 @@
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
 		{ id: 'chronicles', label: '11. Combat Chronicles' },
-		{ id: 'contact', label: '12. Contact & Support' }
+		{ id: 'player-messaging', label: '12. Player Messaging' },
+		{ id: 'contact', label: '13. Contact & Support' }
 	];
 
 	const conditions = [
@@ -930,8 +931,68 @@
 			</section>
 
 			<!-- 12 ─────────────────────────────────────── -->
+			<section id="player-messaging">
+				{@render h2('12', 'Player Messaging')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Players on the viewer screen can send a private message directly to the DM — useful for
+					asking questions, flagging something, or just communicating without leaving the display.
+					Messages are visible only to the DM and are not persisted between server restarts.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Sending a Message (Player)
+				</h3>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Click the <strong class="font-semibold text-white">✉ Message DM</strong> button in the
+						viewer header
+					</li>
+					<li>
+						Choose which <strong class="font-semibold text-white">party member</strong> you are
+						sending as from the dropdown — the list shows all players currently in the session
+					</li>
+					<li>Type your message in the text field</li>
+					<li>
+						Click <strong class="font-semibold text-white">Send</strong> — the modal closes and
+						your message is delivered instantly
+					</li>
+				</ol>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Receiving Messages (DM)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">Messages</strong> button in the dashboard
+					header shows an <strong class="font-semibold text-amber-300">amber badge</strong> with the
+					unread count whenever new messages arrive. On mobile, the same badge appears on the
+					hamburger menu button so you always know there is something waiting even with the menu
+					collapsed.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Reading the Inbox
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Messages</strong> to open the inbox modal.
+					Messages are listed newest-first, each showing the
+					<strong class="font-semibold text-amber-300">sender's name</strong>, the
+					<strong class="font-semibold text-white">time received</strong>, and the full message
+					text. Opening the inbox marks all current messages as read and resets the unread badge.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Clearing Messages
+				</h3>
+				<p class="text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Clear all</strong> in the inbox header to
+					delete all messages for the current session. This action cannot be undone.
+				</p>
+			</section>
+
+			<!-- 13 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('12', 'Contact & Support')}
+				{@render h2('13', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
