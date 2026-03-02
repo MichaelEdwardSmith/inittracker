@@ -4,6 +4,7 @@
 	import { getMonsterDetail } from '$lib/enemies';
 	import type { StorageState, Combatant } from '$lib/types';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
+	import { fly } from 'svelte/transition';
 
 	let { data } = $props();
 
@@ -202,6 +203,42 @@
 		});
 	}
 
+	function playSwordSound(ctx: AudioContext) {
+		const t = ctx.currentTime;
+		// Whoosh: noise burst with bandpass sweeping low → high
+		const bufLen = Math.floor(ctx.sampleRate * 0.18);
+		const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+		const data = buf.getChannelData(0);
+		for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+		const noise = ctx.createBufferSource();
+		noise.buffer = buf;
+		const sweep = ctx.createBiquadFilter();
+		sweep.type = 'bandpass';
+		sweep.frequency.setValueAtTime(250, t);
+		sweep.frequency.exponentialRampToValueAtTime(5000, t + 0.13);
+		sweep.Q.value = 1.5;
+		const whooshGain = ctx.createGain();
+		whooshGain.gain.setValueAtTime(0.55, t);
+		whooshGain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+		noise.connect(sweep);
+		sweep.connect(whooshGain);
+		whooshGain.connect(ctx.destination);
+		noise.start(t);
+		// Metallic ting: triangle wave at the peak of the whoosh
+		const osc = ctx.createOscillator();
+		const oscGain = ctx.createGain();
+		osc.type = 'triangle';
+		osc.frequency.setValueAtTime(2900, t + 0.09);
+		osc.frequency.exponentialRampToValueAtTime(2100, t + 0.38);
+		oscGain.gain.setValueAtTime(0, t + 0.09);
+		oscGain.gain.linearRampToValueAtTime(0.28, t + 0.1);
+		oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+		osc.connect(oscGain);
+		oscGain.connect(ctx.destination);
+		osc.start(t + 0.09);
+		osc.stop(t + 0.42);
+	}
+
 	function playTempHpSound(ctx: AudioContext) {
 		// Bright shield-shimmer: C6 + G6 (a fifth apart), quick attack, short decay
 		[1046.5, 1567.98].forEach((freq, i) => {
@@ -256,6 +293,14 @@
 					// Combat ends (active → null)
 					if (combatState.currentTurnId !== null && newState.currentTurnId === null) {
 						if (audioEnabled && audioCtx) playFanfareSound(audioCtx);
+					}
+					// Turn advances (one combatant → another)
+					if (
+						combatState.currentTurnId !== null &&
+						newState.currentTurnId !== null &&
+						combatState.currentTurnId !== newState.currentTurnId
+					) {
+						if (audioEnabled && audioCtx) playSwordSound(audioCtx);
 					}
 				}
 				firstMessageReceived = true;
@@ -342,6 +387,14 @@
 </svelte:head>
 
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white">
+	<!-- Drifting atmospheric orbs -->
+	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+		<div class="bg-orb orb-1"></div>
+		<div class="bg-orb orb-2"></div>
+		<div class="bg-orb orb-3"></div>
+		<div class="bg-orb orb-4"></div>
+	</div>
+
 	<!-- Join Session gate — satisfies browser autoplay policy -->
 	{#if !joined}
 		<div
@@ -495,10 +548,15 @@
 		</div>
 	{:else}
 		<!-- Active combatant display -->
-		{#key current.id}
-			{@const pct = hpPercent(current)}
-			{@const showAc = current.type === 'player' || current.showAc === true}
-			<main class="relative z-10 flex flex-1 flex-col items-center justify-center px-12 pb-4">
+		<div class="relative z-10 flex flex-1 overflow-hidden">
+			{#key current.id}
+				{@const pct = hpPercent(current)}
+				{@const showAc = current.type === 'player' || current.showAc === true}
+				<main
+					in:fly={{ y: 28, duration: 500 }}
+					out:fly={{ y: -20, duration: 250 }}
+					class="absolute inset-0 flex flex-col items-center justify-center px-12 pb-4"
+				>
 				<!-- Type label -->
 				<div class="mb-5 flex items-center gap-3">
 					<div class="h-px w-16 bg-gradient-to-r from-transparent to-gray-600"></div>
@@ -597,18 +655,22 @@
 				<!-- HP bar + THP extension (players only) -->
 				{#if current.type === 'player'}
 					<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
-						<div
-							class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
-							style="width: {pct}%;"
-						></div>
 						{#if (current.tempHp ?? 0) > 0}
-							{@const thpPct = Math.min(
-								(current.tempHp / current.maxHp) * 100,
-								Math.max(0, 100 - pct)
-							)}
+							{@const total = current.maxHp + current.tempHp}
+							{@const hpW = (current.currentHp / total) * 100}
+							{@const thpW = (current.tempHp / total) * 100}
+							<div
+								class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+								style="width: {hpW}%;"
+							></div>
 							<div
 								class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all duration-500"
-								style="left: {pct}%; width: {thpPct}%;"
+								style="left: {hpW}%; width: {thpW}%;"
+							></div>
+						{:else}
+							<div
+								class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+								style="width: {pct}%;"
 							></div>
 						{/if}
 					</div>
@@ -648,8 +710,9 @@
 						{/each}
 					</div>
 				{/if}
-			</main>
-		{/key}
+				</main>
+			{/key}
+		</div>
 
 		<!-- Up Next strip -->
 		{#if upNext.length > 0}
@@ -739,21 +802,25 @@
 									</div>
 
 									{#if c.type === 'player'}
-										{@const thpPct = Math.min(
-											((c.tempHp ?? 0) / c.maxHp) * 100,
-											Math.max(0, 100 - pct)
-										)}
 										<div
 											class="relative mt-1.5 hidden h-1.5 w-full overflow-hidden rounded-full bg-gray-800 sm:block"
 										>
-											<div
-												class="absolute inset-y-0 left-0 {hpBarColor(pct)}"
-												style="width: {pct}%;"
-											></div>
 											{#if (c.tempHp ?? 0) > 0}
+												{@const total = c.maxHp + (c.tempHp ?? 0)}
+												{@const hpW = (c.currentHp / total) * 100}
+												{@const thpW = ((c.tempHp ?? 0) / total) * 100}
+												<div
+													class="absolute inset-y-0 left-0 {hpBarColor(pct)}"
+													style="width: {hpW}%;"
+												></div>
 												<div
 													class="absolute inset-y-0 bg-yellow-400"
-													style="left: {pct}%; width: {thpPct}%;"
+													style="left: {hpW}%; width: {thpW}%;"
+												></div>
+											{:else}
+												<div
+													class="absolute inset-y-0 left-0 {hpBarColor(pct)}"
+													style="width: {pct}%;"
 												></div>
 											{/if}
 										</div>
@@ -835,5 +902,68 @@
 	}
 	.flash-overlay {
 		animation: flash-effect 0.75s ease-out forwards;
+	}
+
+	/* ── Atmospheric drifting orbs ── */
+	.bg-orb {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(90px);
+	}
+
+	.orb-1 {
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
+		background: rgba(88, 28, 135, 0.45);
+		top: -15%;
+		left: -12%;
+		animation: orb-drift-1 24s ease-in-out infinite;
+	}
+	.orb-2 {
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
+		background: rgba(30, 58, 138, 0.45);
+		bottom: -18%;
+		right: -10%;
+		animation: orb-drift-2 30s ease-in-out infinite;
+	}
+	.orb-3 {
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
+		background: rgba(120, 53, 15, 0.35);
+		top: 35%;
+		left: 42%;
+		transform: translate(-50%, -50%);
+		animation: orb-drift-3 20s ease-in-out infinite;
+	}
+	.orb-4 {
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
+		background: rgba(49, 46, 129, 0.4);
+		top: 15%;
+		right: 18%;
+		animation: orb-drift-4 26s ease-in-out infinite;
+	}
+
+	@keyframes orb-drift-1 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		25%       { transform: translate(8vw, 6vh) scale(1.06); }
+		55%       { transform: translate(3vw, 12vh) scale(0.94); }
+		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+	}
+	@keyframes orb-drift-2 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		30%       { transform: translate(-7vw, -9vh) scale(1.08); }
+		65%       { transform: translate(-2vw, -4vh) scale(0.92); }
+	}
+	@keyframes orb-drift-3 {
+		0%, 100% { transform: translate(-50%, -50%) scale(1); }
+		40%       { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
+		70%       { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+	}
+	@keyframes orb-drift-4 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		35%       { transform: translate(6vw, 9vh) scale(0.94); }
+		68%       { transform: translate(-5vw, 4vh) scale(1.06); }
 	}
 </style>
