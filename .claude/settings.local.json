@@ -20,7 +20,10 @@
       "Bash(git add:*)",
       "Bash(powershell -ExecutionPolicy Bypass -File:*)",
       "Bash(pnpm build:*)",
-      "Bash(git -C \"C:/Users/mojpo/WebstormProjects/Initiative\" log master..Import-Bestiary --oneline)"
+      "Bash(git -C \"C:/Users/mojpo/WebstormProjects/Initiative\" log master..Import-Bestiary --oneline)",
+      "Bash(done)",
+      "Bash(pnpm check:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\fix_cards.ps1\")"
     ]
   }
 }
