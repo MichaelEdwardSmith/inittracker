@@ -372,7 +372,7 @@
 						</svg>
 					</button>
 				{/if}
-				{#if enemy.isCustom && enemy.id}
+				{#if enemy.isCustom && enemy.id && !enemy.source}
 					<button
 						onclick={() =>
 							openEditFromList({
@@ -663,6 +663,7 @@
 										</div>
 									</div>
 									<div class="flex shrink-0 items-center gap-1">
+										{#if !m.source}
 										<button
 											onclick={() => openEdit(m)}
 											title="Edit"
@@ -683,6 +684,7 @@
 												/>
 											</svg>
 										</button>
+										{/if}
 										<button
 											onclick={() => deleteMonster(m.id)}
 											title="Delete"
