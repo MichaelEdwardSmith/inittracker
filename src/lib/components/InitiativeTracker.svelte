@@ -20,8 +20,28 @@
 	let conditionInfo = $state<string | null>(null);
 	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
 
+	// Detail map for imported custom monsters — keyed by monster name
+	let customDetailMap = $state<Map<string, MonsterDetail>>(new Map());
+	$effect(() => {
+		fetch('/api/monsters')
+			.then((r) => (r.ok ? r.json() : []))
+			.then((monsters: Array<{ name: string; detail?: MonsterDetail }>) => {
+				const m = new Map<string, MonsterDetail>();
+				for (const mon of monsters) {
+					if (mon.detail) m.set(mon.name, mon.detail);
+				}
+				customDetailMap = m;
+			})
+			.catch(() => {});
+	});
+
+	function getDetailForCombatant(c: Combatant): MonsterDetail | null {
+		if (!c.templateName) return null;
+		return getMonsterDetail(c.templateName) ?? customDetailMap.get(c.templateName) ?? null;
+	}
+
 	function showMonsterInfo(c: Combatant) {
-		if (c.templateName) infoMonster = getMonsterDetail(c.templateName) ?? null;
+		infoMonster = getDetailForCombatant(c);
 	}
 	let damageInputs = $state<Record<string, string>>({});
 	let tempHpInputs = $state<Record<string, string>>({});
@@ -225,7 +245,12 @@
 						>
 							{c.name}
 						</span>
-						{#if c.type === 'enemy' && getMonsterDetail(c.templateName ?? '')}
+						{#if c.source}
+							<span class="shrink-0 rounded bg-indigo-900/60 px-1 py-0.5 text-[10px] font-semibold text-indigo-300 leading-none">
+								{c.source}
+							</span>
+						{/if}
+						{#if c.type === 'enemy' && getDetailForCombatant(c)}
 							<button
 								onclick={() => showMonsterInfo(c)}
 								title="View stat block"
@@ -513,6 +538,11 @@
 							>
 								{c.name}
 							</span>
+							{#if c.source}
+								<span class="shrink-0 rounded bg-indigo-900/60 px-1 py-0.5 text-[10px] font-semibold text-indigo-300 leading-none">
+									{c.source}
+								</span>
+							{/if}
 						</div>
 					</div>
 
@@ -700,7 +730,7 @@
 
 					<!-- Info + Remove (desktop) -->
 					<div class="hidden items-center gap-1 md:flex">
-						{#if c.type === 'enemy' && getMonsterDetail(c.templateName ?? '')}
+						{#if c.type === 'enemy' && getDetailForCombatant(c)}
 							<button
 								onclick={() => showMonsterInfo(c)}
 								title="View stat block"

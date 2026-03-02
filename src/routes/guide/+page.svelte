@@ -216,12 +216,18 @@
 						['Right sidebar', 'Enemy Library']
 					]
 				)}
-				<p class="mt-4 mb-6 text-sm leading-relaxed">
+				<p class="mt-4 mb-4 text-sm leading-relaxed">
 					On mobile, the sidebars are hidden. Tap <strong class="font-semibold text-white"
 						>Party</strong
 					>
 					or <strong class="font-semibold text-white">Enemies</strong> in the bottom action bar to open
-					them as overlays.
+					them full-screen. Tap the <strong class="font-semibold text-white">✕ close button</strong> or
+					press back to return to the main tracker.
+				</p>
+				<p class="mt-0 mb-6 text-sm leading-relaxed">
+					On desktop, the <strong class="font-semibold text-white">Enemy panel</strong> is resizable —
+					drag its <strong class="font-semibold text-white">left edge</strong> left or right to make it
+					wider or narrower (200–520 px). Your preferred width is saved automatically.
 				</p>
 
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -369,9 +375,9 @@
 					Viewing a Stat Block
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">ℹ️ info icon</strong> on any built-in monster
-					(in the library or the initiative order) to open a full D&amp;D stat block modal — ability scores,
-					saving throws, traits, actions, resistances, artwork, and more.
+					Click the <strong class="font-semibold text-white">ℹ️ info icon</strong> on any built-in or
+					bestiary-imported monster (in the library or the initiative order) to open a full D&amp;D stat
+					block modal — ability scores, saving throws, traits, actions, resistances, artwork, and more.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -392,6 +398,49 @@
 					<strong class="font-semibold text-white">trash</strong> icons in the manager to edit or delete
 					them.
 				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Importing a Bestiary
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Non-SRD monsters (e.g. Icewind Dale: Rime of the Frostmaiden) cannot be bundled with the app
+					because the stat blocks are WotC IP. You can import them yourself from a 5etools bestiary JSON file.
+				</p>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Download the bestiary JSON from the
+						<strong class="font-semibold text-white">5etools data repository</strong> on GitHub
+						(e.g. <code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">bestiary-idrotf.json</code>)
+					</li>
+					<li>
+						In the Enemy Panel, click the <strong class="font-semibold text-white">⬆ Import</strong> button
+						next to the Custom button
+					</li>
+					<li>Select the JSON file — the app parses it entirely in your browser (nothing is uploaded to any server)</li>
+					<li>Review the monster count shown and click <strong class="font-semibold text-white">Import</strong></li>
+				</ol>
+				<p class="mb-3 text-sm leading-relaxed">
+					Imported monsters appear at the top of the library, tagged with a
+					<span class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300">SOURCE</span>
+					badge (e.g. <span class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300">IDRotF</span>).
+					The badge also appears on the combatant row in the initiative tracker so you always know which
+					book a creature came from.
+				</p>
+				<p class="mb-3 text-sm leading-relaxed">
+					Imported monsters carry their full stat block — click the
+					<strong class="font-semibold text-white">ℹ️ info icon</strong> to open the stat block modal just
+					like built-in SRD monsters. Re-importing the same file skips monsters that are already in your
+					library, so it is safe to import repeatedly.
+				</p>
+				<div
+					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
+				>
+					<span class="mt-0.5 shrink-0">💡</span>
+					<span
+						>Entries that rely on another monster’s stat block (<code class="rounded bg-amber-900/40 px-1 font-mono text-xs">_copy</code>
+						entries) are automatically skipped during import, as they carry no independent stat data.</span
+					>
+				</div>
 			</section>
 
 			<!-- 6 ─────────────────────────────────────── -->
