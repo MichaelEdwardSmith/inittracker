@@ -10,9 +10,79 @@
 
 	let imgExpanded = $state(false);
 
+	interface DiceRollResult {
+		expr: string;
+		rolls: number[];
+		sides: number;
+		modifier: number;
+		total: number;
+		isAttack?: boolean;
+	}
+
+	let diceRollResult = $state<DiceRollResult | null>(null);
+
 	$effect(() => {
-		if (monster) imgExpanded = false;
+		if (monster) {
+			imgExpanded = false;
+			diceRollResult = null;
+		}
 	});
+
+	/** Wrap dice expressions and attack-roll phrases in clickable buttons. */
+	function linkDice(html: string): string {
+		// Pass 1 — dice expressions like "2d6+3" or "2d6 + 3"
+		let out = html.replace(
+			/(<[^>]+>)|(\b\d+d\d+(?:\s*[+-]\s*\d+)?(?=\b|\s|[^a-zA-Z]))/g,
+			(_, tag: string | undefined, dice: string | undefined) => {
+				if (tag) return tag;
+				return `<button class="dice-btn" data-dice="${dice!.trim()}">${dice}</button>`;
+			}
+		);
+		// Pass 2 — attack phrases like "<em>Melee Weapon Attack:</em> +9 to hit"
+		//           or plain "Ranged Weapon Attack: +4 to hit" (imported monsters)
+		out = out.replace(
+			/((?:<em>)?(?:Melee(?:\s+or\s+Ranged)?|Ranged)\s+(?:Weapon|Spell)\s+Attack:?(?:<\/em>)?)\s*([+-]?\d+)\s+to\s+hit/gi,
+			(_, label: string, modStr: string) => {
+				const mod = parseInt(modStr);
+				const sign = mod >= 0 ? '+' : '';
+				return `<button class="atk-btn" data-attack="${mod}">${label} ${sign}${mod} to hit</button>`;
+			}
+		);
+		return out;
+	}
+
+	function rollDice(expr: string) {
+		const m = expr.trim().match(/^(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?$/i);
+		if (!m) return;
+		const count = parseInt(m[1]);
+		const sides = parseInt(m[2]);
+		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
+		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
+		const total = rolls.reduce((s, r) => s + r, 0) + modifier;
+		diceRollResult = { expr: expr.trim(), rolls, sides, modifier, total };
+	}
+
+	function rollAttack(modStr: string) {
+		const modifier = parseInt(modStr);
+		const roll = Math.floor(Math.random() * 20) + 1;
+		const sign = modifier >= 0 ? '+' : '';
+		diceRollResult = {
+			expr: `Attack roll ${sign}${modifier}`,
+			rolls: [roll],
+			sides: 20,
+			modifier,
+			total: roll + modifier,
+			isAttack: true
+		};
+	}
+
+	function handleDiceClick(e: MouseEvent) {
+		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack]') as HTMLElement | null;
+		if (!target) return;
+		e.stopPropagation();
+		if (target.dataset.dice) rollDice(target.dataset.dice);
+		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
+	}
 </script>
 
 {#if monster}
@@ -66,7 +136,8 @@
 				</button>
 			</div>
 
-			<div class="overflow-y-auto p-5 text-gray-200">
+			<!-- Scrollable body — dice clicks bubble up to this handler -->
+			<div class="overflow-y-auto p-5 text-gray-200" onclick={handleDiceClick}>
 				<!-- Image -->
 				{#if monster.imgUrl}
 					<div class="mb-4">
@@ -96,7 +167,8 @@
 					</div>
 					<div>
 						<span class="text-gray-500">HP</span>
-						<span class="font-bold text-gray-200">{monster.hitPoints}</span>
+						<!-- HP often contains a dice expression like 52 (8d8+16) -->
+						<span class="font-bold text-gray-200">{@html linkDice(monster.hitPoints)}</span>
 					</div>
 					<div>
 						<span class="text-gray-500">Speed</span>
@@ -171,7 +243,7 @@
 				{#if monster.traits}
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html monster.traits}
+							{@html linkDice(monster.traits)}
 						</div>
 					</div>
 				{/if}
@@ -181,7 +253,7 @@
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Actions</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html monster.actions}
+							{@html linkDice(monster.actions)}
 						</div>
 					</div>
 				{/if}
@@ -191,7 +263,7 @@
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Reactions</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html monster.reactions}
+							{@html linkDice(monster.reactions)}
 						</div>
 					</div>
 				{/if}
@@ -203,7 +275,7 @@
 							Legendary Actions
 						</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html monster.legendaryActions}
+							{@html linkDice(monster.legendaryActions)}
 						</div>
 					</div>
 				{/if}
@@ -211,3 +283,104 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Dice roll result modal (z-[60], renders above the info modal) -->
+{#if diceRollResult}
+	{@const r = diceRollResult}
+	<div
+		class="fixed inset-0 z-[60] flex items-center justify-center"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Dice roll result"
+		tabindex="-1"
+		onclick={() => (diceRollResult = null)}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') diceRollResult = null;
+		}}
+	>
+		<div
+			class="min-w-[18rem] max-w-sm rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<!-- Title row -->
+			<div class="mb-4 flex items-center justify-between">
+				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<button
+					onclick={() => (diceRollResult = null)}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<!-- Individual die results -->
+			<div class="mb-4 flex flex-wrap gap-2">
+				{#each r.rolls as roll}
+					<div class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white">
+						{roll}
+					</div>
+				{/each}
+			</div>
+
+			<!-- Modifier line (only shown when there is one) -->
+			{#if r.modifier !== 0}
+				<p class="mb-1 text-sm text-gray-400">
+					Dice sum: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
+				</p>
+			{/if}
+
+			<!-- Total -->
+			<p class="text-2xl font-black text-white">
+				Total: <span class="text-amber-300">{r.total}</span>
+			</p>
+
+			<button
+				onclick={() => r.isAttack ? rollAttack(String(r.modifier)) : rollDice(r.expr)}
+				class="mt-4 w-full rounded bg-amber-700 py-1.5 text-sm font-bold text-white transition hover:bg-amber-600"
+			>
+				Roll again
+			</button>
+		</div>
+	</div>
+{/if}
+
+<style>
+	/* Dice expression buttons injected via {@html linkDice(...)} */
+	:global(.dice-btn) {
+		display: inline;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		color: rgb(252, 211, 77); /* amber-300 */
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		cursor: pointer;
+		background: transparent;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		line-height: inherit;
+	}
+	:global(.dice-btn:hover) {
+		color: rgb(253, 230, 138); /* amber-200 */
+	}
+	/* Attack-roll phrase buttons (Melee/Ranged Weapon Attack: +N to hit) */
+	:global(.atk-btn) {
+		display: inline;
+		color: rgb(196, 181, 253); /* violet-300 */
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		cursor: pointer;
+		background: transparent;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		line-height: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+	}
+	:global(.atk-btn:hover) {
+		color: rgb(221, 214, 254); /* violet-200 */
+	}
+</style>
