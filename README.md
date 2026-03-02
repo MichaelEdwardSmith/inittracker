@@ -10,6 +10,7 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 - **Enemy library** — ~380 SRD monsters with full stat blocks (ability scores, traits, actions, artwork)
 - **Custom monsters** — create your own enemies with name, AC, HP, CR, type, and an optional avatar
 - **Bestiary import** — drop in any 5etools bestiary JSON (e.g. `bestiary-idrotf.json`) to bulk-import non-SRD monsters with full stat blocks; imported monsters are tagged with their source (e.g. `IDRotF`)
+- **In-stat-block dice roller** — any dice expression in a stat block (e.g. `2d6 + 5`) is clickable; attack phrases (e.g. `Melee Weapon Attack: +9 to hit`) roll a d20 with the modifier; results show per-die values, modifier breakdown, and total in a popup with a Roll Again button
 - **Player display** — public SSE-powered viewer at `/display/[sessionId]`; updates in real time with flash effects and spatial audio
 - **Game sessions** — run multiple campaigns from one account; each session has its own combat state, history, and 6-character share code
 - **Combat chronicles** — permanent encounter history with round-by-round event logs and automatic XP calculation by CR

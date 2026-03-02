@@ -374,10 +374,37 @@
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Viewing a Stat Block
 				</h3>
-				<p class="mb-4 text-sm leading-relaxed">
+				<p class="mb-3 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">ℹ️ info icon</strong> on any built-in or
 					bestiary-imported monster (in the library or the initiative order) to open a full D&amp;D stat
 					block modal — ability scores, saving throws, traits, actions, resistances, artwork, and more.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Rolling Dice from a Stat Block
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Inside the stat block modal, two types of values are interactive:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-2 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Damage / HP dice</strong> — any dice expression
+						such as <code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">2d6 + 5</code>
+						appears in <span class="font-semibold text-amber-300">amber</span> with a dotted underline.
+						Click it to roll those dice and add any modifier.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Attack rolls</strong> — phrases like
+						<span class="font-semibold" style="color: rgb(196,181,253);">Melee Weapon Attack: +9 to hit</span>
+						appear in violet with a dotted underline. Click the phrase to roll a
+						d20 and add the listed attack bonus.
+					</li>
+				</ul>
+				<p class="mb-4 text-sm leading-relaxed">
+					A result popup shows each individual die value, a modifier breakdown when one applies, and a
+					<strong class="font-semibold text-white">Total</strong>. Use
+					<strong class="font-semibold text-white">Roll again</strong> to re-roll the same expression,
+					or click anywhere outside the popup to dismiss it.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
