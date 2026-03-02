@@ -91,6 +91,41 @@
 	let deleteConfirmId = $state<string | null>(null);
 	let showMobileMenu = $state(false);
 
+	// ── DM inbox ──────────────────────────────────────────────────────────────────────
+	interface DmMessage { id: string; from: string; text: string; timestamp: number; }
+	let messages = $state<DmMessage[]>([]);
+	let seenCount = $state(0);
+	let showInbox = $state(false);
+	const unreadCount = $derived(Math.max(0, messages.length - seenCount));
+
+	$effect(() => {
+		async function poll() {
+			try {
+				const r = await fetch('/api/messages');
+				if (r.ok) messages = await r.json();
+			} catch { /* ignore */ }
+		}
+		poll();
+		const id = setInterval(poll, 5000);
+		return () => clearInterval(id);
+	});
+
+	function openInbox() {
+		showInbox = true;
+		seenCount = messages.length;
+	}
+
+	async function clearMessages() {
+		await fetch('/api/messages', { method: 'DELETE' });
+		messages = [];
+		seenCount = 0;
+	}
+
+	function formatTime(ts: number) {
+		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	}
+
+
 	// Keep sessions in sync when page data refreshes (e.g. after invalidateAll)
 	$effect(() => {
 		sessions = data.sessions;
@@ -277,6 +312,25 @@
 		<div class="ml-auto flex items-center gap-2">
 			<!-- Desktop: all buttons (md and up) -->
 			<div class="hidden items-center gap-2 md:flex">
+				<!-- Messages button -->
+				<button
+					onclick={openInbox}
+					class="relative flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-semibold transition
+					       {unreadCount > 0
+						? 'border-amber-600/70 bg-amber-900/30 text-amber-400 hover:bg-amber-900/50'
+						: 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-500 hover:text-gray-200'}"
+					title="Player messages"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+					</svg>
+					Messages
+					{#if unreadCount > 0}
+						<span class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
+							{unreadCount}
+						</span>
+					{/if}
+				</button>
 				<button
 					onclick={openSessionManager}
 					title="Manage Sessions"
@@ -337,21 +391,28 @@
 			</div>
 
 			<!-- Mobile: hamburger (below md) -->
-			<button
-				onclick={() => (showMobileMenu = !showMobileMenu)}
-				aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
-				class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300 md:hidden"
-			>
-				{#if showMobileMenu}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-					</svg>
-				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-					</svg>
+			<div class="relative md:hidden">
+				<button
+					onclick={() => (showMobileMenu = !showMobileMenu)}
+					aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
+					class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					{#if showMobileMenu}
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					{:else}
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+						</svg>
+					{/if}
+				</button>
+				{#if unreadCount > 0}
+					<span class="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
+						{unreadCount > 9 ? '9+' : unreadCount}
+					</span>
 				{/if}
-			</button>
+			</div>
 		</div>
 	</header>
 
@@ -360,8 +421,23 @@
 		<div class="fixed inset-0 z-40 md:hidden" onclick={() => (showMobileMenu = false)}></div>
 		<div class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl md:hidden">
 			<button
+				onclick={() => { openInbox(); showMobileMenu = false; }}
+				class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
+				       {unreadCount > 0 ? 'text-amber-400 hover:bg-amber-900/30' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+				</svg>
+				Messages
+				{#if unreadCount > 0}
+					<span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
+						{unreadCount}
+					</span>
+				{/if}
+			</button>
+			<button
 				onclick={() => { openSessionManager(); showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5"/>
@@ -834,6 +910,59 @@
 						</svg>
 						New Session
 					</button>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- DM Inbox modal -->
+{#if showInbox}
+	<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+		<div class="flex w-full max-w-lg flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: 80vh;">
+			<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
+				<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Player Messages
+					{#if messages.length > 0}
+						<span class="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-xs font-semibold text-gray-400">{messages.length}</span>
+					{/if}
+				</h2>
+				<div class="flex items-center gap-2">
+					{#if messages.length > 0}
+						<button
+							onclick={clearMessages}
+							class="rounded px-2 py-1 text-xs text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
+						>
+							Clear all
+						</button>
+					{/if}
+					<button onclick={() => (showInbox = false)} class="text-gray-600 transition hover:text-gray-300">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			</div>
+			<div class="flex-1 overflow-y-auto">
+				{#if messages.length === 0}
+					<div class="flex flex-col items-center justify-center gap-2 py-16 text-center">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						</svg>
+						<p class="text-sm text-gray-600">No messages yet</p>
+					</div>
+				{:else}
+					<ul class="divide-y divide-gray-800">
+						{#each [...messages].reverse() as msg (msg.id)}
+							<li class="flex flex-col gap-1 px-5 py-4">
+								<div class="flex items-center justify-between gap-2">
+									<span class="text-xs font-bold text-amber-400">{msg.from}</span>
+									<span class="text-xs text-gray-600">{formatTime(msg.timestamp)}</span>
+								</div>
+								<p class="text-sm leading-relaxed text-gray-300">{msg.text}</p>
+							</li>
+						{/each}
+					</ul>
 				{/if}
 			</div>
 		</div>
