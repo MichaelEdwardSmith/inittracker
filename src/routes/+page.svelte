@@ -28,26 +28,34 @@
 			: SIDEBAR_DEFAULT
 	);
 
-	function startResize(e: MouseEvent) {
-		e.preventDefault();
-		const startX = e.clientX;
+	function startResize(e: MouseEvent) { e.preventDefault(); startResizeFrom(e.clientX); }
+	function startResizeTouch(e: TouchEvent) { e.preventDefault(); startResizeFrom(e.touches[0].clientX); }
+	function startResizeFrom(startX: number) {
 		const startWidth = sidebarWidth;
-
-		const onMove = (mv: MouseEvent) => {
+		const onMouseMove = (mv: MouseEvent) => {
 			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + (startX - mv.clientX)));
 		};
+		const onTouchMove = (mv: TouchEvent) => {
+			mv.preventDefault();
+			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + (startX - mv.touches[0].clientX)));
+		};
 		const onUp = () => {
-			document.removeEventListener('mousemove', onMove);
+			document.removeEventListener('mousemove', onMouseMove);
 			document.removeEventListener('mouseup', onUp);
+			document.removeEventListener('touchmove', onTouchMove);
+			document.removeEventListener('touchend', onUp);
+			document.removeEventListener('touchcancel', onUp);
 			document.body.style.userSelect = '';
 			document.body.style.cursor = '';
 			if (browser) localStorage.setItem('enemy-panel-width', String(sidebarWidth));
 		};
-
 		document.body.style.userSelect = 'none';
 		document.body.style.cursor = 'col-resize';
-		document.addEventListener('mousemove', onMove);
+		document.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseup', onUp);
+		document.addEventListener('touchmove', onTouchMove, { passive: false });
+		document.addEventListener('touchend', onUp);
+		document.addEventListener('touchcancel', onUp);
 	}
 
 	// Left sidebar resize (player panel)
@@ -60,26 +68,34 @@
 			: PLAYER_DEFAULT
 	);
 
-	function startResizePlayer(e: MouseEvent) {
-		e.preventDefault();
-		const startX = e.clientX;
+	function startResizePlayer(e: MouseEvent) { e.preventDefault(); startResizePlayerFrom(e.clientX); }
+	function startResizePlayerTouch(e: TouchEvent) { e.preventDefault(); startResizePlayerFrom(e.touches[0].clientX); }
+	function startResizePlayerFrom(startX: number) {
 		const startWidth = playerWidth;
-
-		const onMove = (mv: MouseEvent) => {
+		const onMouseMove = (mv: MouseEvent) => {
 			playerWidth = Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, startWidth + (mv.clientX - startX)));
 		};
+		const onTouchMove = (mv: TouchEvent) => {
+			mv.preventDefault();
+			playerWidth = Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, startWidth + (mv.touches[0].clientX - startX)));
+		};
 		const onUp = () => {
-			document.removeEventListener('mousemove', onMove);
+			document.removeEventListener('mousemove', onMouseMove);
 			document.removeEventListener('mouseup', onUp);
+			document.removeEventListener('touchmove', onTouchMove);
+			document.removeEventListener('touchend', onUp);
+			document.removeEventListener('touchcancel', onUp);
 			document.body.style.userSelect = '';
 			document.body.style.cursor = '';
 			if (browser) localStorage.setItem('player-panel-width', String(playerWidth));
 		};
-
 		document.body.style.userSelect = 'none';
 		document.body.style.cursor = 'col-resize';
-		document.addEventListener('mousemove', onMove);
+		document.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseup', onUp);
+		document.addEventListener('touchmove', onTouchMove, { passive: false });
+		document.addEventListener('touchend', onUp);
+		document.addEventListener('touchcancel', onUp);
 	}
 
 	// Session manager state
@@ -573,10 +589,12 @@
 		>
 			<!-- Drag handle — right edge -->
 			<div
-				class="absolute inset-y-0 right-0 z-10 w-1.5 cursor-col-resize transition-colors hover:bg-blue-500/30"
+				class="absolute inset-y-0 right-0 z-10 w-3 cursor-col-resize transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResizePlayer}
+				ontouchstart={startResizePlayerTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
+				style="touch-action: none"
 			></div>
 			<PlayerPanel />
 		</aside>
@@ -593,10 +611,12 @@
 		>
 			<!-- Drag handle — left edge -->
 			<div
-				class="absolute inset-y-0 left-0 z-10 w-1.5 cursor-col-resize transition-colors hover:bg-blue-500/30"
+				class="absolute inset-y-0 left-0 z-10 w-3 cursor-col-resize transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResize}
+				ontouchstart={startResizeTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
+				style="touch-action: none"
 			></div>
 			<EnemyPanel />
 		</aside>
