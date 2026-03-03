@@ -11,7 +11,9 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 - **Custom monsters** — create your own enemies with name, AC, HP, CR, type, and an optional avatar
 - **Bestiary import** — drop in any 5etools bestiary JSON (e.g. `bestiary-idrotf.json`) to bulk-import non-SRD monsters with full stat blocks; imported monsters are tagged with their source (e.g. `IDRotF`)
 - **In-stat-block dice roller** — any dice expression in a stat block (e.g. `2d6 + 5`) is clickable; attack phrases (e.g. `Melee Weapon Attack: +9 to hit`) roll a d20 with the modifier; results show per-die values, modifier breakdown, and total in a popup with a Roll Again button
-- **Player display** — public SSE-powered viewer at `/display/[sessionId]`; updates in real time with flash effects and spatial audio
+- **Player display** — public SSE-powered viewer at `/display/[sessionId]`; updates in real time with flash effects and spatial audio; fully responsive with a mobile hamburger menu that collapses header actions on small screens
+- **Player initiative rolling** — players can roll their own initiative directly from the viewer screen (normal, advantage, or disadvantage), with DEX modifier applied automatically; the result is submitted to the DM's tracker instantly
+- **Fullscreen mode** — a fullscreen toggle button on both the DM dashboard and the player display for TV/projector use
 - **Game sessions** — run multiple campaigns from one account; each session has its own combat state, history, and 6-character share code
 - **Combat chronicles** — permanent encounter history with round-by-round event logs and automatic XP calculation by CR
 - **Combatant notes** — per-combatant freeform text for DM-only reminders (concentration, loot, etc.)
@@ -63,7 +65,7 @@ Non-SRD monsters (e.g. Icewind Dale: Rime of the Frostmaiden) cannot be bundled 
 3. Select the JSON file — the app parses it entirely client-side
 4. Review the monster count and click **Import**
 
-Imported monsters appear in your enemy library tagged with their source abbreviation and carry full stat blocks viewable via the ℹ️ icon.
+Imported monsters appear in your enemy library tagged with their source abbreviation and carry full stat blocks viewable via the ℹ️ icon. Use the **Source** filter dropdown in the enemy panel to show only monsters from a specific book.
 
 ## User guide
 

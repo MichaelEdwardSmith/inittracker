@@ -14,7 +14,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 6. [Running Combat](#6-running-combat)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
-9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen)
+9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
 10. [Game Sessions](#10-game-sessions)
 11. [Combat Chronicles (History)](#11-combat-chronicles-history)
 12. [Contact & Support](#12-contact--support)
@@ -124,6 +124,7 @@ The right sidebar contains the full D&D 5e SRD monster list (~380 creatures). Us
 
 - **Search bar** — filters by name in real time
 - **Type dropdown** — filters by monster type (Beast, Dragon, Undead, Humanoid, etc.)
+- **Source dropdown** — filters by book source; shows "SRD" by default, plus any imported bestiary sources (e.g. "IDRotF")
 - **Sort dropdown** — sort A–Z by name, or group by type
 
 Each monster entry shows its name, type, CR, AC, and HP.
@@ -270,6 +271,18 @@ Give your players the **6-character Session ID** shown in your dashboard header 
 
 When a player first opens the viewer, an overlay asks them to tap **Join Session**. This is required by browsers before playing audio. Choosing **Continue without sound** skips audio entirely.
 
+### Header Bar
+
+The viewer header contains several actions. On **desktop** they are always visible; on **mobile** they are collapsed behind a **☰ hamburger button** on the right — tap it to expand the menu.
+
+| Action | Description |
+|---|---|
+| **🔊 / 🔇** | Toggle all sound effects on or off |
+| **Message DM** | Send a private message to the DM (appears when party members exist) |
+| **Roll Initiative** | Roll your character's initiative and submit it to the tracker (appears when party members exist) |
+| **Contact** | Opens your email client to contact support |
+| **⛶ Fullscreen** | Toggles fullscreen mode — ideal for a TV or projector |
+
 ### What Players See
 
 **When combat is not active:**
@@ -287,6 +300,29 @@ When a player first opens the viewer, an overlay asks them to tap **Join Session
 - An **"Up Next"** strip at the bottom showing the next 1–4 combatants in order
 
 The background subtly glows blue during a player's turn and red during an enemy's turn.
+
+### Rolling Initiative (Players)
+
+If the DM has added player characters to the tracker, a **Roll Initiative** button appears in the header (or in the hamburger menu on mobile).
+
+1. Click **Roll Initiative**
+2. Select your **character** from the dropdown
+3. Choose a **roll mode**: Normal, Advantage, or Disadvantage
+4. Click **Roll d20** (or **Roll 2d20** for advantage/disadvantage) — the result is shown with per-die values
+5. If your character has a DEX modifier set, it is applied automatically and shown
+6. Click **Submit Initiative** to send your roll to the DM's tracker
+
+The roll is immediately reflected in the DM's initiative order.
+
+### Messaging the DM
+
+Click **Message DM** in the header (or hamburger menu on mobile) to open the message composer.
+
+1. Select your **character name** from the dropdown
+2. Type your message
+3. Click **Send Message**
+
+A confirmation appears briefly, then the modal closes. The DM sees a live unread count badge on their Messages button and can read the full inbox at any time.
 
 ### Flash Effects
 
@@ -310,8 +346,9 @@ All sounds are procedurally generated (no audio files required):
 | Temp HP granted | Bright shield shimmer |
 | Combat begins | Urgent war-horn fanfare |
 | Combat ends | Triumphant brass fanfare |
+| Turn advances | Sword whoosh |
 
-The **🔊 / 🔇 button** in the header toggles all sounds on or off.
+The **🔊 / 🔇 button** in the header (or hamburger menu) toggles all sounds on or off.
 
 ### Connection Status
 
