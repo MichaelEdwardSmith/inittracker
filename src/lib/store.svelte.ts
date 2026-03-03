@@ -141,6 +141,13 @@ function createCombatStore() {
 			return combatStartedAt !== null;
 		},
 
+		/** Apply state received from an external source (e.g. SSE) without syncing back. */
+		applyExternalState(s: StorageState) {
+			combatants = s.combatants;
+			currentTurnId = s.currentTurnId;
+			round = s.round;
+		},
+
 		/** Hydrate store from the server — call once on DM page mount. */
 		async loadFromServer() {
 			if (!browser) return;
@@ -156,7 +163,7 @@ function createCombatStore() {
 			}
 		},
 
-		addPlayer(name: string, ac: number, maxHp: number) {
+		addPlayer(name: string, ac: number, maxHp: number, dexMod?: number) {
 			const c: Combatant = {
 				id: crypto.randomUUID(),
 				name,
@@ -167,7 +174,8 @@ function createCombatStore() {
 				tempHp: 0,
 				statuses: [],
 				initiative: null,
-				inCombat: true
+				inCombat: true,
+				...(dexMod ? { dexMod } : {})
 			};
 			combatants = [...combatants, c];
 			if (combatStartedAt !== null) snapshotCombatant(c);

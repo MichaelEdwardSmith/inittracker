@@ -20,6 +20,8 @@ export interface Combatant {
 	// False means the player is in the party roster but not in the current combat.
 	// Undefined / true means in combat (backwards-compatible with saved state).
 	inCombat?: boolean;
+	// Players only — DEX modifier used when rolling initiative (e.g. +2, -1, 0)
+	dexMod?: number;
 	// Players only — base64 JPEG data URL set by the DM via avatar upload
 	avatarUrl?: string;
 	// Enemies only — avatar image URL (remote for built-ins, base64 for custom monsters)

@@ -15,14 +15,8 @@ import {
 import { isValidSessionId, validateStorageState } from '$lib/server/validate';
 import { authToGameSession } from '$lib/server/sessionCache';
 
-// ---------------------------------------------------------------------------
-// Per-session in-memory state cache and SSE client registry.
-// State is also persisted to MongoDB so it survives server restarts.
-// Both maps are keyed by game session public 6-char ID.
-// ---------------------------------------------------------------------------
+import { sessionStates, sessionClients, broadcastToSession } from '$lib/server/sseState';
 
-const sessionStates = new Map<string, StorageState>();
-const sessionClients = new Map<string, Set<ReadableStreamDefaultController<Uint8Array>>>();
 const encoder = new TextEncoder();
 
 function getClients(sessionId: string): Set<ReadableStreamDefaultController<Uint8Array>> {
@@ -32,18 +26,6 @@ function getClients(sessionId: string): Set<ReadableStreamDefaultController<Uint
 	return sessionClients.get(sessionId)!;
 }
 
-function broadcastToSession(sessionId: string, state: StorageState) {
-	const clients = sessionClients.get(sessionId);
-	if (!clients) return;
-	const msg = encoder.encode(`data: ${JSON.stringify(state)}\n\n`);
-	for (const ctrl of clients) {
-		try {
-			ctrl.enqueue(msg);
-		} catch {
-			clients.delete(ctrl);
-		}
-	}
-}
 
 /** Resolves the active game session's public ID for a DM auth sessionId.
  *  Uses the shared in-memory cache; falls back to DB on cache miss. */
