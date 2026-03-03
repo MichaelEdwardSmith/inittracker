@@ -1,3 +1,6 @@
+<!-- Public player viewer at /display/[sessionId]. Subscribes to the DM's combat state
+     via SSE, renders the initiative order with HP bars and conditions (ADV_CONDITIONS hidden),
+     and provides a form for players to send messages to the DM. No auth required. -->
 <script lang="ts">
 	import { conditionColors, sortCombatants, hpPercent, hpBarColor } from '$lib/utils';
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
@@ -373,6 +376,19 @@
 		return () => source.close();
 	});
 
+	let isFullscreen = $state(false);
+
+	$effect(() => {
+		function onFsChange() { isFullscreen = !!document.fullscreenElement; }
+		document.addEventListener('fullscreenchange', onFsChange);
+		return () => document.removeEventListener('fullscreenchange', onFsChange);
+	});
+
+	function toggleFullscreen() {
+		if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+		else document.exitFullscreen();
+	}
+
 	const sorted = $derived(sortCombatants(combatState.combatants));
 	const players = $derived(sorted.filter((c) => c.type === 'player'));
 	const currentIndex = $derived(sorted.findIndex((c) => c.id === combatState.currentTurnId));
@@ -543,6 +559,21 @@
 				</svg>
 				<span class="hidden sm:inline">Contact</span>
 			</a>
+			<button
+				onclick={toggleFullscreen}
+				title={isFullscreen ? 'Exit full screen' : 'Full screen'}
+				class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
+			>
+				{#if isFullscreen}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+					</svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+					</svg>
+				{/if}
+			</button>
 		</div>
 	</header>
 

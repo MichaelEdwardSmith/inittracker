@@ -1,3 +1,6 @@
+<!-- DM-side enemy management panel. Lists built-in enemy templates and the DM's saved
+     custom monsters; supports adding enemies to the tracker, managing custom monsters
+     (create, edit, delete, import from bestiary), and viewing monster stat blocks. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail } from '$lib/enemies';

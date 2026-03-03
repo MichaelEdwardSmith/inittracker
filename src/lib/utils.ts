@@ -1,3 +1,6 @@
+// Pure utility functions shared across the app. Includes HP bar colour/percentage
+// helpers, condition colour maps and descriptions, combatant sort order, CR→XP
+// conversion table, and time-formatting helpers.
 import type { Combatant } from './types';
 
 export const conditionDescriptions: Record<string, string> = {

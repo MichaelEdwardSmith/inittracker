@@ -1,3 +1,6 @@
+<!-- DM combat chronicle page (/history). Displays all past CombatRecords for the active
+     game session; supports expanding individual encounters to see the turn log, XP totals,
+     participant summaries, and the ability to delete individual records or clear all history. -->
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { CombatRecord, CombatEvent } from '$lib/types';

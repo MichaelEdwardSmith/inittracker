@@ -1,3 +1,6 @@
+<!-- Player join page (/join).
+     Accepts a 6-char session ID (auto-uppercased, invalid chars stripped on input).
+     On submit the server validates the ID and redirects to /display/[sessionId]. -->
 <script lang="ts">
 	import type { ActionData } from './$types';
 

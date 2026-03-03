@@ -1,3 +1,5 @@
+// Server load for /history (Combat Chronicles).
+// Fetches the active game session's combat history from MongoDB and returns it newest-first.
 import type { PageServerLoad } from './$types';
 import { getCombatHistory } from '$lib/server/dmModel';
 

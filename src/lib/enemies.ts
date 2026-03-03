@@ -1,3 +1,6 @@
+// Enemy and condition data. Parses monsters.json into typed EnemyTemplate objects,
+// exports ENEMY_TEMPLATES (built-in monsters), MONSTER_TYPES, CONDITIONS (15 standard 5e),
+// ADV_CONDITIONS (advantage/disadvantage helpers), and getMonsterDetail().
 import type { EnemyTemplate, MonsterDetail } from './types';
 import rawMonsters from './data/monsters.json';
 

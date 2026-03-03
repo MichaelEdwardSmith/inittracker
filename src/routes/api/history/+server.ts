@@ -1,3 +1,6 @@
+// POST   /api/history             — saves a CombatRecord to the active session's history (max 100 kept).
+// GET    /api/history             — returns all combat records for the active session.
+// DELETE /api/history             — deletes all records, or a single record when ?id= is provided.
 import type { RequestHandler } from '@sveltejs/kit';
 import {
 	saveCombatRecord,

@@ -1,2 +1,2 @@
-// Disable SSR — this page reads from localStorage and must run client-side only
+// Disables SSR for the /display fallback page (localStorage dependency).
 export const ssr = false;

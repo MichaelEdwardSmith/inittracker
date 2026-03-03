@@ -1,3 +1,6 @@
+<!-- DM login page (/login).
+     SHA-256 hashes the password client-side before submission (reduces plaintext exposure over HTTP).
+     On success the server sets the dm_auth cookie and redirects to /. -->
 <script lang="ts">
 	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';

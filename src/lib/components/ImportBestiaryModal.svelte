@@ -1,3 +1,6 @@
+<!-- Modal for bulk-importing monsters from a 5etools bestiary JSON file. Parses the
+     dropped/selected file, maps entries to EnemyTemplate objects, and calls onImport with
+     the results; reports how many were imported vs skipped (already existing). -->
 <script lang="ts">
 	import type { EnemyTemplate, MonsterDetail } from '$lib/types';
 

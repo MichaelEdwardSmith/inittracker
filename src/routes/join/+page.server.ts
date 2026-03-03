@@ -1,3 +1,6 @@
+// Server action for /join.
+// Validates the submitted 6-char session ID, looks up the matching game session,
+// and redirects the player to /display/[sessionId].
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { getDMByGameSessionId } from '$lib/server/dmModel';

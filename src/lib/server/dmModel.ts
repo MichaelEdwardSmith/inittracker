@@ -1,3 +1,7 @@
+// All DM data-access functions. Covers account creation/login, combat state persistence,
+// custom monster CRUD, combat history, and game session management (create/rename/delete/switch).
+// Also contains ensureGameSessions() which migrates legacy single-session documents to the
+// multi-session schema on first access.
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import type { WithId, Document } from 'mongodb';

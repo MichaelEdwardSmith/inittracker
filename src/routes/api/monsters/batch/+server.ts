@@ -1,3 +1,6 @@
+// POST /api/monsters/batch  — bulk-imports an array of monsters (from a 5etools bestiary JSON).
+// Skips entries with missing/invalid fields and entries whose name already exists in the library.
+// Returns { imported, skipped } counts.
 import type { RequestHandler } from './$types';
 import type { CustomMonster, MonsterDetail } from '$lib/types';
 import { getCustomMonsters, addCustomMonster } from '$lib/server/dmModel';

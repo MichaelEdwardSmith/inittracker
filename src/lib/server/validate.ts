@@ -1,3 +1,6 @@
+// Input validation for session IDs and StorageState payloads.
+// validateStorageState() performs deep structural checks so MongoDB operator-injection
+// ($gt, $where, etc.) and oversized payloads are rejected before hitting the DB.
 import type { StorageState, Combatant } from '$lib/types';
 
 // ---------------------------------------------------------------------------

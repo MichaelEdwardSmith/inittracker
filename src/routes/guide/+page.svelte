@@ -1,3 +1,6 @@
+<!-- In-app user guide (/guide). Static help page with a sticky table of contents and
+     sections covering DM setup, player joining, the dashboard, combat flow, conditions,
+     custom monsters, bestiary import, session management, history, and player messaging. -->
 <script lang="ts">
 	const toc = [
 		{ id: 'getting-started-dm', label: '1. Getting Started (DM)' },

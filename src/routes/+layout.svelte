@@ -1,3 +1,5 @@
+<!-- Root layout — wraps every page. Loads global CSS, sets the favicon,
+     and syncs the dark/light theme class on <html> with localStorage. -->
 <script lang="ts">
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';

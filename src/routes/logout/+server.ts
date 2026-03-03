@@ -1,3 +1,4 @@
+// POST /logout — deletes the dm_auth cookie and redirects to /login.
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

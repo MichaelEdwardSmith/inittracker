@@ -1,3 +1,6 @@
+// Server logic for /login.
+// load: redirects already-authenticated DMs straight to the dashboard.
+// action: validates credentials, sets the dm_auth cookie (30-day HttpOnly), redirects to /.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { loginDM, getDMBySessionId } from '$lib/server/dmModel';

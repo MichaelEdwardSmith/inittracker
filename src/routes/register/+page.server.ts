@@ -1,3 +1,6 @@
+// Server logic for /register.
+// load: redirects already-authenticated DMs to the dashboard.
+// action: validates the form, creates the DM account, redirects to /login?registered=1.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { createDM, getDMBySessionId } from '$lib/server/dmModel';

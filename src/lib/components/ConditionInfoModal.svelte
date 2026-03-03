@@ -1,3 +1,5 @@
+<!-- Read-only reference modal that shows the name, colour, and 5e rule description
+     for a single condition (e.g. Blinded, Poisoned). Closed by clicking outside or pressing Escape. -->
 <script lang="ts">
 	import { conditionColors, conditionDescriptions } from '$lib/utils';
 

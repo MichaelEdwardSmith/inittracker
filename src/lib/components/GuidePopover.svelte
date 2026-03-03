@@ -1,3 +1,5 @@
+<!-- "?" help button that appears in the DM header. On first visit it shows a welcome
+     popover linking to the full guide; the user can dismiss it permanently (stored in localStorage). -->
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';

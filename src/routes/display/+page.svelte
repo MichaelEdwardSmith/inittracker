@@ -1,3 +1,4 @@
+<!-- Fallback for /display (no sessionId). Immediately redirects to /join. -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';

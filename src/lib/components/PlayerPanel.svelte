@@ -1,3 +1,6 @@
+<!-- DM-side player management panel. Provides a form to add named player characters
+     (name, AC, initiative) to the combat tracker, and lists existing players with
+     options to edit their AC/initiative or remove them. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 

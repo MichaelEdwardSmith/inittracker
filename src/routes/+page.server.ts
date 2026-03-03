@@ -1,3 +1,6 @@
+// Server load for the DM dashboard (/).
+// Fetches all game sessions for the authenticated DM and resolves the active one,
+// passing both down as page data.
 import type { PageServerLoad } from './$types';
 import { listGameSessions } from '$lib/server/dmModel';
 import type { GameSession } from '$lib/types';

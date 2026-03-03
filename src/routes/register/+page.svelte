@@ -1,3 +1,6 @@
+<!-- DM registration page (/register).
+     Client-side validates password length and match before hashing with SHA-256 and submitting.
+     On success the server creates the account and redirects to /login. -->
 <script lang="ts">
 	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';

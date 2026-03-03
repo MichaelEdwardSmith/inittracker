@@ -1,3 +1,6 @@
+// MongoDB singleton. Connects lazily on first call to getDb() and reuses the
+// connection for the lifetime of the process. Ensures unique indexes on email
+// and sessionId in the 'dms' collection of the 'initiative' database.
 import { MongoClient, type Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
 

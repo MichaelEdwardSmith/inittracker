@@ -1,3 +1,6 @@
+// POST /api/messages  — player sends a message to the DM (name + text); stored in memory, max 50.
+// GET  /api/messages  — DM polls for messages for their active game session.
+// DELETE /api/messages — DM clears all messages for their active game session.
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { addMessage, getMessages, clearMessages } from '$lib/server/messageStore';

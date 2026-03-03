@@ -1,3 +1,5 @@
+<!-- Modal for editing a per-combatant DM note. Receives the target combatant and an
+     onSave callback; renders a textarea and saves the note text back to the caller. -->
 <script lang="ts">
 	import type { Combatant } from '$lib/types';
 

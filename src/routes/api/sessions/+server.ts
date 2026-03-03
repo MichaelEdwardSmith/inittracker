@@ -1,3 +1,9 @@
+// GET  /api/sessions         — returns all game sessions for the authenticated DM plus the active one.
+// POST /api/sessions         — session management; body must include { action } where action is one of:
+//   'create'  — creates a new game session with a fresh 6-char public ID.
+//   'rename'  — renames an existing session by its internal UUID (id).
+//   'delete'  — deletes a session; refuses if it would be the last one.
+//   'switch'  — makes a session active and updates the shared auth→session cache.
 import type { RequestHandler } from '@sveltejs/kit';
 import {
 	listGameSessions,

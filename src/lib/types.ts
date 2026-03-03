@@ -1,3 +1,7 @@
+// Shared TypeScript interfaces used across client and server. Defines the shapes for
+// Combatant, EnemyTemplate, CustomMonster, MonsterDetail, StorageState, CombatRecord,
+// CombatEvent, CombatantSummary, and related types.
+
 export interface Combatant {
 	id: string;
 	name: string;

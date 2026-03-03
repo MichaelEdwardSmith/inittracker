@@ -1,3 +1,7 @@
+// Maps monster template names to display emoji and Tailwind colour styles used on
+// combatant tokens in the tracker and viewer. Provides getMonsterEmoji() and
+// getMonsterStyle() helpers.
+
 /** Per-monster emoji, keyed by the original template name. */
 export const MONSTER_EMOJI: Record<string, string> = {
 	Bat: '🦇',

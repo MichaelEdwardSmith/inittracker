@@ -1,3 +1,6 @@
+<!-- DM dashboard (/) — the main authenticated page. Composes PlayerPanel, EnemyPanel,
+     and InitiativeTracker; hosts the top header with session switcher, Messages inbox,
+     light/dark toggle, and guide popover; handles DM inbox polling and mobile hamburger menu. -->
 <script lang="ts">
 	import PlayerPanel from '$lib/components/PlayerPanel.svelte';
 	import EnemyPanel from '$lib/components/EnemyPanel.svelte';
@@ -90,6 +93,18 @@
 	let showNewSessionInput = $state(false);
 	let deleteConfirmId = $state<string | null>(null);
 	let showMobileMenu = $state(false);
+	let isFullscreen = $state(false);
+
+	$effect(() => {
+		function onFsChange() { isFullscreen = !!document.fullscreenElement; }
+		document.addEventListener('fullscreenchange', onFsChange);
+		return () => document.removeEventListener('fullscreenchange', onFsChange);
+	});
+
+	function toggleFullscreen() {
+		if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+		else document.exitFullscreen();
+	}
 
 	// ── DM inbox ──────────────────────────────────────────────────────────────────────
 	interface DmMessage { id: string; from: string; text: string; timestamp: number; }
@@ -366,6 +381,21 @@
 					<span>Contact</span>
 				</a>
 				<button
+					onclick={toggleFullscreen}
+					title={isFullscreen ? 'Exit full screen' : 'Full screen'}
+					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					{#if isFullscreen}
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+						</svg>
+					{:else}
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+						</svg>
+					{/if}
+				</button>
+				<button
 					onclick={() => theme.toggle()}
 					title={theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
 					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -487,6 +517,22 @@
 				</svg>
 				Contact
 			</a>
+			<button
+				onclick={() => { toggleFullscreen(); showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				{#if isFullscreen}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+					</svg>
+					Exit Full Screen
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+					</svg>
+					Full Screen
+				{/if}
+			</button>
 			<button
 				onclick={() => { theme.toggle(); showMobileMenu = false; }}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"

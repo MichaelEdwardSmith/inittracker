@@ -1,3 +1,7 @@
+// SvelteKit server hook — runs on every request.
+// Reads the dm_auth cookie and protects / and /history by redirecting unauthenticated
+// requests to /login. Also resolves the active game session public ID and stores it in
+// event.locals for downstream load functions.
 import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
 import { getDMBySessionId, getActiveGameSessionPublicId } from '$lib/server/dmModel';

@@ -1,3 +1,5 @@
+// PUT    /api/monsters/[id]  — updates an existing custom monster's fields (name, AC, HP, CR, type, avatar).
+// DELETE /api/monsters/[id]  — permanently deletes a custom monster by its UUID.
 import type { RequestHandler } from './$types';
 import { updateCustomMonster, deleteCustomMonster } from '$lib/server/dmModel';
 

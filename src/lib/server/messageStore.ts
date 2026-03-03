@@ -1,3 +1,5 @@
+// In-memory store for player-to-DM messages, keyed by game session public ID.
+// Messages are ephemeral — they are lost on server restart and are never persisted to MongoDB.
 export interface DmMessage {
 	id: string;
 	from: string;

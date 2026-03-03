@@ -1,3 +1,5 @@
+<!-- Read-only stat-block modal for a single monster. Displays ability scores, traits,
+     actions, and other MonsterDetail fields; closed by clicking the backdrop or pressing Escape. -->
 <script lang="ts">
 	import type { MonsterDetail } from '$lib/types';
 

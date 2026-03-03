@@ -1,3 +1,9 @@
+// POST /api/state  — DM pushes updated combat state; validated, cached in memory, broadcast to
+//                    all SSE viewers for that session, and fire-and-forget persisted to MongoDB.
+// GET  /api/state  — Two modes:
+//   • Accept: text/event-stream + ?session=ID  → opens an SSE stream for a viewer; sends a
+//     keepalive ping every 25 s and the current snapshot immediately on connect.
+//   • Any other Accept (no query param)        → returns a JSON snapshot for DM page refresh.
 import type { RequestHandler } from './$types';
 import type { StorageState } from '$lib/types';
 import {

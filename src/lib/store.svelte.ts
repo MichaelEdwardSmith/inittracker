@@ -1,3 +1,6 @@
+// Client-side combat store (Svelte 5 runes). Holds the full combat state in a
+// reactive $state class, syncs to the server via POST /api/state on every mutation,
+// and exposes all DM actions (addPlayer, addEnemy, damage, heal, nextTurn, endCombat, etc.).
 import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary } from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';

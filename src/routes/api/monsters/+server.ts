@@ -1,3 +1,5 @@
+// GET  /api/monsters  — returns all custom monsters for the authenticated DM.
+// POST /api/monsters  — creates a new custom monster; validates name, AC, HP, CR, and type.
 import type { RequestHandler } from './$types';
 import type { CustomMonster } from '$lib/types';
 import {
