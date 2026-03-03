@@ -32,7 +32,8 @@
       "Bash(/tmp/rh2.py:*)",
       "Bash(/tmp/test_sq.py:*)",
       "Bash(/tmp/test_sq2.py:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(ls:*)"
     ]
   }
 }

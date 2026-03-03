@@ -13,6 +13,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
+   - [Death Saving Throws](#death-saving-throws)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
 10. [Game Sessions](#10-game-sessions)
@@ -229,6 +230,43 @@ HP values and bars are color-coded based on the percentage of max HP remaining:
 | 1–25% | Red |
 | 0 (dead) | Grey |
 
+### Death Saving Throws
+
+When a **player** drops to 0 HP they are automatically marked **Unconscious**. Under D&D 5e rules, unconscious players must roll a death saving throw at the start of each of their turns: three successes means they stabilize, three failures means they die.
+
+#### DM tracker
+
+A **☠ Death Saves** row appears at the bottom of that player's initiative card (visible only while HP = 0):
+
+- **Failures** (left) — three circles; filled with ☠ (red) when a failure is recorded
+- **Successes** (right) — three circles; filled with ♥ (green) when a success is recorded
+- Click a **filled** circle to decrement (correct a mistake); click an **empty** circle to increment
+- **Stabilize** button — immediately marks the player as stable without needing three successes (use for a healer spending a bonus action, Medicine check, etc.)
+- **reset** link (top-right of the row) — clears all saves back to 0/0 for corrections
+
+When the player accumulates **3 failures**, a red **☠ Dead** banner replaces the circles and the **Dead** condition is automatically applied. When they reach **3 successes** or you click Stabilize, a green **♥ Stable** banner is shown instead.
+
+#### Player display
+
+While a player is at 0 HP, the HP bar on the viewer screen is replaced with a large **Death Saving Throws panel**:
+
+- Two columns: **Failures** (red, skull circles) and **Successes** (green, heart circles)
+- Circles update in real time as the DM records each roll
+- If the player dies, the panel shows a large red **☠ DEAD** banner
+- If stable, a large green **♥ STABILIZED** banner is shown
+
+The panel is read-only for players — only the DM can record the rolls.
+
+#### Healing an unconscious player
+
+If a player at 0 HP receives any healing (from a spell, potion, or the DM's Heal button), their HP rises above 0, the Unconscious condition is cleared, and the death saves tracker is reset automatically. The HP bar returns to the player display.
+
+#### Reset Players
+
+Clicking **Reset Players** in the initiative order header also clears death saves on all players, restoring everyone to max HP for the next encounter.
+
+---
+
 ### Armor Class Visibility
 
 By default, enemy AC is hidden from the player display. To reveal an enemy's AC to players, check the **Show AC** checkbox on that enemy's row. Players always see their own character's AC.
@@ -243,7 +281,7 @@ Click the **+ Condition** button on any combatant row. A dropdown menu lists 15 
 
 Blinded · Charmed · Concentrating · Deafened · Exhausted · Frightened · Grappled · Incapacitated · Invisible · Paralyzed · Petrified · Poisoned · Prone · Restrained · Stunned
 
-> **Note:** Dead and Unconscious are not in the selectable list. When a **player** reaches 0 HP, they automatically become Unconscious (all other conditions are cleared). Enemies at 0 HP are simply removed from the turn order.
+> **Note:** Dead and Unconscious are not in the selectable list. When a **player** reaches 0 HP, they automatically become Unconscious (all other conditions are cleared) and a death saving throw tracker appears on their row — see [Death Saving Throws](#death-saving-throws). Enemies at 0 HP are simply removed from the turn order.
 
 Click any condition to apply it. Conditions already active are hidden from the list.
 
