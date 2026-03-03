@@ -30,6 +30,8 @@ export interface Combatant {
 	source?: string;
 	// DM-only freeform notes
 	note?: string;
+	// Players only — death saving throw tracker (present when currentHp === 0)
+	deathSaves?: { successes: number; failures: number; stable: boolean };
 }
 
 export interface StorageState {

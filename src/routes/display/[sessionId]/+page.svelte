@@ -894,26 +894,78 @@
 
 				<!-- HP bar + THP extension (players only) -->
 				{#if dc.type === 'player'}
-					<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
-						{#if (dc.tempHp ?? 0) > 0}
-							{@const total = dc.maxHp + dc.tempHp}
-							{@const hpW = (dc.currentHp / total) * 100}
-							{@const thpW = (dc.tempHp / total) * 100}
-							<div
-								class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
-								style="width: {hpW}%;"
-							></div>
-							<div
-								class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all duration-500"
-								style="left: {hpW}%; width: {thpW}%;"
-							></div>
-						{:else}
-							<div
-								class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
-								style="width: {pct}%;"
-							></div>
-						{/if}
-					</div>
+					{#if dc.currentHp > 0}
+						<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
+							{#if (dc.tempHp ?? 0) > 0}
+								{@const total = dc.maxHp + dc.tempHp}
+								{@const hpW = (dc.currentHp / total) * 100}
+								{@const thpW = (dc.tempHp / total) * 100}
+								<div
+									class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+									style="width: {hpW}%;"
+								></div>
+								<div
+									class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all duration-500"
+									style="left: {hpW}%; width: {thpW}%;"
+								></div>
+							{:else}
+								<div
+									class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+									style="width: {pct}%;"
+								></div>
+							{/if}
+						</div>
+					{:else}
+						<!-- Death saving throws panel -->
+						{@const ds = dc.deathSaves ?? { successes: 0, failures: 0, stable: false }}
+						{@const isDead = ds.failures >= 3}
+						{@const isStable = ds.stable || ds.successes >= 3}
+						<div class="mt-6 w-full max-w-lg">
+							<div class="mb-3 flex items-center gap-4">
+								<div class="h-px flex-1 bg-gray-700"></div>
+								<span class="text-xs font-black tracking-[0.25em] text-gray-500 uppercase">☠ Death Saving Throws</span>
+								<div class="h-px flex-1 bg-gray-700"></div>
+							</div>
+							{#if isDead}
+								<div class="flex flex-col items-center gap-2 rounded-xl border border-red-800/60 bg-red-950/50 px-6 py-5">
+									<span class="text-5xl">☠</span>
+									<span class="text-2xl font-black tracking-[0.3em] text-red-400 uppercase">Dead</span>
+								</div>
+							{:else if isStable}
+								<div class="flex flex-col items-center gap-2 rounded-xl border border-green-800/60 bg-green-950/50 px-6 py-5">
+									<span class="text-5xl">♥</span>
+									<span class="text-2xl font-black tracking-[0.3em] text-green-400 uppercase">Stabilized</span>
+								</div>
+							{:else}
+								<div class="grid grid-cols-2 gap-4">
+									<div class="flex flex-col items-center gap-3 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-4">
+										<span class="text-xs font-black tracking-[0.2em] text-red-500 uppercase">Failures</span>
+										<div class="flex gap-3">
+											{#each [0, 1, 2] as i}
+												<div class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.failures > i
+													? 'border-red-600 bg-red-800/60 text-red-300'
+													: 'border-gray-700 bg-gray-900/60 text-gray-700'}">
+													{ds.failures > i ? '☠' : '○'}
+												</div>
+											{/each}
+										</div>
+									</div>
+									<div class="flex flex-col items-center gap-3 rounded-xl border border-green-900/50 bg-green-950/30 px-4 py-4">
+										<span class="text-xs font-black tracking-[0.2em] text-green-600 uppercase">Successes</span>
+										<div class="flex gap-3">
+											{#each [0, 1, 2] as i}
+												<div class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.successes > i
+													? 'border-green-600 bg-green-800/60 text-green-300'
+													: 'border-gray-700 bg-gray-900/60 text-gray-700'}">
+													{ds.successes > i ? '♥' : '○'}
+												</div>
+											{/each}
+										</div>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/if}
 				{/if}
 
 				<!-- Active conditions -->
