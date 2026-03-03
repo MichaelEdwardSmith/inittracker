@@ -103,6 +103,10 @@
 	let flashKey = $state(0);
 	let flashTimer: ReturnType<typeof setTimeout> | null = null;
 
+	// ── Focus animation — temporarily pan to the affected combatant ────
+	let focusCombatantId = $state<string | null>(null);
+	let focusTimer: ReturnType<typeof setTimeout> | null = null;
+
 	// CSS colors for each condition flash (brighter than the badge bg so they read on a dark screen)
 	const conditionFlashColors: Record<string, string> = {
 		Blinded: 'rgba(107, 114, 128, 1)', // gray-500
@@ -343,18 +347,32 @@
 		});
 	}
 
-	function triggerEffect(soundType: 'damage' | 'heal' | 'condition', color: string) {
-		if (flashTimer) clearTimeout(flashTimer);
-		flashColor = color;
-		flashKey++;
-		flashTimer = setTimeout(() => {
-			flashColor = null;
-		}, 750);
-		if (audioEnabled && audioCtx) {
-			if (soundType === 'damage') playDamageSound(audioCtx);
-			else if (soundType === 'heal') playHealSound(audioCtx);
-			else playConditionSound(audioCtx);
+	function triggerEffect(soundType: 'damage' | 'heal' | 'condition', color: string, affectedId?: string) {
+		const willPan = !!(affectedId && current && affectedId !== current.id);
+
+		// Pan to the affected combatant first; flash + sound fire after the fly-in completes
+		if (willPan) {
+			if (focusTimer) clearTimeout(focusTimer);
+			focusCombatantId = affectedId!;
+			focusTimer = setTimeout(() => {
+				focusCombatantId = null;
+			}, 2200);
 		}
+
+		// Delay flash and sound until the fly-in transition finishes (500 ms), or fire immediately
+		setTimeout(() => {
+			if (flashTimer) clearTimeout(flashTimer);
+			flashColor = color;
+			flashKey++;
+			flashTimer = setTimeout(() => {
+				flashColor = null;
+			}, 750);
+			if (audioEnabled && audioCtx) {
+				if (soundType === 'damage') playDamageSound(audioCtx);
+				else if (soundType === 'heal') playHealSound(audioCtx);
+				else playConditionSound(audioCtx);
+			}
+		}, willPan ? 500 : 0);
 	}
 
 	// Prevents fanfares from firing when the viewer first loads into an already-active combat
@@ -396,21 +414,22 @@
 					let hadDamage = false;
 					let hadHeal = false;
 					let hadTempHp = false;
+					let affectedId: string | null = null;
 					let addedCondition: string | null = null;
 					for (const nc of newState.combatants) {
 						const oc = combatState.combatants.find((c) => c.id === nc.id);
 						if (!oc) continue;
 						const oldEff = oc.currentHp + (oc.tempHp ?? 0);
 						const newEff = nc.currentHp + (nc.tempHp ?? 0);
-						if (newEff < oldEff) hadDamage = true;
-						else if (nc.currentHp > oc.currentHp) hadHeal = true;
+						if (newEff < oldEff) { if (!hadDamage) affectedId = nc.id; hadDamage = true; }
+						else if (nc.currentHp > oc.currentHp) { if (!hadHeal) affectedId = nc.id; hadHeal = true; }
 						if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
 						if (!addedCondition) {
 							addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
 						}
 					}
-					if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)');
-					else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)');
+					if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
+					else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
 					else if (hadTempHp) {
 						if (audioEnabled && audioCtx) playTempHpSound(audioCtx);
 					} else if (addedCondition) {
@@ -467,16 +486,26 @@
 		return idx < count ? idx : null;
 	});
 
+	/** The combatant shown in the main display — temporarily overridden when a hit/heal is detected. */
+	const displayCombatant = $derived.by<Combatant | null>(() => {
+		if (focusCombatantId) {
+			return combatState.combatants.find((c) => c.id === focusCombatantId) ?? current;
+		}
+		return current;
+	});
+
 	const backgroundGlow = $derived.by(() => {
-		if (!current) return '';
-		return current.type === 'player'
+		const c = displayCombatant ?? current;
+		if (!c) return '';
+		return c.type === 'player'
 			? 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(37,99,235,0.12) 0%, transparent 70%)'
 			: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(185,28,28,0.14) 0%, transparent 70%)';
 	});
 
 	const typeAccent = $derived.by(() => {
-		if (!current) return { badge: 'text-gray-400 border-gray-600', label: '' };
-		return current.type === 'player'
+		const c = displayCombatant ?? current;
+		if (!c) return { badge: 'text-gray-400 border-gray-600', label: '' };
+		return c.type === 'player'
 			? { badge: 'text-blue-300 border-blue-600 bg-blue-950/60', label: 'PLAYER CHARACTER' }
 			: { badge: 'text-red-300 border-red-700 bg-red-950/60', label: 'ENEMY' };
 	});
@@ -757,11 +786,12 @@
 			{/if}
 		</div>
 	{:else}
+		{@const dc = displayCombatant ?? current}
 		<!-- Active combatant display -->
 		<div class="relative z-10 flex flex-1 overflow-hidden">
-			{#key current.id}
-				{@const pct = hpPercent(current)}
-				{@const showAc = current.type === 'player' || current.showAc === true}
+			{#key dc.id}
+				{@const pct = hpPercent(dc)}
+				{@const showAc = dc.type === 'player' || dc.showAc === true}
 				<main
 					in:fly={{ y: 28, duration: 500 }}
 					out:fly={{ y: -20, duration: 250 }}
@@ -779,9 +809,9 @@
 				</div>
 
 				<!-- Avatar token -->
-				{#if current.type === 'enemy'}
-					{@const style = getMonsterStyle(current.monsterType)}
-					{@const imgUrl = current.imgUrl ?? getMonsterDetail(current.templateName ?? '')?.imgUrl}
+				{#if dc.type === 'enemy'}
+					{@const style = getMonsterStyle(dc.monsterType)}
+					{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
 					{#if imgUrl}
 						<a
 							href={imgUrl}
@@ -790,10 +820,10 @@
 							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring} cursor-pointer"
 							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
 						>
-							<img src={imgUrl} alt={current.name} class="h-full w-full object-cover object-top" />
+							<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
 						</a>
 					{:else}
-						{@const emoji = getMonsterEmoji(current.templateName, current.monsterType)}
+						{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
 						<div
 							class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {style.ring}"
 							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
@@ -801,34 +831,34 @@
 							<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
 						</div>
 					{/if}
-				{:else if current.avatarUrl}
+				{:else if dc.avatarUrl}
 					<div
 						class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
 						style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
 					>
-						<img src={current.avatarUrl} alt={current.name} class="h-full w-full object-cover" />
+						<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
 					</div>
 				{/if}
 
 				<!-- Name -->
 				<h1
 					class="mb-2 text-center leading-none font-black tracking-widest uppercase
-					       {current.type === 'player' ? 'text-blue-50' : 'text-red-50'}"
-					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {current.type === 'player'
+					       {dc.type === 'player' ? 'text-blue-50' : 'text-red-50'}"
+					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {dc.type === 'player'
 						? '4.5rem'
-						: '3.75rem'}); text-shadow: 0 0 40px {current.type === 'player'
+						: '3.75rem'}); text-shadow: 0 0 40px {dc.type === 'player'
 						? 'rgba(96,165,250,0.4)'
 						: 'rgba(248,113,113,0.4)'};"
 				>
-					{current.name}
+					{dc.name}
 				</h1>
 
 				<!-- Stats row -->
 				<div class="mt-6 flex items-center gap-10">
-					{#if current.initiative !== null}
+					{#if dc.initiative !== null}
 						<div class="text-center">
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Initiative</div>
-							<div class="text-4xl font-black text-amber-400">{current.initiative}</div>
+							<div class="text-4xl font-black text-amber-400">{dc.initiative}</div>
 						</div>
 						{#if showAc}
 							<div class="h-10 w-px bg-gray-700"></div>
@@ -837,10 +867,10 @@
 					{#if showAc}
 						<div class="text-center">
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Armor Class</div>
-							<div class="text-4xl font-black text-gray-100">{current.ac}</div>
+							<div class="text-4xl font-black text-gray-100">{dc.ac}</div>
 						</div>
 					{/if}
-					{#if current.type === 'player'}
+					{#if dc.type === 'player'}
 						<div class="h-10 w-px bg-gray-700"></div>
 						<div class="text-center">
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Hit Points</div>
@@ -853,22 +883,22 @@
 											? 'text-amber-400'
 											: 'text-green-400'}"
 							>
-								{current.currentHp}<span class="text-xl text-gray-600">/{current.maxHp}</span>
+								{dc.currentHp}<span class="text-xl text-gray-600">/{dc.maxHp}</span>
 							</div>
-							{#if (current.tempHp ?? 0) > 0}
-								<div class="mt-1 text-lg font-bold text-yellow-400">+{current.tempHp} THP</div>
+							{#if (dc.tempHp ?? 0) > 0}
+								<div class="mt-1 text-lg font-bold text-yellow-400">+{dc.tempHp} THP</div>
 							{/if}
 						</div>
 					{/if}
 				</div>
 
 				<!-- HP bar + THP extension (players only) -->
-				{#if current.type === 'player'}
+				{#if dc.type === 'player'}
 					<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
-						{#if (current.tempHp ?? 0) > 0}
-							{@const total = current.maxHp + current.tempHp}
-							{@const hpW = (current.currentHp / total) * 100}
-							{@const thpW = (current.tempHp / total) * 100}
+						{#if (dc.tempHp ?? 0) > 0}
+							{@const total = dc.maxHp + dc.tempHp}
+							{@const hpW = (dc.currentHp / total) * 100}
+							{@const thpW = (dc.tempHp / total) * 100}
 							<div
 								class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
 								style="width: {hpW}%;"
@@ -887,9 +917,9 @@
 				{/if}
 
 				<!-- Active conditions -->
-				{#if current.statuses.length > 0}
+				{#if dc.statuses.length > 0}
 					<div class="mt-5 flex flex-wrap justify-center gap-2">
-						{#each current.statuses as status}
+						{#each dc.statuses as status}
 							<div
 								class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[
 									status
