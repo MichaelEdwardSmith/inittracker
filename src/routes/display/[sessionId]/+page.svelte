@@ -792,6 +792,7 @@
 			{#key dc.id}
 				{@const pct = hpPercent(dc)}
 				{@const showAc = dc.type === 'player' || dc.showAc === true}
+				{@const isUnconsciousPlayer = dc.type === 'player' && dc.currentHp <= 0}
 				<main
 					in:fly={{ y: 28, duration: 500 }}
 					out:fly={{ y: -20, duration: 250 }}
@@ -860,17 +861,17 @@
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Initiative</div>
 							<div class="text-4xl font-black text-amber-400">{dc.initiative}</div>
 						</div>
-						{#if showAc}
+						{#if showAc && !isUnconsciousPlayer}
 							<div class="h-10 w-px bg-gray-700"></div>
 						{/if}
 					{/if}
-					{#if showAc}
+					{#if showAc && !isUnconsciousPlayer}
 						<div class="text-center">
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Armor Class</div>
 							<div class="text-4xl font-black text-gray-100">{dc.ac}</div>
 						</div>
 					{/if}
-					{#if dc.type === 'player'}
+					{#if dc.type === 'player' && !isUnconsciousPlayer}
 						<div class="h-10 w-px bg-gray-700"></div>
 						<div class="text-center">
 							<div class="text-xs tracking-widest text-gray-500 uppercase">Hit Points</div>
