@@ -278,6 +278,12 @@ function createCombatStore() {
 				hpAfter = updated.currentHp;
 				if (hpBefore > 0 && hpAfter === 0) {
 					updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
+					if (c.type === 'player' && !updated.deathSaves) {
+						updated = { ...updated, deathSaves: { successes: 0, failures: 0, stable: false } };
+					}
+				}
+				if (c.type === 'player' && hpBefore === 0 && hpAfter > 0) {
+					updated = { ...updated, deathSaves: undefined };
 				}
 				return updated;
 			});
@@ -340,6 +346,21 @@ function createCombatStore() {
 			sync();
 		},
 
+		setDeathSaves(id: string, saves: NonNullable<Combatant['deathSaves']>) {
+			combatants = combatants.map((c) => {
+				if (c.id !== id) return c;
+				let updated = { ...c, deathSaves: saves };
+				// Auto-add Dead condition when 3 failures; auto-remove if reset below 3
+				if (saves.failures >= 3 && !c.statuses.includes('Dead')) {
+					updated = { ...updated, statuses: [...updated.statuses, 'Dead'] };
+				} else if (saves.failures < 3 && c.statuses.includes('Dead')) {
+					updated = { ...updated, statuses: updated.statuses.filter((s) => s !== 'Dead') };
+				}
+				return updated;
+			});
+			sync();
+		},
+
 		toggleStatus(id: string, status: string) {
 			let adding = false;
 			let combatantRef: Combatant | undefined;
@@ -391,7 +412,7 @@ function createCombatStore() {
 		resetPlayers() {
 			combatants = combatants.map((c) =>
 				c.type === 'player'
-					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], initiative: null, inCombat: true }
+					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], initiative: null, inCombat: true, deathSaves: undefined }
 					: c
 			);
 			sync();
