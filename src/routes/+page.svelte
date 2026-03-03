@@ -176,6 +176,19 @@
 		combat.loadFromServer();
 	});
 
+	// Subscribe to the session's SSE stream so external state changes (e.g. player
+	// initiative rolls) are reflected immediately without a manual refresh.
+	$effect(() => {
+		const sessionId = activeSession.sessionId;
+		const source = new EventSource(`/api/state?session=${sessionId}`);
+		source.onmessage = (e) => {
+			try {
+				combat.applyExternalState(JSON.parse(e.data));
+			} catch { /* ignore malformed messages */ }
+		};
+		return () => source.close();
+	});
+
 	// -------------------------------------------------------------------------
 	// Session manager helpers
 	// -------------------------------------------------------------------------
