@@ -594,7 +594,8 @@
 				ontouchstart={startResizePlayerTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
-				style="touch-action: none"
+				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
+				oncontextmenu={(e) => e.preventDefault()}
 			></div>
 			<PlayerPanel />
 		</aside>
@@ -616,7 +617,8 @@
 				ontouchstart={startResizeTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
-				style="touch-action: none"
+				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
+				oncontextmenu={(e) => e.preventDefault()}
 			></div>
 			<EnemyPanel />
 		</aside>
