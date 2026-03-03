@@ -10,6 +10,7 @@
 		{ id: 'managing-enemies', label: '5. Managing Enemies' },
 		{ id: 'running-combat', label: '6. Running Combat' },
 		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
+		{ id: 'death-saves', label: '↳ Death Saving Throws' },
 		{ id: 'conditions', label: '8. Conditions & Statuses' },
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
@@ -541,7 +542,7 @@
 					['Button', 'What it does'],
 					[
 						['Reset Init', 'Clears all initiative values and resets the round counter to 1'],
-						['Reset Players', 'Restores all players to max HP, removes temp HP and all conditions'],
+						['Reset Players', 'Restores all players to max HP, removes temp HP, all conditions, and clears death saves'],
 						['Clear Enemies', 'Removes all enemies from the combat tracker'],
 						['Save', 'Saves a snapshot to Chronicles without ending combat']
 					]
@@ -592,6 +593,73 @@
 					]
 				)}
 
+				<div id="death-saves">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Death Saving Throws
+					</h3>
+					<p class="mb-4 text-sm leading-relaxed">
+						When a <strong class="font-semibold text-white">player</strong> drops to 0 HP they are
+						automatically marked <strong class="font-semibold text-white">Unconscious</strong>. Under
+						D&amp;D 5e rules, they must roll a death saving throw at the start of each of their turns:
+						three successes means they stabilize, three failures means they die.
+					</p>
+
+					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">DM Tracker</p>
+					<p class="mb-3 text-sm leading-relaxed">
+						A <strong class="font-semibold text-white">&#9760; Death Saves</strong> row appears at the
+						bottom of that player's initiative card (visible only while HP = 0):
+					</p>
+					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							<strong class="font-semibold text-red-400">Failures</strong> (left) and
+							<strong class="font-semibold text-green-400">Successes</strong> (right) — three
+							clickable circles each; filled with &#9760; or &#9829; when recorded
+						</li>
+						<li>
+							Click a <strong class="font-semibold text-white">filled</strong> circle to decrement
+							(correct a mistake); click an
+							<strong class="font-semibold text-white">empty</strong> circle to increment
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Stabilize</strong> button — immediately marks
+							the player stable without needing three successes (Medicine check, bonus-action
+							healing, etc.)
+						</li>
+						<li>
+							<strong class="font-semibold text-white">reset</strong> link — clears all saves back
+							to 0/0 for corrections
+						</li>
+					</ul>
+					<p class="mb-4 text-sm leading-relaxed">
+						At <strong class="font-semibold text-red-400">3 failures</strong> a red
+						<strong class="font-semibold text-white">&#9760; Dead</strong> banner replaces the circles
+						and the <strong class="font-semibold text-white">Dead</strong> condition is auto-applied.
+						At <strong class="font-semibold text-green-400">3 successes</strong> or after clicking
+						Stabilize, a green <strong class="font-semibold text-white">&#9829; Stable</strong> banner
+						is shown instead.
+					</p>
+
+					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Player Display</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						While a player is at 0 HP the HP bar is replaced with a large
+						<strong class="font-semibold text-white">Death Saving Throws panel</strong> — two
+						columns showing failures (red skull circles) and successes (green heart circles),
+						updating in real time via SSE. A large red
+						<strong class="font-semibold text-white">&#9760; DEAD</strong> or green
+						<strong class="font-semibold text-white">&#9829; STABILIZED</strong> banner replaces the
+						circles when the outcome is decided. The panel is read-only — only the DM records the
+						rolls.
+					</p>
+
+					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Recovery</p>
+					<p class="mb-6 text-sm leading-relaxed">
+						Any healing above 0 HP clears the Unconscious condition and resets the death saves
+						tracker automatically — the HP bar returns on the player display.
+						<strong class="font-semibold text-white">Reset Players</strong> also clears death saves
+						on all players.
+					</p>
+				</div>
+
 				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Armor Class Visibility
 				</h3>
@@ -616,8 +684,10 @@
 					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row.
 					A dropdown lists all conditions in two sections. Click one to apply it — the badge appears
 					immediately on the row. Dead and Unconscious are not selectable: when a player drops to 0
-					HP they automatically become Unconscious (all other conditions cleared). Enemies at 0 HP
-					are simply removed from the turn order.
+					HP they automatically become Unconscious (all other conditions cleared) and a
+					<a href="#death-saves" class="text-amber-400 transition hover:text-amber-300"
+						>death saving throw tracker</a
+					> appears on their row. Enemies at 0 HP are simply removed from the turn order.
 				</p>
 
 				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Standard conditions</p>
