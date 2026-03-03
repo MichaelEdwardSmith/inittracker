@@ -43,6 +43,7 @@
 
 	// ── Initiative rolling ────────────────────────────
 	let showInitModal = $state(false);
+	let showMobileMenu = $state(false);
 	let initCharId = $state('');
 	let initMode = $state<'normal' | 'advantage' | 'disadvantage'>('normal');
 	let initRoll1 = $state<number | null>(null);
@@ -548,7 +549,7 @@
 
 	<!-- Header bar -->
 	<header
-		class="relative z-10 flex shrink-0 items-center justify-between border-b border-gray-800/60 bg-gray-900/80 px-8 py-3 backdrop-blur-sm"
+		class="relative z-10 flex shrink-0 items-center justify-between border-b border-gray-800/60 bg-gray-900/80 px-4 py-3 backdrop-blur-sm sm:px-8"
 	>
 		<div class="flex items-center gap-3">
 			<span class="text-lg">⚔️</span>
@@ -563,11 +564,12 @@
 				></span>
 				{connected ? 'Live' : 'Connecting…'}
 			</span>
+			<!-- Desktop-only action buttons -->
 			{#if joined}
 				<button
 					onclick={toggleAudio}
 					title={audioEnabled ? 'Mute sounds' : 'Unmute sounds'}
-					class="rounded px-2 py-0.5 text-xs transition {audioEnabled
+					class="hidden rounded px-2 py-0.5 text-xs transition sm:inline-block {audioEnabled
 						? 'text-amber-400 hover:text-amber-300'
 						: 'text-gray-600 hover:text-gray-400'}"
 				>
@@ -577,58 +579,48 @@
 			{#if players.length > 0}
 				<button
 					onclick={() => { showMsgModal = true; msgSent = false; }}
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-gray-500 hover:text-gray-200"
+					class="hidden items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-gray-500 hover:text-gray-200 sm:flex"
 					title="Send a message to the DM"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
 					</svg>
-					<span class="hidden sm:inline">Message DM</span>
+					Message DM
 				</button>
 				<button
 					onclick={openInitModal}
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+					class="hidden items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300 sm:flex"
 					title="Roll initiative for your character"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 					</svg>
-					<span class="hidden sm:inline">Roll Initiative</span>
+					Roll Initiative
 				</button>
 			{/if}
 		</div>
-		<div class="flex items-center gap-3">
+		<div class="flex items-center gap-2 sm:gap-3">
 			{#if combatState.currentTurnId}
 				<div class="flex items-center gap-2">
 					<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
 					<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
 				</div>
 			{/if}
+			<!-- Desktop-only right buttons -->
 			<a
 				href="mailto:dm@inittracker.com"
 				title="Contact us"
-				class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
+				class="hidden items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400 sm:flex"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3.5 w-3.5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-					/>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
 				</svg>
-				<span class="hidden sm:inline">Contact</span>
+				Contact
 			</a>
 			<button
 				onclick={toggleFullscreen}
 				title={isFullscreen ? 'Exit full screen' : 'Full screen'}
-				class="flex items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400"
+				class="hidden items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400 sm:flex"
 			>
 				{#if isFullscreen}
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -640,8 +632,93 @@
 					</svg>
 				{/if}
 			</button>
+			<!-- Mobile hamburger -->
+			<button
+				onclick={() => (showMobileMenu = !showMobileMenu)}
+				title="Menu"
+				class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300 sm:hidden"
+			>
+				{#if showMobileMenu}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+					</svg>
+				{/if}
+			</button>
 		</div>
+		<!-- Mobile dropdown menu -->
+		{#if showMobileMenu}
+			<div class="absolute top-full left-0 right-0 z-50 border-b border-gray-800 bg-gray-900/97 px-4 py-3 backdrop-blur-sm sm:hidden">
+				<div class="flex flex-col gap-2">
+					{#if joined}
+						<button
+							onclick={toggleAudio}
+							class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm transition {audioEnabled ? 'text-amber-400 hover:bg-amber-950/40' : 'text-gray-500 hover:bg-gray-800/60'}"
+						>
+							<span class="text-base">{audioEnabled ? '🔊' : '🔇'}</span>
+							{audioEnabled ? 'Sound On' : 'Sound Off'}
+						</button>
+					{/if}
+					{#if players.length > 0}
+						<button
+							onclick={() => { showMsgModal = true; msgSent = false; showMobileMenu = false; }}
+							class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-400 transition hover:border-gray-600 hover:text-gray-200"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+							</svg>
+							Message DM
+						</button>
+						<button
+							onclick={() => { openInitModal(); showMobileMenu = false; }}
+							class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+							</svg>
+							Roll Initiative
+						</button>
+					{/if}
+					<a
+						href="mailto:dm@inittracker.com"
+						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						</svg>
+						Contact
+					</a>
+					<button
+						onclick={() => { toggleFullscreen(); showMobileMenu = false; }}
+						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
+					>
+						{#if isFullscreen}
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+							</svg>
+							Exit Full Screen
+						{:else}
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+							</svg>
+							Full Screen
+						{/if}
+					</button>
+				</div>
+			</div>
+		{/if}
 	</header>
+	<!-- Backdrop to close mobile menu when clicking outside -->
+	{#if showMobileMenu}
+		<div
+			class="fixed inset-0 z-40 sm:hidden"
+			onclick={() => (showMobileMenu = false)}
+			aria-hidden="true"
+		></div>
+	{/if}
 
 	{#if !current}
 		<!-- Waiting for combat -->

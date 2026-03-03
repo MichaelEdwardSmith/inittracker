@@ -24,7 +24,15 @@
       "Bash(done)",
       "Bash(pnpm check:*)",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\fix_cards.ps1\")",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(powershell.exe -Command \":*)",
+      "Bash(powershell.exe -NoProfile -NonInteractive -Command \"Set-Content -Path ''C:\\\\Users\\\\mojpo\\\\AppData\\\\Local\\\\Temp\\\\rh.py'' -Encoding UTF8 -Value ''print\\(42\\)''\")",
+      "Bash(powershell.exe -NoProfile -NonInteractive -Command \":*)",
+      "Bash(powershell.exe -NoProfile:*)",
+      "Bash(/tmp/rh2.py:*)",
+      "Bash(/tmp/test_sq.py:*)",
+      "Bash(/tmp/test_sq2.py:*)",
+      "Bash(git diff:*)"
     ]
   }
 }
