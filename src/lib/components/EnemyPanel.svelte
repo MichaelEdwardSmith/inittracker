@@ -15,6 +15,7 @@
 	let search = $state('');
 	let typeFilter = $state('All');
 	let sortBy = $state<'name' | 'type'>('name');
+	let sourceFilter = $state('All');
 	let selectedEnemy = $state<DisplayTemplate | null>(null);
 	let quantity = $state(1);
 
@@ -83,10 +84,16 @@
 		...ENEMY_TEMPLATES.map((m) => ({ ...m, isCustom: false as const }))
 	]);
 
+	const availableSources = $derived(
+		[...new Set(allTemplates.filter((e) => e.source).map((e) => e.source!))]
+			.sort()
+	);
+
 	const filtered = $derived.by(() => {
 		const matches = (e: DisplayTemplate) =>
 			e.name.toLowerCase().includes(search.toLowerCase()) &&
-			(typeFilter === 'All' || e.monsterType === typeFilter);
+			(typeFilter === 'All' || e.monsterType === typeFilter) &&
+			(sourceFilter === 'All' || e.source === sourceFilter);
 
 		const custom = allTemplates
 			.filter((e) => e.isCustom && matches(e))
@@ -309,6 +316,17 @@
 				<option value="type">By Type</option>
 			</select>
 		</div>
+		{#if availableSources.length > 0}
+			<select
+				bind:value={sourceFilter}
+				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
+			>
+				<option value="All">All Books</option>
+				{#each availableSources as src}
+					<option value={src}>{src}</option>
+				{/each}
+			</select>
+		{/if}
 	</div>
 
 	<!-- Monster list -->
@@ -417,11 +435,22 @@
 	<!-- Add to encounter -->
 	{#if selectedEnemy}
 		<div class="rounded-lg border border-red-700 bg-red-900/20 p-3">
-			<div class="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-300">
-				{#if selectedEnemy.isCustom}
-					<span class="text-xs text-amber-400">✦</span>
-				{/if}
-				{selectedEnemy.name}
+			<div class="mb-2 flex items-center justify-between gap-1.5">
+				<span class="flex items-center gap-1.5 text-sm font-semibold text-red-300">
+					{#if selectedEnemy.isCustom}
+						<span class="text-xs text-amber-400">✦</span>
+					{/if}
+					{selectedEnemy.name}
+				</span>
+				<button
+					onclick={() => { selectedEnemy = null; quantity = 1; }}
+					aria-label="Dismiss"
+					class="rounded p-0.5 text-red-700 transition hover:bg-red-900/40 hover:text-red-300"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
 			</div>
 			<div class="mb-3 flex items-center gap-2">
 				<span class="text-xs text-gray-400">Quantity</span>
