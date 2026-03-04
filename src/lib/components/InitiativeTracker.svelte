@@ -98,6 +98,27 @@
 		pendingInitChange = null;
 	}
 
+	let pendingCondition = $state<{ id: string; combatantName: string; condition: string } | null>(null);
+	let pendingConditionRounds = $state(1);
+
+	function requestAddCondition(id: string, combatantName: string, condition: string) {
+		pendingCondition = { id, combatantName, condition };
+		pendingConditionRounds = 1;
+		openStatusId = null;
+	}
+
+	function confirmConditionTimed() {
+		if (!pendingCondition) return;
+		combat.toggleStatus(pendingCondition.id, pendingCondition.condition, Math.max(1, pendingConditionRounds));
+		pendingCondition = null;
+	}
+
+	function confirmConditionIndefinite() {
+		if (!pendingCondition) return;
+		combat.toggleStatus(pendingCondition.id, pendingCondition.condition);
+		pendingCondition = null;
+	}
+
 	function commitDamage(c: Combatant, sign: 1 | -1) {
 		const val = parseInt(damageInputs[c.id] ?? '');
 		if (isNaN(val) || val <= 0) return;
@@ -552,7 +573,7 @@
 									title="Remove {status}"
 									class="px-2 py-1.5 transition hover:opacity-70"
 								>
-									{status}
+									{status}{#if c.conditionRounds?.[status]}<span class="ml-1 font-normal opacity-75 text-[10px]">({c.conditionRounds[status]})</span>{/if}
 								</button>
 								<button
 									onclick={() => (conditionInfo = status)}
@@ -592,7 +613,7 @@
 									{#each CONDITIONS as cond}
 										{@const active = c.statuses.includes(cond)}
 										<button
-											onclick={() => combat.toggleStatus(c.id, cond)}
+											onclick={() => active ? combat.toggleStatus(c.id, cond) : requestAddCondition(c.id, c.name, cond)}
 											class="rounded px-2 py-1 text-left text-xs transition
 											       {active
 												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
@@ -610,7 +631,7 @@
 									{#each ADV_CONDITIONS as cond}
 										{@const active = c.statuses.includes(cond)}
 										<button
-											onclick={() => combat.toggleStatus(c.id, cond)}
+											onclick={() => active ? combat.toggleStatus(c.id, cond) : requestAddCondition(c.id, c.name, cond)}
 											class="rounded px-2 py-1 text-left text-xs transition
 											       {active
 												? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
@@ -691,6 +712,57 @@
 					class="flex-1 rounded bg-red-900/60 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-800"
 				>
 					Fail
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if pendingCondition}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		onmousedown={(e) => { if (e.target === e.currentTarget) pendingCondition = null; }}
+	>
+		<div class="mx-4 w-full max-w-sm rounded-xl border border-violet-700/60 bg-gray-900 shadow-2xl">
+			<div class="flex items-center gap-2 border-b border-violet-900/40 px-5 py-3">
+				<span class="text-violet-400">⏱</span>
+				<span class="text-sm font-bold tracking-widest text-violet-300 uppercase">Add Condition</span>
+			</div>
+			<div class="px-5 py-4">
+				<p class="mb-1 text-sm text-gray-300">
+					Adding <span class="font-bold text-white">{pendingCondition.condition}</span> to <span class="font-bold text-violet-300">{pendingCondition.combatantName}</span>
+				</p>
+				<p class="mb-4 text-xs text-gray-500">How long should this condition last?</p>
+				<div class="flex items-center gap-3">
+					<label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Rounds</label>
+					<input
+						type="number"
+						min="1"
+						max="99"
+						bind:value={pendingConditionRounds}
+						class="h-9 w-20 rounded border border-violet-700/60 bg-gray-800 px-2 text-center text-sm font-bold text-violet-200 focus:border-violet-500 focus:outline-none"
+					/>
+				</div>
+			</div>
+			<div class="flex gap-2 border-t border-gray-800 px-5 py-3">
+				<button
+					onclick={confirmConditionTimed}
+					class="flex-1 rounded bg-violet-800/60 py-2 text-sm font-semibold text-violet-200 transition hover:bg-violet-700/70"
+				>
+					Add ({pendingConditionRounds} {pendingConditionRounds === 1 ? 'round' : 'rounds'})
+				</button>
+				<button
+					onclick={confirmConditionIndefinite}
+					class="flex-1 rounded bg-gray-700/50 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-600/60"
+				>
+					No Limit
+				</button>
+				<button
+					onclick={() => pendingCondition = null}
+					class="rounded bg-gray-800/50 px-3 py-2 text-sm text-gray-500 transition hover:text-gray-300"
+				>
+					✕
 				</button>
 			</div>
 		</div>
