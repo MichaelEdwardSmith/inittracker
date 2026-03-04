@@ -756,35 +756,7 @@
 					The Dungeon Master will begin shortly…
 				</p>
 			</div>
-			{#if sorted.length > 0}
-				<div class="mt-4 flex flex-wrap justify-center gap-3">
-					{#each sorted as c}
-						<div
-							class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/60 px-4 py-2"
-						>
-							{#if c.type === 'enemy'}
-								{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
-								{#if imgUrl}
-									<div class="h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-red-700">
-										<img src={imgUrl} alt={c.name} class="h-full w-full object-cover object-top" />
-									</div>
-								{:else}
-									<span class="text-lg leading-none"
-										>{getMonsterEmoji(c.templateName, c.monsterType)}</span
-									>
-								{/if}
-							{/if}
-							<span
-								class="text-xs font-bold {c.type === 'player' ? 'text-blue-400' : 'text-red-400'}"
-							>
-								{c.initiative ?? '?'}
-							</span>
-							<span class="text-sm text-gray-300">{c.name}</span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
+			</div>
 	{:else}
 		{@const dc = displayCombatant ?? current}
 		<!-- Active combatant display -->
