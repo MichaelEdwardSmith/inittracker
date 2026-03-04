@@ -382,7 +382,7 @@ function createCombatStore() {
 			sync();
 		},
 
-		toggleStatus(id: string, status: string) {
+		toggleStatus(id: string, status: string, rounds?: number) {
 			let adding = false;
 			let combatantRef: Combatant | undefined;
 			combatants = combatants.map((c) => {
@@ -390,10 +390,21 @@ function createCombatStore() {
 				combatantRef = c;
 				const has = c.statuses.includes(status);
 				adding = !has;
-				const statuses = has
-					? c.statuses.filter((s) => s !== status)
-					: [...c.statuses, status];
-				return { ...c, statuses };
+				if (has) {
+					// Removing — clean up conditionRounds too
+					const statuses = c.statuses.filter((s) => s !== status);
+					const conditionRounds = c.conditionRounds ? { ...c.conditionRounds } : undefined;
+					if (conditionRounds) delete conditionRounds[status];
+					return { ...c, statuses, conditionRounds };
+				} else {
+					// Adding
+					const statuses = [...c.statuses, status];
+					if (rounds !== undefined && rounds > 0) {
+						const conditionRounds = { ...(c.conditionRounds ?? {}), [status]: rounds };
+						return { ...c, statuses, conditionRounds };
+					}
+					return { ...c, statuses };
+				}
 			});
 
 			if (combatStartedAt !== null && combatantRef) {
@@ -433,7 +444,7 @@ function createCombatStore() {
 		resetPlayers() {
 			combatants = combatants.map((c) =>
 				c.type === 'player'
-					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], initiative: null, inCombat: true, deathSaves: undefined }
+					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], conditionRounds: undefined, initiative: null, inCombat: true, deathSaves: undefined }
 					: c
 			);
 			sync();
@@ -477,6 +488,24 @@ function createCombatStore() {
 								combatantType: 'player'
 							}];
 						}
+						// Decrement timed conditions; remove any that hit 0
+						const expiredEvents: import('./types').CombatEvent[] = [];
+						combatants = combatants.map((c) => {
+							if (!c.conditionRounds || Object.keys(c.conditionRounds).length === 0) return c;
+							const nr = { ...c.conditionRounds };
+							const expired: string[] = [];
+							for (const [cond, remaining] of Object.entries(nr)) {
+								if (remaining <= 1) { expired.push(cond); delete nr[cond]; }
+								else { nr[cond] = remaining - 1; }
+							}
+							if (expired.length === 0) return { ...c, conditionRounds: nr };
+							for (const condition of expired) {
+								expiredEvents.push({ type: 'condition_remove', round, combatantId: c.id, combatantName: c.name, combatantType: c.type, condition });
+							}
+							const statuses = c.statuses.filter((s) => !expired.includes(s));
+							return { ...c, statuses, conditionRounds: Object.keys(nr).length > 0 ? nr : undefined };
+						});
+						if (expiredEvents.length > 0) combatEvents = [...combatEvents, ...expiredEvents];
 					}
 					currentTurnId = sorted[nextIdx].id;
 				}

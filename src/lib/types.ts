@@ -30,6 +30,8 @@ export interface Combatant {
 	source?: string;
 	// Enemies only — challenge rating string (e.g. "1/2", "5") for XP calculation
 	cr?: string;
+	// Per-condition round countdown. Conditions absent from this map last indefinitely.
+	conditionRounds?: Record<string, number>;
 	// DM-only freeform notes
 	note?: string;
 	// Players only — death saving throw tracker (present when currentHp === 0)
