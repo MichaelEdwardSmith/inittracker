@@ -24,6 +24,7 @@
 	let conditionInfo = $state<string | null>(null);
 	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
 	let concentrationCheck = $state<{ id: string; name: string; damage: number; dc: number } | null>(null);
+	let pendingInitChange = $state<{ id: string; name: string; value: string; oldValue: number | null } | null>(null);
 	// Detail map for imported custom monsters — keyed by monster name
 	let customDetailMap = $state<Map<string, MonsterDetail>>(new Map());
 	// Re-fetch whenever the set of sourced enemy names in combat changes so that
@@ -68,12 +69,33 @@
 		setTimeout(() => (chronicleSaved = false), 2000);
 	}
 
-	function handleInitiativeInput(id: string, raw: string) {
+	function handleInitiativeInput(id: string, raw: string, name: string, oldValue: number | null) {
 		clearTimeout(initiativeTimers[id]);
-		initiativeTimers[id] = setTimeout(() => {
-			const val = parseInt(raw);
-			combat.update(id, { initiative: isNaN(val) ? null : val });
-		}, 1000);
+		if (combat.isInCombat) {
+			initiativeTimers[id] = setTimeout(() => {
+				pendingInitChange = { id, name, value: raw, oldValue };
+			}, 600);
+		} else {
+			initiativeTimers[id] = setTimeout(() => {
+				const val = parseInt(raw);
+				combat.update(id, { initiative: isNaN(val) ? null : val });
+			}, 1000);
+		}
+	}
+
+	function confirmInitChange() {
+		if (!pendingInitChange) return;
+		const val = parseInt(pendingInitChange.value);
+		combat.update(pendingInitChange.id, { initiative: isNaN(val) ? null : val });
+		pendingInitChange = null;
+	}
+
+	function cancelInitChange() {
+		if (!pendingInitChange) return;
+		const card = document.getElementById(`combatant-${pendingInitChange.id}`);
+		const input = card?.querySelector('[data-init-input]') as HTMLInputElement | null;
+		if (input) input.value = pendingInitChange.oldValue !== null ? String(pendingInitChange.oldValue) : '';
+		pendingInitChange = null;
 	}
 
 	function commitDamage(c: Combatant, sign: 1 | -1) {
@@ -332,9 +354,10 @@
 							<span class="text-xs tracking-wide text-gray-500 uppercase">Init</span>
 							<input
 								type="number"
+								data-init-input
 								value={c.initiative ?? ''}
 								placeholder="—"
-								oninput={(e) => handleInitiativeInput(c.id, e.currentTarget.value)}
+								oninput={(e) => handleInitiativeInput(c.id, e.currentTarget.value, c.name, c.initiative)}
 								class="h-11 w-14 rounded border border-gray-600 bg-gray-900 text-center text-xl font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
 							/>
 						</div>
@@ -668,6 +691,41 @@
 					class="flex-1 rounded bg-red-900/60 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-800"
 				>
 					Fail
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if pendingInitChange}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		onmousedown={(e) => { if (e.target === e.currentTarget) cancelInitChange(); }}
+	>
+		<div class="mx-4 w-full max-w-sm rounded-xl border border-amber-700/60 bg-gray-900 shadow-2xl">
+			<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
+				<span class="text-amber-400">⚠</span>
+				<span class="text-sm font-bold tracking-widest text-amber-300 uppercase">Change Initiative Mid-Combat?</span>
+			</div>
+			<div class="px-5 py-4">
+				<p class="text-sm text-gray-300">
+					You're changing <span class="font-bold text-white">{pendingInitChange.name}</span>'s initiative to <span class="font-bold text-amber-300">{pendingInitChange.value}</span> while combat is active.
+				</p>
+				<p class="mt-2 text-xs text-gray-500">This will re-sort the turn order immediately.</p>
+			</div>
+			<div class="flex gap-2 border-t border-gray-800 px-5 py-3">
+				<button
+					onclick={confirmInitChange}
+					class="flex-1 rounded bg-amber-700/60 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-600/70"
+				>
+					Yes, change it
+				</button>
+				<button
+					onclick={cancelInitChange}
+					class="flex-1 rounded bg-gray-700/50 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-600/60"
+				>
+					Cancel
 				</button>
 			</div>
 		</div>

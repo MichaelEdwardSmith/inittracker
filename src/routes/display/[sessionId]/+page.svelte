@@ -791,6 +791,7 @@
 		<div class="relative z-10 flex flex-1 overflow-hidden">
 			{#key dc.id}
 				{@const pct = hpPercent(dc)}
+				{@const isBloodied = dc.type === 'enemy' && pct > 0 && pct <= 50}
 				{@const showAc = dc.type === 'player' || dc.showAc === true}
 				{@const isUnconsciousPlayer = dc.type === 'player' && dc.currentHp <= 0}
 				<main
@@ -818,16 +819,16 @@
 							href={imgUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.ring} cursor-pointer"
-							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
+							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 cursor-pointer {isBloodied ? 'ring-red-600 bloodied-avatar' : style.ring}"
+							style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
 						>
 							<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
 						</a>
 					{:else}
 						{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
 						<div
-							class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {style.ring}"
-							style="box-shadow: 0 0 48px -8px var(--tw-ring-color);"
+							class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {isBloodied ? 'ring-red-600 bloodied-avatar' : style.ring}"
+							style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
 						>
 							<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
 						</div>
@@ -838,6 +839,14 @@
 						style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
 					>
 						<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
+					</div>
+				{/if}
+
+				<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
+				{#if isBloodied}
+					<div class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1">
+						<span class="text-base leading-none">🩸</span>
+						<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase">Bloodied</span>
 					</div>
 				{/if}
 
@@ -1087,6 +1096,9 @@
 											{c.type === 'player' ? 'PC' : 'NPC'}
 										</span>
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
+										{#if c.type === 'enemy' && hpPercent(c) > 0 && hpPercent(c) <= 50}
+											<span class="shrink-0 text-sm leading-none" title="Bloodied">🩸</span>
+										{/if}
 										{#if c.initiative !== null}
 											<span class="ml-auto hidden shrink-0 text-xs text-amber-500 sm:inline"
 												>{c.initiative}</span
@@ -1339,6 +1351,15 @@
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
 
 <style>
+	/* Bloodied enemy avatar — pulsing crimson ring */
+	@keyframes bloodied-glow {
+		0%, 100% { box-shadow: 0 0 50px -2px rgba(185, 28, 28, 0.85), 0 0 0 4px rgba(220, 38, 38, 0.8); }
+		50%       { box-shadow: 0 0 80px 6px rgba(220, 38, 38, 1),    0 0 0 4px rgba(239, 68, 68, 1); }
+	}
+	.bloodied-avatar {
+		animation: bloodied-glow 2s ease-in-out infinite;
+	}
+
 	@keyframes flash-effect {
 		0% {
 			opacity: 0.5;
