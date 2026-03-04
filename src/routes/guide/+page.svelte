@@ -9,6 +9,7 @@
 		{ id: 'managing-players', label: '4. Managing Your Party' },
 		{ id: 'managing-enemies', label: '5. Managing Enemies' },
 		{ id: 'running-combat', label: '6. Running Combat' },
+		{ id: 'initiative-ties', label: '↳ Initiative Ties' },
 		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
 		{ id: 'death-saves', label: '↳ Death Saving Throws' },
 		{ id: 'concentration-check', label: '↳ Concentration Checks' },
@@ -488,6 +489,31 @@
 						class="font-semibold text-white">—</strong
 					> and those combatants sort to the bottom.
 				</p>
+
+				<div id="initiative-ties">
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Resolving Initiative Ties
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						When two or more combatants share the same initiative value,
+						<strong class="font-semibold text-white">▲/▼ buttons</strong> appear on the left
+						side of each tied card so you can set the tiebreak order.
+					</p>
+					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							<strong class="font-semibold text-white">▲</strong> — moves this combatant above
+							the one directly ahead of it in the tied group
+						</li>
+						<li>
+							<strong class="font-semibold text-white">▼</strong> — moves this combatant below
+							the one directly behind it in the tied group
+						</li>
+					</ul>
+					<p class="mb-6 text-sm leading-relaxed">
+						A button is dimmed and inactive when there is no same-initiative neighbour in
+						that direction. The buttons disappear entirely once no tie exists.
+					</p>
+				</div>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Starting Combat
