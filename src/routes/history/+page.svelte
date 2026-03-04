@@ -159,6 +159,7 @@
 	}
 
 	let records = $state<CombatRecord[]>(untrack(() => data.records));
+	let exportingId = $state<string | null>(null);
 	let confirmDeleteId = $state<string | null>(null);
 	let confirmClearAll = $state(false);
 	let confirmTimer: ReturnType<typeof setTimeout> | null = null;
@@ -176,6 +177,18 @@
 			confirmDeleteId = null;
 			confirmClearAll = false;
 		}, 3000);
+	}
+
+	async function handleExport(record: CombatRecord, num: number) {
+		exportingId = record.id;
+		try {
+			const { exportChronicle } = await import('$lib/pdfExport');
+			await exportChronicle(record, num);
+		} catch (err) {
+			console.error('PDF export failed:', err);
+		} finally {
+			exportingId = null;
+		}
 	}
 
 	async function deleteRecord(id: string) {
@@ -313,6 +326,23 @@
 											)}</span
 										>
 									</div>
+									<!-- PDF export button -->
+									<button
+										onclick={() => handleExport(record, records.length - i)}
+										disabled={exportingId === record.id}
+										title="Export to PDF"
+										class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-amber-400 disabled:opacity-40"
+									>
+										{#if exportingId === record.id}
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V4" />
+											</svg>
+										{:else}
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+											</svg>
+										{/if}
+									</button>
 									<!-- Delete button -->
 									{#if confirmDeleteId === record.id}
 										<button

@@ -989,6 +989,35 @@
 				)}
 
 				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Exporting to PDF
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">download icon</strong> button on any
+					record card header to generate and download a PDF of that encounter. The button shows a
+					spinner while it prepares; the file downloads automatically once ready.
+				</p>
+				<p class="mb-3 text-sm leading-relaxed">The PDF contains:</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>Header — encounter number (Roman numerals), date, time, and duration</li>
+					<li>Stats row — rounds, players, casualties, and total XP</li>
+					<li>
+						Participants table — starting HP, final HP, damage dealt, healing done, and outcome
+						(Survived / Slain)
+					</li>
+					<li>
+						XP breakdown — each slain enemy with its CR and XP value, a total, and a per-player
+						split (shown when any slain enemies had a CR set)
+					</li>
+					<li>Full round-by-round event log, paginating automatically for long encounters</li>
+				</ul>
+				<p class="mb-6 text-sm leading-relaxed">
+					Files are named <code
+						class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>encounter-XVIII-2025-01-15.pdf</code
+					> (Roman-numeral encounter number + ISO date).
+				</p>
+
+				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Deleting Records
 				</h3>
 				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">

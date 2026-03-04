@@ -35,6 +35,8 @@
 		"@sveltejs/adapter-node": "^5.5.3",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"bcryptjs": "^3.0.3",
+		"jspdf": "^4.2.0",
+		"jspdf-autotable": "^5.0.7",
 		"mongodb": "^7.1.0"
 	}
 }

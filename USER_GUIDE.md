@@ -467,6 +467,19 @@ Click **Show Chronicle** on any record to expand the detailed event log. Events 
 
 Click **Hide Chronicle** to collapse the log.
 
+### Exporting a Record to PDF
+
+Click the **download icon** button on any record card header to generate and download a PDF of that encounter. The button shows a spinner while it prepares; the download begins automatically once the PDF is ready.
+
+The PDF contains:
+- A header with the encounter number (Roman numerals), date, time, and duration
+- A stats row — rounds, number of players, casualties, and total XP (if applicable)
+- A participants table with starting HP, final HP, damage dealt, healing done, and outcome (Survived / Slain)
+- An XP breakdown table per slain enemy with CR and XP values, plus an even-split total (if any slain enemies had a CR set)
+- The full round-by-round event log, paginating automatically if the encounter was long
+
+Files are saved as `encounter-XVIII-2025-01-15.pdf` (Roman-numeral encounter number + ISO date).
+
 ### Deleting Records
 
 - **Delete one**: Click the trash icon on a record card and confirm within 3 seconds

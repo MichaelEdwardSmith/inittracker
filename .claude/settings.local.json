@@ -33,7 +33,11 @@
       "Bash(/tmp/test_sq.py:*)",
       "Bash(/tmp/test_sq2.py:*)",
       "Bash(git diff:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npm install:*)",
+      "Bash(ForEach-Object { [int]$_ })",
+      "Bash(npx tsc:*)"
     ]
   }
 }
