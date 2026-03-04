@@ -11,6 +11,7 @@
 		{ id: 'running-combat', label: '6. Running Combat' },
 		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
 		{ id: 'death-saves', label: '↳ Death Saving Throws' },
+		{ id: 'concentration-check', label: '↳ Concentration Checks' },
 		{ id: 'conditions', label: '8. Conditions & Statuses' },
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
@@ -657,6 +658,37 @@
 						tracker automatically — the HP bar returns on the player display.
 						<strong class="font-semibold text-white">Reset Players</strong> also clears death saves
 						on all players.
+					</p>
+				</div>
+
+				<div id="concentration-check">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Concentration Checks
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						When any combatant with the <strong class="font-semibold text-white">Concentrating</strong>
+						condition takes damage, a <strong class="font-semibold text-white">Concentration Check</strong>
+						modal appears automatically.
+					</p>
+					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							Shows the combatant's name, the damage taken, and the
+							<strong class="font-semibold text-white">CON Save DC</strong> — the higher of 10 or
+							half the damage taken, per PHB rules.
+						</li>
+						<li>
+							<strong class="font-semibold text-green-400">Success</strong> — closes the modal; the
+							Concentrating condition remains.
+						</li>
+						<li>
+							<strong class="font-semibold text-red-400">Fail</strong> — closes the modal and
+							automatically removes the
+							<strong class="font-semibold text-white">Concentrating</strong> condition from that
+							combatant.
+						</li>
+					</ul>
+					<p class="mb-6 text-sm leading-relaxed">
+						This applies to both players and enemies.
 					</p>
 				</div>
 
