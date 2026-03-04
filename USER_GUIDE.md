@@ -174,6 +174,15 @@ Your custom monster will appear at the top of the monster list and can be used i
 
 Before starting, each combatant needs an initiative roll. Click the **initiative field** on any row in the center panel and type a number. Fields left blank show **—** and those combatants will sort to the bottom.
 
+### Resolving Initiative Ties
+
+When two or more combatants share the same initiative value, **▲/▼ buttons** appear on the left side of each tied card:
+
+- **▲** — move this combatant above the one directly ahead of it in the tie group
+- **▼** — move this combatant below the one directly behind it in the tie group
+
+A button is dimmed and inactive when there is no same-initiative neighbour in that direction (e.g. the topmost card in a tied group has no ▲ to press). The buttons disappear entirely once no tie exists.
+
 ### Starting Combat
 
 Once at least one combatant has an initiative set, click **Start Combat**. The combatant with the highest initiative becomes the active turn (highlighted in amber with a glowing border). The round counter starts at **1**.

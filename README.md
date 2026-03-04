@@ -4,7 +4,7 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 
 ## Features
 
-- **Initiative order** — drag-free, sorted automatically; advance/rewind turns with a single click
+- **Initiative order** — drag-free, sorted automatically; advance/rewind turns with a single click; when two or more combatants share the same initiative value, ▲/▼ buttons appear on their cards to set the tiebreak order
 - **Hit points** — damage, healing, and temp HP with colour-coded HP bars (green → amber → red → grey)
 - **Conditions & status effects** — all 15 standard D&D 5e conditions plus four Advantage/Disadvantage markers; applied and removed with audio/visual cues on the player display
 - **Concentration checks** — when a combatant with the Concentrating condition takes damage, a modal automatically shows the CON save DC (max(10, damage ÷ 2)); click **Success** to dismiss or **Fail** to dismiss and automatically remove the Concentrating condition

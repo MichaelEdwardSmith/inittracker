@@ -207,10 +207,12 @@
 	{:else}
 		<!-- Combatant rows -->
 		<div class="flex flex-1 flex-col gap-1.5 overflow-y-auto">
-			{#each combat.sorted as c (c.id)}
+			{#each combat.sorted as c, i (c.id)}
 				{@const isDead = c.currentHp === 0}
 				{@const isActive = c.id === combat.currentTurnId}
 				{@const pct = hpPercent(c)}
+				{@const prevSameInit = i > 0 && combat.sorted[i - 1].initiative === c.initiative}
+				{@const nextSameInit = i < combat.sorted.length - 1 && combat.sorted[i + 1].initiative === c.initiative}
 				<div
 					id="combatant-{c.id}"
 					class="relative flex flex-col gap-2 rounded-lg border px-3 py-2 transition-all
@@ -224,6 +226,22 @@
 				>
 					<!-- Header row (badge + name + remove) -->
 					<div class="flex items-center gap-2">
+						{#if prevSameInit || nextSameInit}
+							<div class="flex shrink-0 flex-col">
+								<button
+									onclick={() => combat.swapOrder(c.id, combat.sorted[i - 1].id)}
+									disabled={!prevSameInit}
+									title="Move up"
+									class="text-xs leading-none text-gray-600 transition hover:text-gray-300 disabled:cursor-default disabled:opacity-20"
+								>▲</button>
+								<button
+									onclick={() => combat.swapOrder(c.id, combat.sorted[i + 1].id)}
+									disabled={!nextSameInit}
+									title="Move down"
+									class="text-xs leading-none text-gray-600 transition hover:text-gray-300 disabled:cursor-default disabled:opacity-20"
+								>▼</button>
+							</div>
+						{/if}
 						{#if isActive}
 							<span class="text-amber-400" title="Active turn">▶</span>
 						{/if}

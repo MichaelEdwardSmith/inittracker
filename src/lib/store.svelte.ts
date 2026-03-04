@@ -250,12 +250,23 @@ function createCombatStore() {
 			sync();
 		},
 
-		/** Apply multiple updates in a single sync — used by drag-and-drop reorder. */
+		/** Apply multiple updates in a single sync. */
 		batchUpdate(updates: Array<{ id: string; changes: Partial<Combatant> }>) {
 			combatants = combatants.map((c) => {
 				const u = updates.find((upd) => upd.id === c.id);
 				return u ? { ...c, ...u.changes } : c;
 			});
+			sync();
+		},
+
+		/** Swap two combatants' positions in the array — used to reorder within a tie group. */
+		swapOrder(id1: string, id2: string) {
+			const idx1 = combatants.findIndex((c) => c.id === id1);
+			const idx2 = combatants.findIndex((c) => c.id === id2);
+			if (idx1 === -1 || idx2 === -1) return;
+			const next = [...combatants];
+			[next[idx1], next[idx2]] = [next[idx2], next[idx1]];
+			combatants = next;
 			sync();
 		},
 
