@@ -77,8 +77,8 @@ function createCombatStore() {
 	function buildRecord(endedAt: string): CombatRecord {
 		const participants: CombatantSummary[] = combatants.map((c) => {
 			const stats = participantStats.get(c.id);
-			const cr = c.type === 'enemy' && c.templateName
-				? crByTemplateName.get(c.templateName)
+			const cr = c.type === 'enemy'
+				? (c.cr ?? crByTemplateName.get(c.templateName ?? ''))
 				: undefined;
 			return {
 				id: c.id,
@@ -196,6 +196,7 @@ function createCombatStore() {
 				templateName: template.name,
 				monsterType: template.monsterType,
 				imgUrl: template.imgUrl,
+				cr: template.cr,
 				...(template.source ? { source: template.source } : {}),
 				inCombat: true
 			}));

@@ -28,6 +28,8 @@ export interface Combatant {
 	imgUrl?: string;
 	// Enemies only — source abbreviation for bestiary-imported monsters (e.g. "IDRotF")
 	source?: string;
+	// Enemies only — challenge rating string (e.g. "1/2", "5") for XP calculation
+	cr?: string;
 	// DM-only freeform notes
 	note?: string;
 	// Players only — death saving throw tracker (present when currentHp === 0)
