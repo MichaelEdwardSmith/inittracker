@@ -250,6 +250,15 @@ function createCombatStore() {
 			sync();
 		},
 
+		/** Apply multiple updates in a single sync — used by drag-and-drop reorder. */
+		batchUpdate(updates: Array<{ id: string; changes: Partial<Combatant> }>) {
+			combatants = combatants.map((c) => {
+				const u = updates.find((upd) => upd.id === c.id);
+				return u ? { ...c, ...u.changes } : c;
+			});
+			sync();
+		},
+
 		/** Set showAc for every enemy sharing the same templateName in one sync. */
 		setShowAcForTemplate(templateName: string, showAc: boolean) {
 			combatants = combatants.map((c) =>

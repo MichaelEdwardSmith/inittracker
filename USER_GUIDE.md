@@ -267,6 +267,22 @@ Clicking **Reset Players** in the initiative order header also clears death save
 
 ---
 
+### Concentration Checks
+
+When any combatant with the **Concentrating** condition takes damage, a **Concentration Check** modal appears automatically showing:
+
+- The combatant's name and the damage taken
+- The **CON Save DC** — the higher of 10 or half the damage taken (per PHB rules)
+
+Two buttons resolve the check:
+
+- **Success** — closes the modal; the Concentrating condition remains
+- **Fail** — closes the modal and automatically removes the Concentrating condition from that combatant
+
+This works for both players and enemies.
+
+---
+
 ### Armor Class Visibility
 
 By default, enemy AC is hidden from the player display. To reveal an enemy's AC to players, check the **Show AC** checkbox on that enemy's row. Players always see their own character's AC.

@@ -7,6 +7,7 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 - **Initiative order** — drag-free, sorted automatically; advance/rewind turns with a single click
 - **Hit points** — damage, healing, and temp HP with colour-coded HP bars (green → amber → red → grey)
 - **Conditions & status effects** — all 15 standard D&D 5e conditions plus four Advantage/Disadvantage markers; applied and removed with audio/visual cues on the player display
+- **Concentration checks** — when a combatant with the Concentrating condition takes damage, a modal automatically shows the CON save DC (max(10, damage ÷ 2)); click **Success** to dismiss or **Fail** to dismiss and automatically remove the Concentrating condition
 - **Death saving throws** — when a player drops to 0 HP a compact tracker appears on their DM row to record successes and failures (click each circle to toggle); 3 successes or a "Stabilize" click = Stable, 3 failures = Dead (Dead condition auto-applied); the player display replaces the HP bar with a large death saves panel that updates in real time via SSE
 - **Enemy library** — ~380 SRD monsters with full stat blocks (ability scores, traits, actions, artwork)
 - **Custom monsters** — create your own enemies with name, AC, HP, CR, type, and an optional avatar

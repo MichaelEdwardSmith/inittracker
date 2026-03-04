@@ -393,6 +393,7 @@
 					{#if searchQuery}
 						<button
 							onclick={() => (searchQuery = '')}
+							title="Clear search"
 							class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-gray-400"
 						>
 							<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
