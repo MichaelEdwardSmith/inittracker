@@ -93,6 +93,7 @@
 		combat.setTempHp(id, val);
 		tempHpInputs[id] = '';
 	}
+
 </script>
 
 <div class="flex h-full flex-col gap-3">
