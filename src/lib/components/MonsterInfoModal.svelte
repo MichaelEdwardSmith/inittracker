@@ -19,6 +19,11 @@
 		modifier: number;
 		total: number;
 		isAttack?: boolean;
+		isSavingThrow?: boolean;
+		savingThrowStatLabel?: string;
+		savingThrowFromOverride?: boolean;
+		isSkillCheck?: boolean;
+		skillCheckName?: string;
 	}
 
 	let diceRollResult = $state<DiceRollResult | null>(null);
@@ -78,12 +83,74 @@
 		};
 	}
 
+	const SAVE_STATS = [
+		{ label: 'STR', key: 'str' as const, modKey: 'strMod' as const, full: 'Strength' },
+		{ label: 'DEX', key: 'dex' as const, modKey: 'dexMod' as const, full: 'Dexterity' },
+		{ label: 'CON', key: 'con' as const, modKey: 'conMod' as const, full: 'Constitution' },
+		{ label: 'INT', key: 'int' as const, modKey: 'intMod' as const, full: 'Intelligence' },
+		{ label: 'WIS', key: 'wis' as const, modKey: 'wisMod' as const, full: 'Wisdom' },
+		{ label: 'CHA', key: 'cha' as const, modKey: 'chaMod' as const, full: 'Charisma' },
+	];
+
+	function parseSavingThrows(savingThrows: string | undefined): Record<string, number> {
+		if (!savingThrows) return {};
+		const result: Record<string, number> = {};
+		for (const m of savingThrows.matchAll(/(\w+)\s*([+-]\d+)/g)) {
+			result[m[1].toLowerCase()] = parseInt(m[2]);
+		}
+		return result;
+	}
+
+	function rollSavingThrow(statLabel: string, statKey: string, baseMod: string) {
+		if (!monster) return;
+		const stMap = parseSavingThrows(monster.savingThrows);
+		const fromOverride = statKey in stMap;
+		const modifier = fromOverride ? stMap[statKey] : parseInt(baseMod.replace(/[()]/g, ''));
+		const roll = Math.floor(Math.random() * 20) + 1;
+		const sign = modifier >= 0 ? '+' : '';
+		diceRollResult = {
+			expr: `${statLabel} Save ${sign}${modifier}`,
+			rolls: [roll],
+			sides: 20,
+			modifier,
+			total: roll + modifier,
+			isSavingThrow: true,
+			savingThrowStatLabel: statLabel,
+			savingThrowFromOverride: fromOverride,
+		};
+	}
+
+	/** Wrap each "Skill +N" entry in the skills string with a clickable button. */
+	function linkSkills(skills: string): string {
+		return skills.replace(/([^,]+)\s*([+-]\d+)/g, (_, name, mod) => {
+			const n = name.trim();
+			const m = mod.trim();
+			return `<button class="skill-btn" data-skill-mod="${m}" data-skill-name="${n}">${n} ${m}</button>`;
+		});
+	}
+
+	function rollSkillCheck(skillName: string, modStr: string) {
+		const modifier = parseInt(modStr);
+		const roll = Math.floor(Math.random() * 20) + 1;
+		const sign = modifier >= 0 ? '+' : '';
+		diceRollResult = {
+			expr: `${skillName} ${sign}${modifier}`,
+			rolls: [roll],
+			sides: 20,
+			modifier,
+			total: roll + modifier,
+			isSkillCheck: true,
+			skillCheckName: skillName,
+		};
+	}
+
 	function handleDiceClick(e: MouseEvent) {
-		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack]') as HTMLElement | null;
+		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack],[data-skill-mod]') as HTMLElement | null;
 		if (!target) return;
 		e.stopPropagation();
 		if (target.dataset.dice) rollDice(target.dataset.dice);
 		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
+		else if (target.dataset.skillMod !== undefined) rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
 	}
 </script>
 
@@ -182,16 +249,18 @@
 					</div>
 				</div>
 
-				<!-- Ability scores -->
+				<!-- Ability scores — click to roll a saving throw -->
 				<div class="mb-4 grid grid-cols-6 gap-2 border-b border-gray-700 pb-4 text-center">
-					{#each [{ label: 'STR', val: monster.str, mod: monster.strMod }, { label: 'DEX', val: monster.dex, mod: monster.dexMod }, { label: 'CON', val: monster.con, mod: monster.conMod }, { label: 'INT', val: monster.int, mod: monster.intMod }, { label: 'WIS', val: monster.wis, mod: monster.wisMod }, { label: 'CHA', val: monster.cha, mod: monster.chaMod }] as stat}
-						<div class="rounded bg-gray-800 px-1 py-2">
-							<div class="text-xs font-bold tracking-wider text-red-400 uppercase">
-								{stat.label}
-							</div>
-							<div class="text-sm font-bold text-white">{stat.val}</div>
-							<div class="text-xs text-gray-400">{stat.mod}</div>
-						</div>
+					{#each SAVE_STATS as stat}
+						<button
+							onclick={() => rollSavingThrow(stat.label, stat.key, monster![stat.modKey])}
+							title="Roll {stat.full} saving throw"
+							class="rounded bg-gray-800 px-1 py-2 transition hover:bg-violet-900/50 hover:ring-1 hover:ring-violet-500 active:scale-95"
+						>
+							<div class="text-xs font-bold tracking-wider text-red-400 uppercase">{stat.label}</div>
+							<div class="text-sm font-bold text-white">{monster[stat.key]}</div>
+							<div class="text-xs text-gray-400">{monster[stat.modKey]}</div>
+						</button>
 					{/each}
 				</div>
 
@@ -203,7 +272,7 @@
 						</div>
 					{/if}
 					{#if monster.skills}
-						<div><span class="text-gray-500">Skills </span><span>{monster.skills}</span></div>
+						<div><span class="text-gray-500">Skills </span><span>{@html linkSkills(monster.skills)}</span></div>
 					{/if}
 					{#if monster.damageVulnerabilities}
 					<div>
@@ -330,7 +399,8 @@
 			<!-- Modifier line (only shown when there is one) -->
 			{#if r.modifier !== 0}
 				<p class="mb-1 text-sm text-gray-400">
-					Dice sum: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
+					{r.isSavingThrow ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
+					{#if r.isSavingThrow}<span class="text-xs text-gray-600"> ({r.savingThrowFromOverride ? 'saving throw bonus' : 'ability modifier'})</span>{/if}
 				</p>
 			{/if}
 
@@ -340,7 +410,18 @@
 			</p>
 
 			<button
-				onclick={() => r.isAttack ? rollAttack(String(r.modifier)) : rollDice(r.expr)}
+				onclick={() => {
+					if (r.isSavingThrow && r.savingThrowStatLabel) {
+						const s = SAVE_STATS.find((x) => x.label === r.savingThrowStatLabel)!;
+						rollSavingThrow(s.label, s.key, monster![s.modKey]);
+					} else if (r.isSkillCheck && r.skillCheckName) {
+						rollSkillCheck(r.skillCheckName, String(r.modifier));
+					} else if (r.isAttack) {
+						rollAttack(String(r.modifier));
+					} else {
+						rollDice(r.expr);
+					}
+				}}
 				class="mt-4 w-full rounded bg-amber-700 py-1.5 text-sm font-bold text-white transition hover:bg-amber-600"
 			>
 				Roll again
@@ -384,5 +465,21 @@
 	}
 	:global(.atk-btn:hover) {
 		color: rgb(221, 214, 254); /* violet-200 */
+	}
+	/* Skill check buttons injected via {@html linkSkills(...)} */
+	:global(.skill-btn) {
+		display: inline;
+		color: rgb(110, 231, 183); /* emerald-300 */
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		cursor: pointer;
+		background: transparent;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		line-height: inherit;
+	}
+	:global(.skill-btn:hover) {
+		color: rgb(167, 243, 208); /* emerald-200 */
 	}
 </style>
