@@ -98,6 +98,7 @@
 		pendingInitChange = null;
 	}
 
+	let legendaryInfoModal = $state<{ name: string; text: string } | null>(null);
 	let pendingCondition = $state<{ id: string; combatantName: string; condition: string } | null>(null);
 	let pendingConditionRounds = $state(1);
 
@@ -645,6 +646,34 @@
 							</div>
 						{/if}
 					</div>
+					{#if c.type === 'enemy'}
+						{@const legendaryDetail = getDetailForCombatant(c)}
+						{#if legendaryDetail?.legendaryActions}
+							{@const spent = c.legendaryActionsSpent ?? 0}
+						<div class="flex items-center gap-2">
+							<span class="shrink-0 text-xs font-semibold text-amber-200/70">Legendary Actions:</span>
+							<div class="flex items-center gap-1">
+								{#each [0, 1, 2] as dotIdx}
+									{@const isSpent = dotIdx >= (3 - spent)}
+									<button
+										onclick={() => combat.setLegendaryActionsSpent(c.id, isSpent ? 2 - dotIdx : 3 - dotIdx)}
+										title={isSpent ? 'Mark as available' : 'Spend action'}
+										class="h-4 w-4 rounded-full border-2 transition {isSpent ? 'border-amber-600 bg-transparent hover:bg-amber-900/30' : 'border-amber-400 bg-amber-400 hover:bg-amber-300'}"
+									></button>
+								{/each}
+							</div>
+							<button
+								onclick={() => (legendaryInfoModal = { name: c.name, text: legendaryDetail.legendaryActions! })}
+								title="View legendary actions"
+								class="rounded p-1 text-gray-600 transition hover:text-blue-400"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</button>
+						</div>
+						{/if}
+					{/if}
 				</div>
 			{/each}
 		</div>
@@ -764,6 +793,35 @@
 				>
 					✕
 				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if legendaryInfoModal}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		onmousedown={(e) => { if (e.target === e.currentTarget) legendaryInfoModal = null; }}
+	>
+		<div class="mx-4 w-full max-w-lg rounded-xl border border-amber-700/50 bg-gray-900 shadow-2xl">
+			<div class="flex items-center justify-between border-b border-amber-900/40 px-5 py-3">
+				<div class="flex items-center gap-2">
+					<span class="text-amber-400">★</span>
+					<span class="text-sm font-bold tracking-widest text-amber-300 uppercase">Legendary Actions</span>
+					<span class="text-xs text-gray-500">— {legendaryInfoModal.name}</span>
+				</div>
+				<button
+					onclick={() => (legendaryInfoModal = null)}
+					class="text-gray-600 transition hover:text-gray-300"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div class="monster-text max-h-[60vh] overflow-y-auto px-5 py-4 text-sm text-gray-300 leading-relaxed">
+				{@html legendaryInfoModal.text}
 			</div>
 		</div>
 	</div>

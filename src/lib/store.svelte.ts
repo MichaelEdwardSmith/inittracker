@@ -507,9 +507,21 @@ function createCombatStore() {
 						});
 						if (expiredEvents.length > 0) combatEvents = [...combatEvents, ...expiredEvents];
 					}
-					currentTurnId = sorted[nextIdx].id;
+					const nextId = sorted[nextIdx].id;
+					// Reset legendary actions for the combatant whose turn is starting
+					combatants = combatants.map((c) =>
+						c.id === nextId && c.legendaryActionsSpent !== undefined
+							? { ...c, legendaryActionsSpent: 0 }
+							: c
+					);
+					currentTurnId = nextId;
 				}
 			}
+			sync();
+		},
+
+		setLegendaryActionsSpent(id: string, spent: number) {
+			combatants = combatants.map((c) => c.id === id ? { ...c, legendaryActionsSpent: spent } : c);
 			sync();
 		},
 
