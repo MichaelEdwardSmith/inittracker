@@ -14,6 +14,7 @@
 		{ id: 'death-saves', label: '↳ Death Saving Throws' },
 		{ id: 'concentration-check', label: '↳ Concentration Checks' },
 		{ id: 'legendary-actions', label: '↳ Legendary Actions' },
+		{ id: 'lair-actions', label: '↳ Lair Actions' },
 		{ id: 'conditions', label: '8. Conditions & Statuses' },
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
@@ -127,7 +128,7 @@
 				{#each toc as item}
 					<a
 						href="#{item.id}"
-						class="block truncate rounded px-2 py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300"
+						class="block truncate rounded py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 {item.label.startsWith('↳') ? 'pl-6 pr-2' : 'px-2'}"
 					>
 						{item.label}
 					</a>
@@ -749,6 +750,43 @@
 					This row only appears for enemies with a full stat block (built-in SRD monsters and
 					bestiary imports). Custom monsters created manually do not have a stat block and will not
 					show the tracker.
+				</p>
+
+				<h3 id="lair-actions" class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Lair Actions
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Some powerful creatures can take <strong class="font-semibold text-white">lair actions</strong>
+					— special effects that trigger on initiative count 20. Click the
+					<strong class="font-semibold text-white">building icon</strong> on any enemy card to add a
+					purple <strong class="font-semibold text-purple-300">Lair Actions</strong> card to the
+					initiative order.
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						The building icon appears between the info and notes buttons on enemy cards, and is only
+						visible when no lair card already exists for that creature.
+					</li>
+					<li>
+						The lair card sits at <strong class="font-semibold text-white">initiative count 20</strong>
+						and participates in the normal turn order — it is highlighted amber when it is that
+						card's turn, prompting you to resolve the lair action.
+					</li>
+					<li>
+						Only one lair card can exist per creature template at a time.
+					</li>
+					<li>
+						When the <strong class="font-semibold text-white">last instance</strong> of a creature is
+						removed from combat, its lair card is automatically removed as well.
+					</li>
+					<li>
+						Click the <strong class="font-semibold text-white">✕ button</strong> on the lair card to
+						dismiss it manually at any time.
+					</li>
+				</ul>
+				<p class="mb-6 text-sm leading-relaxed text-gray-400">
+					On the player display, the lair card appears in the initiative list and active-turn view
+					with purple styling and a "LAIR" label.
 				</p>
 
 				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">

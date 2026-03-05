@@ -37,9 +37,9 @@ function validateCombatant(c: unknown): c is Combatant {
 
 	if (!isStr(o.id, 36)) return false;
 	if (!isStr(o.name, MAX_NAME_LEN)) return false;
-	if (o.type !== 'player' && o.type !== 'enemy') return false;
+	if (o.type !== 'player' && o.type !== 'enemy' && o.type !== 'lair') return false;
 	if (!isInt(o.ac, 0, 99)) return false;
-	if (!isInt(o.maxHp, 1, 99_999)) return false;
+	if (!isInt(o.maxHp, 0, 99_999)) return false;
 	if (!isInt(o.currentHp, -99_999, 99_999)) return false;
 	if (!isInt(o.tempHp, 0, 99_999)) return false;
 

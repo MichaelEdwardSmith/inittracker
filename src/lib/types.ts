@@ -5,7 +5,7 @@
 export interface Combatant {
 	id: string;
 	name: string;
-	type: 'player' | 'enemy';
+	type: 'player' | 'enemy' | 'lair';
 	ac: number;
 	maxHp: number;
 	currentHp: number;
