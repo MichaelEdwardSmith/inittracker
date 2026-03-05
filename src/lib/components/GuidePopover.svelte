@@ -22,7 +22,6 @@
 	});
 
 	function dismiss() {
-		if (dontShow) localStorage.setItem(KEY, '1');
 		visible = false;
 		btnRect = null;
 	}
@@ -91,7 +90,11 @@
 				<label class="mb-4 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
 					<input
 						type="checkbox"
-						bind:checked={dontShow}
+						checked={dontShow}
+						onchange={(e) => {
+							dontShow = e.currentTarget.checked;
+							if (dontShow) localStorage.setItem(KEY, '1');
+						}}
 						class="h-3.5 w-3.5 cursor-pointer accent-amber-500"
 					/>
 					Don't show this again

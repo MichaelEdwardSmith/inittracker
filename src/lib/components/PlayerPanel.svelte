@@ -10,6 +10,7 @@
 	let dexMod = $state(0);
 	let editDexMod = $state(0);
 	let editingId = $state<string | null>(null);
+	let confirmDeleteId = $state<string | null>(null);
 	let editAc = $state(0);
 	let editHp = $state(0);
 	let editName = $state('');
@@ -291,26 +292,39 @@
 								/>
 							</svg>
 						</button>
-						<button
-							onclick={() => combat.remove(player.id)}
-							title="Delete"
-							class="rounded p-1 text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
+						{#if confirmDeleteId === player.id}
+							<div class="flex items-center gap-1">
+								<button
+									onclick={() => { combat.remove(player.id); confirmDeleteId = null; }}
+									class="rounded bg-red-800/70 px-1.5 py-0.5 text-[10px] font-bold text-red-200 transition hover:bg-red-700"
+								>Yes</button>
+								<button
+									onclick={() => (confirmDeleteId = null)}
+									class="rounded bg-gray-700 px-1.5 py-0.5 text-[10px] text-gray-300 transition hover:bg-gray-600"
+								>No</button>
+							</div>
+						{:else}
+							<button
+								onclick={() => (confirmDeleteId = player.id)}
+								title="Delete"
+								class="rounded p-1 text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
 							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-								/>
-							</svg>
-						</button>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+									/>
+								</svg>
+							</button>
+						{/if}
 					</div>
 				</div>
 			{/if}

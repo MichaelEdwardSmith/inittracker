@@ -192,7 +192,7 @@ function createCombatStore() {
 				currentHp: template.hp,
 				tempHp: 0,
 				statuses: [],
-				initiative: quantity > 1 ? Math.max(1, Math.floor(Math.random() * 20) + 1 + (template.dexMod ?? 0)) : null,
+				initiative: Math.max(1, Math.floor(Math.random() * 20) + 1 + (template.dexMod ?? 0)),
 				templateName: template.name,
 				monsterType: template.monsterType,
 				imgUrl: template.imgUrl,
