@@ -14,6 +14,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 6. [Running Combat](#6-running-combat)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
    - [Death Saving Throws](#death-saving-throws)
+   - [Legendary Actions](#legendary-actions)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
 10. [Game Sessions](#10-game-sessions)
@@ -289,6 +290,26 @@ Two buttons resolve the check:
 - **Fail** — closes the modal and automatically removes the Concentrating condition from that combatant
 
 This works for both players and enemies.
+
+---
+
+### Legendary Actions
+
+Enemies that have legendary actions (e.g. dragons, liches, and other powerful monsters) automatically show a **Legendary Actions** row on their initiative card. This row only appears when the creature's stat block includes legendary action data.
+
+**The dot tracker:**
+
+Three amber dots represent the three legendary action uses available each round. Filled dots (●) are available; hollow dots (○) are spent.
+
+- Click any filled dot to spend down to that point — for example, clicking the rightmost dot spends one action
+- Click any hollow dot to restore actions from that position onward
+- All dots automatically refill at the **start of that creature's turn**
+
+**Viewing the action options:**
+
+Click the **ℹ️ icon** beside the dots to open a modal showing the full text of the creature's legendary actions — what each option costs and what it does — as a quick reference while running the encounter.
+
+> **Note:** Legendary actions only appear on enemies that have a full stat block with legendary actions listed (built-in SRD monsters and bestiary imports). Custom monsters created manually do not include a stat block and will not show this row.
 
 ---
 

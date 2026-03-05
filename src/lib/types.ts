@@ -34,6 +34,8 @@ export interface Combatant {
 	conditionRounds?: Record<string, number>;
 	// DM-only freeform notes
 	note?: string;
+	// Enemies only — legendary actions spent this round (resets at start of their turn)
+	legendaryActionsSpent?: number;
 	// Players only — death saving throw tracker (present when currentHp === 0)
 	deathSaves?: { successes: number; failures: number; stable: boolean };
 }
