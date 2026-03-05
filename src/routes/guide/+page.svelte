@@ -13,6 +13,7 @@
 		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
 		{ id: 'death-saves', label: '↳ Death Saving Throws' },
 		{ id: 'concentration-check', label: '↳ Concentration Checks' },
+		{ id: 'legendary-actions', label: '↳ Legendary Actions' },
 		{ id: 'conditions', label: '8. Conditions & Statuses' },
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
@@ -717,6 +718,38 @@
 						This applies to both players and enemies.
 					</p>
 				</div>
+
+				<h3 id="legendary-actions" class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Legendary Actions
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Enemies whose stat block includes legendary actions automatically show a
+					<strong class="font-semibold text-white">Legendary Actions</strong> row on their initiative
+					card. Three amber dots represent the legendary action uses available each round.
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-amber-300">Filled dot (●)</strong> — action available.
+						<strong class="font-semibold text-amber-300">Hollow dot (○)</strong> — action spent.
+					</li>
+					<li>
+						Click a filled dot to spend actions down to that position; click a hollow dot to restore
+						actions from that position onward.
+					</li>
+					<li>
+						All dots <strong class="font-semibold text-white">automatically refill</strong> at the
+						start of that creature's turn.
+					</li>
+					<li>
+						Click the <strong class="font-semibold text-white">ℹ️ icon</strong> beside the dots to
+						open a quick-reference modal showing all of the creature's legendary action options.
+					</li>
+				</ul>
+				<p class="mb-6 text-sm leading-relaxed text-gray-400">
+					This row only appears for enemies with a full stat block (built-in SRD monsters and
+					bestiary imports). Custom monsters created manually do not have a stat block and will not
+					show the tracker.
+				</p>
 
 				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Armor Class Visibility
