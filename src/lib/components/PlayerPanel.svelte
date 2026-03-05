@@ -129,7 +129,7 @@
 					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 				/>
 			</label>
-			<label class="flex flex-col gap-1" style="width: 4rem">
+			<label class="flex flex-1 flex-col gap-1">
 				<span class="text-xs text-gray-400">DEX Mod</span>
 				<input
 					type="number"
@@ -177,7 +177,7 @@
 								class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 							/>
 						</label>
-						<label class="flex flex-col gap-1" style="width: 4rem">
+						<label class="flex flex-1 flex-col gap-1">
 							<span class="text-xs text-gray-400">DEX Mod</span>
 							<input
 								type="number"
