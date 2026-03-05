@@ -1180,7 +1180,7 @@
 		<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
 				<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">Message the DM</h2>
-				<button onclick={() => (showMsgModal = false)} class="text-gray-600 hover:text-gray-300 transition">
+				<button onclick={() => (showMsgModal = false)} aria-label="Close" class="text-gray-600 hover:text-gray-300 transition">
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 					</svg>
@@ -1237,7 +1237,7 @@
 		<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
 				<h2 class="text-sm font-bold tracking-widest text-amber-400 uppercase">Roll Initiative</h2>
-				<button onclick={() => (showInitModal = false)} class="text-gray-600 hover:text-gray-300 transition">
+				<button onclick={() => (showInitModal = false)} aria-label="Close" class="text-gray-600 hover:text-gray-300 transition">
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 					</svg>

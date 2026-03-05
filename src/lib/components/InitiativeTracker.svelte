@@ -879,8 +879,9 @@
 				</p>
 				<p class="mb-4 text-xs text-gray-500">How long should this condition last?</p>
 				<div class="flex items-center gap-3">
-					<label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Rounds</label>
+					<label for="condition-rounds-input" class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Rounds</label>
 					<input
+						id="condition-rounds-input"
 						type="number"
 						min="1"
 						max="99"
@@ -928,6 +929,7 @@
 				</div>
 				<button
 					onclick={() => { legendaryInfoModal = null; legendaryDiceRollResult = null; }}
+					aria-label="Close"
 					class="text-gray-600 transition hover:text-gray-300"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -962,6 +964,7 @@
 				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
 				<button
 					onclick={() => (legendaryDiceRollResult = null)}
+					aria-label="Close"
 					class="text-gray-500 transition hover:text-white"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

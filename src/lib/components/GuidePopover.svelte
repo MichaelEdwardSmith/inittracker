@@ -69,6 +69,7 @@
 
 		<!-- Popover: child of the wrapper, stops propagation so clicking it doesn't also fire the wrapper's dismiss -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
 			class="absolute w-[272px] rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
 			style="top:{popoverTop}px; left:{popoverLeft}px;"

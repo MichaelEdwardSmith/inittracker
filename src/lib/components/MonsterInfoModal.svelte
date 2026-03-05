@@ -206,6 +206,8 @@
 			</div>
 
 			<!-- Scrollable body — dice clicks bubble up to this handler -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<div class="overflow-y-auto p-5 text-gray-200" onclick={handleDiceClick}>
 				<!-- Image -->
 				{#if monster.imgUrl}
@@ -369,6 +371,8 @@
 			if (e.key === 'Escape') diceRollResult = null;
 		}}
 	>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
 			class="min-w-[18rem] max-w-sm rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
