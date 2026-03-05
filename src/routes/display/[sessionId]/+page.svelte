@@ -507,7 +507,9 @@
 		if (!c) return { badge: 'text-gray-400 border-gray-600', label: '' };
 		return c.type === 'player'
 			? { badge: 'text-blue-300 border-blue-600 bg-blue-950/60', label: 'PLAYER CHARACTER' }
-			: { badge: 'text-red-300 border-red-700 bg-red-950/60', label: 'ENEMY' };
+			: c.type === 'lair'
+				? { badge: 'text-purple-300 border-purple-600 bg-purple-950/60', label: 'LAIR' }
+				: { badge: 'text-red-300 border-red-700 bg-red-950/60', label: 'ENEMY' };
 	});
 </script>
 
@@ -825,12 +827,14 @@
 				<!-- Name -->
 				<h1
 					class="mb-2 text-center leading-none font-black tracking-widest uppercase
-					       {dc.type === 'player' ? 'text-blue-50' : 'text-red-50'}"
+					       {dc.type === 'player' ? 'text-blue-50' : dc.type === 'lair' ? 'text-purple-50' : 'text-red-50'}"
 					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {dc.type === 'player'
 						? '4.5rem'
 						: '3.75rem'}); text-shadow: 0 0 40px {dc.type === 'player'
 						? 'rgba(96,165,250,0.4)'
-						: 'rgba(248,113,113,0.4)'};"
+						: dc.type === 'lair'
+							? 'rgba(192,132,252,0.4)'
+							: 'rgba(248,113,113,0.4)'};"
 				>
 					{dc.name}
 				</h1>
@@ -1018,7 +1022,9 @@
 									: 'flex'} min-w-0 flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-2 sm:flex-row sm:gap-3 sm:px-3 sm:py-2.5
 								       {c.type === 'player'
 									? 'border-blue-900/60 bg-blue-950/30'
-									: 'border-red-900/60 bg-red-950/30'}"
+									: c.type === 'lair'
+										? 'border-purple-900/60 bg-purple-950/30'
+										: 'border-red-900/60 bg-red-950/30'}"
 							>
 								{#if c.type === 'enemy'}
 									{@const style = getMonsterStyle(c.monsterType)}
@@ -1063,9 +1069,11 @@
 											class="hidden shrink-0 rounded px-1 py-0.5 text-xs font-bold sm:inline {c.type ===
 											'player'
 												? 'bg-blue-900/60 text-blue-400'
-												: 'bg-red-900/60 text-red-400'}"
+												: c.type === 'lair'
+													? 'bg-purple-900/60 text-purple-400'
+													: 'bg-red-900/60 text-red-400'}"
 										>
-											{c.type === 'player' ? 'PC' : 'NPC'}
+											{c.type === 'player' ? 'PC' : c.type === 'lair' ? 'LAIR' : 'NPC'}
 										</span>
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
 										{#if c.type === 'enemy' && hpPercent(c) > 0 && hpPercent(c) <= 50}

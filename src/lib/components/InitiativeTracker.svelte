@@ -99,6 +99,60 @@
 	}
 
 	let legendaryInfoModal = $state<{ name: string; text: string } | null>(null);
+
+	interface LegendaryDiceRollResult {
+		expr: string;
+		rolls: number[];
+		modifier: number;
+		total: number;
+		isAttack?: boolean;
+	}
+	let legendaryDiceRollResult = $state<LegendaryDiceRollResult | null>(null);
+
+	function linkDice(html: string): string {
+		let out = html.replace(
+			/(<[^>]+>)|(\b\d+d\d+(?:\s*[+-]\s*\d+)?(?=\b|\s|[^a-zA-Z]))/g,
+			(_, tag: string | undefined, dice: string | undefined) => {
+				if (tag) return tag;
+				return `<button class="dice-btn" data-dice="${dice!.trim()}">${dice}</button>`;
+			}
+		);
+		out = out.replace(
+			/((?:<em>)?(?:Melee(?:\s+or\s+Ranged)?|Ranged)\s+(?:Weapon|Spell)\s+Attack:?(?:<\/em>)?)\s*([+-]?\d+)\s+to\s+hit/gi,
+			(_, label: string, modStr: string) => {
+				const mod = parseInt(modStr);
+				const sign = mod >= 0 ? '+' : '';
+				return `<button class="atk-btn" data-attack="${mod}">${label} ${sign}${mod} to hit</button>`;
+			}
+		);
+		return out;
+	}
+
+	function rollLegendaryDice(expr: string) {
+		const m = expr.trim().match(/^(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?$/i);
+		if (!m) return;
+		const count = parseInt(m[1]);
+		const sides = parseInt(m[2]);
+		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
+		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
+		legendaryDiceRollResult = { expr: expr.trim(), rolls, modifier, total: rolls.reduce((s, r) => s + r, 0) + modifier };
+	}
+
+	function rollLegendaryAttack(modStr: string) {
+		const modifier = parseInt(modStr);
+		const roll = Math.floor(Math.random() * 20) + 1;
+		const sign = modifier >= 0 ? '+' : '';
+		legendaryDiceRollResult = { expr: `Attack roll ${sign}${modifier}`, rolls: [roll], modifier, total: roll + modifier, isAttack: true };
+	}
+
+	function handleLegendaryDiceClick(e: MouseEvent) {
+		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack]') as HTMLElement | null;
+		if (!target) return;
+		e.stopPropagation();
+		if (target.dataset.dice) rollLegendaryDice(target.dataset.dice);
+		else if (target.dataset.attack !== undefined) rollLegendaryAttack(target.dataset.attack);
+	}
+
 	let pendingCondition = $state<{ id: string; combatantName: string; condition: string } | null>(null);
 	let pendingConditionRounds = $state(1);
 
@@ -265,10 +319,59 @@
 						? 'border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
 						: isDead
 							? 'border-gray-800 bg-gray-900/50 opacity-60'
-							: c.type === 'player'
-								? 'border-blue-900/50 bg-gray-800'
-								: 'border-red-900/50 bg-gray-800'}"
+							: c.type === 'lair'
+								? 'border-purple-700/50 bg-purple-950/20'
+								: c.type === 'player'
+									? 'border-blue-900/50 bg-gray-800'
+									: 'border-red-900/50 bg-gray-800'}"
 				>
+					{#if c.type === 'lair'}
+						<!-- Lair Actions card -->
+						<div class="flex items-center gap-2">
+							{#if prevSameInit || nextSameInit}
+								<div class="flex shrink-0 flex-col">
+									<button
+										onclick={() => combat.swapOrder(c.id, combat.sorted[i - 1].id)}
+										disabled={!prevSameInit}
+										title="Move up"
+										class="text-xs leading-none text-gray-600 transition hover:text-gray-300 disabled:cursor-default disabled:opacity-20"
+									>▲</button>
+									<button
+										onclick={() => combat.swapOrder(c.id, combat.sorted[i + 1].id)}
+										disabled={!nextSameInit}
+										title="Move down"
+										class="text-xs leading-none text-gray-600 transition hover:text-gray-300 disabled:cursor-default disabled:opacity-20"
+									>▼</button>
+								</div>
+							{/if}
+							{#if isActive}
+								<span class="text-amber-400" title="Active turn">▶</span>
+							{/if}
+							<span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold bg-purple-900/60 text-purple-300">LAIR</span>
+							<span class="flex-1 truncate text-sm font-semibold {isActive ? 'text-amber-100' : 'text-purple-200'}">
+								Lair Actions
+								{#if c.templateName}
+									<span class="ml-1 text-xs font-normal text-purple-400/60">— {c.templateName}</span>
+								{/if}
+							</span>
+							<button
+								onclick={() => combat.removeFromCombat(c.id)}
+								title="Remove lair actions"
+								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
+						</div>
+						<div class="flex items-center gap-3 px-1">
+							<div class="flex flex-col items-center gap-0.5">
+								<span class="text-xs tracking-wide text-gray-500 uppercase">Init</span>
+								<span class="flex h-11 w-14 items-center justify-center text-xl font-bold text-amber-300">20</span>
+							</div>
+							<p class="text-xs italic text-purple-400/60">On initiative count 20, the lair takes action.</p>
+						</div>
+					{:else}
 					<!-- Header row (badge + name + remove) -->
 					<div class="flex items-center gap-2">
 						{#if prevSameInit || nextSameInit}
@@ -333,6 +436,17 @@
 										stroke-width="2"
 										d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 									/>
+								</svg>
+							</button>
+						{/if}
+						{#if c.type === 'enemy' && !combat.sorted.some(x => x.type === 'lair' && x.templateName === c.templateName)}
+							<button
+								onclick={() => combat.addLairCard(c.templateName ?? c.name)}
+								title="Add Lair Actions to initiative"
+								class="rounded p-2 text-gray-600 transition hover:text-purple-400"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
 								</svg>
 							</button>
 						{/if}
@@ -674,6 +788,7 @@
 						</div>
 						{/if}
 					{/if}
+					{/if}
 				</div>
 			{/each}
 		</div>
@@ -802,7 +917,7 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-		onmousedown={(e) => { if (e.target === e.currentTarget) legendaryInfoModal = null; }}
+		onmousedown={(e) => { if (e.target === e.currentTarget) { legendaryInfoModal = null; legendaryDiceRollResult = null; } }}
 	>
 		<div class="mx-4 w-full max-w-lg rounded-xl border border-amber-700/50 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-amber-900/40 px-5 py-3">
@@ -812,7 +927,7 @@
 					<span class="text-xs text-gray-500">— {legendaryInfoModal.name}</span>
 				</div>
 				<button
-					onclick={() => (legendaryInfoModal = null)}
+					onclick={() => { legendaryInfoModal = null; legendaryDiceRollResult = null; }}
 					class="text-gray-600 transition hover:text-gray-300"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -820,9 +935,64 @@
 					</svg>
 				</button>
 			</div>
-			<div class="monster-text max-h-[60vh] overflow-y-auto px-5 py-4 text-sm text-gray-300 leading-relaxed">
-				{@html legendaryInfoModal.text}
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<div
+				class="monster-text max-h-[60vh] overflow-y-auto px-5 py-4 text-sm text-gray-300 leading-relaxed"
+				onclick={handleLegendaryDiceClick}
+			>
+				{@html linkDice(legendaryInfoModal.text)}
 			</div>
+		</div>
+	</div>
+{/if}
+
+{#if legendaryDiceRollResult}
+	{@const r = legendaryDiceRollResult}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<div
+		class="fixed inset-0 z-[60] flex items-center justify-center"
+		onclick={() => (legendaryDiceRollResult = null)}
+	>
+		<div
+			class="min-w-[18rem] max-w-sm rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<div class="mb-4 flex items-center justify-between">
+				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<button
+					onclick={() => (legendaryDiceRollResult = null)}
+					class="text-gray-500 transition hover:text-white"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div class="mb-4 flex flex-wrap gap-2">
+				{#each r.rolls as roll}
+					<div class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white">
+						{roll}
+					</div>
+				{/each}
+			</div>
+			{#if r.modifier !== 0}
+				<p class="mb-1 text-sm text-gray-400">
+					{r.isAttack ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
+				</p>
+			{/if}
+			<p class="text-2xl font-black text-white">
+				Total: <span class="text-amber-300">{r.total}</span>
+			</p>
+			<button
+				onclick={() => {
+					if (r.isAttack) rollLegendaryAttack(String(r.modifier));
+					else rollLegendaryDice(r.expr);
+				}}
+				class="mt-4 w-full rounded bg-amber-700 py-1.5 text-sm font-bold text-white transition hover:bg-amber-600"
+			>
+				Roll again
+			</button>
 		</div>
 	</div>
 {/if}

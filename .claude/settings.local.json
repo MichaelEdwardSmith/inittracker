@@ -37,7 +37,8 @@
       "Bash(pnpm add:*)",
       "Bash(npm install:*)",
       "Bash(ForEach-Object { [int]$_ })",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(pnpm exec svelte-check:*)"
     ]
   }
 }

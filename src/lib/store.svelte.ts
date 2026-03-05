@@ -4,10 +4,19 @@
 import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary } from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
-import { ENEMY_TEMPLATES } from './enemies';
+import { ENEMY_TEMPLATES, getMonsterDetail } from './enemies';
 
 // CR lookup by template name — built once at module load
 const crByTemplateName = new Map<string, string>(ENEMY_TEMPLATES.map((t) => [t.name, t.cr]));
+
+/** Returns true if a monster's stat block text mentions lair actions. */
+function detectsLairActions(templateName: string): boolean {
+	const detail = getMonsterDetail(templateName);
+	if (!detail) return false;
+	const text = [detail.traits, detail.actions, detail.legendaryActions, detail.reactions]
+		.filter(Boolean).join(' ');
+	return /lair action/i.test(text);
+}
 
 // Re-export so existing imports from this module still work.
 export type { StorageState };
@@ -75,7 +84,9 @@ function createCombatStore() {
 	}
 
 	function buildRecord(endedAt: string): CombatRecord {
-		const participants: CombatantSummary[] = combatants.map((c) => {
+		const participants: CombatantSummary[] = combatants
+			.filter((c): c is Combatant & { type: 'player' | 'enemy' } => c.type !== 'lair')
+			.map((c) => {
 			const stats = participantStats.get(c.id);
 			const cr = c.type === 'enemy'
 				? (c.cr ?? crByTemplateName.get(c.templateName ?? ''))
@@ -207,6 +218,27 @@ function createCombatStore() {
 			sync();
 		},
 
+		addLairCard(templateName: string) {
+			const alreadyExists = combatants.some(
+				(c) => c.type === 'lair' && c.templateName === templateName
+			);
+			if (alreadyExists) return;
+			combatants = [...combatants, {
+				id: crypto.randomUUID(),
+				name: 'Lair Actions',
+				type: 'lair',
+				initiative: 20,
+				ac: 0,
+				maxHp: 0,
+				currentHp: 1,
+				tempHp: 0,
+				statuses: [],
+				templateName,
+				inCombat: true
+			}];
+			sync();
+		},
+
 		remove(id: string) {
 			if (currentTurnId === id) {
 				const sorted = sortCombatants(activeCombatants());
@@ -230,8 +262,19 @@ function createCombatStore() {
 				const remaining = sorted.filter((c) => c.id !== id);
 				currentTurnId = remaining[idx % remaining.length]?.id ?? null;
 			}
-			if (target.type === 'enemy') {
+			if (target.type === 'enemy' || target.type === 'lair') {
 				combatants = combatants.filter((c) => c.id !== id);
+				// If removing an enemy, also remove its lair card when no more of that template remain
+				if (target.type === 'enemy' && target.templateName) {
+					const stillPresent = combatants.some(
+						(c) => c.type === 'enemy' && c.templateName === target.templateName
+					);
+					if (!stillPresent) {
+						combatants = combatants.filter(
+							(c) => !(c.type === 'lair' && c.templateName === target.templateName)
+						);
+					}
+				}
 			} else {
 				combatants = combatants.map((c) =>
 					c.id === id ? { ...c, inCombat: false, initiative: null } : c
@@ -314,7 +357,7 @@ function createCombatStore() {
 				const c = combatantRef;
 				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
 				const actorFields = actor
-					? { actorId: actor.id, actorName: actor.name, actorType: actor.type }
+					? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
 					: {};
 				const actualDelta = hpAfter - hpBefore;
 				if (actualDelta < 0) {
@@ -326,7 +369,7 @@ function createCombatStore() {
 						...actorFields,
 						combatantId: id,
 						combatantName: c.name,
-						combatantType: c.type,
+						combatantType: c.type as 'player' | 'enemy',
 						value: dmg,
 						hpBefore,
 						hpAfter,
@@ -347,7 +390,7 @@ function createCombatStore() {
 						...actorFields,
 						combatantId: id,
 						combatantName: c.name,
-						combatantType: c.type,
+						combatantType: c.type as 'player' | 'enemy',
 						value: actualDelta,
 						hpBefore,
 						hpAfter
@@ -410,7 +453,7 @@ function createCombatStore() {
 			if (combatStartedAt !== null && combatantRef) {
 				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
 				const actorFields = actor
-					? { actorId: actor.id, actorName: actor.name, actorType: actor.type }
+					? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
 					: {};
 				combatEvents = [...combatEvents, {
 					type: adding ? 'condition_add' : 'condition_remove',
@@ -418,7 +461,7 @@ function createCombatStore() {
 					...actorFields,
 					combatantId: id,
 					combatantName: combatantRef.name,
-					combatantType: combatantRef.type,
+					combatantType: combatantRef.type as 'player' | 'enemy',
 					condition: status
 				}];
 			}
@@ -500,7 +543,7 @@ function createCombatStore() {
 							}
 							if (expired.length === 0) return { ...c, conditionRounds: nr };
 							for (const condition of expired) {
-								expiredEvents.push({ type: 'condition_remove', round, combatantId: c.id, combatantName: c.name, combatantType: c.type, condition });
+								expiredEvents.push({ type: 'condition_remove', round, combatantId: c.id, combatantName: c.name, combatantType: c.type as 'player' | 'enemy', condition });
 							}
 							const statuses = c.statuses.filter((s) => !expired.includes(s));
 							return { ...c, statuses, conditionRounds: Object.keys(nr).length > 0 ? nr : undefined };

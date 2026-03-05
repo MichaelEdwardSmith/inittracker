@@ -15,6 +15,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
    - [Death Saving Throws](#death-saving-throws)
    - [Legendary Actions](#legendary-actions)
+   - [Lair Actions](#lair-actions)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
 10. [Game Sessions](#10-game-sessions)
@@ -310,6 +311,33 @@ Three amber dots represent the three legendary action uses available each round.
 Click the **ℹ️ icon** beside the dots to open a modal showing the full text of the creature's legendary actions — what each option costs and what it does — as a quick reference while running the encounter.
 
 > **Note:** Legendary actions only appear on enemies that have a full stat block with legendary actions listed (built-in SRD monsters and bestiary imports). Custom monsters created manually do not include a stat block and will not show this row.
+
+---
+
+### Lair Actions
+
+Some powerful creatures (dragons, beholders, and other legendary monsters) can take **lair actions** — special effects that occur on initiative count 20. You can add a dedicated **Lair Actions** card to the initiative order for any enemy.
+
+**Adding a lair card:**
+
+1. Find the enemy's card in the initiative order
+2. Click the **building icon** (🏢) in the card header — it appears between the info button and the notes button, and is only visible when no lair card already exists for that creature
+3. A purple **Lair Actions** card is immediately added to the initiative at count 20
+
+**How it works:**
+
+- The lair card has a purple border and a **LAIR** badge, and shows the creature's name for reference
+- It participates in the normal turn order — when initiative count 20 is reached, the card is highlighted just like any other combatant's turn, prompting you to resolve the lair action
+- Only one lair card can exist per creature template at a time; the building icon disappears once a lair card has been added
+- When the **last remaining instance** of a creature is removed from combat, its lair card is automatically removed as well
+
+**Removing a lair card:**
+
+Click the **✕** button on the lair card at any time to dismiss it manually.
+
+**On the player display:**
+
+The lair card appears in the player-facing initiative list and active-turn display with purple styling and a "LAIR" label so players know when lair actions are resolving.
 
 ---
 
