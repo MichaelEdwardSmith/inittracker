@@ -7,6 +7,7 @@
 	import InitiativeTracker from '$lib/components/InitiativeTracker.svelte';
 	import { untrack } from 'svelte';
 	import GuidePopover from '$lib/components/GuidePopover.svelte';
+	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { invalidateAll } from '$app/navigation';
@@ -99,6 +100,7 @@
 	}
 
 	// Session manager state
+	let showDiceRoller = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -376,6 +378,16 @@
 					{/if}
 				</button>
 				<button
+					onclick={() => (showDiceRoller = true)}
+					title="Dice Roller"
+					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+					</svg>
+					<span>Dice</span>
+				</button>
+				<button
 					onclick={openSessionManager}
 					title="Manage Sessions"
 					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -495,6 +507,15 @@
 						{unreadCount}
 					</span>
 				{/if}
+			</button>
+			<button
+				onclick={() => { showDiceRoller = true; showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+				</svg>
+				Dice Roller
 			</button>
 			<button
 				onclick={() => { openSessionManager(); showMobileMenu = false; }}
@@ -1055,3 +1076,7 @@
 {/if}
 
 <GuidePopover />
+
+{#if showDiceRoller}
+	<DiceRollerModal onclose={() => (showDiceRoller = false)} />
+{/if}
