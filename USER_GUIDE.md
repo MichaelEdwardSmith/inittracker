@@ -20,7 +20,9 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
 10. [Game Sessions](#10-game-sessions)
 11. [Combat Chronicles (History)](#11-combat-chronicles-history)
-12. [Contact & Support](#12-contact--support)
+12. [Dice Roller](#12-dice-roller)
+13. [Player Messaging](#13-player-messaging)
+14. [Contact & Support](#14-contact--support)
 
 ---
 
@@ -79,8 +81,11 @@ The header runs across the top of every screen. From left to right:
 - **⚔️ Initiative Tracker** — app title
 - **Session display** — shows the active session name and its 6-char public ID
   - Click the **copy icon** next to the ID to copy it to your clipboard (the icon turns into a green checkmark to confirm)
+- **Messages** — shows unread player messages; opens the DM inbox
+- **Dice** — opens the Dice Roller modal (see [Dice Roller](#12-dice-roller))
 - **Sessions** — opens the Session Manager modal (see [Game Sessions](#10-game-sessions))
 - **Chronicle** — opens the Combat History page
+- **Guide** — opens the in-app user guide
 - **Player Display** — opens the viewer screen in a new tab (desktop only)
 - **Contact** — opens your email client to contact support
 - **Logout** — ends your session
@@ -561,6 +566,60 @@ Files are saved as `encounter-XVIII-2025-01-15.pdf` (Roman-numeral encounter num
 
 ---
 
-## 12. Contact & Support
+## 12. Dice Roller
+
+Click the **Dice** button (cube icon) in the dashboard header to open the Dice Roller modal. It is available at any time — in or out of combat.
+
+### Controls
+
+| Control | Description |
+|---|---|
+| **Die type** | Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber. |
+| **Quantity** | How many dice to roll (1–99). Use the **−** / **+** buttons or type directly. |
+| **Modifier** | A flat bonus or penalty added to the dice sum (−99 to +99). Color-coded green (positive) or red (negative). |
+
+An expression preview (e.g. `2d6 + 3`) updates live above the **Roll** button so you can confirm your selection before rolling.
+
+### Rolling
+
+Click **Roll** to execute. The result panel shows:
+
+- **Individual die tiles** — one tile per die rolled. On a d20, a natural **20** glows amber and a natural **1** glows red.
+- **Dice sum + modifier** — shown when a modifier is set, breaking down the raw sum and the adjustment separately.
+- **Total** — the final result in large amber text.
+- **Roll Again** — re-rolls the same die type, quantity, and modifier immediately.
+
+### Roll History
+
+The last **5 rolls** are listed below the result in a compact log showing the expression (e.g. `2d6+3`), the individual values, and the total. The most recent roll is fully opaque; older entries are dimmed.
+
+---
+
+## 13. Player Messaging
+
+Players on the viewer screen can send a private message directly to the DM — useful for asking questions, flagging something, or communicating without leaving the display. Messages are visible only to the DM and are not persisted between server restarts.
+
+### Sending a Message (Player)
+
+1. Click the **✉ Message DM** button in the viewer header
+2. Select which **party member** you are from the dropdown
+3. Type your message
+4. Click **Send Message** — the modal closes and the message is delivered instantly
+
+### Receiving Messages (DM)
+
+The **Messages** button in the dashboard header shows an amber badge with the unread count when new messages arrive. On mobile the same badge appears on the hamburger menu button.
+
+### Reading the Inbox
+
+Click **Messages** to open the inbox. Messages are listed newest-first, each showing the sender's name, the time received, and the full message text. Opening the inbox marks all messages as read.
+
+### Clearing Messages
+
+Click **Clear all** in the inbox header to delete all messages for the current session.
+
+---
+
+## 14. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.

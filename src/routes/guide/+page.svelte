@@ -19,8 +19,9 @@
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
 		{ id: 'chronicles', label: '11. Combat Chronicles' },
-		{ id: 'player-messaging', label: '12. Player Messaging' },
-		{ id: 'contact', label: '13. Contact & Support' }
+		{ id: 'dice-roller', label: '12. Dice Roller' },
+		{ id: 'player-messaging', label: '13. Player Messaging' },
+		{ id: 'contact', label: '14. Contact & Support' }
 	];
 
 	const conditions = [
@@ -251,6 +252,9 @@
 						and its 6-char public ID. Click the
 						<strong class="font-semibold text-white">copy icon</strong> to copy it to your clipboard (turns
 						into a green checkmark to confirm).
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Dice</strong> — opens the Dice Roller modal (see <a href="#dice-roller" class="text-amber-400 transition hover:text-amber-300">section 12</a>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Sessions</strong> — opens the Session Manager modal
@@ -1162,8 +1166,67 @@
 			</section>
 
 			<!-- 12 ─────────────────────────────────────── -->
+			<section id="dice-roller">
+				{@render h2('12', 'Dice Roller')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">Dice</strong> button (cube icon) in the
+					dashboard header to open the Dice Roller modal. It is available at any time — in or out of combat.
+				</p>
+
+				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Controls</h3>
+				{@render dataTable(
+					['Control', 'Description'],
+					[
+						['Die type', 'Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber.'],
+						['Quantity', 'How many dice to roll (1–99). Use the − / + buttons or type directly.'],
+						['Modifier', 'A flat bonus or penalty added to the dice sum (−99 to +99). Displayed green when positive, red when negative.']
+					]
+				)}
+
+				<p class="mt-4 mb-4 text-sm leading-relaxed">
+					An expression preview (e.g.
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">2d6 + 3</code>)
+					updates live above the <strong class="font-semibold text-white">Roll</strong> button so you
+					can confirm your selection before rolling.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Rolling</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Roll</strong> to execute. The result panel shows:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Individual die tiles</strong> — one tile per die rolled.
+						On a d20, a natural <strong class="font-semibold text-amber-300">20</strong> glows amber
+						and a natural <strong class="font-semibold text-red-400">1</strong> glows red.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Dice sum + modifier</strong> — shown when a modifier
+						is set, breaking down the raw sum and the adjustment separately.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Total</strong> — the final result in large amber text.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Roll Again</strong> — re-rolls the same die type,
+						quantity, and modifier immediately.
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Roll History</h3>
+				<p class="text-sm leading-relaxed">
+					The last <strong class="font-semibold text-white">5 rolls</strong> are listed below the result
+					in a compact log showing the expression (e.g.
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">2d6+3</code>),
+					the individual die values, and the total. The most recent roll is fully opaque; older entries
+					are dimmed.
+				</p>
+			</section>
+
+			<!-- 13 ───────────────────────────────────────── -->
 			<section id="player-messaging">
-				{@render h2('12', 'Player Messaging')}
+				{@render h2('13', 'Player Messaging')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Players on the viewer screen can send a private message directly to the DM — useful for
@@ -1223,7 +1286,7 @@
 
 			<!-- 13 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('13', 'Contact & Support')}
+				{@render h2('14', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
