@@ -1,4 +1,4 @@
-<!-- DM dashboard (/) — the main authenticated page. Composes PlayerPanel, EnemyPanel,
+﻿<!-- DM dashboard (/) — the main authenticated page. Composes PlayerPanel, EnemyPanel,
      and InitiativeTracker; hosts the top header with session switcher, Messages inbox,
      light/dark toggle, and guide popover; handles DM inbox polling and mobile hamburger menu. -->
 <script lang="ts">
@@ -8,6 +8,7 @@
 	import { untrack } from 'svelte';
 	import GuidePopover from '$lib/components/GuidePopover.svelte';
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
+	import SessionNotesModal from '$lib/components/SessionNotesModal.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { invalidateAll } from '$app/navigation';
@@ -101,6 +102,7 @@
 
 	// Session manager state
 	let showDiceRoller = $state(false);
+	let showNotes = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -219,6 +221,7 @@
 				body: JSON.stringify({ action: 'switch', id: session.id })
 			});
 			if (res.ok) {
+				showNotes = false;
 				closeSessionManager();
 				await invalidateAll();
 				await combat.loadFromServer();
@@ -378,6 +381,16 @@
 					{/if}
 				</button>
 				<button
+					onclick={() => (showNotes = true)}
+					title="Session Notes"
+					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+					</svg>
+					<span>Notes</span>
+				</button>
+				<button
 					onclick={() => (showDiceRoller = true)}
 					title="Dice Roller"
 					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -507,6 +520,15 @@
 						{unreadCount}
 					</span>
 				{/if}
+			</button>
+			<button
+				onclick={() => { showNotes = true; showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+				</svg>
+				Notes
 			</button>
 			<button
 				onclick={() => { showDiceRoller = true; showMobileMenu = false; }}
@@ -1076,6 +1098,10 @@
 {/if}
 
 <GuidePopover />
+
+{#if showNotes}
+	<SessionNotesModal onclose={() => (showNotes = false)} sessionName={activeSession.name} />
+{/if}
 
 {#if showDiceRoller}
 	<DiceRollerModal onclose={() => (showDiceRoller = false)} />

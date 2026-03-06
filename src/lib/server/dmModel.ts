@@ -14,6 +14,7 @@ import type { StorageState, CustomMonster, CombatRecord, GameSession } from '$li
 interface DMGameSession extends GameSession {
 	combatState: StorageState;
 	combatHistory: CombatRecord[];
+	notes?: string;
 	createdAt: Date;
 }
 
@@ -193,6 +194,23 @@ export async function getCombatState(gameSessionId: string): Promise<StorageStat
 		(s) => s.sessionId === gameSessionId
 	);
 	return session?.combatState ?? { combatants: [], currentTurnId: null, round: 1 };
+}
+
+export async function getSessionNotes(gameSessionId: string): Promise<string> {
+	const c = await col();
+	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const session = (dm?.gameSessions as DMGameSession[])?.find(
+		(s) => s.sessionId === gameSessionId
+	);
+	return session?.notes ?? '';
+}
+
+export async function saveSessionNotes(gameSessionId: string, notes: string): Promise<void> {
+	const c = await col();
+	await c.updateOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		{ $set: { 'gameSessions.$.notes': notes } }
+	);
 }
 
 // ---------------------------------------------------------------------------

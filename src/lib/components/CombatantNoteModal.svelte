@@ -1,7 +1,8 @@
 <!-- Modal for editing a per-combatant DM note. Receives the target combatant and an
-     onSave callback; renders a textarea and saves the note text back to the caller. -->
+     onSave callback; renders a rich-text editor and saves the note HTML back to the caller. -->
 <script lang="ts">
 	import type { Combatant } from '$lib/types';
+	import RichTextEditor from './RichTextEditor.svelte';
 
 	interface Props {
 		combatant: Combatant | null;
@@ -63,15 +64,8 @@
 			</div>
 
 			<!-- Body -->
-			<div class="p-5">
-				<!-- svelte-ignore a11y_autofocus -->
-				<textarea
-					autofocus
-					bind:value={noteValue}
-					placeholder="Enter notes for this combatant…"
-					rows={6}
-					class="w-full resize-none rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:border-gray-500 focus:outline-none"
-				></textarea>
+			<div style="height: 260px" class="flex min-h-0 overflow-hidden p-4">
+				<RichTextEditor value={noteValue} onchange={(v) => (noteValue = v)} placeholder="Enter notes for this combatant…" />
 			</div>
 
 			<!-- Footer -->

@@ -38,7 +38,10 @@
       "Bash(npm install:*)",
       "Bash(ForEach-Object { [int]$_ })",
       "Bash(npx tsc:*)",
-      "Bash(pnpm exec svelte-check:*)"
+      "Bash(pnpm exec svelte-check:*)",
+      "Bash(powershell.exe -File:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/Users/mojpo/WebstormProjects/Initiative/fix_note_modal.ps1\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/Users/mojpo/WebstormProjects/Initiative/fix_page.ps1\")"
     ]
   }
 }
