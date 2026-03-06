@@ -9,9 +9,10 @@
 	import GuidePopover from '$lib/components/GuidePopover.svelte';
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import SessionNotesModal from '$lib/components/SessionNotesModal.svelte';
+	import SessionManagerModal from '$lib/components/SessionManagerModal.svelte';
+	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
-	import { invalidateAll } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import type { GameSession } from '$lib/types';
 
@@ -106,12 +107,6 @@
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
-	let sessionManagerBusy = $state(false);
-	let renamingId = $state<string | null>(null);
-	let renameValue = $state('');
-	let newSessionName = $state('');
-	let showNewSessionInput = $state(false);
-	let deleteConfirmId = $state<string | null>(null);
 	let showMobileMenu = $state(false);
 	let isFullscreen = $state(false);
 
@@ -156,11 +151,6 @@
 		seenCount = 0;
 	}
 
-	function formatTime(ts: number) {
-		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
-
-
 	// Keep sessions in sync when page data refreshes (e.g. after invalidateAll)
 	$effect(() => {
 		sessions = data.sessions;
@@ -193,113 +183,6 @@
 		return () => source.close();
 	});
 
-	// -------------------------------------------------------------------------
-	// Session manager helpers
-	// -------------------------------------------------------------------------
-
-	function openSessionManager() {
-		showSessionManager = true;
-		renamingId = null;
-		showNewSessionInput = false;
-		deleteConfirmId = null;
-	}
-
-	function closeSessionManager() {
-		showSessionManager = false;
-		renamingId = null;
-		showNewSessionInput = false;
-		deleteConfirmId = null;
-	}
-
-	async function switchSession(session: GameSession) {
-		if (session.id === activeSession.id || sessionManagerBusy) return;
-		sessionManagerBusy = true;
-		try {
-			const res = await fetch('/api/sessions', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'switch', id: session.id })
-			});
-			if (res.ok) {
-				showNotes = false;
-				closeSessionManager();
-				await invalidateAll();
-				await combat.loadFromServer();
-			}
-		} finally {
-			sessionManagerBusy = false;
-		}
-	}
-
-	function startRename(session: GameSession) {
-		renamingId = session.id;
-		renameValue = session.name;
-	}
-
-	async function commitRename(sessionId: string) {
-		if (!renameValue.trim()) {
-			renamingId = null;
-			return;
-		}
-		const res = await fetch('/api/sessions', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ action: 'rename', id: sessionId, name: renameValue })
-		});
-		renamingId = null;
-		if (res.ok) {
-			sessions = sessions.map((s) => (s.id === sessionId ? { ...s, name: renameValue } : s));
-			if (activeSession.id === sessionId) activeSession = { ...activeSession, name: renameValue };
-		}
-	}
-
-	async function createSession() {
-		if (sessionManagerBusy) return;
-		const name = newSessionName.trim() || `Session ${sessions.length + 1}`;
-		sessionManagerBusy = true;
-		try {
-			const res = await fetch('/api/sessions', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'create', name })
-			});
-			if (res.ok) {
-				const created: { id: string; sessionId: string } = await res.json();
-				sessions = [...sessions, { id: created.id, sessionId: created.sessionId, name }];
-				newSessionName = '';
-				showNewSessionInput = false;
-			}
-		} finally {
-			sessionManagerBusy = false;
-		}
-	}
-
-	async function deleteSession(session: GameSession) {
-		if (sessions.length <= 1) return;
-		if (deleteConfirmId !== session.id) {
-			deleteConfirmId = session.id;
-			return;
-		}
-		// Second click — confirmed
-		deleteConfirmId = null;
-		const res = await fetch('/api/sessions', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ action: 'delete', id: session.id })
-		});
-		if (res.ok) {
-			sessions = sessions.filter((s) => s.id !== session.id);
-			// If we deleted the active session, re-fetch everything
-			if (session.id === activeSession.id) {
-				await invalidateAll();
-				await combat.loadFromServer();
-			}
-		}
-	}
-
-	function cancelDeleteConfirm() {
-		deleteConfirmId = null;
-	}
 </script>
 
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 text-white">
@@ -401,7 +284,7 @@
 					<span>Dice</span>
 				</button>
 				<button
-					onclick={openSessionManager}
+					onclick={() => (showSessionManager = true)}
 					title="Manage Sessions"
 					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 				>
@@ -540,7 +423,7 @@
 				Dice Roller
 			</button>
 			<button
-				onclick={() => { openSessionManager(); showMobileMenu = false; }}
+				onclick={() => { showSessionManager = true; showMobileMenu = false; }}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -749,352 +632,19 @@
 	</div>
 {/if}
 
-<!-- =========================================================================
-     Session Manager Modal
-     ========================================================================= -->
+<!-- Session Manager Modal -->
 {#if showSessionManager}
-	<div
-		role="dialog"
-		aria-modal="true"
-		aria-label="Session manager"
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-		tabindex="-1"
-		onclick={(e) => {
-			if (e.target === e.currentTarget) closeSessionManager();
-		}}
-		onkeydown={(e) => {
-			if (e.key === 'Escape') closeSessionManager();
-		}}
-	>
-		<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
-			<!-- Modal header -->
-			<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
-				<div class="flex items-center gap-2">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4 text-amber-400"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M19 11H5m14-7H5m14 14H5"
-						/>
-					</svg>
-					<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">Sessions</h2>
-				</div>
-				<button
-					onclick={closeSessionManager}
-					class="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-white"
-					aria-label="Close"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
-				</button>
-			</div>
-
-			<!-- Session list -->
-			<ul class="max-h-72 divide-y divide-gray-800 overflow-y-auto">
-				{#each sessions as session (session.id)}
-					{@const isActive = session.id === activeSession.id}
-					{@const isRenaming = renamingId === session.id}
-					{@const awaitingDeleteConfirm = deleteConfirmId === session.id}
-
-					<li
-						class="group flex items-center gap-3 px-4 py-3 transition
-						       {isActive ? 'bg-amber-900/20' : 'hover:bg-gray-800/60'}"
-					>
-						<!-- Active indicator -->
-						<span
-							class="flex h-2 w-2 shrink-0 rounded-full {isActive ? 'bg-amber-400' : 'bg-gray-700'}"
-						></span>
-
-						<!-- Name / rename input -->
-						<div class="min-w-0 flex-1">
-							{#if isRenaming}
-								<!-- svelte-ignore a11y_autofocus -->
-								<input
-									autofocus
-									type="text"
-									class="w-full rounded border border-amber-500 bg-gray-800 px-2 py-0.5 text-sm text-white outline-none"
-									bind:value={renameValue}
-									onkeydown={(e) => {
-										if (e.key === 'Enter') commitRename(session.id);
-										if (e.key === 'Escape') renamingId = null;
-									}}
-									onblur={() => commitRename(session.id)}
-								/>
-							{:else}
-								<button
-									class="w-full text-left"
-									onclick={() => !isActive && switchSession(session)}
-									disabled={isActive || sessionManagerBusy}
-								>
-									<span
-										class="block truncate text-sm font-medium {isActive
-											? 'text-amber-300'
-											: 'text-gray-200 group-hover:text-white'}"
-									>
-										{session.name}
-									</span>
-									<span
-										class="font-mono text-xs tracking-widest {isActive
-											? 'text-amber-500/70'
-											: 'text-gray-500'}"
-									>
-										{session.sessionId}
-									</span>
-								</button>
-							{/if}
-						</div>
-
-						<!-- Action buttons -->
-						<div class="flex shrink-0 items-center gap-1">
-							<!-- Rename -->
-							{#if !isRenaming}
-								<button
-									onclick={() => startRename(session)}
-									title="Rename"
-									class="rounded p-1 text-gray-600 transition hover:bg-gray-700 hover:text-gray-300"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-3.5 w-3.5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-										/>
-									</svg>
-								</button>
-							{/if}
-
-							<!-- Delete -->
-							{#if sessions.length > 1}
-								{#if awaitingDeleteConfirm}
-									<button
-										onclick={() => deleteSession(session)}
-										title="Confirm delete"
-										class="rounded px-1.5 py-0.5 text-xs font-semibold text-red-400 ring-1 ring-red-500/50 transition hover:bg-red-900/30"
-									>
-										Sure?
-									</button>
-									<button
-										onclick={cancelDeleteConfirm}
-										title="Cancel"
-										class="rounded p-1 text-gray-500 transition hover:text-gray-300"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M6 18L18 6M6 6l12 12"
-											/>
-										</svg>
-									</button>
-								{:else}
-									<button
-										onclick={() => deleteSession(session)}
-										title="Delete session"
-										class="rounded p-1 text-gray-600 transition hover:bg-gray-700 hover:text-red-400"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-											/>
-										</svg>
-									</button>
-								{/if}
-							{:else}
-								<span
-									title="Can't delete last session"
-									class="cursor-not-allowed rounded p-1 text-gray-800"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-3.5 w-3.5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-										/>
-									</svg>
-								</span>
-							{/if}
-						</div>
-					</li>
-				{/each}
-			</ul>
-
-			<!-- New session footer -->
-			<div class="border-t border-gray-700 px-4 py-3">
-				{#if showNewSessionInput}
-					<div class="flex items-center gap-2">
-						<!-- svelte-ignore a11y_autofocus -->
-						<input
-							autofocus
-							type="text"
-							placeholder="Session name…"
-							class="flex-1 rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-500"
-							bind:value={newSessionName}
-							onkeydown={(e) => {
-								if (e.key === 'Enter') createSession();
-								if (e.key === 'Escape') {
-									showNewSessionInput = false;
-									newSessionName = '';
-								}
-							}}
-						/>
-						<button
-							onclick={createSession}
-							disabled={sessionManagerBusy}
-							class="rounded bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-500 disabled:opacity-50"
-						>
-							Create
-						</button>
-						<button
-							aria-label="Cancel"
-							onclick={() => {
-								showNewSessionInput = false;
-								newSessionName = '';
-							}}
-							class="rounded p-1.5 text-gray-500 transition hover:text-gray-300"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-					</div>
-				{:else}
-					<button
-						onclick={() => (showNewSessionInput = true)}
-						class="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray-700 py-2 text-xs font-semibold text-gray-500 transition hover:border-amber-600/60 hover:text-amber-400"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-3.5 w-3.5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4v16m8-8H4"
-							/>
-						</svg>
-						New Session
-					</button>
-				{/if}
-			</div>
-		</div>
-	</div>
+	<SessionManagerModal
+		{sessions}
+		{activeSession}
+		onclose={() => (showSessionManager = false)}
+		onswitched={() => (showNotes = false)}
+	/>
 {/if}
 
 <!-- DM Inbox modal -->
 {#if showInbox}
-	<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-		<div class="flex w-full max-w-lg flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" style="max-height: 80vh;">
-			<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
-				<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Player Messages
-					{#if messages.length > 0}
-						<span class="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-xs font-semibold text-gray-400">{messages.length}</span>
-					{/if}
-				</h2>
-				<div class="flex items-center gap-2">
-					{#if messages.length > 0}
-						<button
-							onclick={clearMessages}
-							class="rounded px-2 py-1 text-xs text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
-						>
-							Clear all
-						</button>
-					{/if}
-					<button onclick={() => (showInbox = false)} aria-label="Close" class="text-gray-600 transition hover:text-gray-300">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-						</svg>
-					</button>
-				</div>
-			</div>
-			<div class="flex-1 overflow-y-auto">
-				{#if messages.length === 0}
-					<div class="flex flex-col items-center justify-center gap-2 py-16 text-center">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-						</svg>
-						<p class="text-sm text-gray-600">No messages yet</p>
-					</div>
-				{:else}
-					<ul class="divide-y divide-gray-800">
-						{#each [...messages].reverse() as msg (msg.id)}
-							<li class="flex flex-col gap-1 px-5 py-4">
-								<div class="flex items-center justify-between gap-2">
-									<span class="text-xs font-bold text-amber-400">{msg.from}</span>
-									<span class="text-xs text-gray-600">{formatTime(msg.timestamp)}</span>
-								</div>
-								<p class="text-sm leading-relaxed text-gray-300">{msg.text}</p>
-							</li>
-						{/each}
-					</ul>
-				{/if}
-			</div>
-		</div>
-	</div>
+	<DMInboxModal {messages} onclose={() => (showInbox = false)} onclear={clearMessages} />
 {/if}
 
 <GuidePopover />

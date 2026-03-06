@@ -60,7 +60,6 @@ function validateCombatant(c: unknown): c is Combatant {
 	if (o.avatarUrl !== undefined && !isStr(o.avatarUrl, MAX_AVATAR_LEN)) return false;
 
 	// Optional boolean fields
-	if (o.showAc !== undefined && typeof o.showAc !== 'boolean') return false;
 	if (o.inCombat !== undefined && typeof o.inCombat !== 'boolean') return false;
 
 	return true;
