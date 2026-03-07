@@ -1,7 +1,7 @@
 // Client-side combat store (Svelte 5 runes). Holds the full combat state in a
 // reactive $state class, syncs to the server via POST /api/state on every mutation,
 // and exposes all DM actions (addPlayer, addEnemy, damage, heal, nextTurn, endCombat, etc.).
-import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary } from './types';
+import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary, LootItem } from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
 import { ENEMY_TEMPLATES, getMonsterDetail } from './enemies';
@@ -101,7 +101,8 @@ function createCombatStore() {
 				totalDamage: stats?.totalDamage ?? 0,
 				totalHealing: stats?.totalHealing ?? 0,
 				wasSlain: c.type === 'enemy' && c.currentHp <= 0,
-				cr
+				cr,
+				loot: c.type === 'enemy' && c.currentHp <= 0 ? (c.loot ?? []) : undefined
 			};
 		});
 
@@ -558,6 +559,11 @@ function createCombatStore() {
 
 		setLegendaryActionsSpent(id: string, spent: number) {
 			combatants = combatants.map((c) => c.id === id ? { ...c, legendaryActionsSpent: spent } : c);
+			sync();
+		},
+
+		setLoot(id: string, loot: LootItem[]) {
+			combatants = combatants.map((c) => c.id === id ? { ...c, loot } : c);
 			sync();
 		},
 

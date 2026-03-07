@@ -62,6 +62,15 @@ function validateCombatant(c: unknown): c is Combatant {
 	// Optional boolean fields
 	if (o.inCombat !== undefined && typeof o.inCombat !== 'boolean') return false;
 
+	// Optional loot array
+	if (o.loot !== undefined) {
+		if (!Array.isArray(o.loot)) return false;
+		for (const item of o.loot) {
+			if (!item || typeof item !== 'object') return false;
+			if (typeof item.name !== 'string' || typeof item.quantity !== 'number') return false;
+		}
+	}
+
 	return true;
 }
 
