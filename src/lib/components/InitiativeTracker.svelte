@@ -14,6 +14,7 @@
 	import ConcentrationCheckModal from '$lib/components/ConcentrationCheckModal.svelte';
 	import ConditionTimingModal from '$lib/components/ConditionTimingModal.svelte';
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
+	import LootModal from '$lib/components/LootModal.svelte';
 
 	async function scrollToActive() {
 		await tick();
@@ -26,6 +27,7 @@
 	let infoMonster = $state<MonsterDetail | null>(null);
 	let conditionInfo = $state<string | null>(null);
 	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
+	let lootTarget = $state<import('$lib/types').Combatant | null>(null);
 	let concentrationCheck = $state<{ id: string; name: string; damage: number; dc: number } | null>(null);
 	let pendingInitChange = $state<{ id: string; name: string; value: string; oldValue: number | null } | null>(null);
 	// Detail map for imported custom monsters — keyed by monster name
@@ -715,6 +717,15 @@
 						</div>
 						{/if}
 					{/if}
+					{#if c.currentHp <= 0}
+						<button
+							onclick={() => (lootTarget = c)}
+							title={c.loot?.length ? 'Edit loot' : 'Roll loot'}
+							class="flex items-center gap-1.5 rounded border border-amber-800/50 bg-amber-950/30 px-2 py-1 text-xs text-amber-500 transition hover:border-amber-600 hover:text-amber-300"
+						>
+							⬡ {c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
+						</button>
+					{/if}
 					{/if}
 				</div>
 			{/each}
@@ -729,6 +740,14 @@
 	onclose={() => (noteTarget = null)}
 	onsave={(id, note) => combat.update(id, { note })}
 />
+
+{#if lootTarget}
+	<LootModal
+		combatant={lootTarget}
+		onclose={() => (lootTarget = null)}
+		onsave={(id, loot) => { combat.setLoot(id, loot); lootTarget = null; }}
+	/>
+{/if}
 
 <ConcentrationCheckModal
 	check={concentrationCheck}

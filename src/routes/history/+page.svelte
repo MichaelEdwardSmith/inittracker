@@ -672,7 +672,35 @@
 										{@const slainWithCr = record.participants.filter(
 											(p) => p.wasSlain && p.cr !== undefined
 										)}
+										{@const slainWithLoot = record.participants.filter(p => p.wasSlain && p.loot?.length)}
 										<div class="border-t border-gray-800/40 bg-gray-950/60 px-5 py-4">
+											<!-- Loot -->
+											{#if slainWithLoot.length > 0}
+												<div class="mb-5">
+													<div class="mb-2 flex items-center gap-2">
+														<span class="text-xs font-bold tracking-widest text-amber-700/80 uppercase">Loot</span>
+														<div class="h-px flex-1 bg-amber-900/20"></div>
+													</div>
+													<div class="flex flex-col gap-3 pl-2">
+														{#each slainWithLoot as p}
+															<div>
+																<div class="flex items-center gap-2 text-xs mb-1">
+																	<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+																	<span class="font-semibold text-gray-300">{p.name}</span>
+																</div>
+																<div class="pl-6 flex flex-col gap-0.5">
+																	{#each p.loot! as item}
+																		<div class="flex items-center gap-2 text-xs text-gray-400">
+																			<span class="text-amber-600">•</span>
+																			<span>{item.quantity}× {item.name}</span>
+																		</div>
+																	{/each}
+																</div>
+															</div>
+														{/each}
+													</div>
+												</div>
+											{/if}
 											<!-- XP Breakdown -->
 											{#if slainWithCr.length > 0}
 												<div class="mb-5">

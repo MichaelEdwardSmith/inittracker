@@ -2,6 +2,12 @@
 // Combatant, EnemyTemplate, CustomMonster, MonsterDetail, StorageState, CombatRecord,
 // CombatEvent, CombatantSummary, and related types.
 
+export interface LootItem {
+	id: string;
+	name: string;
+	quantity: number;
+}
+
 export interface Combatant {
 	id: string;
 	name: string;
@@ -36,6 +42,8 @@ export interface Combatant {
 	legendaryActionsSpent?: number;
 	// Players only — death saving throw tracker (present when currentHp === 0)
 	deathSaves?: { successes: number; failures: number; stable: boolean };
+	// Enemies only — loot items rolled/edited by the DM after enemy is slain
+	loot?: LootItem[];
 }
 
 export interface StorageState {
@@ -95,6 +103,8 @@ export interface CombatantSummary {
 	wasSlain: boolean;
 	/** Challenge Rating string (enemies only, from template lookup) */
 	cr?: string;
+	/** Loot items (enemies only, captured when combat ends) */
+	loot?: LootItem[];
 }
 
 export interface CombatRecord {
