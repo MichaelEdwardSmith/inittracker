@@ -124,6 +124,12 @@ export interface GameSession {
 	name: string; // user-defined name
 }
 
+export interface NoteEntry {
+	id: string;
+	date: string; // ISO date string
+	content: string;
+}
+
 export interface MonsterDetail {
 	name: string;
 	meta: string;
