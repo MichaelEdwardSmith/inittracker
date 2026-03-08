@@ -2,6 +2,7 @@
      actions, and other MonsterDetail fields; closed by clicking the backdrop or pressing Escape. -->
 <script lang="ts">
 	import type { MonsterDetail } from '$lib/types';
+	import { getContext } from 'svelte';
 
 	interface Props {
 		monster: MonsterDetail | null;
@@ -9,6 +10,8 @@
 	}
 
 	let { monster, onclose }: Props = $props();
+
+	const openSpell = getContext<((name: string) => void) | undefined>('openSpell');
 
 	let imgExpanded = $state(false);
 
@@ -57,6 +60,43 @@
 		);
 		return out;
 	}
+
+	/** Wrap spell names in stat-block spell lists with clickable buttons.
+	 *  Handles both plain-text names (built-in monsters) and <em>-wrapped names (imported bestiary). */
+	function linkSpells(html: string): string {
+		// Matches spell-list headers ("Cantrips (at will):", "1st level (3 slots):", "3/day each:", etc.)
+		// followed by either <em>name</em> groups or plain comma-separated spell names.
+		return html.replace(
+			/((?:at will|(?:\d+\/day(?:\s+each)?)|(?:cantrips?(?:\s*\([^)]*\))?)|(?:\d+\w+\s+level\s*\([^)]*\)))\s*:)\s*((?:<em>[^<]+<\/em>(?:,\s*)?)+|[^<\n]+)/gi,
+			(_, header: string, spellList: string) => {
+				if (/<em>/.test(spellList)) {
+					// <em>spell name</em> format (imported bestiary)
+					const linked = spellList.replace(/<em>([^<]+)<\/em>/g, (__, name) => {
+						const trimmed = name.trim();
+						return `<button class="spell-btn" data-spell="${trimmed}">${trimmed}</button>`;
+					});
+					return header + ' ' + linked;
+				}
+				// Plain text format (built-in monsters)
+				const linked = spellList
+					.split(/,\s*/)
+					.map((name) => {
+						const trimmed = name.trim().replace(/[.;]$/, '');
+						if (!trimmed) return name;
+						return `<button class="spell-btn" data-spell="${trimmed}">${trimmed}</button>`;
+					})
+					.join(', ');
+				return header + ' ' + linked;
+			}
+		);
+	}
+
+	// Pre-compute rendered HTML as derived state so Svelte 5 tracks all dependencies correctly.
+	const traitsHtml = $derived(monster?.traits ? linkSpells(linkDice(monster.traits)) : '');
+	const actionsHtml = $derived(monster?.actions ? linkSpells(linkDice(monster.actions)) : '');
+	const reactionsHtml = $derived(monster?.reactions ? linkSpells(linkDice(monster.reactions)) : '');
+	const legendaryHtml = $derived(monster?.legendaryActions ? linkSpells(linkDice(monster.legendaryActions)) : '');
+	const hpHtml = $derived(monster?.hitPoints ? linkDice(monster.hitPoints) : '');
 
 	function rollDice(expr: string) {
 		const m = expr.trim().match(/^(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?$/i);
@@ -144,13 +184,18 @@
 		};
 	}
 
-	function handleDiceClick(e: MouseEvent) {
-		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack],[data-skill-mod]') as HTMLElement | null;
+	function handleStatBlockClick(e: MouseEvent) {
+		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack],[data-skill-mod],[data-spell]') as HTMLElement | null;
 		if (!target) return;
 		e.stopPropagation();
 		if (target.dataset.dice) rollDice(target.dataset.dice);
 		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
 		else if (target.dataset.skillMod !== undefined) rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
+		else if (target.dataset.spell) {
+			const spellName = target.dataset.spell;
+			onclose();
+			openSpell?.(spellName);
+		}
 	}
 </script>
 
@@ -208,7 +253,7 @@
 			<!-- Scrollable body — dice clicks bubble up to this handler -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<div class="overflow-y-auto p-5 text-gray-200" onclick={handleDiceClick}>
+			<div class="overflow-y-auto p-5 text-gray-200" onclick={handleStatBlockClick}>
 				<!-- Image -->
 				{#if monster.imgUrl}
 					<div class="mb-4">
@@ -239,7 +284,7 @@
 					<div>
 						<span class="text-gray-500">HP</span>
 						<!-- HP often contains a dice expression like 52 (8d8+16) -->
-						<span class="font-bold text-gray-200">{@html linkDice(monster.hitPoints)}</span>
+						<span class="font-bold text-gray-200">{@html hpHtml}</span>
 					</div>
 					<div>
 						<span class="text-gray-500">Speed</span>
@@ -316,7 +361,7 @@
 				{#if monster.traits}
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html linkDice(monster.traits)}
+							{@html traitsHtml}
 						</div>
 					</div>
 				{/if}
@@ -326,7 +371,7 @@
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Actions</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html linkDice(monster.actions)}
+							{@html actionsHtml}
 						</div>
 					</div>
 				{/if}
@@ -336,7 +381,7 @@
 					<div class="mb-4 border-b border-gray-700 pb-4">
 						<h4 class="mb-2 text-xs font-bold tracking-widest text-red-400 uppercase">Reactions</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html linkDice(monster.reactions)}
+							{@html reactionsHtml}
 						</div>
 					</div>
 				{/if}
@@ -348,7 +393,7 @@
 							Legendary Actions
 						</h4>
 						<div class="[&_em]:text-gray-300 [&_p]:mb-2 [&_strong]:text-gray-200">
-							{@html linkDice(monster.legendaryActions)}
+							{@html legendaryHtml}
 						</div>
 					</div>
 				{/if}
@@ -485,5 +530,21 @@
 	}
 	:global(.skill-btn:hover) {
 		color: rgb(167, 243, 208); /* emerald-200 */
+	}
+	/* Spell name buttons injected via {@html linkSpells(...)} */
+	:global(.spell-btn) {
+		display: inline;
+		color: rgb(147, 197, 253); /* blue-300 */
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		cursor: pointer;
+		background: transparent;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		line-height: inherit;
+	}
+	:global(.spell-btn:hover) {
+		color: rgb(191, 219, 254); /* blue-200 */
 	}
 </style>

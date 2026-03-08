@@ -11,9 +11,11 @@
 	import SessionNotesModal from '$lib/components/SessionNotesModal.svelte';
 	import SessionManagerModal from '$lib/components/SessionManagerModal.svelte';
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
+	import SpellsModal from '$lib/components/SpellsModal.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
+	import { setContext } from 'svelte';
 	import type { GameSession } from '$lib/types';
 
 	let { data } = $props();
@@ -103,6 +105,10 @@
 
 	// Session manager state
 	let showDiceRoller = $state(false);
+	let showSpells = $state(false);
+	let spellToOpen = $state<string | null>(null);
+
+	setContext('openSpell', (name: string) => { spellToOpen = name; showSpells = true; });
 	let showNotes = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
@@ -284,6 +290,16 @@
 					<span>Dice</span>
 				</button>
 				<button
+					onclick={() => (showSpells = true)}
+					title="Spell Reference"
+					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+					</svg>
+					<span>Spells</span>
+				</button>
+				<button
 					onclick={() => (showSessionManager = true)}
 					title="Manage Sessions"
 					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -421,6 +437,15 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 				</svg>
 				Dice Roller
+			</button>
+			<button
+				onclick={() => { showSpells = true; showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+				</svg>
+				Spells
 			</button>
 			<button
 				onclick={() => { showSessionManager = true; showMobileMenu = false; }}
@@ -655,4 +680,11 @@
 
 {#if showDiceRoller}
 	<DiceRollerModal onclose={() => (showDiceRoller = false)} />
+{/if}
+
+{#if showSpells}
+	<SpellsModal
+		initialSpell={spellToOpen ?? undefined}
+		onclose={() => { showSpells = false; spellToOpen = null; }}
+	/>
 {/if}

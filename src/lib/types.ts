@@ -130,6 +130,21 @@ export interface NoteEntry {
 	content: string;
 }
 
+export interface Spell5e {
+	name: string;
+	source: string;        // "PHB" | "XGE" | "TCE"
+	level: number;         // 0 = cantrip
+	school: string;        // "A" | "C" | "D" | "E" | "V" | "I" | "N" | "T"
+	time: unknown[];       // raw 5etools time array
+	range: unknown;        // raw 5etools range object
+	components: Record<string, unknown>; // {v, s, m}
+	duration: unknown[];   // raw 5etools duration array
+	entries: unknown[];    // rich text entries
+	entriesHigherLevel?: unknown[];
+	classes?: unknown;     // 5etools classes object
+	ritual?: true;
+}
+
 export interface MonsterDetail {
 	name: string;
 	meta: string;
