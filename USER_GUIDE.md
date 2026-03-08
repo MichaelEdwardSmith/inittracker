@@ -21,8 +21,9 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 10. [Game Sessions](#10-game-sessions)
 11. [Combat Chronicles (History)](#11-combat-chronicles-history)
 12. [Dice Roller](#12-dice-roller)
-13. [Player Messaging](#13-player-messaging)
-14. [Contact & Support](#14-contact--support)
+13. [Spell Reference](#13-spell-reference)
+14. [Player Messaging](#14-player-messaging)
+15. [Contact & Support](#15-contact--support)
 
 ---
 
@@ -595,7 +596,52 @@ The last **5 rolls** are listed below the result in a compact log showing the ex
 
 ---
 
-## 13. Player Messaging
+## 13. Spell Reference
+
+Click the **Spells** button in the dashboard header to open the Spell Reference modal. It is available at any time — in or out of combat.
+
+### Layout
+
+The modal is split into two panels:
+
+| Panel | Contents |
+|---|---|
+| **Left** | Search bar, filters, and the scrollable spell list |
+| **Right** | Full spell card for the selected spell |
+
+### Searching and Filtering
+
+- **Search bar** — filters the list by name in real time
+- **Level dropdown** — filters by spell level: All Levels, Cantrip, 1st through 9th
+- **School dropdown** — filters by school of magic (Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, Transmutation)
+- **Class dropdown** — filters by class (Artificer, Bard, Cleric, Druid, Paladin, Ranger, Sorcerer, Warlock, Wizard)
+
+Each spell in the list shows its name and a level badge — **C** for cantrips, **1–9** for leveled spells. Click any spell to open its card in the right panel.
+
+### Spell Card
+
+The right panel shows:
+
+- **Name** — in violet
+- **Level and school** — e.g. "3rd-level spell · Evocation"
+- **Source badge** — the book the spell comes from (e.g. PHB)
+- **Ritual badge** — shown when the spell can be cast as a ritual
+- **Info grid**: Casting Time · Range · Components · Duration
+- **Description** — full spell text
+- **At Higher Levels** — shown when applicable (amber-bordered section)
+- **Available to** — the classes that can learn the spell
+
+### Clickable Dice
+
+Dice expressions inside spell descriptions (e.g. `8d6`) appear in amber with a dotted underline. Click one to roll it — the same result popup used in stat blocks appears, showing individual die values and the total.
+
+### Opening a Spell from a Stat Block
+
+When viewing a monster's stat block, any spell name in a spell list (e.g. in the monster's *Innate Spellcasting* or *Spellcasting* trait) is a clickable button. Click it to close the stat block and open the Spell Reference directly to that spell.
+
+---
+
+## 14. Player Messaging
 
 Players on the viewer screen can send a private message directly to the DM — useful for asking questions, flagging something, or communicating without leaving the display. Messages are visible only to the DM and are not persisted between server restarts.
 
@@ -620,6 +666,6 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 
 ---
 
-## 14. Contact & Support
+## 15. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.

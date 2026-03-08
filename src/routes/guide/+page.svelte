@@ -20,8 +20,9 @@
 		{ id: 'game-sessions', label: '10. Game Sessions' },
 		{ id: 'chronicles', label: '11. Combat Chronicles' },
 		{ id: 'dice-roller', label: '12. Dice Roller' },
-		{ id: 'player-messaging', label: '13. Player Messaging' },
-		{ id: 'contact', label: '14. Contact & Support' }
+		{ id: 'spell-reference', label: '13. Spell Reference' },
+		{ id: 'player-messaging', label: '14. Player Messaging' },
+		{ id: 'contact', label: '15. Contact & Support' }
 	];
 
 	const conditions = [
@@ -1224,9 +1225,102 @@
 				</p>
 			</section>
 
-			<!-- 13 ───────────────────────────────────────── -->
+			<!-- 13 ─────────────────────────────────────── -->
+			<section id="spell-reference">
+				{@render h2('13', 'Spell Reference')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">Spells</strong> button in the dashboard
+					header to open the Spell Reference modal. It is available at any time — in or out of combat.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Searching and Filtering
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					The left panel contains a search bar and three filter dropdowns:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Search bar</strong> — filters the list by name
+						in real time
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Level</strong> — All Levels, Cantrip, or 1st
+						through 9th
+					</li>
+					<li>
+						<strong class="font-semibold text-white">School</strong> — Abjuration, Conjuration,
+						Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Class</strong> — Artificer, Bard, Cleric,
+						Druid, Paladin, Ranger, Sorcerer, Warlock, or Wizard
+					</li>
+				</ul>
+				<p class="mb-4 text-sm leading-relaxed">
+					Each spell in the list shows its name and a level badge —
+					<strong class="font-semibold text-emerald-400">C</strong> for cantrips,
+					<strong class="font-semibold text-white">1–9</strong> for leveled spells. Click any spell
+					to open its card in the right panel.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Spell Card
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					The right panel shows the full spell details:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-violet-300">Name</strong>, level, school, and
+						source badge
+					</li>
+					<li>
+						<strong class="font-semibold text-amber-300">Ritual</strong> badge — shown when the
+						spell can be cast as a ritual
+					</li>
+					<li>
+						Info grid — <strong class="font-semibold text-white">Casting Time</strong>,
+						<strong class="font-semibold text-white">Range</strong>,
+						<strong class="font-semibold text-white">Components</strong>,
+						<strong class="font-semibold text-white">Duration</strong>
+					</li>
+					<li>Full <strong class="font-semibold text-white">description</strong></li>
+					<li>
+						<strong class="font-semibold text-amber-300">At Higher Levels</strong> — shown when
+						applicable
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Available to</strong> — the classes that can
+						learn the spell
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Clickable Dice
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Dice expressions inside spell descriptions (e.g.
+					<code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">8d6</code>) appear
+					in <span class="font-semibold text-amber-300">amber</span> with a dotted underline. Click
+					one to roll it — the same result popup used in stat blocks appears, showing individual die
+					values and the total.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Opening a Spell from a Stat Block
+				</h3>
+				<p class="text-sm leading-relaxed">
+					When viewing a monster's stat block, any spell name in a spell list (e.g. in a
+					<em>Spellcasting</em> or <em>Innate Spellcasting</em> trait) is a clickable button. Click
+					it to close the stat block and open the Spell Reference directly to that spell.
+				</p>
+			</section>
+
+			<!-- 14 ───────────────────────────────────────── -->
 			<section id="player-messaging">
-				{@render h2('13', 'Player Messaging')}
+				{@render h2('14', 'Player Messaging')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Players on the viewer screen can send a private message directly to the DM — useful for
@@ -1284,9 +1378,9 @@
 				</p>
 			</section>
 
-			<!-- 13 ─────────────────────────────────────── -->
+			<!-- 15 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('14', 'Contact & Support')}
+				{@render h2('15', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
