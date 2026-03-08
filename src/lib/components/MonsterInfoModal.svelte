@@ -42,7 +42,7 @@
 	function linkDice(html: string): string {
 		// Pass 1 — dice expressions like "2d6+3" or "2d6 + 3"
 		let out = html.replace(
-			/(<[^>]+>)|(\b\d+d\d+(?:\s*[+-]\s*\d+)?(?=\b|\s|[^a-zA-Z]))/g,
+			/(<[^>]+>)|(\b\d*d\d+(?:\s*[+-]\s*\d+)?(?=\b|\s|[^a-zA-Z]))/g,
 			(_, tag: string | undefined, dice: string | undefined) => {
 				if (tag) return tag;
 				return `<button class="dice-btn" data-dice="${dice!.trim()}">${dice}</button>`;
@@ -99,9 +99,9 @@
 	const hpHtml = $derived(monster?.hitPoints ? linkDice(monster.hitPoints) : '');
 
 	function rollDice(expr: string) {
-		const m = expr.trim().match(/^(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?$/i);
+		const m = expr.trim().match(/^(\d*)d(\d+)(?:\s*([+-])\s*(\d+))?$/i);
 		if (!m) return;
-		const count = parseInt(m[1]);
+		const count = parseInt(m[1]) || 1;
 		const sides = parseInt(m[2]);
 		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
 		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
