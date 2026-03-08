@@ -1,7 +1,7 @@
 // Client-side PDF export for Combat Chronicle records.
 // Dynamically imports jsPDF and jspdf-autotable so they are never included
 // in the SSR bundle — only loaded in the browser on first use.
-import type { CombatRecord, CombatEvent } from '$lib/types';
+import type { CombatRecord, CombatEvent, NoteEntry } from '$lib/types';
 import { crToXp } from '$lib/utils';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -364,6 +364,126 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 	const roman = toRoman(encounterNumber);
 	const dateSlug = isoDate(record.startedAt);
 	const filename = `encounter-${roman}-${dateSlug}.pdf`;
+	const blob = doc.output('blob');
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = filename;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
+// ── Notes PDF export ──────────────────────────────────────────────────────────
+
+/** Convert rich-text editor HTML to plain text, preserving block structure. */
+function htmlToPlainText(html: string): string {
+	return html
+		.replace(/<br\s*\/?>/gi, '\n')
+		.replace(/<\/div>/gi, '\n')
+		.replace(/<\/p>/gi, '\n')
+		.replace(/<p[^>]*>/gi, '')
+		.replace(/<div[^>]*>/gi, '')
+		.replace(/<\/li>/gi, '\n')
+		.replace(/<li[^>]*>/gi, '\u2022 ')
+		.replace(/<\/ul>|<\/ol>/gi, '')
+		.replace(/<ul[^>]*>|<ol[^>]*>/gi, '')
+		.replace(/<[^>]+>/g, '')
+		.replace(/&amp;/g, '&')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&nbsp;/g, ' ')
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/\n{3,}/g, '\n\n')
+		.trim();
+}
+
+/**
+ * Export one or all session notes to PDF.
+ * @param notes - array of NoteEntry (one for 'single', all for 'all')
+ * @param sessionName - displayed in the PDF header
+ * @param mode - 'single' exports one note; 'all' puts each on a new page
+ */
+export async function exportNotesPdf(
+	notes: NoteEntry[],
+	sessionName: string,
+	mode: 'single' | 'all'
+): Promise<void> {
+	const { jsPDF } = await import('jspdf');
+	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+	const pageW = doc.internal.pageSize.getWidth();
+	const pageH = doc.internal.pageSize.getHeight();
+	const margin = 15;
+	const contentW = pageW - margin * 2;
+
+	const darkHeader = [30, 30, 35] as [number, number, number];
+	const textDark = [20, 20, 25] as [number, number, number];
+
+	let y = margin;
+	let firstNote = true;
+
+	for (const note of notes) {
+		if (!firstNote) {
+			doc.addPage();
+			y = margin;
+		}
+		firstNote = false;
+
+		// ── Note header block ────────────────────────────────────────────────
+		doc.setFillColor(...darkHeader);
+		doc.rect(margin, y, contentW, 22, 'F');
+
+		doc.setTextColor(180, 130, 40);
+		doc.setFontSize(7);
+		doc.setFont('helvetica', 'bold');
+		doc.text('SESSION NOTES', margin + 5, y + 6);
+
+		doc.setTextColor(255, 255, 255);
+		doc.setFontSize(12);
+		doc.setFont('helvetica', 'bold');
+		doc.text(formatDate(note.date), margin + 5, y + 14);
+
+		doc.setFontSize(8);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(180, 180, 185);
+		doc.text(sessionName, margin + 5, y + 20);
+
+		y += 22 + 8;
+
+		// ── Note body ────────────────────────────────────────────────────────
+		const plainText = htmlToPlainText(note.content);
+		const paragraphs = plainText.split('\n');
+
+		doc.setFontSize(10);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(...textDark);
+
+		const lineH = 5;
+
+		for (const para of paragraphs) {
+			const lines = doc.splitTextToSize(para || '', contentW);
+			for (const line of lines) {
+				if (y + lineH > pageH - margin) {
+					doc.addPage();
+					y = margin;
+				}
+				doc.text(line, margin, y);
+				y += lineH;
+			}
+			// extra space between paragraphs
+			if (para === '') y += lineH * 0.4;
+		}
+	}
+
+	// ── Download ─────────────────────────────────────────────────────────────
+	const dateSlug = new Date().toISOString().slice(0, 10);
+	const filename =
+		mode === 'single'
+			? `notes-${isoDate(notes[0].date)}.pdf`
+			: `notes-all-${dateSlug}.pdf`;
+
 	const blob = doc.output('blob');
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');

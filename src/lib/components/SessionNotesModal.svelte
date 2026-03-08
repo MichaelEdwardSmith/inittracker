@@ -3,6 +3,7 @@
 <script lang="ts">
 	import RichTextEditor from './RichTextEditor.svelte';
 	import type { NoteEntry } from '$lib/types';
+	import { exportNotesPdf } from '$lib/pdfExport';
 
 	interface Props {
 		onclose: () => void;
@@ -16,6 +17,8 @@
 	let search = $state('');
 	let saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+	let exportingNote = $state(false);
+	let exportingAll = $state(false);
 
 	let selectedNote = $derived(notes.find((n) => n.id === selectedId) ?? null);
 
@@ -87,6 +90,26 @@
 		}
 	}
 
+	async function exportNote() {
+		if (!selectedNote) return;
+		exportingNote = true;
+		try {
+			await exportNotesPdf([selectedNote], sessionName, 'single');
+		} finally {
+			exportingNote = false;
+		}
+	}
+
+	async function exportAll() {
+		if (notes.length === 0) return;
+		exportingAll = true;
+		try {
+			await exportNotesPdf(notes, sessionName, 'all');
+		} finally {
+			exportingAll = false;
+		}
+	}
+
 	async function deleteSelected() {
 		if (!selectedId) return;
 		const idToDelete = selectedId;
@@ -126,6 +149,46 @@
 						<span class="text-xs text-gray-500">Saving…</span>
 					{:else if saveStatus === 'saved'}
 						<span class="text-xs text-green-500">Saved ✓</span>
+					{/if}
+					{#if selectedNote}
+						<button
+							onclick={exportNote}
+							disabled={exportingNote}
+							title="Export this note as PDF"
+							aria-label="Export this note as PDF"
+							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
+						>
+							{#if exportingNote}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+							{:else}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								</svg>
+							{/if}
+							Note
+						</button>
+					{/if}
+					{#if notes.length > 1}
+						<button
+							onclick={exportAll}
+							disabled={exportingAll}
+							title="Export all notes as PDF"
+							aria-label="Export all notes as PDF"
+							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
+						>
+							{#if exportingAll}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+							{:else}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								</svg>
+							{/if}
+							All
+						</button>
 					{/if}
 					<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
