@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
-import type { StorageState, CustomMonster, CombatRecord, GameSession } from '$lib/types';
+import type { StorageState, CustomMonster, CombatRecord, GameSession, NoteEntry } from '$lib/types';
 
 // ---------------------------------------------------------------------------
 // Internal full game-session shape (includes server-only fields)
@@ -14,7 +14,7 @@ import type { StorageState, CustomMonster, CombatRecord, GameSession } from '$li
 interface DMGameSession extends GameSession {
 	combatState: StorageState;
 	combatHistory: CombatRecord[];
-	notes?: string;
+	notes?: NoteEntry[];
 	createdAt: Date;
 }
 
@@ -196,20 +196,74 @@ export async function getCombatState(gameSessionId: string): Promise<StorageStat
 	return session?.combatState ?? { combatants: [], currentTurnId: null, round: 1 };
 }
 
-export async function getSessionNotes(gameSessionId: string): Promise<string> {
+// ---------------------------------------------------------------------------
+// Session notes — multiple dated entries per game session
+// ---------------------------------------------------------------------------
+
+/** Returns all note entries for a game session, newest first.
+ *  Migrates legacy string notes (if any) to the array format on first access. */
+export async function listNotes(gameSessionId: string): Promise<NoteEntry[]> {
 	const c = await col();
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
 	const session = (dm?.gameSessions as DMGameSession[])?.find(
 		(s) => s.sessionId === gameSessionId
 	);
-	return session?.notes ?? '';
+	if (!session) return [];
+
+	const raw = session.notes as unknown;
+
+	// Migration: legacy single string → single NoteEntry
+	if (typeof raw === 'string' && raw.length > 0) {
+		const migrated: NoteEntry[] = [{ id: randomUUID(), date: new Date().toISOString(), content: raw }];
+		await c.updateOne(
+			{ 'gameSessions.sessionId': gameSessionId },
+			{ $set: { 'gameSessions.$.notes': migrated } }
+		);
+		return migrated;
+	}
+
+	if (!Array.isArray(raw)) return [];
+	return (raw as NoteEntry[]).slice().sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export async function saveSessionNotes(gameSessionId: string, notes: string): Promise<void> {
+/** Creates a new note entry and returns it. */
+export async function createNote(gameSessionId: string, content: string): Promise<NoteEntry> {
+	const entry: NoteEntry = { id: randomUUID(), date: new Date().toISOString(), content };
 	const c = await col();
 	await c.updateOne(
 		{ 'gameSessions.sessionId': gameSessionId },
-		{ $set: { 'gameSessions.$.notes': notes } }
+		{ $push: { 'gameSessions.$.notes': entry } as Record<string, unknown> }
+	);
+	return entry;
+}
+
+/** Updates the content of an existing note entry. */
+export async function updateNote(gameSessionId: string, noteId: string, content: string): Promise<void> {
+	const c = await col();
+	// MongoDB positional operator can't target nested array element by id in one shot,
+	// so fetch → modify → replace the whole notes array.
+	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const session = (dm?.gameSessions as DMGameSession[])?.find(s => s.sessionId === gameSessionId);
+	if (!session) return;
+	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
+	const updated = notes.map(n => n.id === noteId ? { ...n, content } : n);
+	await c.updateOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		{ $set: { 'gameSessions.$.notes': updated } }
+	);
+}
+
+/** Deletes a note entry by id. */
+export async function deleteNote(gameSessionId: string, noteId: string): Promise<void> {
+	const c = await col();
+	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const session = (dm?.gameSessions as DMGameSession[])?.find(s => s.sessionId === gameSessionId);
+	if (!session) return;
+	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
+	const filtered = notes.filter(n => n.id !== noteId);
+	await c.updateOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		{ $set: { 'gameSessions.$.notes': filtered } }
 	);
 }
 
