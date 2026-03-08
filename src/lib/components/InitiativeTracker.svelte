@@ -733,6 +733,7 @@
 	{/if}
 </div>
 
+
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
 <CombatantNoteModal
