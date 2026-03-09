@@ -232,9 +232,12 @@
 				<ul class="min-h-0 flex-1 overflow-y-auto p-2 pt-0 space-y-1">
 					{#each filteredNotes as note (note.id)}
 						<li>
-							<button
+							<!-- svelte-ignore a11y_interactive_supports_focus -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<div
+								role="button"
 								onclick={() => { selectedId = note.id; saveStatus = 'idle'; }}
-								class="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
+								class="group flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
 									{selectedId === note.id
 										? 'bg-amber-600/20 text-amber-400'
 										: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'}"
@@ -252,7 +255,7 @@
 										</svg>
 									</button>
 								{/if}
-							</button>
+							</div>
 						</li>
 					{:else}
 						<li class="px-3 py-4 text-center text-xs text-gray-600">

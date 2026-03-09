@@ -1,5 +1,6 @@
 <!-- Initiative roller modal — players use this to roll and submit their initiative. -->
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Combatant } from '$lib/types';
 
 	interface Props {
@@ -10,7 +11,7 @@
 
 	let { players, sessionId, onclose }: Props = $props();
 
-	let initCharId = $state(players.length === 1 ? players[0].id : '');
+	let initCharId = $state(untrack(() => players.length === 1 ? players[0].id : ''));
 	let initMode = $state<'normal' | 'advantage' | 'disadvantage'>('normal');
 	let initRoll1 = $state<number | null>(null);
 	let initRoll2 = $state<number | null>(null);

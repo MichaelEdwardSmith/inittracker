@@ -354,6 +354,7 @@
 											</span>
 											<button
 												onclick={() => removeFromStaging(entry.templateName)}
+												aria-label="Remove enemy"
 												class="text-gray-600 transition hover:text-red-400"
 											>
 												<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

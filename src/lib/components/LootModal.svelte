@@ -1,5 +1,6 @@
 <!-- Modal for viewing and editing enemy loot. Auto-rolls D&D 5e Individual Treasure on first open. -->
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Combatant, LootItem } from '$lib/types';
 	import { generateLoot } from '$lib/loot';
 
@@ -10,9 +11,11 @@
 	} = $props();
 
 	let items = $state<LootItem[]>(
-		combatant.loot?.length
-			? combatant.loot.map((i) => ({ ...i }))
-			: generateLoot(combatant.cr ?? '1')
+		untrack(() =>
+			combatant.loot?.length
+				? combatant.loot.map((i) => ({ ...i }))
+				: generateLoot(combatant.cr ?? '1')
+		)
 	);
 
 	function reroll() {
