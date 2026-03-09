@@ -30,11 +30,12 @@
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1"
 	},
-	"packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f",
+	"packageManager": "pnpm@10.31.0+sha512.e3927388bfaa8078ceb79b748ffc1e8274e84d75163e67bc22e06c0d3aed43dd153151cbf11d7f8301ff4acb98c68bdc5cadf6989532801ffafe3b3e4a63c268",
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.5.3",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"bcryptjs": "^3.0.3",
+		"claude": "^0.1.2",
 		"jspdf": "^4.2.0",
 		"jspdf-autotable": "^5.0.7",
 		"mongodb": "^7.1.0"

@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
-import type { StorageState, CustomMonster, CombatRecord, GameSession, NoteEntry } from '$lib/types';
+import type { StorageState, CustomMonster, CombatRecord, GameSession, NoteEntry, Encounter } from '$lib/types';
 
 // ---------------------------------------------------------------------------
 // Internal full game-session shape (includes server-only fields)
@@ -29,6 +29,7 @@ export interface DM {
 	activeGameSessionId: string;
 	gameSessions: DMGameSession[];
 	customMonsters: CustomMonster[];
+	encounters?: Encounter[];
 	/** Legacy top-level fields — may exist in documents created before migration. */
 	combatState?: StorageState;
 	combatHistory?: CombatRecord[];
@@ -474,4 +475,24 @@ export async function switchActiveGameSession(
 	await c.updateOne({ sessionId: authSessionId }, { $set: { activeGameSessionId: sessionUUID } });
 
 	return session.sessionId;
+}
+
+// ---------------------------------------------------------------------------
+// Encounters — per DM account (shared across sessions, like custom monsters)
+// ---------------------------------------------------------------------------
+
+export async function getEncounters(authSessionId: string): Promise<Encounter[]> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	return (dm?.encounters as Encounter[]) ?? [];
+}
+
+export async function saveEncounter(authSessionId: string, encounter: Encounter): Promise<void> {
+	const c = await col();
+	await c.updateOne({ sessionId: authSessionId }, { $push: { encounters: encounter } } as never);
+}
+
+export async function deleteEncounter(authSessionId: string, encounterId: string): Promise<void> {
+	const c = await col();
+	await c.updateOne({ sessionId: authSessionId }, { $pull: { encounters: { id: encounterId } } } as never);
 }
