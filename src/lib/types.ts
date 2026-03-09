@@ -124,6 +124,18 @@ export interface GameSession {
 	name: string; // user-defined name
 }
 
+export interface EncounterEnemy {
+	templateName: string;
+	quantity: number;
+}
+
+export interface Encounter {
+	id: string;
+	name: string;
+	enemies: EncounterEnemy[];
+	createdAt: string;
+}
+
 export interface NoteEntry {
 	id: string;
 	date: string; // ISO date string

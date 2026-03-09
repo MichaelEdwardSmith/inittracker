@@ -20,9 +20,10 @@
 		{ id: 'game-sessions', label: '10. Game Sessions' },
 		{ id: 'chronicles', label: '11. Combat Chronicles' },
 		{ id: 'dice-roller', label: '12. Dice Roller' },
-		{ id: 'spell-reference', label: '13. Spell Reference' },
-		{ id: 'player-messaging', label: '14. Player Messaging' },
-		{ id: 'contact', label: '15. Contact & Support' }
+		{ id: 'encounter-builder', label: '13. Encounter Builder' },
+		{ id: 'spell-reference', label: '14. Spell Reference' },
+		{ id: 'player-messaging', label: '15. Player Messaging' },
+		{ id: 'contact', label: '16. Contact & Support' }
 	];
 
 	const conditions = [
@@ -1226,8 +1227,134 @@
 			</section>
 
 			<!-- 13 ─────────────────────────────────────── -->
+			<section id="encounter-builder">
+				{@render h2('13', 'Encounter Builder')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">Encounters</strong> button (clipboard
+					icon) in the dashboard header to open the Encounter Builder. Use it to plan and save
+					reusable combat encounters — add enemies, preview XP and difficulty, then load the whole
+					encounter into the initiative tracker with one click.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Party Context
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Two small inputs at the top of the modal set the
+					<strong class="font-semibold text-white">Party size</strong> (number of players) and
+					<strong class="font-semibold text-white">Level</strong> (average party level). These affect
+					the difficulty display for every encounter card and the builder preview. They are not
+					persisted — adjust them each session as needed.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Saved Encounters
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Each saved encounter card shows:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li><strong class="font-semibold text-white">Name</strong> — the encounter's title</li>
+					<li>
+						<strong class="font-semibold text-white">Difficulty badge</strong> — Trivial / Easy /
+						Medium / Hard / Deadly, calculated from adjusted XP vs. the D&D 5e DMG thresholds for the
+						current party size and level
+					</li>
+					<li>
+						<strong class="font-semibold text-white">XP total</strong> — adjusted XP (raw XP × the
+						standard enemy-count multiplier)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Enemy summary</strong> — e.g.
+						<em>2× Goblin, 1× Hobgoblin</em>
+					</li>
+				</ul>
+				<p class="mb-4 text-sm leading-relaxed">
+					Two action buttons appear on each card:
+				</p>
+				{@render dataTable(
+					['Button', 'What it does'],
+					[
+						['Load to Initiative', 'Adds all enemies in the encounter to the active tracker and closes the modal'],
+						['Delete', 'Permanently removes the encounter from your account']
+					]
+				)}
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Building a New Encounter
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">New Encounter</strong> to expand the
+					builder form.
+				</p>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Give the encounter a <strong class="font-semibold text-white">name</strong> (e.g.
+						<em>Goblin Ambush</em>)
+					</li>
+					<li>
+						Type in the <strong class="font-semibold text-white">enemy search box</strong> to filter
+						the full library (SRD monsters + your custom monsters); click a result to select it
+					</li>
+					<li>Set a <strong class="font-semibold text-white">quantity</strong> in the number input beside the search box</li>
+					<li>
+						Click <strong class="font-semibold text-white">Add</strong> — the group appears in the
+						staging list; adding the same monster again merges the quantities
+					</li>
+					<li>Remove any staged entry with the <strong class="font-semibold text-white">✕</strong> button on its row</li>
+					<li>
+						The <strong class="font-semibold text-amber-300">live preview</strong> below the list
+						shows the adjusted XP total and difficulty badge as you build
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Save Encounter</strong> — it appears
+						immediately in the saved list above
+					</li>
+				</ol>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Difficulty Calculation
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Difficulty follows the D&D 5e DMG rules:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Raw XP</strong> — each enemy's CR XP value ×
+						its quantity, summed
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Adjusted XP</strong> — raw XP × a multiplier
+						based on total enemy count (×1 for 1, ×1.5 for 2, ×2 for 3–6, ×2.5 for 7–10, etc.)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Thresholds</strong> — adjusted XP is compared
+						to the party's Easy / Medium / Hard / Deadly values (per-level DMG values × number of
+						players)
+					</li>
+				</ul>
+				{@render dataTable(
+					['Badge', 'Meaning'],
+					[
+						['Trivial', 'Below the Easy threshold'],
+						['Easy', 'At or above Easy'],
+						['Medium', 'At or above Medium'],
+						['Hard', 'At or above Hard'],
+						['Deadly', 'At or above Deadly']
+					]
+				)}
+
+				<p class="mt-4 text-sm leading-relaxed text-gray-500">
+					<strong class="text-gray-400">Note:</strong> Encounters are stored at the account level
+					and are available in every game session — build your library once, reuse it across
+					campaigns.
+				</p>
+			</section>
+
+			<!-- 14 ─────────────────────────────────────── -->
 			<section id="spell-reference">
-				{@render h2('13', 'Spell Reference')}
+				{@render h2('14', 'Spell Reference')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">Spells</strong> button in the dashboard
@@ -1318,9 +1445,9 @@
 				</p>
 			</section>
 
-			<!-- 14 ───────────────────────────────────────── -->
+			<!-- 15 ───────────────────────────────────────── -->
 			<section id="player-messaging">
-				{@render h2('14', 'Player Messaging')}
+				{@render h2('15', 'Player Messaging')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Players on the viewer screen can send a private message directly to the DM — useful for
@@ -1378,9 +1505,9 @@
 				</p>
 			</section>
 
-			<!-- 15 ─────────────────────────────────────── -->
+			<!-- 16 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('15', 'Contact & Support')}
+				{@render h2('16', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"

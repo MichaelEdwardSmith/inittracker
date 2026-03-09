@@ -95,3 +95,64 @@ const XP_BY_CR: Record<string, number> = {
 export function crToXp(cr: string): number {
 	return XP_BY_CR[cr] ?? 0;
 }
+
+// D&D 5e XP thresholds per player per level [easy, medium, hard, deadly]
+const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
+	1:  [25,   50,   75,   100],
+	2:  [50,   100,  150,  200],
+	3:  [75,   150,  225,  400],
+	4:  [125,  250,  375,  500],
+	5:  [250,  500,  750,  1100],
+	6:  [300,  600,  900,  1400],
+	7:  [350,  750,  1100, 1700],
+	8:  [450,  900,  1400, 2100],
+	9:  [550,  1100, 1600, 2400],
+	10: [600,  1200, 1900, 2800],
+	11: [800,  1600, 2400, 3600],
+	12: [1000, 2000, 3000, 4500],
+	13: [1100, 2200, 3400, 5100],
+	14: [1250, 2500, 3800, 5700],
+	15: [1400, 2800, 4300, 6400],
+	16: [1600, 3200, 4800, 7200],
+	17: [2000, 3900, 5900, 8800],
+	18: [2100, 4200, 6300, 9500],
+	19: [2400, 4900, 7300, 10900],
+	20: [2800, 5700, 8500, 12700],
+};
+
+/** D&D 5e encounter multiplier based on total enemy count. */
+export function encounterMultiplier(enemyCount: number): number {
+	if (enemyCount <= 1) return 1;
+	if (enemyCount === 2) return 1.5;
+	if (enemyCount <= 6) return 2;
+	if (enemyCount <= 10) return 2.5;
+	if (enemyCount <= 14) return 3;
+	return 4;
+}
+
+export type EncounterDifficulty = 'Trivial' | 'Easy' | 'Medium' | 'Hard' | 'Deadly';
+
+/**
+ * Returns the encounter difficulty label based on adjusted XP vs party thresholds.
+ * @param rawXp  Sum of XP for all enemies (before multiplier)
+ * @param enemyCount  Total number of individual enemies
+ * @param partySize  Number of players
+ * @param partyLevel  Average party level (1–20)
+ */
+export function encounterDifficulty(
+	rawXp: number,
+	enemyCount: number,
+	partySize: number,
+	partyLevel: number
+): EncounterDifficulty {
+	if (partySize <= 0 || partyLevel <= 0) return 'Trivial';
+	const level = Math.max(1, Math.min(20, Math.round(partyLevel)));
+	const thresholds = XP_THRESHOLDS[level];
+	const adjusted = rawXp * encounterMultiplier(enemyCount);
+	const [easy, medium, hard, deadly] = thresholds.map((t) => t * partySize);
+	if (adjusted < easy) return 'Trivial';
+	if (adjusted < medium) return 'Easy';
+	if (adjusted < hard) return 'Medium';
+	if (adjusted < deadly) return 'Hard';
+	return 'Deadly';
+}

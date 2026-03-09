@@ -21,9 +21,10 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 10. [Game Sessions](#10-game-sessions)
 11. [Combat Chronicles (History)](#11-combat-chronicles-history)
 12. [Dice Roller](#12-dice-roller)
-13. [Spell Reference](#13-spell-reference)
-14. [Player Messaging](#14-player-messaging)
-15. [Contact & Support](#15-contact--support)
+13. [Encounter Builder](#13-encounter-builder)
+14. [Spell Reference](#14-spell-reference)
+15. [Player Messaging](#15-player-messaging)
+16. [Contact & Support](#16-contact--support)
 
 ---
 
@@ -596,7 +597,65 @@ The last **5 rolls** are listed below the result in a compact log showing the ex
 
 ---
 
-## 13. Spell Reference
+## 13. Encounter Builder
+
+Click the **Encounters** button (clipboard icon) in the dashboard header to open the Encounter Builder modal. Use it to plan combat encounters before adding anything to the initiative order.
+
+### Party Context
+
+At the top of the modal, two small inputs let you set the **Party size** (number of players) and **Level** (average party level). These affect the difficulty display for all encounters in the list and for the builder preview. They are not persisted — adjust them each session as needed.
+
+### Saved Encounters List
+
+All saved encounters are shown as cards. Each card displays:
+
+- **Name** — the encounter's title
+- **Difficulty badge** — Trivial / Easy / Medium / Hard / Deadly based on adjusted XP vs. the D&D 5e DMG thresholds for the current party size and level
+- **XP total** — the adjusted XP value (raw XP × the standard D&D 5e enemy-count multiplier)
+- **Enemy summary** — each enemy group listed as `2× Goblin, 1× Hobgoblin`, etc.
+
+Two buttons appear on each card:
+
+| Button | What it does |
+|---|---|
+| **Load to Initiative** | Adds all enemies in the encounter to the active initiative tracker and closes the modal |
+| **Delete** | Permanently removes the encounter from your account |
+
+### Building a New Encounter
+
+Click **New Encounter** to expand the builder form.
+
+1. **Encounter Name** — type a descriptive name (e.g. *Goblin Ambush*)
+2. **Add Enemy** — type in the search box to filter the full enemy library (built-in SRD monsters + your custom monsters); click a result to select it
+3. Set a **quantity** in the number input beside the search box
+4. Click **Add** — the enemy group appears in the staging list below; adding the same monster again increases its quantity
+5. Remove any staged enemy with the **✕** button on its row
+6. The **live preview** below the staging list updates automatically:
+   - **Total XP** — adjusted XP for the staged enemies
+   - **Difficulty badge** — based on the party size and level inputs at the top of the modal
+7. Click **Save Encounter** to persist it to your account
+
+> **Tip:** Encounters are stored at the account level and are available in every game session — build your library once and reuse it across campaigns.
+
+### Difficulty Calculation
+
+XP and difficulty follow the D&D 5e DMG rules:
+
+- **Raw XP** — the sum of each enemy's standard XP value (from the CR table) multiplied by its quantity
+- **Adjusted XP** — raw XP × a multiplier based on total enemy count (×1 for 1 enemy, ×1.5 for 2, ×2 for 3–6, ×2.5 for 7–10, etc.)
+- **Thresholds** — adjusted XP is compared to the party's Easy / Medium / Hard / Deadly thresholds (per-level values from the DMG × number of players)
+
+| Badge | Meaning |
+|---|---|
+| **Trivial** | Below Easy threshold |
+| **Easy** | At or above Easy |
+| **Medium** | At or above Medium |
+| **Hard** | At or above Hard |
+| **Deadly** | At or above Deadly |
+
+---
+
+## 14. Spell Reference
 
 Click the **Spells** button in the dashboard header to open the Spell Reference modal. It is available at any time — in or out of combat.
 
@@ -641,7 +700,7 @@ When viewing a monster's stat block, any spell name in a spell list (e.g. in the
 
 ---
 
-## 14. Player Messaging
+## 15. Player Messaging
 
 Players on the viewer screen can send a private message directly to the DM — useful for asking questions, flagging something, or communicating without leaving the display. Messages are visible only to the DM and are not persisted between server restarts.
 
@@ -666,6 +725,6 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 
 ---
 
-## 15. Contact & Support
+## 16. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
