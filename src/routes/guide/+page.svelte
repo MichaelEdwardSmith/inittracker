@@ -2,6 +2,8 @@
      sections covering DM setup, player joining, the dashboard, combat flow, conditions,
      custom monsters, bestiary import, session management, history, and player messaging. -->
 <script lang="ts">
+	let { data } = $props();
+
 	const toc = [
 		{ id: 'getting-started-dm', label: '1. Getting Started (DM)' },
 		{ id: 'getting-started-players', label: '2. Getting Started (Players)' },
@@ -136,6 +138,14 @@
 						{item.label}
 					</a>
 				{/each}
+				{#if data.showVoiceCommands}
+					<a
+						href="#voice-commands"
+						class="block truncate rounded px-2 py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300"
+					>
+						17. Voice Commands (Beta)
+					</a>
+				{/if}
 			</nav>
 		</aside>
 
@@ -1517,6 +1527,62 @@
 					login page, the join page, and in both the DM and viewer headers.
 				</p>
 			</section>
+			{#if data.showVoiceCommands}
+			<!-- 17 ─────────────────────────────────────── -->
+			<section id="voice-commands">
+				{@render h2('17', 'Voice Commands (Beta)')}
+
+				<div class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300">
+					⚠️ <strong>Beta feature — still in testing.</strong> Voice commands use the browser's built-in
+					Speech Recognition API, currently supported in <strong class="text-white">Chrome and Edge</strong>
+					only. Results may vary based on microphone quality, accent, and ambient noise.
+				</div>
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">🎤 Voice</strong> button in the dashboard
+					header to control the tracker hands-free. The button only appears when your browser supports
+					speech recognition.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Activating
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Voice</strong> to start listening — the button
+					turns amber with a <strong class="font-semibold text-amber-300">pulsing dot</strong>. Your
+					browser will ask for microphone permission the first time. Click the button again to stop.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Commands
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Every command begins with <strong class="font-semibold text-amber-300">"Tracker"</strong> so
+					the app ignores normal table conversation. A confirmation toast appears at the bottom of the
+					screen when a command is recognized.
+				</p>
+				{@render dataTable(
+					['Say', 'Action'],
+					[
+						['"Tracker Next"', 'Advance to the next combatant\'s turn'],
+						['"Tracker Previous"', 'Go back to the previous combatant\'s turn'],
+						['"Tracker Start Combat"', 'Start combat (same as clicking Start Combat)'],
+						['"Tracker End Combat"', 'End combat and save it to Chronicles']
+					]
+				)}
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Tips
+				</h3>
+				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>Commands only fire when valid — <em>Next</em> and <em>Previous</em> do nothing if combat hasn't started</li>
+					<li>If <strong class="font-semibold text-white">"Tracker End Combat"</strong> isn't recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"</li>
+					<li>The mic listens continuously and auto-restarts after silence; no need to re-click between commands</li>
+				</ul>
+			</section>
+
+
+			{/if}
 		</main>
 	</div>
 </div>

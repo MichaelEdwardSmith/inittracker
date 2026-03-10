@@ -44,7 +44,12 @@
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/Users/mojpo/WebstormProjects/Initiative/fix_page.ps1\")",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\remove_session_manager_leftover.ps1\")",
       "WebFetch(domain:github.com)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Skill(claude-api)",
+      "Bash(npm show @huggingface/transformers@3 version 2>/dev/null || echo \"not found\")",
+      "Bash(npm show @huggingface/transformers@latest dist-tags 2>/dev/null; npm show @huggingface/transformers@3.8.1 main exports 2>/dev/null | head -30)",
+      "Bash(npm show @huggingface/transformers@3.8.1 peerDependencies 2>/dev/null; npm show @huggingface/transformers@3.8.1 description 2>/dev/null)",
+      "Bash(node -e \"console.log\\(require\\('vite/package.json'\\).version\\)\" 2>/dev/null || node -e \"const v=require\\('C:/Users/mojpo/WebstormProjects/Initiative/node_modules/vite/package.json'\\); console.log\\(v.version\\)\" 2>/dev/null)"
     ]
   }
 }

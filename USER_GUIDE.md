@@ -24,7 +24,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 13. [Encounter Builder](#13-encounter-builder)
 14. [Spell Reference](#14-spell-reference)
 15. [Player Messaging](#15-player-messaging)
-16. [Contact & Support](#16-contact--support)
+16. [Voice Commands *(Beta)*](#16-voice-commands-beta)
+17. [Contact & Support](#17-contact--support)
 
 ---
 
@@ -728,3 +729,35 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 ## 16. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
+
+---
+
+## 17. Voice Commands *(Beta)*
+
+> ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
+
+Click the **🎤 Voice** button in the DM dashboard header to enable hands-free control of the tracker. The button is only visible when your browser supports speech recognition.
+
+### Activating Voice Commands
+
+Click **Voice** to start listening. The button turns amber with a **pulsing dot** to indicate the microphone is active. The browser will prompt for microphone permission the first time you enable it. Click the button again at any time to stop listening.
+
+### Supported Commands
+
+Speak clearly and naturally. Every command begins with the wake word **"Tracker"** so the app ignores normal table conversation.
+
+| Say | Action |
+|---|---|
+| **"Tracker Next"** | Advance to the next combatant's turn |
+| **"Tracker Previous"** | Go back to the previous combatant's turn |
+| **"Tracker Start Combat"** | Start the combat (equivalent to clicking **Start Combat**) |
+| **"Tracker End Combat"** | End the current combat and save it to Chronicles |
+
+A small **confirmation toast** appears at the bottom of the screen whenever a command is successfully recognized.
+
+### Tips
+
+- Commands only trigger when appropriate — for example, **"Tracker Next"** does nothing if combat has not started yet
+- If **"Tracker End Combat"** is not recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"
+- The microphone listens continuously and auto-restarts after silence; you do not need to re-click the button between commands
+- Click **Voice** again (or navigate away) to stop the microphone
