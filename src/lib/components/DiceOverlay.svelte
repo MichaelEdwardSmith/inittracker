@@ -11,7 +11,7 @@
 	} from '$lib/diceOverlay.svelte';
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	let diceBox: any = null;
+	let diceBox = $state<any>(null);
 	let clearTimer: ReturnType<typeof setTimeout> | null = null;
 
 	onMount(async () => {

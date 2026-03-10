@@ -186,10 +186,10 @@
 				<span class="flex-1 rounded border border-gray-700 bg-gray-800/60 px-3 py-1.5 font-mono text-sm text-amber-300">{expr}</span>
 				<button
 					onclick={roll}
-					disabled={rolling || (!diceOverlay.virtualDiceDisabled && !diceOverlay.diceReady)}
+					disabled={rolling}
 					class="rounded bg-amber-600 px-5 py-1.5 text-sm font-black text-white transition hover:bg-amber-500 active:scale-95 disabled:opacity-50"
 				>
-					{!diceOverlay.virtualDiceDisabled && !diceOverlay.diceReady ? 'Loading…' : rolling ? 'Rolling…' : 'Roll'}
+					{rolling ? 'Rolling…' : 'Roll'}
 				</button>
 			</div>
 
