@@ -1,9 +1,10 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import Anthropic from '@anthropic-ai/sdk';
-import { ANTHROPIC_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+// Key is optional — endpoint returns 503 if unconfigured rather than failing at build time.
+const client = env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY }) : null;
 
 interface CombatantInfo {
 	id: string;
@@ -21,6 +22,10 @@ export async function POST({ request }: RequestEvent) {
 
 	if (!transcript || !combatants) {
 		throw error(400, 'Missing transcript or combatants');
+	}
+
+	if (!client) {
+		throw error(503, 'ANTHROPIC_API_KEY is not configured on this server');
 	}
 
 	const combatantList = combatants
