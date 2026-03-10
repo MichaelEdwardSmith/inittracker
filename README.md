@@ -26,6 +26,7 @@ A real-time D&D 5e combat tracker for DMs. The DM manages the encounter on their
 - **Combatant notes** — per-combatant freeform text for DM-only reminders (concentration, loot, etc.)
 - **Player-to-DM messaging** — players on the viewer screen can send a private message to the DM; choose which party member you are, type your message, and hit Send. The DM sees a live unread count badge on the Messages button in the header (and on the mobile hamburger menu) and can read the full inbox at any time
 - **Resizable panels** — drag the left edge of the enemy panel on desktop to make it wider or narrower; preference is saved in localStorage
+- **Voice commands** *(Beta — Chrome/Edge only)* — click the **🎤 Voice** button in the DM header to enable hands-free control via the browser's Speech Recognition API; say **"Tracker Next"**, **"Tracker Previous"**, **"Tracker Start Combat"**, or **"Tracker End Combat"** to trigger those actions without touching the keyboard; a pulsing amber dot shows when the mic is active and a toast confirms each recognized command; the button is hidden on unsupported browsers
 
 ## Tech stack
 

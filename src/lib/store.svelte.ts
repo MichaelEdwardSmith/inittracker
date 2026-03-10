@@ -195,9 +195,10 @@ function createCombatStore() {
 		},
 
 		addEnemies(template: EnemyTemplate, quantity: number) {
+			const existingCount = combatants.filter((c) => c.templateName === template.name).length;
 			const newEnemies: Combatant[] = Array.from({ length: quantity }, (_, i) => ({
 				id: crypto.randomUUID(),
-				name: quantity > 1 ? `${template.name} ${i + 1}` : template.name,
+				name: `${template.name} ${existingCount + i + 1}`,
 				type: 'enemy' as const,
 				ac: template.ac,
 				maxHp: template.hp,

@@ -13,6 +13,7 @@
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
 	import SpellsModal from '$lib/components/SpellsModal.svelte';
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
+	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
@@ -301,6 +302,7 @@
 					</svg>
 					<span>Spells</span>
 				</button>
+				{#if data.showVoiceCommands}<VoiceCommands />{/if}
 				<button
 					onclick={() => (showEncounters = true)}
 					title="Encounter Builder"

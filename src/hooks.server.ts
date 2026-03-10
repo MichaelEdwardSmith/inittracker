@@ -12,6 +12,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.sessionId = sessionId;
 	event.locals.gameSessionId = null;
 	event.locals.dmFirstName = null;
+	event.locals.dmEmail = null;
 
 	// Protect DM-only pages. /display/*, /login, /register, /join, /api/* are open.
 	const { pathname } = event.url;
@@ -23,6 +24,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			redirect(303, '/login');
 		}
 		event.locals.dmFirstName = dm.firstName;
+		event.locals.dmEmail = dm.email;
 
 		// Resolve active game session (triggers migration for legacy documents).
 		let gameSessionId = authToGameSession.get(sessionId) ?? null;
