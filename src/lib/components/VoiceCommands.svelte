@@ -8,6 +8,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { combat } from '$lib/store.svelte';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	// ── Status ───────────────────────────────────────────────────────────────
 	type Status = 'idle' | 'loading' | 'ready' | 'listening' | 'processing';
@@ -80,12 +81,13 @@
 		const modifier = m[3] ? parseInt(m[3]) : m[4] ? -parseInt(m[4]) : 0;
 
 		return () => {
-			const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
-			const total = rolls.reduce((s, r) => s + r, 0) + modifier;
 			const modStr = modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : '';
 			const expr = `${count}d${sides}${modStr}`;
-			const rollsStr = count > 1 ? ` [${rolls.join(', ')}]` : '';
-			showToast(`🎲 ${expr}:${rollsStr} = ${total}`, 6000);
+			triggerRoll(`${count}d${sides}`, (rolls) => {
+				const total = rolls.reduce((s, r) => s + r, 0) + modifier;
+				const rollsStr = count > 1 ? ` [${rolls.join(', ')}]` : '';
+				showToast(`🎲 ${expr}:${rollsStr} = ${total}`, 6000);
+			});
 		};
 	}
 
