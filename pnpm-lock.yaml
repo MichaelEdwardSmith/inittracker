@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@3d-dice/dice-box-threejs':
+        specifier: ^0.0.12
+        version: 0.0.12
       '@anthropic-ai/sdk':
         specifier: ^0.78.0
         version: 0.78.0
@@ -83,6 +86,9 @@ importers:
         version: 7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1)
 
 packages:
+
+  '@3d-dice/dice-box-threejs@0.0.12':
+    resolution: {integrity: sha512-Bau5UizUunZS9+A6zgGeZecEJotSLEI6YvmYTosvvdhRxv92xo89aIvKYQb6xqdx/AqjHdGENJmqBOadlFL9kA==}
 
   '@anthropic-ai/sdk@0.78.0':
     resolution: {integrity: sha512-PzQhR715td/m1UaaN5hHXjYB8Gl2lF9UVhrrGrZeysiF6Rb74Wc9GCB8hzLdzmQtBd1qe89F9OptgB9Za1Ib5w==}
@@ -859,6 +865,9 @@ packages:
     resolution: {integrity: sha512-YCEo7KjMlbNlyHhz7zAZNDpIpQbd+wOEHJYezv0nMYTn4x31eIUM2yomNNubclAt63dObUzKHWsBLJ9QcZNSnQ==}
     engines: {node: '>=20.19.0'}
 
+  cannon-es@0.20.0:
+    resolution: {integrity: sha512-eZhWTZIkFOnMAJOgfXJa9+b3kVlvG+FX4mdkpePev/w/rP5V8NRquGyEozcjPfEoXUlb+p7d9SUcmDSn14prOA==}
+
   canvg@3.0.11:
     resolution: {integrity: sha512-5ON+q7jCTgMp9cjpu4Jo6XbvfYwSB2Ow3kzHKfIyJfaCAOHLbdKPQqGKgfED/R5B+3TFFfe8pegYA+b423SRyA==}
     engines: {node: '>=10.0.0'}
@@ -1416,6 +1425,9 @@ packages:
   text-segmentation@1.0.3:
     resolution: {integrity: sha512-iOiPUo/BGnZ6+54OsWxZidGCsdU8YbE4PSpdPinp7DeMtUJNJBoJ/ouUSTJjHkh1KntHaltHl/gDs2FC4i5+Nw==}
 
+  three@0.143.0:
+    resolution: {integrity: sha512-oKcAGYHhJ46TGEuHjodo2n6TY2R6lbvrkp+feKZxqsUL/WkH7GKKaeu6RHeyb2Xjfk2dPLRKLsOP0KM2VgT8Zg==}
+
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
@@ -1516,6 +1528,11 @@ packages:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
 
 snapshots:
+
+  '@3d-dice/dice-box-threejs@0.0.12':
+    dependencies:
+      cannon-es: 0.20.0
+      three: 0.143.0
 
   '@anthropic-ai/sdk@0.78.0':
     dependencies:
@@ -2047,6 +2064,8 @@ snapshots:
   boolean@3.2.0: {}
 
   bson@7.2.0: {}
+
+  cannon-es@0.20.0: {}
 
   canvg@3.0.11:
     dependencies:
@@ -2590,6 +2609,8 @@ snapshots:
     dependencies:
       utrie: 1.0.2
     optional: true
+
+  three@0.143.0: {}
 
   tinyglobby@0.2.15:
     dependencies:

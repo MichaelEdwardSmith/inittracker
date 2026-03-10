@@ -9,7 +9,7 @@ export default defineConfig({
 	// Vite's pre-bundler (esbuild) breaks those relative URL references, so we
 	// exclude the package and let it load directly from node_modules.
 	optimizeDeps: {
-		exclude: ['@huggingface/transformers']
+		exclude: ['@huggingface/transformers', '@3d-dice/dice-box-threejs']
 	},
 
 	// Workers must be ES modules so top-level await and native ESM imports work.

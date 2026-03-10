@@ -49,7 +49,14 @@
       "Bash(npm show @huggingface/transformers@3 version 2>/dev/null || echo \"not found\")",
       "Bash(npm show @huggingface/transformers@latest dist-tags 2>/dev/null; npm show @huggingface/transformers@3.8.1 main exports 2>/dev/null | head -30)",
       "Bash(npm show @huggingface/transformers@3.8.1 peerDependencies 2>/dev/null; npm show @huggingface/transformers@3.8.1 description 2>/dev/null)",
-      "Bash(node -e \"console.log\\(require\\('vite/package.json'\\).version\\)\" 2>/dev/null || node -e \"const v=require\\('C:/Users/mojpo/WebstormProjects/Initiative/node_modules/vite/package.json'\\); console.log\\(v.version\\)\" 2>/dev/null)"
+      "Bash(node -e \"console.log\\(require\\('vite/package.json'\\).version\\)\" 2>/dev/null || node -e \"const v=require\\('C:/Users/mojpo/WebstormProjects/Initiative/node_modules/vite/package.json'\\); console.log\\(v.version\\)\" 2>/dev/null)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:fantasticdice.games)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(mkdir -p \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box\" && cp -r \"C:/Users/mojpo/WebstormProjects/Initiative/node_modules/@3d-dice/dice-box/dist/assets/.\" \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box/\" && echo \"Done\" && ls \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box/\")",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm remove @3d-dice/dice-box && pnpm add @3d-dice/dice-box-threejs 2>&1)",
+      "Bash(rm -rf \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box\" && mkdir -p \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs\" && cp -r \"C:/Users/mojpo/WebstormProjects/Initiative/node_modules/@3d-dice/dice-box-threejs/public/.\" \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs/\" && echo \"Done\" && ls \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs/\")"
     ]
   }
 }
