@@ -1,6 +1,10 @@
 <!-- DM dice roller modal — pick die type, quantity, and modifier, then roll.
-     Keeps the last 5 rolls in a compact history list. -->
+     Keeps the last 5 rolls in a compact history list.
+     3D dice rendered via @3d-dice/dice-box-threejs (Three.js + Cannon ES physics). -->
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
+
 	interface Props {
 		onclose: () => void;
 	}
@@ -24,26 +28,96 @@
 
 	let result = $state<RollResult | null>(null);
 	let history = $state<RollResult[]>([]);
+	let rolling = $state(false);
+	let diceReady = $state(false);
+	let virtualDiceDisabled = $state(
+		browser ? localStorage.getItem('dice-roller-disable-3d') === 'true' : false
+	);
+
+	// Captured at roll-time so the async onRollComplete callback reads correct values
+	let pendingDie: DieType = 20;
+	let pendingQty = 1;
+	let pendingMod = 0;
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let diceBox: any = null;
+	let clearTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const expr = $derived(
 		`${quantity}d${selectedDie}${modifier > 0 ? ` + ${modifier}` : modifier < 0 ? ` − ${Math.abs(modifier)}` : ''}`
 	);
 
+	onMount(async () => {
+		if (!browser) return;
+
+		const DiceBox = (await import('@3d-dice/dice-box-threejs')).default;
+
+		diceBox = new DiceBox('#dice-box-canvas', {
+			assetPath: '/assets/dice-box-threejs/',
+			baseScale: 150,
+			gravity_multiplier: 400,
+			strength: 2,
+			shadows: true,
+			sounds: false,
+			theme_colorset: 'fire',
+			theme_material: 'glass',
+			theme_surface: 'default',
+			onRollComplete: (results: { sets: { rolls: { value: number }[] }[] }) => {
+				const rolls = results.sets.flatMap((set) => set.rolls.map((r) => r.value));
+				const total = rolls.reduce((s, r) => s + r, 0) + pendingMod;
+				const newResult: RollResult = {
+					dieType: pendingDie,
+					quantity: pendingQty,
+					modifier: pendingMod,
+					rolls,
+					total
+				};
+				result = newResult;
+				history = [newResult, ...history].slice(0, 5);
+				rolling = false;
+				// Clear dice from canvas after 3 s
+				clearTimer = setTimeout(() => diceBox?.clearDice(), 3000);
+			}
+		});
+
+		await diceBox.initialize();
+		diceReady = true;
+	});
+
+	onDestroy(() => {
+		if (clearTimer) clearTimeout(clearTimer);
+		diceBox?.clearDice();
+	});
+
+	function doRoll(dieType: DieType, qty: number, mod: number) {
+		if (rolling) return;
+		result = null;
+		if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+
+		if (virtualDiceDisabled) {
+			const rolls = Array.from({ length: qty }, () => Math.floor(Math.random() * dieType) + 1);
+			const total = rolls.reduce((s, r) => s + r, 0) + mod;
+			result = { dieType, quantity: qty, modifier: mod, rolls, total };
+			history = [result, ...history].slice(0, 5);
+			return;
+		}
+
+		if (!diceReady) return;
+		pendingDie = dieType;
+		pendingQty = qty;
+		pendingMod = mod;
+		diceBox.clearDice();
+		rolling = true;
+		diceBox.roll(`${qty}d${dieType}`);
+	}
+
 	function roll() {
-		const rolls = Array.from({ length: quantity }, () => Math.floor(Math.random() * selectedDie) + 1);
-		const total = rolls.reduce((s, r) => s + r, 0) + modifier;
-		const newResult: RollResult = { dieType: selectedDie, quantity, modifier, rolls, total };
-		result = newResult;
-		history = [newResult, ...history].slice(0, 5);
+		doRoll(selectedDie, quantity, modifier);
 	}
 
 	function rollAgain() {
 		if (!result) return;
-		const rolls = Array.from({ length: result.quantity }, () => Math.floor(Math.random() * result!.dieType) + 1);
-		const total = rolls.reduce((s, r) => s + r, 0) + result.modifier;
-		const newResult: RollResult = { ...result, rolls, total };
-		result = newResult;
-		history = [newResult, ...history].slice(0, 5);
+		doRoll(result.dieType, result.quantity, result.modifier);
 	}
 
 	function adjustQuantity(delta: number) {
@@ -68,6 +142,13 @@
 		return `${r.quantity}d${r.dieType}${r.modifier > 0 ? `+${r.modifier}` : r.modifier < 0 ? `${r.modifier}` : ''}`;
 	}
 </script>
+
+<!-- Full-screen 3D canvas — pointer-events-none so the modal below stays interactive -->
+<div
+	id="dice-box-canvas"
+	class="pointer-events-none fixed inset-0 z-[200]"
+	aria-hidden="true"
+></div>
 
 <div
 	role="dialog"
@@ -173,9 +254,10 @@
 				<span class="flex-1 rounded border border-gray-700 bg-gray-800/60 px-3 py-1.5 font-mono text-sm text-amber-300">{expr}</span>
 				<button
 					onclick={roll}
-					class="rounded bg-amber-600 px-5 py-1.5 text-sm font-black text-white transition hover:bg-amber-500 active:scale-95"
+					disabled={rolling || !diceReady}
+					class="rounded bg-amber-600 px-5 py-1.5 text-sm font-black text-white transition hover:bg-amber-500 active:scale-95 disabled:opacity-50"
 				>
-					Roll
+					{!diceReady ? 'Loading…' : rolling ? 'Rolling…' : 'Roll'}
 				</button>
 			</div>
 
@@ -184,17 +266,17 @@
 				<div class="mb-4 rounded-lg border border-gray-700 bg-gray-800/60 p-4">
 					<!-- Individual dice -->
 					<div class="mb-3 flex flex-wrap gap-2">
-						{#each result.rolls as roll, i}
+						{#each result.rolls as r, i}
 							<div
 								class="flex h-11 w-11 items-center justify-center rounded-lg border-2 font-black text-lg
-								       {result.dieType === 20 && roll === 20
+								       {result.dieType === 20 && r === 20
 									? 'border-amber-400 bg-amber-900/40 text-amber-300'
-									: result.dieType === 20 && roll === 1
+									: result.dieType === 20 && r === 1
 									? 'border-red-600 bg-red-900/40 text-red-300'
 									: 'border-gray-600 bg-gray-800 text-white'}"
 								title="Die {i + 1}"
 							>
-								{roll}
+								{r}
 							</div>
 						{/each}
 					</div>
@@ -213,7 +295,8 @@
 
 					<button
 						onclick={rollAgain}
-						class="mt-3 w-full rounded bg-amber-700 py-1.5 text-sm font-bold text-white transition hover:bg-amber-600"
+						disabled={rolling}
+						class="mt-3 w-full rounded bg-amber-700 py-1.5 text-sm font-bold text-white transition hover:bg-amber-600 disabled:opacity-50"
 					>
 						Roll Again
 					</button>
@@ -237,6 +320,19 @@
 					</div>
 				</div>
 			{/if}
+		<!-- Disable virtual dice -->
+			<label class="mt-3 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
+				<input
+					type="checkbox"
+					checked={virtualDiceDisabled}
+					onchange={(e) => {
+						virtualDiceDisabled = (e.target as HTMLInputElement).checked;
+						localStorage.setItem('dice-roller-disable-3d', String(virtualDiceDisabled));
+					}}
+					class="accent-amber-500"
+				/>
+				Disable virtual dice
+			</label>
 		</div>
 	</div>
 </div>
