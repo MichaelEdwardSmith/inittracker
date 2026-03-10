@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Combatant } from '$lib/types';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	interface Props {
 		players: Combatant[];
@@ -29,9 +30,14 @@
 	});
 
 	function rollInitiative() {
-		initRoll1 = Math.floor(Math.random() * 20) + 1;
-		initRoll2 = initMode !== 'normal' ? Math.floor(Math.random() * 20) + 1 : null;
+		initRoll1 = null;
+		initRoll2 = null;
 		initSubmitted = false;
+		const notation = initMode !== 'normal' ? '2d20' : '1d20';
+		triggerRoll(notation, (rolls) => {
+			initRoll1 = rolls[0];
+			initRoll2 = rolls.length > 1 ? rolls[1] : null;
+		});
 	}
 
 	async function submitInitiative() {

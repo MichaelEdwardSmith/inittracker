@@ -2,6 +2,7 @@
      Right panel: spell card with rich description and clickable dice. -->
 <script lang="ts">
 	import type { Spell5e } from '$lib/types';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 	import {
 		formatSchool,
 		formatLevel,
@@ -93,23 +94,27 @@
 		const count = parseInt(m[1]) || 1;
 		const sides = parseInt(m[2]);
 		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
-		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
-		const total = rolls.reduce((s, r) => s + r, 0) + modifier;
-		diceRollResult = { expr: expr.trim(), rolls, sides, modifier, total };
+		diceRollResult = null;
+		triggerRoll(`${count}d${sides}`, (rolls) => {
+			const total = rolls.reduce((s, r) => s + r, 0) + modifier;
+			diceRollResult = { expr: expr.trim(), rolls, sides, modifier, total };
+		});
 	}
 
 	function rollAttack(modStr: string) {
 		const modifier = parseInt(modStr);
-		const roll = Math.floor(Math.random() * 20) + 1;
 		const sign = modifier >= 0 ? '+' : '';
-		diceRollResult = {
-			expr: `Attack roll ${sign}${modifier}`,
-			rolls: [roll],
-			sides: 20,
-			modifier,
-			total: roll + modifier,
-			isAttack: true,
-		};
+		diceRollResult = null;
+		triggerRoll('1d20', ([roll]) => {
+			diceRollResult = {
+				expr: `Attack roll ${sign}${modifier}`,
+				rolls: [roll],
+				sides: 20,
+				modifier,
+				total: roll + modifier,
+				isAttack: true,
+			};
+		});
 	}
 
 	function handleDiceClick(e: MouseEvent) {

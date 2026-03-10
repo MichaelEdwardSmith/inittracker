@@ -3,6 +3,7 @@
 <script lang="ts">
 	import type { MonsterDetail } from '$lib/types';
 	import { getContext } from 'svelte';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	interface Props {
 		monster: MonsterDetail | null;
@@ -104,23 +105,27 @@
 		const count = parseInt(m[1]) || 1;
 		const sides = parseInt(m[2]);
 		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
-		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
-		const total = rolls.reduce((s, r) => s + r, 0) + modifier;
-		diceRollResult = { expr: expr.trim(), rolls, sides, modifier, total };
+		diceRollResult = null;
+		triggerRoll(`${count}d${sides}`, (rolls) => {
+			const total = rolls.reduce((s, r) => s + r, 0) + modifier;
+			diceRollResult = { expr: expr.trim(), rolls, sides, modifier, total };
+		});
 	}
 
 	function rollAttack(modStr: string) {
 		const modifier = parseInt(modStr);
-		const roll = Math.floor(Math.random() * 20) + 1;
 		const sign = modifier >= 0 ? '+' : '';
-		diceRollResult = {
-			expr: `Attack roll ${sign}${modifier}`,
-			rolls: [roll],
-			sides: 20,
-			modifier,
-			total: roll + modifier,
-			isAttack: true
-		};
+		diceRollResult = null;
+		triggerRoll('1d20', ([roll]) => {
+			diceRollResult = {
+				expr: `Attack roll ${sign}${modifier}`,
+				rolls: [roll],
+				sides: 20,
+				modifier,
+				total: roll + modifier,
+				isAttack: true
+			};
+		});
 	}
 
 	const SAVE_STATS = [
@@ -146,18 +151,20 @@
 		const stMap = parseSavingThrows(monster.savingThrows);
 		const fromOverride = statKey in stMap;
 		const modifier = fromOverride ? stMap[statKey] : parseInt(baseMod.replace(/[()]/g, ''));
-		const roll = Math.floor(Math.random() * 20) + 1;
 		const sign = modifier >= 0 ? '+' : '';
-		diceRollResult = {
-			expr: `${statLabel} Save ${sign}${modifier}`,
-			rolls: [roll],
-			sides: 20,
-			modifier,
-			total: roll + modifier,
-			isSavingThrow: true,
-			savingThrowStatLabel: statLabel,
-			savingThrowFromOverride: fromOverride,
-		};
+		diceRollResult = null;
+		triggerRoll('1d20', ([roll]) => {
+			diceRollResult = {
+				expr: `${statLabel} Save ${sign}${modifier}`,
+				rolls: [roll],
+				sides: 20,
+				modifier,
+				total: roll + modifier,
+				isSavingThrow: true,
+				savingThrowStatLabel: statLabel,
+				savingThrowFromOverride: fromOverride,
+			};
+		});
 	}
 
 	/** Wrap each "Skill +N" entry in the skills string with a clickable button. */
@@ -171,17 +178,19 @@
 
 	function rollSkillCheck(skillName: string, modStr: string) {
 		const modifier = parseInt(modStr);
-		const roll = Math.floor(Math.random() * 20) + 1;
 		const sign = modifier >= 0 ? '+' : '';
-		diceRollResult = {
-			expr: `${skillName} ${sign}${modifier}`,
-			rolls: [roll],
-			sides: 20,
-			modifier,
-			total: roll + modifier,
-			isSkillCheck: true,
-			skillCheckName: skillName,
-		};
+		diceRollResult = null;
+		triggerRoll('1d20', ([roll]) => {
+			diceRollResult = {
+				expr: `${skillName} ${sign}${modifier}`,
+				rolls: [roll],
+				sides: 20,
+				modifier,
+				total: roll + modifier,
+				isSkillCheck: true,
+				skillCheckName: skillName,
+			};
+		});
 	}
 
 	function handleStatBlockClick(e: MouseEvent) {

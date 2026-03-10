@@ -16,8 +16,11 @@
 		if (browser) localStorage.setItem('theme', theme.isDark ? 'dark' : 'light');
 	});
 
+	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
+
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<DiceOverlay />
 {@render children()}

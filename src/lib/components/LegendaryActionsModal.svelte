@@ -6,6 +6,8 @@
 		onclose: () => void;
 	}
 
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
+
 	let { modal, onclose }: Props = $props();
 
 	interface DiceRollResult {
@@ -43,15 +45,19 @@
 		const count = parseInt(m[1]) || 1;
 		const sides = parseInt(m[2]);
 		const modifier = m[3] ? (m[3] === '+' ? 1 : -1) * parseInt(m[4]) : 0;
-		const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
-		diceResult = { expr: expr.trim(), rolls, modifier, total: rolls.reduce((s, r) => s + r, 0) + modifier };
+		diceResult = null;
+		triggerRoll(`${count}d${sides}`, (rolls) => {
+			diceResult = { expr: expr.trim(), rolls, modifier, total: rolls.reduce((s, r) => s + r, 0) + modifier };
+		});
 	}
 
 	function rollAttack(modStr: string) {
 		const modifier = parseInt(modStr);
-		const roll = Math.floor(Math.random() * 20) + 1;
 		const sign = modifier >= 0 ? '+' : '';
-		diceResult = { expr: `Attack roll ${sign}${modifier}`, rolls: [roll], modifier, total: roll + modifier, isAttack: true };
+		diceResult = null;
+		triggerRoll('1d20', ([roll]) => {
+			diceResult = { expr: `Attack roll ${sign}${modifier}`, rolls: [roll], modifier, total: roll + modifier, isAttack: true };
+		});
 	}
 
 	function handleDiceClick(e: MouseEvent) {
