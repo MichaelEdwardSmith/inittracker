@@ -1227,12 +1227,34 @@
 				</ul>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Roll History</h3>
-				<p class="text-sm leading-relaxed">
+				<p class="mb-6 text-sm leading-relaxed">
 					The last <strong class="font-semibold text-white">5 rolls</strong> are listed below the result
 					in a compact log showing the expression (e.g.
 					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">2d6+3</code>),
 					the individual die values, and the total. The most recent roll is fully opaque; older entries
 					are dimmed.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Virtual Dice</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					By default, every roll triggers a full-screen 3D physics animation — dice tumble across the
+					screen with metal sound effects, and the face values that come to rest are the
+					<strong class="font-semibold text-white">authoritative result</strong>. The result panel only
+					appears once the dice have settled.
+				</p>
+				<p class="mb-3 text-sm leading-relaxed">
+					Virtual dice fire on <strong class="font-semibold text-white">every roll surface in the app</strong>:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>The Dice Roller modal</li>
+					<li>Clickable dice expressions in monster stat blocks (damage rolls, attack rolls, saving throws, skill checks)</li>
+					<li>Clickable dice in spell descriptions and legendary action text</li>
+					<li>Voice command dice rolls (e.g. <em>"Tracker roll d20"</em>)</li>
+				</ul>
+				<p class="text-sm leading-relaxed">
+					A <strong class="font-semibold text-white">Disable virtual dice</strong> checkbox at the
+					bottom of the Dice Roller modal switches to instant results with no animation. The preference
+					is saved between sessions and applies to every roll surface across the entire app.
 				</p>
 			</section>
 
@@ -1567,9 +1589,20 @@
 						['"Tracker Next"', 'Advance to the next combatant\'s turn'],
 						['"Tracker Previous"', 'Go back to the previous combatant\'s turn'],
 						['"Tracker Start Combat"', 'Start combat (same as clicking Start Combat)'],
-						['"Tracker End Combat"', 'End combat and save it to Chronicles']
+						['"Tracker End Combat"', 'End combat and save it to Chronicles'],
+						['"Tracker roll d20"', 'Roll a single d20 — 3D dice animate on screen'],
+						['"Tracker roll two d6 plus three"', 'Roll 2d6+3 — number words and modifiers supported'],
+						['"Tracker roll a d100"', 'Roll a d100 (percentile)']
 					]
 				)}
+
+				<p class="mt-4 mb-4 text-sm leading-relaxed">
+					Dice rolls via voice trigger the same
+					<strong class="font-semibold text-white">3D virtual dice animation</strong> as clicking dice
+					anywhere in the app. The result appears in a toast once the dice have settled. Number words
+					(<em>one</em> through <em>twenty</em>, <em>hundred</em>) and modifiers
+					(<em>plus</em> / <em>minus</em> followed by a number) are recognized.
+				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Tips
@@ -1578,6 +1611,7 @@
 					<li>Commands only fire when valid — <em>Next</em> and <em>Previous</em> do nothing if combat hasn't started</li>
 					<li>If <strong class="font-semibold text-white">"Tracker End Combat"</strong> isn't recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"</li>
 					<li>The mic listens continuously and auto-restarts after silence; no need to re-click between commands</li>
+					<li>Virtual dice can be disabled via the <strong class="font-semibold text-white">Disable virtual dice</strong> checkbox in the Dice Roller modal — voice rolls will then return instant results</li>
 				</ul>
 			</section>
 

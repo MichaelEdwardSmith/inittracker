@@ -41,13 +41,27 @@
 		if (rolling) return;
 		result = null;
 		rolling = true;
-		triggerRoll(`${qty}d${dieType}`, (rolls) => {
-			const total = rolls.reduce((s, r) => s + r, 0) + mod;
-			const newResult: RollResult = { dieType, quantity: qty, modifier: mod, rolls, total };
-			result = newResult;
-			history = [newResult, ...history].slice(0, 5);
-			rolling = false;
-		});
+
+		if (dieType === 100) {
+			// Percentile: two d10s — one for tens (0,10,20…90), one for ones (0–9)
+			triggerRoll('1d100+1d10', ([tensRoll, onesRoll]) => {
+				const tens = tensRoll % 100;  // d100 returns 10-100; 100 ÷ 100 = 0 (shows 00)
+				const ones = onesRoll % 10;   // d10 returns 1-10; 10 mod 10 = 0
+				const base = tens === 0 && ones === 0 ? 100 : tens + ones;
+				const newResult: RollResult = { dieType: 100, quantity: 1, modifier: mod, rolls: [tens, ones], total: base + mod };
+				result = newResult;
+				history = [newResult, ...history].slice(0, 5);
+				rolling = false;
+			});
+		} else {
+			triggerRoll(`${qty}d${dieType}`, (rolls) => {
+				const total = rolls.reduce((s, r) => s + r, 0) + mod;
+				const newResult: RollResult = { dieType, quantity: qty, modifier: mod, rolls, total };
+				result = newResult;
+				history = [newResult, ...history].slice(0, 5);
+				rolling = false;
+			});
+		}
 	}
 
 	function roll() {
@@ -197,21 +211,38 @@
 			{#if result}
 				<div class="mb-4 rounded-lg border border-gray-700 bg-gray-800/60 p-4">
 					<!-- Individual dice -->
-					<div class="mb-3 flex flex-wrap gap-2">
-						{#each result.rolls as r, i}
-							<div
-								class="flex h-11 w-11 items-center justify-center rounded-lg border-2 font-black text-lg
-								       {result.dieType === 20 && r === 20
-									? 'border-amber-400 bg-amber-900/40 text-amber-300'
-									: result.dieType === 20 && r === 1
-									? 'border-red-600 bg-red-900/40 text-red-300'
-									: 'border-gray-600 bg-gray-800 text-white'}"
-								title="Die {i + 1}"
-							>
-								{r}
+					{#if result.dieType === 100}
+						<div class="mb-3 flex gap-3">
+							<div class="flex flex-col items-center gap-1">
+								<div class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 font-black text-lg text-white">
+									{String(result.rolls[0]).padStart(2, '0')}
+								</div>
+								<span class="text-xs text-gray-500">Tens</span>
 							</div>
-						{/each}
-					</div>
+							<div class="flex flex-col items-center gap-1">
+								<div class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 font-black text-lg text-white">
+									{result.rolls[1]}
+								</div>
+								<span class="text-xs text-gray-500">Ones</span>
+							</div>
+						</div>
+					{:else}
+						<div class="mb-3 flex flex-wrap gap-2">
+							{#each result.rolls as r, i}
+								<div
+									class="flex h-11 w-11 items-center justify-center rounded-lg border-2 font-black text-lg
+									       {result.dieType === 20 && r === 20
+										? 'border-amber-400 bg-amber-900/40 text-amber-300'
+										: result.dieType === 20 && r === 1
+										? 'border-red-600 bg-red-900/40 text-red-300'
+										: 'border-gray-600 bg-gray-800 text-white'}"
+									title="Die {i + 1}"
+								>
+									{r}
+								</div>
+							{/each}
+						</div>
+					{/if}
 
 					<!-- Modifier line -->
 					{#if result.modifier !== 0}

@@ -596,6 +596,20 @@ Click **Roll** to execute. The result panel shows:
 
 The last **5 rolls** are listed below the result in a compact log showing the expression (e.g. `2d6+3`), the individual values, and the total. The most recent roll is fully opaque; older entries are dimmed.
 
+### Virtual Dice
+
+By default, every roll triggers a full-screen 3D physics animation — dice tumble across the screen with metal sound effects, and the face values that come to rest are the authoritative result. The result panel only appears once the dice have settled.
+
+Virtual dice fire on **every roll surface in the app**:
+
+- The Dice Roller modal
+- Clickable dice expressions in monster stat blocks (damage rolls, attack rolls, saving throws, skill checks)
+- Clickable dice in spell descriptions
+- Legendary action dice and attack rolls
+- Voice command dice rolls ("Tracker roll d20", etc.)
+
+**Disabling virtual dice:** A **Disable virtual dice** checkbox at the bottom of the Dice Roller modal switches to instant results with no animation. The preference is saved between sessions. When disabled, all rolls across the entire app return to instant results.
+
 ---
 
 ## 13. Encounter Builder
@@ -752,6 +766,11 @@ Speak clearly and naturally. Every command begins with the wake word **"Tracker"
 | **"Tracker Previous"** | Go back to the previous combatant's turn |
 | **"Tracker Start Combat"** | Start the combat (equivalent to clicking **Start Combat**) |
 | **"Tracker End Combat"** | End the current combat and save it to Chronicles |
+| **"Tracker roll d20"** | Roll a single d20 — 3D dice animate on screen |
+| **"Tracker roll two d6 plus three"** | Roll 2d6+3 — number words and modifiers are supported |
+| **"Tracker roll a d100"** | Roll a d100 (percentile) |
+
+**Dice rolls via voice** trigger the same 3D virtual dice animation as clicking dice anywhere in the app. The result appears in a toast once the dice settle.
 
 A small **confirmation toast** appears at the bottom of the screen whenever a command is successfully recognized.
 

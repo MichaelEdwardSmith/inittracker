@@ -81,13 +81,24 @@
 		const modifier = m[3] ? parseInt(m[3]) : m[4] ? -parseInt(m[4]) : 0;
 
 		return () => {
-			const modStr = modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : '';
-			const expr = `${count}d${sides}${modStr}`;
-			triggerRoll(`${count}d${sides}`, (rolls) => {
-				const total = rolls.reduce((s, r) => s + r, 0) + modifier;
-				const rollsStr = count > 1 ? ` [${rolls.join(', ')}]` : '';
-				showToast(`🎲 ${expr}:${rollsStr} = ${total}`, 6000);
-			});
+			if (sides === 100) {
+				triggerRoll('1d100+1d10', ([tensRoll, onesRoll]) => {
+					const tens = tensRoll % 100;
+					const ones = onesRoll % 10;
+					const total = tens === 0 && ones === 0 ? 100 : tens + ones;
+					const modStr = modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : '';
+					const finalTotal = total + modifier;
+					showToast(`🎲 d100: [${String(tens).padStart(2, '0')}, ${ones}]${modStr} = ${finalTotal}`, 6000);
+				});
+			} else {
+				const modStr = modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : '';
+				const expr = `${count}d${sides}${modStr}`;
+				triggerRoll(`${count}d${sides}`, (rolls) => {
+					const total = rolls.reduce((s, r) => s + r, 0) + modifier;
+					const rollsStr = count > 1 ? ` [${rolls.join(', ')}]` : '';
+					showToast(`🎲 ${expr}:${rollsStr} = ${total}`, 6000);
+				});
+			}
 		};
 	}
 
