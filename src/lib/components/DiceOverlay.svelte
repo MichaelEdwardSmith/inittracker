@@ -13,6 +13,26 @@
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let diceBox = $state<any>(null);
 	let clearTimer: ReturnType<typeof setTimeout> | null = null;
+	let fadeTimer: ReturnType<typeof setTimeout> | null = null;
+	let fading = $state(false);
+
+	const FADE_DURATION = 800; // ms — must match the CSS transition duration
+
+	function scheduleClear() {
+		clearTimer = setTimeout(() => {
+			fading = true;
+			fadeTimer = setTimeout(() => {
+				diceBox?.clearDice();
+				fading = false;
+			}, FADE_DURATION);
+		}, 3000);
+	}
+
+	function cancelTimers() {
+		if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+		if (fadeTimer) { clearTimeout(fadeTimer); fadeTimer = null; }
+		fading = false;
+	}
 
 	onMount(async () => {
 		if (!browser) return;
@@ -36,7 +56,7 @@
 				const cb = _getRollCallback();
 				_clearCallback();
 				if (cb) cb(rolls);
-				clearTimer = setTimeout(() => diceBox?.clearDice(), 3000);
+				scheduleClear();
 			}
 		});
 
@@ -45,7 +65,7 @@
 	});
 
 	onDestroy(() => {
-		if (clearTimer) clearTimeout(clearTimer);
+		cancelTimers();
 		diceBox?.clearDice();
 		_setReady(false);
 	});
@@ -53,10 +73,15 @@
 	$effect(() => {
 		const roll = diceOverlay.pendingRoll;
 		if (!roll || !diceBox) return;
-		if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+		cancelTimers();
 		diceBox.clearDice();
 		diceBox.roll(roll.notation);
 	});
 </script>
 
-<div id="global-dice-canvas" class="pointer-events-none fixed inset-0 z-[200]" aria-hidden="true"></div>
+<div
+	id="global-dice-canvas"
+	class="pointer-events-none fixed inset-0 z-[200] transition-opacity"
+	style="opacity: {fading ? 0 : 1}; transition-duration: {fading ? FADE_DURATION : 0}ms;"
+	aria-hidden="true"
+></div>

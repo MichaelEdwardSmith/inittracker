@@ -201,7 +201,7 @@
 		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
 		else if (target.dataset.skillMod !== undefined) rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
 		else if (target.dataset.spell) {
-			const spellName = target.dataset.spell;
+			const spellName = target.dataset.spell.replace(/[^a-zA-Z0-9 '\-/]/g, '').trim();
 			onclose();
 			openSpell?.(spellName);
 		}
