@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
-		showVoiceCommands: locals.dmEmail === 'michael.e.smith.1978@gmail.com',
+		showVoiceCommands: true,
 		sessions,
 		activeSession
 	};

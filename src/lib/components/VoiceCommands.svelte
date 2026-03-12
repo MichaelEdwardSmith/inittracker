@@ -9,9 +9,14 @@
 	import { browser } from '$app/environment';
 	import { combat } from '$lib/store.svelte';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
+	import VoiceCommandsHelpModal from './VoiceCommandsHelpModal.svelte';
 
 	// ── Props ─────────────────────────────────────────────────────────────────
 	const { mobile = false }: { mobile?: boolean } = $props();
+
+	// ── Help modal (shown once per session on first activation) ───────────────
+	const HELP_SEEN_KEY = 'voice-commands-help-seen';
+	let showHelp = $state(false);
 
 	// ── Status ───────────────────────────────────────────────────────────────
 	type Status = 'idle' | 'loading' | 'ready' | 'listening' | 'processing';
@@ -390,6 +395,14 @@
 	// ── Toggle ────────────────────────────────────────────────────────────────
 	function toggle() {
 		if (!browser) return;
+
+		// Show the help modal the first time per browser session.
+		if (!sessionStorage.getItem(HELP_SEEN_KEY)) {
+			sessionStorage.setItem(HELP_SEEN_KEY, '1');
+			showHelp = true;
+			// Proceed with activation so the model starts loading behind the modal.
+		}
+
 		if (status === 'idle') {
 			// First click: load the model then auto-start listening.
 			initWorker();
@@ -499,6 +512,11 @@
 			{/if}
 		</button>
 	{/if}
+{/if}
+
+<!-- Help modal — first-time activation only -->
+{#if showHelp}
+	<VoiceCommandsHelpModal onclose={() => (showHelp = false)} />
 {/if}
 
 <!-- Command feedback toast -->
