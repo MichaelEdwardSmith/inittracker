@@ -17,6 +17,7 @@
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
 	import QuickRulesModal from '$lib/components/QuickRulesModal.svelte';
+	import { ENEMY_TEMPLATES } from '$lib/enemies';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
@@ -619,5 +620,20 @@
 {/if}
 
 {#if showQuickRules}
-	<QuickRulesModal onclose={() => (showQuickRules = false)} />
+	<QuickRulesModal
+		onclose={() => (showQuickRules = false)}
+		onAddEncounter={(monsters) => {
+			combat.clearEnemies();
+			for (const m of monsters) {
+				const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
+				if (template) {
+					combat.addEnemies(template, m.count);
+				} else {
+					// Fallback: create a minimal template for monsters not in the bestiary
+					combat.addEnemies({ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' }, m.count);
+				}
+			}
+			showQuickRules = false;
+		}}
+	/>
 {/if}
