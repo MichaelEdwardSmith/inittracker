@@ -16,6 +16,7 @@
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
+	import QuickRulesModal from '$lib/components/QuickRulesModal.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
@@ -118,6 +119,7 @@
 
 	setContext('openSpell', (name: string) => { spellToOpen = name; showSpells = true; });
 	let showNotes = $state(false);
+	let showQuickRules = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -343,6 +345,15 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
 				</svg>
 				Mixer
+			</button>
+			<button
+				onclick={() => { showQuickRules = true; showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+				</svg>
+				Quick Rules
 			</button>
 			<button
 				onclick={() => { showEncounters = true; showMobileMenu = false; }}
@@ -605,4 +616,8 @@
 	<div class={showMixer ? '' : 'hidden'}>
 		<AudioMixer onclose={() => (showMixer = false)} />
 	</div>
+{/if}
+
+{#if showQuickRules}
+	<QuickRulesModal onclose={() => (showQuickRules = false)} />
 {/if}
