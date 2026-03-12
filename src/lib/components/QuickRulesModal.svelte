@@ -23,7 +23,9 @@
 		{ id: 'checks',        label: 'Ability Check DCs',       icon: '🎲' },
 		{ id: 'saves',         label: 'Common Save DCs',         icon: '💀' },
 		{ id: 'xp',            label: 'Encounter Difficulty',    icon: '⚖️' },
-			{ id: 'names',         label: 'Name Generator',          icon: '📛' },
+		{ id: 'magic',         label: 'Magic & Casting',         icon: '✨' },
+		{ id: 'names',         label: 'Name Generator',          icon: '📛' },
+		{ id: 'weather',       label: 'Weather & Travel',        icon: '🌦️' },
 	];
 
 	let selected = $state('actions');
@@ -160,6 +162,186 @@
 		generatedSurnames = Array.from({ length: 10 }, () => generateOneSurname(nameType));
 	}
 
+	// ── Weather Generator ─────────────────────────────────────────
+	const seasonOptions = [
+		{ value: 'spring', label: 'Spring' },
+		{ value: 'summer', label: 'Summer' },
+		{ value: 'autumn', label: 'Autumn' },
+		{ value: 'winter', label: 'Winter' },
+	];
+	const biomeOptions = [
+		{ value: 'forest',    label: 'Forest'              },
+		{ value: 'plains',    label: 'Plains / Grassland'  },
+		{ value: 'mountains', label: 'Mountains'           },
+		{ value: 'desert',    label: 'Desert'              },
+		{ value: 'arctic',    label: 'Arctic / Tundra'     },
+		{ value: 'coastal',   label: 'Coastal'             },
+		{ value: 'swamp',     label: 'Swamp / Marsh'       },
+		{ value: 'jungle',    label: 'Jungle / Rainforest' },
+	];
+
+	// Base temperature level (0=freezing … 7=scorching) at midday
+	const biomeSeasonTemp: Record<string, Record<string, number>> = {
+		forest:    { spring: 4, summer: 5, autumn: 3, winter: 2 },
+		plains:    { spring: 4, summer: 6, autumn: 3, winter: 2 },
+		mountains: { spring: 3, summer: 5, autumn: 2, winter: 0 },
+		desert:    { spring: 6, summer: 7, autumn: 5, winter: 3 },
+		arctic:    { spring: 1, summer: 3, autumn: 1, winter: 0 },
+		coastal:   { spring: 4, summer: 5, autumn: 3, winter: 2 },
+		swamp:     { spring: 5, summer: 6, autumn: 4, winter: 3 },
+		jungle:    { spring: 6, summer: 6, autumn: 6, winter: 5 },
+	};
+	const tempLabels = ['Freezing','Bitter cold','Cold','Cool','Mild','Warm','Hot','Scorching'];
+	const timeOffsets: Record<string, number> = { dawn: -2, morning: -1, midday: 0, evening: -1, night: -2 };
+
+	const conditionPools: Record<string, Record<string, string[]>> = {
+		forest:    { spring: ['clear','partly_cloudy','partly_cloudy','light_rain','fog','overcast','light_rain'],
+		             summer: ['clear','clear','partly_cloudy','thunderstorm','muggy','light_rain'],
+		             autumn: ['overcast','light_rain','fog','partly_cloudy','overcast','heavy_rain'],
+		             winter: ['overcast','light_snow','clear','fog','sleet','light_snow'] },
+		plains:    { spring: ['clear','partly_cloudy','thunderstorm','light_rain','overcast','clear'],
+		             summer: ['clear','clear','thunderstorm','partly_cloudy','haze'],
+		             autumn: ['clear','overcast','light_rain','fog','partly_cloudy'],
+		             winter: ['overcast','light_snow','clear','blizzard','partly_cloudy'] },
+		mountains: { spring: ['partly_cloudy','overcast','light_snow','light_rain','clear','fog'],
+		             summer: ['clear','partly_cloudy','thunderstorm','clear','overcast'],
+		             autumn: ['overcast','heavy_snow','sleet','fog','clear','light_snow'],
+		             winter: ['blizzard','heavy_snow','overcast','clear','blizzard'] },
+		desert:    { spring: ['clear','clear','sandstorm','partly_cloudy','clear','haze'],
+		             summer: ['clear','clear','sandstorm','haze','clear','thunderstorm'],
+		             autumn: ['clear','clear','sandstorm','partly_cloudy','haze'],
+		             winter: ['clear','partly_cloudy','overcast','light_rain','clear'] },
+		arctic:    { spring: ['overcast','light_snow','blizzard','partly_cloudy','fog'],
+		             summer: ['clear','partly_cloudy','fog','light_rain','overcast'],
+		             autumn: ['overcast','heavy_snow','blizzard','fog','light_snow'],
+		             winter: ['blizzard','heavy_snow','overcast','clear','blizzard'] },
+		coastal:   { spring: ['partly_cloudy','fog','light_rain','overcast','clear','strong_wind'],
+		             summer: ['clear','partly_cloudy','fog','clear','thunderstorm'],
+		             autumn: ['overcast','heavy_rain','fog','thunderstorm','partly_cloudy'],
+		             winter: ['overcast','heavy_rain','fog','sleet','clear'] },
+		swamp:     { spring: ['fog','light_rain','overcast','muggy','partly_cloudy','fog'],
+		             summer: ['muggy','heavy_rain','thunderstorm','fog','overcast'],
+		             autumn: ['fog','overcast','light_rain','muggy','heavy_rain'],
+		             winter: ['fog','overcast','sleet','cold_rain','partly_cloudy'] },
+		jungle:    { spring: ['heavy_rain','light_rain','muggy','partly_cloudy','thunderstorm'],
+		             summer: ['heavy_rain','thunderstorm','muggy','overcast','heavy_rain'],
+		             autumn: ['heavy_rain','muggy','partly_cloudy','thunderstorm','overcast'],
+		             winter: ['light_rain','muggy','partly_cloudy','overcast','light_rain'] },
+	};
+
+	type SlotTexts = { dawn: string; morning: string; midday: string; evening: string; night: string };
+	const conditionSlots: Record<string, SlotTexts> = {
+		clear:        { dawn:'☀️ Clear, stars fading',      morning:'☀️ Bright sunshine',         midday:'☀️ Clear blue skies',     evening:'☀️ Golden hour',          night:'✨ Clear, starry sky'      },
+		partly_cloudy:{ dawn:'⛅ Thin clouds at sunrise',   morning:'⛅ Partly cloudy',            midday:'⛅ Partly cloudy',         evening:'⛅ Drifting clouds',       night:'⛅ Patchy clouds'           },
+		overcast:     { dawn:'☁️ Leaden skies',             morning:'☁️ Overcast',                midday:'☁️ Heavy cloud cover',    evening:'☁️ Dark and overcast',    night:'☁️ No stars visible'      },
+		light_rain:   { dawn:'🌦 Light drizzle',            morning:'🌦 Patchy showers',           midday:'🌦 Steady drizzle',       evening:'🌧 Light rain',           night:'🌧 Drizzle overnight'    },
+		heavy_rain:   { dawn:'🌧 Heavy rain',               morning:'🌧 Downpour',                 midday:'🌧 Persistent heavy rain', evening:'🌧 Sheets of rain',       night:'🌧 Relentless rain'      },
+		thunderstorm: { dawn:'⛈ Distant thunder',          morning:'⛈ Storm building',           midday:'⛈ Thunderstorm',          evening:'⛈ Violent storm',         night:'⛈ Thunder and lightning'  },
+		fog:          { dawn:'🌫 Dense fog',                morning:'🌫 Fog lifting slowly',       midday:'🌫 Patchy fog',            evening:'🌫 Mist rolling in',      night:'🌫 Thick fog'             },
+		light_snow:   { dawn:'🌨 Dusting of snow',          morning:'🌨 Light flurries',           midday:'🌨 Light snowfall',        evening:'🌨 Snowflakes drifting',  night:'❄️ Light snow overnight'  },
+		heavy_snow:   { dawn:'❄️ Heavy snow',               morning:'❄️ Thick snowfall',           midday:'❄️ Heavy snowstorm',      evening:'❄️ Blinding snow',        night:'❄️ Deep snow falling'      },
+		blizzard:     { dawn:'❄️ Blizzard conditions',      morning:'❄️ Whiteout',                 midday:'❄️ Blizzard, zero vis.',  evening:'❄️ Raging blizzard',      night:'❄️ Blizzard raging'        },
+		sleet:        { dawn:'🌧 Icy sleet',                morning:'🌧 Sleet and rain',           midday:'🌧 Sleet',                evening:'❄️ Sleet turning to snow', night:'❄️ Frozen sleet'           },
+		sandstorm:    { dawn:'🏜️ Dust rising',              morning:'🏜️ Sandstorm building',       midday:'🏜️ Full sandstorm',      evening:'🏜️ Sand gusts',           night:'🏜️ Gritty winds'           },
+		haze:         { dawn:'🌅 Hazy dawn',                morning:'☀️ Hazy sunshine',            midday:'☀️ Scorching haze',       evening:'🌅 Hazy sunset',          night:'⛅ Hazy night sky'           },
+		muggy:        { dawn:'💧 Muggy and damp',           morning:'💧 Humid, oppressive',        midday:'💧 Stifling heat',         evening:'⛈ Muggy, storms brewing', night:'💧 Hot and humid'         },
+		strong_wind:  { dawn:'💨 Gusty winds',              morning:'💨 Strong coastal winds',     midday:'💨 Powerful gusts',        evening:'💨 Howling wind',         night:'💨 Gale-force winds'     },
+		cold_rain:    { dawn:'🌧 Cold grey rain',           morning:'🌧 Frigid drizzle',           midday:'🌧 Cold steady rain',      evening:'🌧 Bone-chilling rain',   night:'🌧 Cold rain'             },
+	};
+
+	const conditionBg: Record<string, string> = {
+		clear:'bg-amber-950/20', partly_cloudy:'bg-gray-800/40', overcast:'bg-gray-900/60',
+		light_rain:'bg-blue-950/40', heavy_rain:'bg-blue-950/60', thunderstorm:'bg-indigo-950/60',
+		fog:'bg-gray-800/60', light_snow:'bg-slate-800/50', heavy_snow:'bg-slate-800/70',
+		blizzard:'bg-slate-900/80', sleet:'bg-slate-800/50', sandstorm:'bg-amber-900/40',
+		haze:'bg-amber-900/30', muggy:'bg-green-950/40', strong_wind:'bg-gray-800/40', cold_rain:'bg-blue-950/40',
+	};
+
+	const windByCondition: Record<string, string[]> = {
+		thunderstorm:['Strong wind','Gusting','Gale'],
+		blizzard:    ['Gale','Howling gale','Strong wind'],
+		sandstorm:   ['Strong wind','Gusting','Gale'],
+		heavy_rain:  ['Moderate wind','Strong wind','Gusting'],
+		strong_wind: ['Strong wind','Gusting','Gale'],
+		clear:       ['Calm','Calm','Light breeze'],
+		fog:         ['Calm','Calm','Light breeze'],
+		haze:        ['Calm','Calm','Light breeze'],
+	};
+	const defaultWindPool = ['Calm','Light breeze','Light breeze','Moderate wind','Moderate wind','Strong wind'];
+
+	const weatherDays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+	const weatherTimeSlots = ['dawn','morning','midday','evening','night'] as const;
+	const timeSlotLabels: Record<string, string> = {
+		dawn:'Dawn', morning:'Morning', midday:'Midday', evening:'Evening', night:'Night'
+	};
+
+	type WeatherSlot = { sky: string; temp: string; wind: string; condition: string };
+	type DayWeather  = { day: string; slots: Record<string, WeatherSlot> };
+
+	let selectedSeason = $state('spring');
+	let selectedBiome  = $state('forest');
+	let weekWeather    = $state<DayWeather[]>([]);
+
+	const biomePaceData: Record<string, { mult: number; reason: string }> = {
+		forest:    { mult: 0.75, reason: 'Dense undergrowth, no roads' },
+		plains:    { mult: 1.0,  reason: 'Open ground' },
+		mountains: { mult: 0.5,  reason: 'Steep terrain and altitude' },
+		desert:    { mult: 0.75, reason: 'Sand, heat, no trails' },
+		arctic:    { mult: 0.75, reason: 'Snow, ice, and cold' },
+		coastal:   { mult: 1.0,  reason: 'Open shoreline' },
+		swamp:     { mult: 0.5,  reason: 'Deep mud and water crossings' },
+		jungle:    { mult: 0.5,  reason: 'Thick vegetation, no trails' },
+	};
+	const seasonPaceData: Record<string, { mult: number; reason: string }> = {
+		spring: { mult: 0.9,  reason: 'Muddy trails and spring floods' },
+		summer: { mult: 1.0,  reason: 'Clear conditions' },
+		autumn: { mult: 0.95, reason: 'Wet ground and shortening days' },
+		winter: { mult: 0.75, reason: 'Snow, ice, and bitter cold' },
+	};
+	const paceMult = $derived(
+		(biomePaceData[selectedBiome]?.mult ?? 1) * (seasonPaceData[selectedSeason]?.mult ?? 1)
+	);
+	const biomeMult   = $derived(biomePaceData[selectedBiome]?.mult ?? 1);
+	const seasonMult  = $derived(seasonPaceData[selectedSeason]?.mult ?? 1);
+	const biomeReason = $derived(biomePaceData[selectedBiome]?.reason ?? '');
+	const seasonReason = $derived(seasonPaceData[selectedSeason]?.reason ?? '');
+	const paceRows = $derived([
+		['Fast',   '400 ft/min', (4 * paceMult).toFixed(1) + ' mph', Math.round(30 * paceMult) + ' miles', '−5 to passive Perception; cannot use Stealth'],
+		['Normal', '300 ft/min', (3 * paceMult).toFixed(1) + ' mph', Math.round(24 * paceMult) + ' miles', 'No effect'],
+		['Slow',   '200 ft/min', (2 * paceMult).toFixed(1) + ' mph', Math.round(18 * paceMult) + ' miles', 'Can move stealthily; able to forage while traveling'],
+	] as [string,string,string,string,string][]);
+
+
+	function clamp(n: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, n)); }
+
+	function generateWeek() {
+		const baseTemp = biomeSeasonTemp[selectedBiome]?.[selectedSeason] ?? 4;
+		const pool     = conditionPools[selectedBiome]?.[selectedSeason] ?? ['clear','partly_cloudy','overcast'];
+		const result: DayWeather[] = [];
+		let frontCondition = pickRandom(pool);
+		let frontDaysLeft  = Math.floor(Math.random() * 3) + 1;
+		for (const day of weatherDays) {
+			if (frontDaysLeft <= 0) {
+				frontCondition = pickRandom(pool);
+				frontDaysLeft  = Math.floor(Math.random() * 3) + 1;
+			}
+			frontDaysLeft--;
+			const slots: Record<string, WeatherSlot> = {};
+			for (const t of weatherTimeSlots) {
+				const condition = Math.random() < 0.18 ? pickRandom(pool) : frontCondition;
+				const slotTexts = conditionSlots[condition] ?? conditionSlots['clear'];
+				const sky       = slotTexts[t];
+				const tempIdx   = clamp(baseTemp + (timeOffsets[t] ?? 0), 0, 7);
+				const temp      = tempLabels[tempIdx];
+				const wPool     = windByCondition[condition] ?? defaultWindPool;
+				const wind      = pickRandom(wPool);
+				slots[t] = { sky, temp, wind, condition };
+			}
+			result.push({ day, slots });
+		}
+		weekWeather = result;
+	}
+
 	function pickRandom<T>(arr: T[]): T {
 		return arr[Math.floor(Math.random() * arr.length)];
 	}
@@ -190,7 +372,7 @@
 	<!-- Header -->
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
 		<span class="text-xl">📖</span>
-		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Quick Rules</h2>
+		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Quick Reference</h2>
 		<p class="ml-2 hidden text-xs text-gray-500 sm:block">D&amp;D 5e combat reference</p>
 		<button
 			onclick={onclose}
@@ -954,6 +1136,130 @@
 							{/if}
 						</div>
 					{/if}
+				</div>
+
+			<!-- ── Weather & Travel ───────────────────────────────── -->
+			{:else if selected === 'weather'}
+				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">Weather &amp; Travel</h3>
+				<div class="flex flex-col gap-8">
+
+					<!-- Controls -->
+					<div class="flex flex-wrap items-center gap-4">
+						<div class="flex flex-col gap-1">
+							<label class="text-[10px] font-bold tracking-widest text-gray-500 uppercase" for="weather-season">Season</label>
+							<select id="weather-season" bind:value={selectedSeason} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each seasonOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
+							</select>
+						</div>
+						<div class="flex flex-col gap-1">
+							<label class="text-[10px] font-bold tracking-widest text-gray-500 uppercase" for="weather-biome">Biome</label>
+							<select id="weather-biome" bind:value={selectedBiome} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each biomeOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
+							</select>
+						</div>
+						<button onclick={generateWeek} class="mt-5 rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95">
+							Generate Week
+						</button>
+					</div>
+
+					<!-- 7-day weather table -->
+					{#if weekWeather.length > 0}
+						<div class="overflow-x-auto rounded-xl border border-gray-700">
+							<table class="min-w-full border-collapse text-xs">
+								<thead>
+									<tr class="border-b border-gray-700 bg-gray-900">
+										<th class="sticky left-0 z-10 bg-gray-900 px-3 py-2 text-left w-20"></th>
+										{#each weekWeather as dw}
+											<th class="px-3 py-2 text-center font-bold text-amber-400 tracking-wider">{dw.day}</th>
+										{/each}
+									</tr>
+								</thead>
+								<tbody>
+									{#each weatherTimeSlots as t}
+										<tr class="border-b border-gray-800/60">
+											<td class="sticky left-0 z-10 bg-gray-900 px-3 py-2.5 font-bold tracking-widest text-gray-400 uppercase text-[10px] whitespace-nowrap border-r border-gray-800">{timeSlotLabels[t]}</td>
+											{#each weekWeather as dw}
+												{@const slot = dw.slots[t]}
+												<td class="px-2.5 py-2 align-top {conditionBg[slot.condition] ?? 'bg-gray-800/30'}">
+													<div class="whitespace-nowrap font-medium text-white leading-snug">{slot.sky}</div>
+													<div class="mt-0.5 whitespace-nowrap text-[10px] text-gray-400">{slot.temp} · {slot.wind}</div>
+												</td>
+											{/each}
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					{:else}
+						<p class="text-sm text-gray-500">Select a season and biome, then click Generate Week.</p>
+					{/if}
+
+					<!-- Travel Pace -->
+					<section>
+						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">Travel Pace</h4>
+							{#if paceMult !== 1}
+								<div class="mb-3 rounded-lg border border-amber-700/40 bg-amber-950/20 px-3 py-2 text-xs text-amber-300 space-y-0.5">
+									<p class="font-bold">Pace adjusted for current conditions (×{paceMult.toFixed(2)})</p>
+									{#if biomeMult !== 1}<p class="text-amber-400/70">Biome ×{biomeMult} — {biomeReason}</p>{/if}
+									{#if seasonMult !== 1}<p class="text-amber-400/70">Season ×{seasonMult} — {seasonReason}</p>{/if}
+								</div>
+							{/if}
+						<table class="w-full text-sm">
+							<thead>
+								<tr class="border-b border-gray-700">
+									<th class="pb-2 text-left font-semibold text-gray-400 w-20">Pace</th>
+									<th class="pb-2 text-left font-semibold text-gray-400">Speed</th>
+									<th class="pb-2 text-left font-semibold text-gray-400">Per Hour</th>
+									<th class="pb-2 text-left font-semibold text-gray-400">Per Day</th>
+									<th class="pb-2 text-left font-semibold text-gray-400">Effect</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-gray-800">
+								{#each paceRows as [pace, ftmin, mph, mpd, effect]}
+									<tr>
+										<td class="py-2 pr-4 font-bold {pace === 'Fast' ? 'text-red-400' : pace === 'Slow' ? 'text-green-400' : 'text-white'}">{pace}</td>
+										<td class="py-2 pr-4 text-gray-300 tabular-nums">{ftmin}</td>
+										<td class="py-2 pr-4 text-gray-300 tabular-nums">{mph}</td>
+										<td class="py-2 pr-4 font-semibold text-amber-300 tabular-nums">{mpd}</td>
+										<td class="py-2 text-gray-400">{effect}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+						<div class="mt-4 space-y-2 text-sm text-gray-400">
+							<p><strong class="text-white">Difficult terrain</strong> — halve all distances (Fast: {Math.round(15 * paceMult)} mi, Normal: {Math.round(12 * paceMult)} mi, Slow: {Math.round(9 * paceMult)} mi/day).</p>
+							<p><strong class="text-white">Forced march</strong> — after 8 hours, each extra hour requires a CON save (DC 10 + 1 per hour past 8). Fail = 1 level of exhaustion.</p>
+							<p><strong class="text-white">Galloping mount</strong> — a mount can gallop at 2× fast pace (~8 mi/hr) for up to 1 hour before needing rest.</p>
+							<p><strong class="text-white">Stealth (slow pace)</strong> — each member rolls Stealth; group check = lowest individual roll.</p>
+						</div>
+					</section>
+
+					<!-- Navigation -->
+					<section>
+						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">Navigation</h4>
+						<p class="mb-3 text-sm text-gray-400">One party member acts as Navigator. The DM may call for a <strong class="text-white">Wisdom (Survival)</strong> check. On a fail, the party travels the wrong direction and must spend 1d6 hours reorienting.</p>
+						<table class="w-full max-w-lg text-sm">
+							<thead>
+								<tr class="border-b border-gray-700">
+									<th class="pb-2 text-left font-semibold text-gray-400">Terrain</th>
+									<th class="pb-2 text-left font-semibold text-gray-400 w-12">DC</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-gray-800">
+								{#each [
+									['Grassland, meadow, or farmland',                              '5'],
+									['Arctic, desert, hills, or open sea with clear skies',        '10'],
+									['Forest, jungle, swamp, mountains, or open sea (overcast)',   '15'],
+								] as [terrain, dc]}
+									<tr>
+										<td class="py-1.5 pr-4 text-gray-300">{terrain}</td>
+										<td class="py-1.5 font-black text-amber-300 text-lg">{dc}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</section>
+
 				</div>
 			{/if}
 
