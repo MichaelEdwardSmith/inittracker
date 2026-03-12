@@ -26,14 +26,14 @@ env.allowLocalModels = false;
 // ── Model ────────────────────────────────────────────────────────────────
 // whisper-tiny.en  ~75 MB  — fast first load, good enough for short commands
 // whisper-base.en  ~145 MB — noticeably better accuracy if load time is acceptable
-const MODEL_ID = 'Xenova/whisper-tiny.en';
+const MODEL_ID = 'Xenova/whisper-base.en';
 
 // Typed as any to avoid the overly complex union type the generic produces.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let asr: any = null;
 
 // ── Message handler ───────────────────────────────────────────────────────
-self.addEventListener('message', async (e: MessageEvent<{ type: string; audio?: Float32Array }>) => {
+self.addEventListener('message', async (e: MessageEvent<{ type: string; audio?: Float32Array; initial_prompt?: string }>) => {
 	const msg = e.data;
 
 	if (msg.type === 'load') {
@@ -62,7 +62,10 @@ self.addEventListener('message', async (e: MessageEvent<{ type: string; audio?: 
 			// sampling_rate is not in the TS types but the model expects 16 kHz PCM —
 		// we enforce that in the main thread via OfflineAudioContext before sending.
 		// .en models are English-only — don't pass language/task (multilingual-only options).
-		const result = await asr(msg.audio);
+		// initial_prompt biases the decoder toward domain vocab (combatant names, D&D terms).
+		const opts: Record<string, unknown> = {};
+		if (msg.initial_prompt) opts.initial_prompt = msg.initial_prompt;
+		const result = await asr(msg.audio, opts);
 			const text = (result as { text: string }).text.trim();
 			self.postMessage({ type: 'transcript', text });
 		} catch (err) {
