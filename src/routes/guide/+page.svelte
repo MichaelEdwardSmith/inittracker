@@ -25,7 +25,9 @@
 		{ id: 'encounter-builder', label: '13. Encounter Builder' },
 		{ id: 'spell-reference', label: '14. Spell Reference' },
 		{ id: 'player-messaging', label: '15. Player Messaging' },
-		{ id: 'contact', label: '16. Contact & Support' }
+		{ id: 'contact', label: '16. Contact & Support' },
+		{ id: 'voice-commands', label: '17. Voice Commands (Beta)' },
+		{ id: 'audio-mixer', label: '18. Audio Mixer' }
 	];
 
 	const conditions = [
@@ -138,14 +140,6 @@
 						{item.label}
 					</a>
 				{/each}
-				{#if data.showVoiceCommands}
-					<a
-						href="#voice-commands"
-						class="block truncate rounded px-2 py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300"
-					>
-						17. Voice Commands (Beta)
-					</a>
-				{/if}
 			</nav>
 		</aside>
 
@@ -1615,6 +1609,97 @@
 				</ul>
 			</section>
 
+			<!-- 18 ─────────────────────────────────────── -->
+			<section id="audio-mixer">
+				{@render h2('18', 'Audio Mixer')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the
+					dashboard header to open a full-screen ambient audio board. Layer music, atmosphere, and
+					sound effects across as many channels as you need — audio keeps playing in the background
+					when the mixer is closed.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Channel Controls
+				</h3>
+				{@render dataTable(
+					['Control', 'What it does'],
+					[
+						['Label', 'Click to rename the channel — saved automatically'],
+						['Coloured dot', 'Status: grey = stopped, green = playing, amber = solo active'],
+						['File area', 'Click to pick an audio file from your device (see File Persistence below)'],
+						['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
+						['▶ / ■ button', 'Start or stop playback on this channel'],
+						['S (Solo)', 'Solo this channel — mutes all others while active'],
+						['M (Mute)', 'Mute this channel without stopping playback'],
+						['✕', 'Remove the channel and delete its saved file reference']
+					]
+				)}
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Master Channel
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The leftmost strip is the master channel. Its fader scales every channel simultaneously.
+					The <strong class="font-semibold text-white">Stop All</strong> button stops playback on
+					every channel at once.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Adding Channels
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end
+					of the mixer to append a new blank channel. The mixer starts with 5 channels; there is no
+					maximum.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					What Is Remembered
+				</h3>
+				{@render dataTable(
+					['Setting', 'Remembered?'],
+					[
+						['Channel count &amp; order', 'Always — saved in browser storage'],
+						['Channel labels', 'Always — saved in browser storage'],
+						['Volume faders (per channel &amp; master)', 'Always — saved in browser storage'],
+						['Selected audio files', 'Chrome / Edge only (see below) — not remembered on Firefox']
+					]
+				)}
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					File Persistence (Chrome &amp; Edge)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					On Chrome and Edge, the mixer uses the browser's
+					<strong class="font-semibold text-white">File System Access API</strong> to remember your
+					chosen files — it stores a lightweight reference to the file on disk rather than copying
+					audio data into browser storage, so there are no storage quota issues.
+				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">Same browser session</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Files reload silently — permission is already held and nothing extra is required.
+				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					The browser clears file permissions on exit. Channels that need re-authorization show a
+					<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber.
+					Click it once — the browser shows a one-time permission prompt — and the file reloads
+					automatically.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Tips
+				</h3>
+				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>The mixer keeps playing after you close it — run combat while music plays in the background</li>
+					<li>Use <strong class="font-semibold text-white">Solo</strong> to quickly audition a single channel without changing other faders</li>
+					<li>Use <strong class="font-semibold text-white">Mute</strong> for a clean cut; setting the fader to 0 still leaves the channel technically active</li>
+					<li>On Firefox, audio files must be re-selected after every page reload; consider keeping the mixer tab open for long sessions</li>
+					<li><strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset faders or unload files</li>
+				</ul>
+			</section>
 
 			{/if}
 		</main>

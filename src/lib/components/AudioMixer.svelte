@@ -63,20 +63,28 @@
 	const PAD       = 32;  // px — p-4 on each side of the channel area
 
 	interface Channel {
-		id: string;       // stable UUID — IndexedDB key for the saved audio file
+		id: string;       // stable UUID — IndexedDB key for the saved file handle
 		label: string;
 		fileName: string | null;
+		// Set when the handle was restored but permission hasn't been granted yet
+		// (requires a user gesture to call requestPermission).
+		pendingHandle: FileSystemFileHandle | null;
+		persistFailed: boolean; // fallback: true when ArrayBuffer save hits quota
 		volume: number;
 		muted: boolean;
 		solo: boolean;
 		playing: boolean;
 	}
 
-	// ── IndexedDB helpers — persist audio Blobs across page loads ─────────────
+	// File System Access API available in Chrome/Edge — stores a tiny handle
+	// reference instead of the full file content, so quota is never an issue.
+	const hasFSA = browser && 'showOpenFilePicker' in window;
+
+	// ── IndexedDB helpers ─────────────────────────────────────────────────────
 	const IDB_NAME  = 'dm-mixer-files';
 	const IDB_STORE = 'files';
 
-	function openIDB(): Promise<IDBDatabase> {
+	function openFreshIDB(): Promise<IDBDatabase> {
 		return new Promise((resolve, reject) => {
 			const req = indexedDB.open(IDB_NAME, 1);
 			req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
@@ -85,40 +93,129 @@
 		});
 	}
 
-	async function idbSave(key: string, blob: Blob, name: string) {
+	async function idbPut(key: string, value: unknown): Promise<boolean> {
+		let db: IDBDatabase | null = null;
 		try {
-			const db = await openIDB();
+			db = await openFreshIDB();
 			await new Promise<void>((res, rej) => {
-				const tx = db.transaction(IDB_STORE, 'readwrite');
-				tx.objectStore(IDB_STORE).put({ blob, name }, key);
+				const tx  = db!.transaction(IDB_STORE, 'readwrite');
+				const req = tx.objectStore(IDB_STORE).put(value, key);
+				req.onerror = (e) => { e.preventDefault(); rej(req.error); };
 				tx.oncomplete = () => res();
-				tx.onerror    = () => rej(tx.error);
+				tx.onabort    = () => rej(tx.error ?? new Error('IDB transaction aborted'));
 			});
-		} catch { /* silent — file just won't persist */ }
+			return true;
+		} catch (err) { console.warn('[Mixer] idbPut failed:', err); return false; }
+		finally { db?.close(); }
 	}
 
-	async function idbLoad(key: string): Promise<{ blob: Blob; name: string } | null> {
+	type IdbEntry =
+		| { kind: 'handle'; handle: FileSystemFileHandle; name: string }
+		| { kind: 'blob';   blob: Blob;                   name: string };
+
+	async function idbLoad(key: string): Promise<IdbEntry | null> {
+		let db: IDBDatabase | null = null;
 		try {
-			const db = await openIDB();
-			return await new Promise((resolve) => {
-				const tx  = db.transaction(IDB_STORE, 'readonly');
+			db = await openFreshIDB();
+			const raw = await new Promise<Record<string, unknown> | null>((resolve) => {
+				const tx  = db!.transaction(IDB_STORE, 'readonly');
 				const req = tx.objectStore(IDB_STORE).get(key);
-				req.onsuccess = () => resolve((req.result as { blob: Blob; name: string }) ?? null);
+				req.onsuccess = () => resolve((req.result as Record<string, unknown>) ?? null);
 				req.onerror   = () => resolve(null);
 			});
-		} catch { return null; }
+			if (!raw) return null;
+			if (raw.handle)                        return { kind: 'handle', handle: raw.handle as FileSystemFileHandle, name: raw.name as string };
+			if (raw.buffer instanceof ArrayBuffer) return { kind: 'blob', blob: new Blob([raw.buffer], { type: raw.type as string }), name: raw.name as string };
+			if (raw.blob   instanceof Blob)        return { kind: 'blob', blob: raw.blob as Blob, name: raw.name as string };
+			return null;
+		} catch (err) { console.warn('[Mixer] idbLoad failed:', err); return null; }
+		finally { db?.close(); }
 	}
 
 	async function idbDelete(key: string) {
+		let db: IDBDatabase | null = null;
 		try {
-			const db = await openIDB();
+			db = await openFreshIDB();
 			await new Promise<void>((res) => {
-				const tx = db.transaction(IDB_STORE, 'readwrite');
+				const tx = db!.transaction(IDB_STORE, 'readwrite');
 				tx.objectStore(IDB_STORE).delete(key);
 				tx.oncomplete = () => res();
-				tx.onerror    = () => res();
+				tx.onabort    = () => res();
 			});
 		} catch { /* silent */ }
+		finally { db?.close(); }
+	}
+
+	// ── File System Access API path (Chrome/Edge) ─────────────────────────────
+	// Opens the OS file picker, stores a tiny handle reference in IDB.
+	async function showFilePicker(i: number) {
+		try {
+			type FSAPicker = { showOpenFilePicker: (o?: unknown) => Promise<FileSystemFileHandle[]> };
+		const [handle] = await (window as unknown as FSAPicker)
+			.showOpenFilePicker({ types: [{ description: 'Audio', accept: { 'audio/*': [] } }], multiple: false });
+			await applyHandle(i, handle, /* saveToIdb */ true);
+		} catch { /* user cancelled */ }
+	}
+
+	// Reads the file from a handle, wires up the audio element, optionally saves.
+	async function applyHandle(i: number, handle: FileSystemFileHandle, saveToIdb: boolean) {
+		try {
+			const file = await handle.getFile();
+			const a = audios[i];
+			const wasPlaying = channels[i].playing;
+			a.pause();
+			if (a.src.startsWith('blob:')) URL.revokeObjectURL(a.src);
+			a.src = URL.createObjectURL(file);
+			a.load();
+			channels[i].fileName     = file.name;
+			channels[i].pendingHandle = null;
+			channels[i].persistFailed = false;
+			channels[i].playing       = false;
+			if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
+			applyVol(i);
+			if (saveToIdb) {
+				const ok = await idbPut(channels[i].id, { handle, name: file.name });
+				channels[i].persistFailed = !ok;
+				saveSettings();
+			}
+		} catch (err) { console.warn('[Mixer] applyHandle failed:', err); }
+	}
+
+	// Called when user clicks "Tap to restore" on a channel with a pending handle.
+	// Must be called from a user-gesture context so requestPermission is allowed.
+	async function restoreFromHandle(i: number) {
+		const handle = channels[i].pendingHandle;
+		if (!handle) return;
+		try {
+			type WithPerm = { requestPermission(o: { mode: string }): Promise<PermissionState> };
+		const perm = await (handle as unknown as WithPerm).requestPermission({ mode: 'read' });
+			if (perm === 'granted') await applyHandle(i, handle, /* saveToIdb */ false);
+		} catch (err) { console.warn('[Mixer] restoreFromHandle failed:', err); }
+	}
+
+	// ── Fallback path (Firefox / non-FSA browsers) — store ArrayBuffer in IDB ─
+	function handleFile(i: number, e: Event) {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (!file) return;
+		const a = audios[i];
+		const wasPlaying = channels[i].playing;
+		a.pause();
+		if (a.src.startsWith('blob:')) URL.revokeObjectURL(a.src);
+		a.src = URL.createObjectURL(file);
+		a.load();
+		channels[i].fileName     = file.name;
+		channels[i].pendingHandle = null;
+		channels[i].persistFailed = false;
+		channels[i].playing       = false;
+		if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
+		applyVol(i);
+		saveSettings();
+		idbPut(channels[i].id, { buffer: null, name: file.name, _needsBuffer: true });
+		// Read the ArrayBuffer async and then overwrite with the real entry.
+		file.arrayBuffer().then((buffer) =>
+			idbPut(channels[i].id, { buffer, type: file.type || 'audio/mpeg', name: file.name })
+				.then((ok) => { channels[i].persistFailed = !ok; })
+		);
 	}
 
 	// ── Persistence ───────────────────────────────────────────────────────────
@@ -145,13 +242,15 @@
 	let masterVolume  = $state(saved.master ?? 0.8);
 	let channels      = $state<Channel[]>(
 		Array.from({ length: initCount }, (_, i) => ({
-			id:       saved.ids?.[i] ?? crypto.randomUUID(),
-			label:    saved.labels?.[i] ?? `Channel ${i + 1}`,
-			fileName: null,
-			volume:   saved.volumes?.[i] ?? 0.8,
-			muted:    false,
-			solo:     false,
-			playing:  false
+			id:            saved.ids?.[i] ?? crypto.randomUUID(),
+			label:         saved.labels?.[i] ?? `Channel ${i + 1}`,
+			fileName:      null,
+			pendingHandle: null,
+			persistFailed: false,
+			volume:        saved.volumes?.[i] ?? 0.8,
+			muted:         false,
+			solo:          false,
+			playing:       false
 		}))
 	);
 
@@ -190,20 +289,40 @@
 		: [];
 
 	// ── Restore saved files from IndexedDB on mount ───────────────────────────
-	if (browser) {
+	let _filesRestored = false;
+	$effect(() => {
+		if (!browser || _filesRestored) return;
+		_filesRestored = true;
+		const ids = channels.map((c) => c.id);
 		(async () => {
-			for (let i = 0; i < channels.length; i++) {
-				const saved = await idbLoad(channels[i].id);
-				if (saved) {
-					const a = audios[i];
-					a.src = URL.createObjectURL(saved.blob);
-					a.load();
-					channels[i].fileName = saved.name;
-					applyVol(i);
+			for (let i = 0; i < ids.length; i++) {
+				try {
+					const entry = await idbLoad(ids[i]);
+					if (!entry || !audios[i]) continue;
+
+					if (entry.kind === 'handle') {
+						// Check permission without requiring a user gesture.
+						type WithQuery = { queryPermission(o: { mode: string }): Promise<PermissionState> };
+						const perm = await (entry.handle as unknown as WithQuery).queryPermission({ mode: 'read' });
+						if (perm === 'granted') {
+							await applyHandle(i, entry.handle, /* saveToIdb */ false);
+						} else {
+							// Permission needs re-granting — show the "Tap to restore" UI.
+							channels[i].fileName     = entry.name;
+							channels[i].pendingHandle = entry.handle;
+						}
+					} else {
+						audios[i].src = URL.createObjectURL(entry.blob);
+						audios[i].load();
+						channels[i].fileName = entry.name;
+						applyVol(i);
+					}
+				} catch (err) {
+					console.warn(`[Mixer] Failed to restore channel ${i}:`, err);
 				}
 			}
 		})();
-	}
+	});
 
 	const anySolo = $derived(channels.some((c) => c.solo));
 
@@ -246,22 +365,6 @@
 	}
 
 	// ── Channel actions ───────────────────────────────────────────────────────
-	function handleFile(i: number, e: Event) {
-		const file = (e.target as HTMLInputElement).files?.[0];
-		if (!file) return;
-		const a = audios[i];
-		const wasPlaying = channels[i].playing;
-		a.pause();
-		if (a.src.startsWith('blob:')) URL.revokeObjectURL(a.src);
-		a.src = URL.createObjectURL(file);
-		a.load();
-		channels[i].fileName = file.name;
-		channels[i].playing = false;
-		if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
-		applyVol(i);
-		// Persist to IndexedDB so the file survives page reloads.
-		idbSave(channels[i].id, file, file.name);
-	}
 
 	function fadeOutAndStop(i: number, duration = 400) {
 		const a = audios[i];
@@ -328,7 +431,7 @@
 	// ── Add / remove channels ─────────────────────────────────────────────────
 	function addChannel() {
 		const n = channels.length + 1;
-		channels.push({ id: crypto.randomUUID(), label: `Channel ${n}`, fileName: null, volume: 0.8, muted: false, solo: false, playing: false });
+		channels.push({ id: crypto.randomUUID(), label: `Channel ${n}`, fileName: null, pendingHandle: null, persistFailed: false, volume: 0.8, muted: false, solo: false, playing: false });
 		faderHeights.push(0);
 		remainingTimes.push(null);
 		if (browser) {
@@ -412,21 +515,46 @@
 		</div>
 
 		<!-- File upload -->
-		<label class="block cursor-pointer">
-			<input
-				type="file"
-				accept="audio/*"
-				class="sr-only"
-				onchange={(e) => handleFile(i, e)}
-			/>
-			<div class="rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10">
-				{#if ch.fileName}
-					<span class="block w-full truncate text-[10px] leading-tight text-amber-300" title={ch.fileName}>{ch.fileName}</span>
-				{:else}
-					<span class="text-[10px] text-gray-500">Upload audio</span>
-				{/if}
-			</div>
-		</label>
+		{#if hasFSA}
+			{#if ch.pendingHandle}
+				<!-- Handle loaded but needs permission re-grant (new browser session) -->
+				<button
+					onclick={() => restoreFromHandle(i)}
+					class="block w-full rounded border border-dashed border-amber-600/60 bg-amber-950/20 px-2 py-2 text-center transition hover:border-amber-500 hover:bg-amber-900/30"
+					title="Click to restore — browser needs permission to re-read this file"
+				>
+					<span class="block w-full truncate text-[10px] leading-tight text-amber-400/80" title={ch.fileName ?? ''}>🔒 {ch.fileName}</span>
+				</button>
+			{:else}
+				<button
+					onclick={() => showFilePicker(i)}
+					class="block w-full rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10"
+				>
+					{#if ch.fileName}
+						<span class="block w-full truncate text-[10px] leading-tight text-amber-300" title={ch.fileName}>{ch.fileName}</span>
+					{:else}
+						<span class="text-[10px] text-gray-500">Upload audio</span>
+					{/if}
+				</button>
+			{/if}
+		{:else}
+			<!-- Fallback for Firefox / non-FSA browsers -->
+			<label class="block cursor-pointer">
+				<input type="file" accept="audio/*" class="sr-only" onchange={(e) => handleFile(i, e)} />
+				<div class="rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10">
+					{#if ch.fileName}
+						<span class="block w-full truncate text-[10px] leading-tight text-amber-300" title={ch.fileName}>{ch.fileName}</span>
+					{:else}
+						<span class="text-[10px] text-gray-500">Upload audio</span>
+					{/if}
+				</div>
+			</label>
+			{#if ch.persistFailed}
+				<div class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400" title="File too large for browser storage — plays this session only">
+					⚠ won't persist
+				</div>
+			{/if}
+		{/if}
 
 		<!-- Time remaining -->
 		<div class="text-center font-mono text-[10px] tabular-nums {remainingTimes[i] != null ? 'text-gray-400' : 'text-gray-700'}">

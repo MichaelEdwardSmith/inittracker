@@ -25,7 +25,9 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 14. [Spell Reference](#14-spell-reference)
 15. [Player Messaging](#15-player-messaging)
 16. [Voice Commands *(Beta)*](#16-voice-commands-beta)
-17. [Contact & Support](#17-contact--support)
+17. [Audio Mixer](#17-audio-mixer)
+18. [Contact & Support](#18-contact--support)
+
 
 ---
 
@@ -740,13 +742,73 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 
 ---
 
-## 16. Contact & Support
+## 18. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
 
 ---
 
-## 17. Voice Commands *(Beta)*
+## 17. Audio Mixer
+
+Click the **🎚 Mixer** button in the DM dashboard header to open the full-screen audio mixer. Use it to layer ambient sounds — dungeon ambience, tavern noise, battle music — that play in the background while you run your session.
+
+### Opening & Closing
+
+Click **🎚 Mixer** in the header to open the mixer overlay. Click the **✕** button (top-right of the mixer) or press **Escape** to close it. Audio continues playing in the background when the mixer is closed — there is no need to keep it open.
+
+### Channels
+
+The mixer starts with **5 channels**. Each channel strip contains:
+
+| Control | Description |
+|---|---|
+| **Label** (text field at top) | Editable channel name — click to rename |
+| **Green dot** | Pulses while audio is playing on this channel |
+| **File area** | Click to pick an audio file from your computer |
+| **Timer** | Counts down the remaining play time for the loaded clip |
+| **Volume fader** | Vertical slider controlling this channel's level |
+| **▶ Play / ■ Stop** | Start or stop playback with a 400 ms fade-out on stop |
+| **S (Solo)** | Mutes all other channels so only soloed channels play |
+| **M (Mute)** | Silences this channel without stopping playback |
+| **✕ (Delete)** | Removes the channel and clears its saved file |
+
+All clips loop automatically.
+
+### Master Channel
+
+The **Master** strip (leftmost) controls the overall output level with a dedicated vertical fader. The **Stop All** button on the master strip fades out and stops every playing channel at once.
+
+### Adding Channels
+
+Click the **+ Add a Channel** card at the end of the channel row to add a new channel. There is no upper limit.
+
+### What Is Remembered
+
+| Setting | Persisted |
+|---|---|
+| Channel labels | ✅ Always (localStorage) |
+| Volume levels | ✅ Always (localStorage) |
+| Master volume | ✅ Always (localStorage) |
+| Selected audio files | ✅ Chrome/Edge (File System Access API) |
+| Selected audio files | ⚠️ Firefox — stored in browser cache; large files may hit storage limits |
+
+### File Persistence on Chrome / Edge
+
+When you pick a file on Chrome or Edge, the mixer saves a lightweight **reference** to the file on your hard drive (not the file's content). This means there are no browser storage limits regardless of file size.
+
+- **Same browser session** — files reload silently when you open the page.
+- **After a browser restart** — the channel shows **🔒 [filename]**. Click it once and the browser will ask permission to re-read the file. Grant it and the audio loads instantly.
+
+### Tips
+
+- Keep the mixer closed during play — the audio keeps running and the tracker remains fully interactive.
+- Use **Solo** to quickly preview one track without changing any volume faders.
+- Label your channels with descriptive names (e.g. *Dungeon Ambience*, *Boss Fight Music*) so you can find them at a glance mid-session.
+- For the best experience on Chrome or Edge, pick files from a stable location on your drive (not a USB stick or network share) so they are always accessible when the browser requests permission.
+
+---
+
+## 16. Voice Commands *(Beta)*
 
 > ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
 
