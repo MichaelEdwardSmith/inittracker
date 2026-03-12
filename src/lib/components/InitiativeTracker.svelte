@@ -243,7 +243,7 @@
 		</div>
 	{:else}
 		<!-- Combatant rows -->
-		<div class="flex flex-1 flex-col gap-1.5 overflow-y-auto">
+		<div class="flex flex-1 flex-col gap-5 overflow-y-auto pr-2">
 			{#each combat.sorted as c, i (c.id)}
 				{@const isDead = c.currentHp === 0}
 				{@const isActive = c.id === combat.currentTurnId}
