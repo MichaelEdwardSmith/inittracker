@@ -26,6 +26,7 @@
 		{ id: 'magic',         label: 'Magic & Casting',         icon: '✨' },
 		{ id: 'names',         label: 'Name Generator',          icon: '📛' },
 		{ id: 'weather',       label: 'Weather & Travel',        icon: '🌦️' },
+		{ id: 'shop',          label: 'Shop Generator',           icon: '🛒' },
 	];
 
 	let selected = $state('actions');
@@ -358,6 +359,622 @@
 		return name.charAt(0).toUpperCase() + name.slice(1);
 	}
 
+
+	// ── Shop Generator ──────────────────────────────────────────────────────────────────────
+	type ShopItemDef = { name: string; price: number; rarity?: string };
+	const shopData: Record<string, { label: string; items: ShopItemDef[] }> = {
+		general:   { label: 'General Store', items: [
+			{ name: 'Torch', price: 0.01 }, { name: 'Rations (1 day)', price: 0.5 },
+			{ name: 'Rope, hempen (50 ft)', price: 1 }, { name: 'Waterskin', price: 0.2 },
+			{ name: 'Lantern, hooded', price: 5 }, { name: 'Oil (flask)', price: 0.1 },
+			{ name: 'Bedroll', price: 1 }, { name: 'Backpack', price: 2 },
+			{ name: 'Tinderbox', price: 0.5 }, { name: 'Crowbar', price: 2 },
+			{ name: 'Hammer', price: 1 }, { name: 'Pot, iron', price: 2 },
+			{ name: 'Shovel', price: 2 }, { name: 'Tent (2-person)', price: 2 },
+			{ name: 'Mirror, steel', price: 5 }, { name: 'Blanket', price: 0.5 },
+			{ name: 'Grappling hook', price: 2 }, { name: 'Candle (10)', price: 0.1 },
+			{ name: 'Chalk (10 pieces)', price: 0.1 }, { name: 'Soap', price: 0.02 },
+			{ name: 'Sack', price: 0.01 }, { name: 'Ball bearings (bag)', price: 1 },
+			{ name: 'Signal whistle', price: 0.05 }, { name: 'Block and tackle', price: 1 },
+		] },
+		weapon:    { label: 'Weaponsmith', items: [
+			{ name: 'Dagger', price: 2 }, { name: 'Handaxe', price: 5 },
+			{ name: 'Shortsword', price: 10 }, { name: 'Longsword', price: 15 },
+			{ name: 'Battleaxe', price: 10 }, { name: 'Greatsword', price: 50 },
+			{ name: 'Greataxe', price: 30 }, { name: 'Mace', price: 5 },
+			{ name: 'Warhammer', price: 15 }, { name: 'Spear', price: 1 },
+			{ name: 'Javelin', price: 0.5 }, { name: 'Light hammer', price: 2 },
+			{ name: 'Quarterstaff', price: 0.2 }, { name: 'Pike', price: 5 },
+			{ name: 'Rapier', price: 25 }, { name: 'Flail', price: 10 },
+			{ name: 'Trident', price: 5 }, { name: 'Whip', price: 2 },
+			{ name: 'Arrows (20)', price: 1 }, { name: 'Crossbow bolts (20)', price: 1 },
+			{ name: 'Whetstone', price: 0.01 },
+		] },
+		armor:     { label: 'Armorer', items: [
+			{ name: 'Padded armor', price: 5 }, { name: 'Leather armor', price: 10 },
+			{ name: 'Studded leather', price: 45 }, { name: 'Ring mail', price: 30 },
+			{ name: 'Chain shirt', price: 50 }, { name: 'Scale mail', price: 50 },
+			{ name: 'Chain mail', price: 75 }, { name: 'Breastplate', price: 400 },
+			{ name: 'Half plate', price: 750 }, { name: 'Shield', price: 10 },
+			{ name: 'Helmet', price: 10 }, { name: 'Gauntlets', price: 5 },
+			{ name: 'Greaves', price: 10 }, { name: 'Vambrace (pair)', price: 8 },
+		] },
+		alchemist: { label: 'Alchemist', items: [
+			{ name: 'Potion of Healing', price: 50 }, { name: 'Antitoxin', price: 50 },
+			{ name: 'Acid (vial)', price: 25 }, { name: "Alchemist's fire", price: 50 },
+			{ name: 'Holy water (flask)', price: 25 }, { name: "Healer's kit", price: 5 },
+			{ name: 'Vial (empty)', price: 1 }, { name: 'Perfume (vial)', price: 5 },
+			{ name: 'Poison, basic (vial)', price: 100 }, { name: 'Potion of Climbing', price: 75 },
+			{ name: 'Ink (1 oz)', price: 10 }, { name: 'Candle (10)', price: 0.1 },
+			{ name: 'Soap', price: 0.02 }, { name: 'Smokestick', price: 10 },
+			{ name: 'Oil of Slipperiness', price: 150 },
+		] },
+		magic:     { label: 'Magic Shop', items: [
+			{ name: 'Spell Scroll (cantrip)', price: 25 }, { name: 'Spell Scroll (1st level)', price: 75 },
+			{ name: 'Spell Scroll (2nd level)', price: 150 }, { name: 'Spell Scroll (3rd level)', price: 300 },
+			{ name: 'Potion of Healing', price: 50 }, { name: 'Potion of Greater Healing', price: 150 },
+			{ name: 'Component pouch', price: 25 }, { name: 'Arcane focus (crystal)', price: 10 },
+			{ name: 'Arcane focus (orb)', price: 20 }, { name: 'Arcane focus (wand)', price: 10 },
+			{ name: 'Spellbook (blank)', price: 50 }, { name: 'Holy symbol (amulet)', price: 5 },
+			{ name: 'Druidic focus (staff)', price: 5 }, { name: 'Pearl (spell component)', price: 100 },
+			{ name: 'Diamond dust (per oz)', price: 300 }, { name: 'Identify (service)', price: 20 },
+		] },
+		jeweler:   { label: 'Jeweler', items: [
+			{ name: 'Copper bracelet', price: 5 }, { name: 'Silver ring', price: 10 },
+			{ name: 'Silver necklace', price: 15 }, { name: 'Gold ring', price: 25 },
+			{ name: 'Onyx pendant', price: 30 }, { name: 'Pearl earrings', price: 50 },
+			{ name: 'Garnet brooch', price: 60 }, { name: 'Jade bracelet', price: 75 },
+			{ name: 'Amethyst ring', price: 80 }, { name: 'Topaz earrings', price: 90 },
+			{ name: 'Sapphire pendant', price: 100 }, { name: 'Opal amulet', price: 120 },
+			{ name: 'Ruby brooch', price: 150 }, { name: 'Emerald necklace', price: 200 },
+			{ name: 'Diamond stud', price: 200 },
+		] },
+		tavern:    { label: 'Tavern & Inn', items: [
+			{ name: 'Ale (mug)', price: 0.04 }, { name: 'Ale (gallon)', price: 0.2 },
+			{ name: 'Wine, common (pitcher)', price: 0.2 }, { name: 'Wine, fine (bottle)', price: 10 },
+			{ name: 'Mead (mug)', price: 0.05 }, { name: 'Meal, poor', price: 0.03 },
+			{ name: 'Meal, modest', price: 0.3 }, { name: 'Meal, fine', price: 5 },
+			{ name: 'Room, poor (per night)', price: 0.1 }, { name: 'Room, modest (per night)', price: 0.5 },
+			{ name: 'Room, comfortable (per night)', price: 2 }, { name: 'Stabling (per night)', price: 0.5 },
+			{ name: 'Bread, loaf', price: 0.02 }, { name: 'Meat, chunk', price: 0.03 },
+			{ name: 'Pipe tobacco (pouch)', price: 0.5 },
+		] },
+		book:      { label: 'Bookshop', items: [
+			{ name: 'Common book', price: 25 }, { name: 'History tome', price: 100 },
+			{ name: 'Rare tome', price: 250 }, { name: 'Blank journal', price: 10 },
+			{ name: 'Ink (1 oz)', price: 10 }, { name: 'Ink pen', price: 0.02 },
+			{ name: 'Paper (sheet)', price: 0.02 }, { name: 'Parchment (sheet)', price: 0.01 },
+			{ name: 'Scroll case', price: 1 }, { name: 'Map, local area', price: 5 },
+			{ name: 'Map, regional', price: 20 }, { name: 'Spellbook (blank)', price: 50 },
+			{ name: 'Sealing wax', price: 0.05 }, { name: 'Star chart', price: 30 },
+		] },
+		herbalist: { label: 'Herbalist', items: [
+			{ name: "Healer's kit", price: 5 }, { name: 'Healing salve (minor)', price: 10 },
+			{ name: 'Potion of Healing', price: 50 }, { name: 'Antitoxin', price: 50 },
+			{ name: 'Common herbs (bundle)', price: 0.5 }, { name: 'Rare herb (single)', price: 15 },
+			{ name: 'Fever bark (strip)', price: 2 }, { name: 'Sleep dust (pinch)', price: 5 },
+			{ name: 'Wound poultice', price: 3 }, { name: 'Dried mushrooms (bundle)', price: 0.5 },
+			{ name: 'Eye drops, clarity', price: 8 }, { name: 'Calming draught', price: 6 },
+			{ name: 'Fortifying tea (pouch)', price: 1 }, { name: 'Breath tonic (vial)', price: 4 },
+		] },
+		fletcher:  { label: 'Fletcher & Bowyer', items: [
+			{ name: 'Shortbow', price: 25 }, { name: 'Longbow', price: 50 },
+			{ name: 'Hand crossbow', price: 75 }, { name: 'Light crossbow', price: 25 },
+			{ name: 'Heavy crossbow', price: 50 }, { name: 'Arrows (20)', price: 1 },
+			{ name: 'Crossbow bolts (20)', price: 1 }, { name: 'Blowgun', price: 10 },
+			{ name: 'Blowgun needles (50)', price: 1 }, { name: 'Quiver', price: 1 },
+			{ name: 'Net', price: 1 }, { name: 'Sling', price: 0.1 },
+			{ name: 'Sling bullets (20)', price: 0.04 }, { name: 'Arrow (silvered)', price: 25 },
+			{ name: 'Bowstring (replacement)', price: 0.5 },
+		] },
+		stable:    { label: 'Stable', items: [
+			{ name: 'Riding horse', price: 75 }, { name: 'Draft horse', price: 50 },
+			{ name: 'Warhorse', price: 400 }, { name: 'Pony', price: 30 },
+			{ name: 'Donkey / Mule', price: 8 }, { name: 'Mastiff (guard dog)', price: 25 },
+			{ name: 'Saddle, riding', price: 10 }, { name: 'Saddle, military', price: 20 },
+			{ name: 'Saddle, pack', price: 5 }, { name: 'Saddlebags', price: 4 },
+			{ name: 'Cart', price: 15 }, { name: 'Wagon', price: 35 },
+			{ name: 'Bit and bridle', price: 2 }, { name: 'Horseshoes (set)', price: 1 },
+			{ name: 'Feed (per day)', price: 0.05 },
+		] },
+	};
+	const affluenceData: Record<string, { label: string; mult: number; note: string }> = {
+		impoverished: { label: 'Impoverished', mult: 0.6,  note: 'Scarce goods, desperate prices' },
+		poor:         { label: 'Poor',         mult: 0.8,  note: 'Below-market, worn stock' },
+		common:       { label: 'Common',       mult: 1.0,  note: 'Standard market prices' },
+		prosperous:   { label: 'Prosperous',   mult: 1.3,  note: 'Good selection, modest markup' },
+		wealthy:      { label: 'Wealthy',      mult: 1.6,  note: 'Premium stock and pricing' },
+		opulent:      { label: 'Opulent',      mult: 2.2,  note: 'Luxury goods, high-end market' },
+	};
+	const shopItemCount: Record<string, [number, number]> = {
+		impoverished: [4, 6], poor: [6, 9], common: [8, 12],
+		prosperous: [10, 14], wealthy: [12, 16], opulent: [14, 18],
+	};
+	let shopType      = $state('general');
+	let shopAffluence = $state('common');
+	type ShopRow = { name: string; liked: string; neutral: string; disliked: string; rarity?: string };
+	let generatedShop = $state<ShopRow[]>([]);
+	function formatPrice(gp: number): string {
+		if (gp < 0.1) return Math.max(1, Math.round(gp * 100)) + ' cp';
+		if (gp < 1)   return Math.max(1, Math.round(gp * 10))  + ' sp';
+		if (gp < 10)  { const r = Math.round(gp * 2) / 2; return r + ' gp'; }
+		if (gp < 100) return Math.round(gp) + ' gp';
+		return (Math.round(gp / 5) * 5) + ' gp';
+	}
+	const shopNames: Record<string, string[]> = {
+		general:   ['The Rusty Anchor','The Golden Sack','The Wandering Barrel','The Old Compass','The Dusty Lantern','The Humble Wagon','The Cracked Pot','The Mended Sack','The Traveling Post','The Wayfarers Nook'],
+		weapon:    ['The Iron Edge','The Steel Fang','Grimshaw\'s Forge','The Sharpened Thorn','The Crimson Anvil','The Forged Blade','Ironclad Arms','The Broken Axe','The Tempered Steel','Bloodmetal Smithy'],
+		armor:     ['The Iron Shell','The Plated Boar','Stonehide Armory','The Gilded Guard','The Dented Pauldron','The Buckled Shield','Ironwall Armory','The Crestfallen Forge','The Hammered Plate','Steelbark Armory'],
+		alchemist: ['The Frothing Flask','Mirabelle\'s Mixtures','The Crackling Vial','The Amber Tincture','Fumes & Fortunes','The Bubbling Cauldron','The Murky Draught','The Unstable Mixture','Ashwick Alchemy','The Simmering Still'],
+		magic:     ['The Arcane Alcove','Whispers & Wonders','The Gilded Grimoire','The Shimmering Shelf','Starfall Curios','The Mystic Emporium','The Hidden Sigil','The Silver Rune','The Woven Veil','The Enchanted Threshold'],
+		jeweler:   ['The Glittering Gem','Aurelia\'s Jewels','The Burnished Clasp','The Faceted Crown','The Gilded Locket','Stoneset & Sons','The Sparkling Vein','The Polished Stone','The Diamond Needle','The Golden Finger'],
+		tavern:    ['The Prancing Pony','The Drunken Dragon','The Salted Flagon','The Wandering Bard','The Crooked Tankard','The Roaring Hearth','The Tipped Goblet','The Muddy Boot','The Warm Ember','The Gilded Tap'],
+		book:      ['The Inky Quill','The Cracked Spine','Vellum & Verse','The Dusty Shelf','The Worn Binding','The Scribed Page','The Faded Tome','The Illuminated Letter','The Paper & Pen','The Chronicle Nook'],
+		herbalist: ['The Green Thumb','The Twisted Root','Briar & Bloom','The Dried Bundle','The Mossy Hollow','The Morning Dew','The Herb & Hearth','The Sprig & Spore','Thornwood Remedies','The Wilting Petal'],
+		fletcher:  ['The True Arrow','The Split Shaft','The Quivering Reed','The Notched Bow','The Feathered Flight','Hawkseye Bowery','The Bent Limb','The Taut String','The Iron Nock','Swiftwind Fletching'],
+		stable:    ['The Iron Shoe','The Mossy Trough','The Snorting Mare','Brindleback Stables','The Gilded Bridle','The Dusty Saddle','The Warm Stall','The Broken Spur','Swiftfoot Stables','The Clover Patch'],
+	};
+	const rarityColors: Record<string, string> = {
+		common:    'text-green-400',
+		uncommon:  'text-teal-400',
+		rare:      'text-blue-400',
+		very_rare: 'text-purple-400',
+		legendary: 'text-amber-400',
+	};
+	const rarityLabels: Record<string, string> = {
+		common: 'Common', uncommon: 'Uncommon', rare: 'Rare', very_rare: 'Very Rare', legendary: 'Legendary',
+	};
+	// Magic item pools per shop type, keyed by rarity
+	const shopMagicItems: Record<string, ShopItemDef[]> = {
+		general: [
+			{ name: 'Cloak of Billowing', price: 75, rarity: 'common' },
+			{ name: 'Rope of Mending', price: 75, rarity: 'common' },
+			{ name: 'Bead of Nourishment', price: 50, rarity: 'common' },
+			{ name: 'Pipe of Smoke Monsters', price: 75, rarity: 'common' },
+			{ name: 'Sending Stones (pair)', price: 250, rarity: 'uncommon' },
+			{ name: 'Immovable Rod', price: 350, rarity: 'uncommon' },
+			{ name: 'Bag of Holding', price: 450, rarity: 'uncommon' },
+		],
+		weapon: [
+			{ name: 'Moon-Touched Sword', price: 75, rarity: 'common' },
+			{ name: 'Silvered Weapon', price: 100, rarity: 'common' },
+			{ name: '+1 Dagger', price: 250, rarity: 'uncommon' },
+			{ name: '+1 Shortsword', price: 300, rarity: 'uncommon' },
+			{ name: '+1 Longsword', price: 350, rarity: 'uncommon' },
+			{ name: '+1 Battleaxe', price: 350, rarity: 'uncommon' },
+			{ name: 'Sword of Life Stealing', price: 2500, rarity: 'rare' },
+			{ name: 'Sword of Wounding', price: 2500, rarity: 'rare' },
+			{ name: 'Flame Tongue', price: 3000, rarity: 'rare' },
+			{ name: 'Frost Brand', price: 3500, rarity: 'rare' },
+			{ name: '+2 Longsword', price: 4000, rarity: 'rare' },
+			{ name: '+3 Longsword', price: 20000, rarity: 'very_rare' },
+			{ name: 'Sword of Sharpness', price: 25000, rarity: 'very_rare' },
+			{ name: 'Holy Avenger', price: 75000, rarity: 'legendary' },
+			{ name: 'Vorpal Sword', price: 75000, rarity: 'legendary' },
+		],
+		armor: [
+			{ name: '+1 Shield', price: 250, rarity: 'uncommon' },
+			{ name: '+1 Leather Armor', price: 300, rarity: 'uncommon' },
+			{ name: '+1 Chain Mail', price: 350, rarity: 'uncommon' },
+			{ name: 'Adamantine Armor', price: 400, rarity: 'uncommon' },
+			{ name: 'Mithral Armor', price: 450, rarity: 'uncommon' },
+			{ name: '+2 Shield', price: 2500, rarity: 'rare' },
+			{ name: '+2 Breastplate', price: 3000, rarity: 'rare' },
+			{ name: 'Armor of Resistance', price: 3000, rarity: 'rare' },
+			{ name: '+3 Plate Armor', price: 20000, rarity: 'very_rare' },
+			{ name: 'Armor of Invulnerability', price: 75000, rarity: 'legendary' },
+		],
+		alchemist: [
+			{ name: 'Potion of Healing (Greater)', price: 150, rarity: 'uncommon' },
+			{ name: 'Potion of Fire Breath', price: 150, rarity: 'uncommon' },
+			{ name: 'Potion of Invisibility', price: 180, rarity: 'uncommon' },
+			{ name: 'Potion of Resistance', price: 200, rarity: 'uncommon' },
+			{ name: 'Potion of Water Breathing', price: 200, rarity: 'uncommon' },
+			{ name: 'Potion of Healing (Superior)', price: 500, rarity: 'rare' },
+			{ name: 'Potion of Invulnerability', price: 1000, rarity: 'rare' },
+			{ name: 'Potion of Mind Control', price: 1500, rarity: 'rare' },
+			{ name: 'Potion of Healing (Supreme)', price: 5000, rarity: 'very_rare' },
+			{ name: 'Potion of Storm Giant Strength', price: 25000, rarity: 'legendary' },
+		],
+		magic: [
+			{ name: 'Clockwork Amulet', price: 75, rarity: 'common' },
+			{ name: 'Hat of Disguise', price: 75, rarity: 'common' },
+			{ name: 'Wand of Spark', price: 75, rarity: 'common' },
+			{ name: 'Bag of Holding', price: 450, rarity: 'uncommon' },
+			{ name: 'Boots of Elvenkind', price: 300, rarity: 'uncommon' },
+			{ name: 'Cloak of Elvenkind', price: 300, rarity: 'uncommon' },
+			{ name: 'Helm of Comprehending Languages', price: 300, rarity: 'uncommon' },
+			{ name: 'Pearl of Power', price: 400, rarity: 'uncommon' },
+			{ name: 'Ring of Feather Falling', price: 350, rarity: 'uncommon' },
+			{ name: 'Wand of Magic Missiles', price: 350, rarity: 'uncommon' },
+			{ name: 'Wand of Web', price: 300, rarity: 'uncommon' },
+			{ name: 'Winged Boots', price: 450, rarity: 'uncommon' },
+			{ name: 'Bag of Tricks (Grey)', price: 750, rarity: 'uncommon' },
+			{ name: 'Necklace of Fireballs', price: 1500, rarity: 'rare' },
+			{ name: 'Ring of Evasion', price: 2000, rarity: 'rare' },
+			{ name: 'Ring of Protection', price: 2000, rarity: 'rare' },
+			{ name: 'Ring of the Ram', price: 2500, rarity: 'rare' },
+			{ name: 'Staff of Healing', price: 3000, rarity: 'rare' },
+			{ name: 'Staff of Fire', price: 4000, rarity: 'rare' },
+			{ name: 'Wand of Fireballs', price: 3000, rarity: 'rare' },
+			{ name: 'Wand of Lightning Bolts', price: 3000, rarity: 'rare' },
+			{ name: 'Portable Hole', price: 4000, rarity: 'rare' },
+			{ name: 'Amulet of the Planes', price: 10000, rarity: 'very_rare' },
+			{ name: 'Carpet of Flying', price: 15000, rarity: 'very_rare' },
+			{ name: 'Crystal Ball', price: 25000, rarity: 'very_rare' },
+			{ name: 'Robe of Eyes', price: 20000, rarity: 'very_rare' },
+			{ name: 'Staff of the Magi', price: 40000, rarity: 'very_rare' },
+			{ name: 'Wand of Polymorph', price: 30000, rarity: 'very_rare' },
+			{ name: 'Deck of Many Things', price: 75000, rarity: 'legendary' },
+			{ name: 'Ring of Three Wishes', price: 75000, rarity: 'legendary' },
+			{ name: 'Sphere of Annihilation', price: 75000, rarity: 'legendary' },
+		],
+		jeweler: [
+			{ name: 'Amulet of Proof vs. Detection', price: 300, rarity: 'uncommon' },
+			{ name: 'Periapt of Health', price: 300, rarity: 'uncommon' },
+			{ name: 'Ring of Mind Shielding', price: 350, rarity: 'uncommon' },
+			{ name: 'Ring of Swimming', price: 300, rarity: 'uncommon' },
+			{ name: 'Necklace of Adaptation', price: 400, rarity: 'uncommon' },
+			{ name: 'Ring of Evasion', price: 2000, rarity: 'rare' },
+			{ name: 'Ring of Protection', price: 2000, rarity: 'rare' },
+			{ name: 'Periapt of Wound Closure', price: 2500, rarity: 'uncommon' },
+			{ name: 'Amulet of Health', price: 2500, rarity: 'rare' },
+			{ name: 'Ring of Regeneration', price: 20000, rarity: 'very_rare' },
+			{ name: 'Ring of Spell Storing', price: 25000, rarity: 'very_rare' },
+		],
+		tavern: [
+			{ name: 'Tankard of Sobriety', price: 75, rarity: 'common' },
+			{ name: 'Bead of Nourishment', price: 50, rarity: 'common' },
+			{ name: 'Pipe of Smoke Monsters', price: 75, rarity: 'common' },
+			{ name: 'Sending Stones (pair)', price: 250, rarity: 'uncommon' },
+		],
+		book: [
+			{ name: 'Spell Scroll (4th level)', price: 500, rarity: 'rare' },
+			{ name: 'Spell Scroll (5th level)', price: 1000, rarity: 'rare' },
+			{ name: 'Manual of Bodily Health', price: 20000, rarity: 'very_rare' },
+			{ name: 'Manual of Gainful Exercise', price: 20000, rarity: 'very_rare' },
+			{ name: 'Tome of Clear Thought', price: 20000, rarity: 'very_rare' },
+			{ name: 'Tome of Leadership and Influence', price: 20000, rarity: 'very_rare' },
+			{ name: 'Tome of Understanding', price: 20000, rarity: 'very_rare' },
+		],
+		herbalist: [
+			{ name: 'Potion of Healing (Greater)', price: 150, rarity: 'uncommon' },
+			{ name: 'Potion of Animal Friendship', price: 150, rarity: 'uncommon' },
+			{ name: 'Potion of Water Breathing', price: 200, rarity: 'uncommon' },
+			{ name: 'Keoghtom\'s Ointment', price: 250, rarity: 'uncommon' },
+			{ name: 'Periapt of Health', price: 300, rarity: 'uncommon' },
+			{ name: 'Potion of Healing (Superior)', price: 500, rarity: 'rare' },
+			{ name: 'Potion of Longevity', price: 5000, rarity: 'very_rare' },
+		],
+		fletcher: [
+			{ name: '+1 Arrows (3)', price: 150, rarity: 'uncommon' },
+			{ name: 'Bracers of Archery', price: 300, rarity: 'uncommon' },
+			{ name: '+1 Longbow', price: 350, rarity: 'uncommon' },
+			{ name: '+2 Longbow', price: 3000, rarity: 'rare' },
+			{ name: 'Arrow of Slaying', price: 2000, rarity: 'very_rare' },
+		],
+		stable: [
+			{ name: 'Horseshoes of Speed', price: 1500, rarity: 'rare' },
+			{ name: 'Horseshoes of a Zephyr', price: 3000, rarity: 'very_rare' },
+		],
+	};
+	// Rarity slots available per affluence
+	const magicByAffluence: Record<string, { rarity: string; count: [number,number]; chance: number }[]> = {
+		impoverished: [],
+		poor:         [{ rarity:'common',    count:[0,1], chance:0.25 }],
+		common:       [{ rarity:'common',    count:[1,2], chance:1.0  }, { rarity:'uncommon', count:[0,1], chance:0.4 }],
+		prosperous:   [{ rarity:'common',    count:[1,2], chance:1.0  }, { rarity:'uncommon', count:[1,2], chance:1.0 }, { rarity:'rare',      count:[0,1], chance:0.35 }],
+		wealthy:      [{ rarity:'uncommon',  count:[1,3], chance:1.0  }, { rarity:'rare',      count:[1,2], chance:1.0 }, { rarity:'very_rare', count:[0,1], chance:0.3 }],
+		opulent:      [{ rarity:'rare',      count:[2,3], chance:1.0  }, { rarity:'very_rare', count:[1,2], chance:1.0 }, { rarity:'legendary', count:[0,1], chance:0.25 }],
+	};
+	let selectedShopItem = $state<ShopRow | null>(null);
+	const itemDescriptions: Record<string, string> = {
+		'Torch': 'A wooden stick tipped with oil-soaked cloth. Provides bright light in a 20-ft radius and dim light for an additional 20 ft. Burns for 1 hour.',
+		'Rations (1 day)': 'Dried food — hardtack, jerked meat, dried fruit, and nuts — sufficient for one day of travel. No cooking required.',
+		'Rope, hempen (50 ft)': 'Sturdy hemp rope with 2 hit points. Can be burst with a DC 17 Strength check. Essential for climbing and securing loads.',
+		'Waterskin': 'A leather pouch sealed with a stopper. Holds up to 4 pints of liquid — enough for a day of travel in moderate conditions.',
+		'Lantern, hooded': 'Casts bright light in a 30-ft radius and dim light for an additional 30 ft. The hood can be closed to hide the light. Burns 6 hours per flask of oil.',
+		'Oil (flask)': 'Fuels lanterns. Can also be poured on a 5-ft square surface and ignited, dealing 5 fire damage (DC 10 Dex save) for 2 rounds.',
+		'Bedroll': 'A padded mat and blanket for sleeping outdoors. Provides modest comfort for a long rest.',
+		'Backpack': 'A sturdy leather pack with multiple compartments. Holds up to 30 lbs or 1 cubic foot of gear.',
+		'Tinderbox': 'Contains a flint, fire steel, and tinder. Starting a small fire takes 1 action; a larger fire takes 1 minute.',
+		'Crowbar': 'A metal pry bar. Grants advantage on Strength checks where it can be used as a lever.',
+		'Hammer': 'A basic iron hammer for driving pitons, light construction, or utility work.',
+		'Pot, iron': 'A sturdy iron cooking pot, holding roughly 1 gallon. Used for boiling water or preparing camp meals.',
+		'Shovel': 'A digging tool for excavation, burying items, or setting pit traps.',
+		'Tent (2-person)': 'A simple canvas shelter protecting two people from the elements during a rest.',
+		'Mirror, steel': 'A polished steel hand mirror. Useful for signaling, scouting around corners, or reflecting gaze attacks.',
+		'Blanket': 'A thick wool blanket providing warmth on cold nights and comfort during rests.',
+		'Grappling hook': 'An iron hook with 3-4 prongs. Thrown and used with rope to scale walls or anchor lines.',
+		'Candle (10)': 'Wax candles that shed dim light in a 5-ft radius. Each burns for 1 hour.',
+		'Chalk (10 pieces)': 'Soft white sticks for marking paths, writing on stone, or leaving messages.',
+		'Soap': 'A bar of tallow soap for cleaning wounds, disguising scent from animals, or general hygiene.',
+		'Sack': 'A simple burlap sack holding up to 30 lbs or 1 cubic foot.',
+		'Ball bearings (bag)': 'A bag of 1,000 steel ball bearings. Scattered over a 10-ft square, creatures must succeed on a DC 10 Dex save or fall prone.',
+		'Signal whistle': 'A small tin whistle producing a shrill sound audible up to 300 feet away.',
+		'Block and tackle': 'A set of pulleys with rope. Halves the force needed to lift heavy objects (doubles lift capacity).',
+		'Dagger': 'A light finesse weapon that can be thrown (range 20/60). 1d4 piercing damage. Ideal for rogues, assassins, and as a backup blade.',
+		'Handaxe': 'A light thrown weapon (range 20/60). 1d6 slashing damage. Popular among barbarians and fighters as a versatile sidearm.',
+		'Shortsword': 'A light finesse blade favored by rogues and rangers. 1d6 piercing damage.',
+		'Longsword': 'A versatile blade and the most common sword among soldiers and adventurers. 1d8 piercing or slashing (1d10 two-handed).',
+		'Battleaxe': 'A single-bladed axe. 1d8 slashing damage (1d10 two-handed). Favored by warriors who prefer raw power.',
+		'Greatsword': 'A massive two-handed blade. 2d6 slashing damage. Heavy — requires Str 13+ to wield effectively.',
+		'Greataxe': 'A sweeping two-handed axe. 1d12 slashing damage. Heavy. Beloved by barbarians for its cleaving power.',
+		'Mace': 'A spiked or flanged bludgeoning weapon effective against armored foes. 1d6 bludgeoning damage.',
+		'Warhammer': 'A heavy bludgeoning weapon. 1d8 damage (1d10 two-handed). Favored by clerics of war deities.',
+		'Spear': 'A versatile thrown weapon (range 20/60). 1d6 piercing (1d8 two-handed). A workhorse weapon throughout the ages.',
+		'Javelin': 'A light throwing weapon (range 30/120). 1d6 piercing damage. Used for opening volleys before melee.',
+		'Light hammer': 'A small bludgeoning weapon (thrown 20/60). 1d4 bludgeoning damage. Light, so useful as an off-hand weapon.',
+		'Quarterstaff': 'A wooden staff used as a weapon. 1d6 bludgeoning (1d8 two-handed). Iconic weapon of druids and monks.',
+		'Pike': 'A long polearm with reach. 1d10 piercing damage. Heavy, two-handed. Reach property (attack targets up to 10 ft away).',
+		'Rapier': 'An elegant finesse thrusting sword. 1d8 piercing damage. A duelist\'s weapon of choice.',
+		'Flail': 'A spiked ball on a chain. 1d8 bludgeoning damage. The chain can wrap around shields, making it harder to block.',
+		'Trident': 'A three-pronged spear (thrown 20/60). 1d6 piercing (1d8 two-handed). Associated with sea gods and gladiators.',
+		'Whip': 'A finesse reach weapon (10 ft). 1d4 slashing damage. Can be used to disarm or trip foes at the DM\'s discretion.',
+		'Arrows (20)': 'Standard wooden shafts with iron tips, fletched for stability. Ammunition for shortbows and longbows.',
+		'Crossbow bolts (20)': 'Short iron-tipped bolts for use with any crossbow variant. Sturdier than arrows but shorter range.',
+		'Whetstone': 'A small abrasive stone for honing blade edges. Keeps weapons sharp and well-maintained.',
+		'Padded armor': 'Quilted cloth and batting. AC 11 + Dex. Disadvantage on Stealth. The lightest armor available — better than nothing.',
+		'Leather armor': 'Hardened chest and shoulder pieces of boiled leather. AC 11 + Dex. No Stealth penalty.',
+		'Studded leather': 'Leather reinforced with close-set metal rivets. AC 12 + Dex. No Stealth penalty. The go-to light armor.',
+		'Ring mail': 'Leather with metal rings sewn in. AC 14. Disadvantage on Stealth. Inferior to chain — rarely used by professionals.',
+		'Chain shirt': 'Interlocking metal rings protecting the torso and upper arms. AC 13 + Dex (max 2). No Stealth penalty.',
+		'Scale mail': 'Overlapping metal scales on a leather backing. AC 14 + Dex (max 2). Disadvantage on Stealth.',
+		'Chain mail': 'A full suit of interlocking metal rings. AC 16. Requires Str 13. Disadvantage on Stealth. A soldier\'s standard.',
+		'Breastplate': 'A fitted metal chest piece with flexible leather protection. AC 14 + Dex (max 2). No Stealth penalty.',
+		'Half plate': 'Metal plates covering most of the body with chainmail beneath. AC 15 + Dex (max 2). Disadvantage on Stealth.',
+		'Shield': 'A wooden or metal shield strapped to the forearm. +2 AC. Requires one hand and proficiency.',
+		'Helmet': 'A metal helm protecting the head. Often includes a visor, cheek guards, and neck protection.',
+		'Gauntlets': 'Metal gloves that protect the hands without hampering grip or dexterity.',
+		'Greaves': 'Metal shin and leg guards. Provide protection on the lower body without restricting mobility.',
+		'Vambrace (pair)': 'Forearm guards of hardened leather or metal, protecting without restricting wrist flexibility.',
+		'Potion of Healing': 'A red liquid that glimmers when agitated. Drinking it restores 2d4+2 hit points.',
+		'Antitoxin': 'A vial of clear liquid. Drinking grants advantage on saving throws against poison for 1 hour.',
+		'Acid (vial)': 'A corrosive liquid. On a hit (thrown up to 20 ft or splashed within 5 ft), deals 2d6 acid damage.',
+		"Alchemist's fire": 'A sticky fluid that ignites on air contact. On a hit it deals 1d4 fire damage per turn until extinguished (DC 10 Dex action).',
+		'Holy water (flask)': 'Blessed water harmful to undead and fiends. Thrown up to 20 ft; 2d6 radiant damage on a failed DC 13 Dex save.',
+		"Healer's kit": 'A leather pouch with bandages, salves, and splints. Lets you stabilize a dying creature automatically. 10 uses.',
+		'Vial (empty)': 'A small glass container with a stopper, holding up to 4 ounces of liquid. Used for storing samples and potions.',
+		'Perfume (vial)': 'A pleasant-smelling liquid. May grant advantage on Charisma checks or mask the wearer\'s scent from animals.',
+		'Poison, basic (vial)': 'Coat a blade or ammunition. On a hit, the target must succeed on a DC 10 Con save or take 1d4 poison damage.',
+		'Potion of Climbing': 'Grants a climbing speed equal to your walking speed and advantage on Athletics checks to climb for 1 hour.',
+		'Ink (1 oz)': 'A small bottle of dark writing ink, sufficient for many pages of script.',
+		'Smokestick': 'When ignited, produces thick opaque smoke filling a 10-ft cube for 1 minute. Obscures vision.',
+		'Oil of Slipperiness': 'Applied to surfaces or creatures, it replicates the Grease spell for 8 hours. Alternatively, drinking it grants freedom of movement for 8 hours.',
+		'Spell Scroll (cantrip)': 'A rolled parchment inscribed with a cantrip. Any spellcaster with that cantrip can cast it for free. Others must succeed on a DC 10 Arcana check or the scroll is lost.',
+		'Spell Scroll (1st level)': 'Inscribed with a 1st-level spell. Appropriate class casters can cast it freely; others need DC 11 Arcana check.',
+		'Spell Scroll (2nd level)': 'Inscribed with a 2nd-level spell. DC 12 Arcana check for non-class casters.',
+		'Spell Scroll (3rd level)': 'Inscribed with a 3rd-level spell. DC 13 Arcana check for non-class casters.',
+		'Component pouch': 'A leather belt pouch with compartments for spell components and foci. Replaces any material component that has no listed cost.',
+		'Arcane focus (crystal)': 'A crystal used as a spellcasting focus for arcane casters (wizards, sorcerers, warlocks). Replaces non-costly material components.',
+		'Arcane focus (orb)': 'A glass or crystal orb used as a spellcasting focus for arcane casters.',
+		'Arcane focus (wand)': 'A short wooden or metal wand used as a spellcasting focus. Elegant and easily concealed.',
+		'Spellbook (blank)': 'A leather-bound tome with 100 pages of magic-receptive vellum. Every wizard begins with one and expands it throughout their career.',
+		'Holy symbol (amulet)': 'A sacred pendant bearing a deity\'s symbol. Serves as a spellcasting focus for clerics and paladins.',
+		'Druidic focus (staff)': 'A wooden staff carved with nature symbols, housing mistletoe or holly. Spellcasting focus for druids.',
+		'Pearl (spell component)': 'A 100-gp pearl consumed when casting the Identify spell.',
+		'Diamond dust (per oz)': 'Finely powdered diamond consumed as a material component for Revivify, Raise Dead, and similar resurrection spells.',
+		'Identify (service)': 'A resident mage will cast Identify on one item or creature, revealing its magical properties, charges, and attunement requirements.',
+		'Copper bracelet': 'A simple copper band — affordable and easy to find. A common token of friendship or a beginning adventurer\'s first adornment.',
+		'Silver ring': 'A plain polished silver band. Simple, elegant, and a popular betrothal ring among commoners.',
+		'Silver necklace': 'A fine silver chain suitable as a modest gift or light adornment.',
+		'Gold ring': 'A solid gold band. A mark of modest wealth and a common pledge of commitment.',
+		'Onyx pendant': 'A smooth black gemstone set in a simple mount. Popular for mourning jewelry and dark-themed fashion.',
+		'Pearl earrings': 'A matched pair of lustrous pearls set in silver drops. Refined and timeless.',
+		'Garnet brooch': 'A deep red gemstone set in a decorative clasp. A fashionable accessory in noble circles.',
+		'Jade bracelet': 'A carved green jade bangle. Associated with luck and longevity in many cultures.',
+		'Amethyst ring': 'A violet gemstone set in silver. In folklore it wards off intoxication — unlikely, but a lovely story.',
+		'Topaz earrings': 'A pair of warm golden gemstone drops. Said to promote confidence and clarity of thought.',
+		'Sapphire pendant': 'A deep blue sapphire on a fine chain. A mark of wealth and refinement, favored by royalty.',
+		'Opal amulet': 'A shimmering multi-colored opal said to contain captured fire. Used as a decorative focus and lucky charm.',
+		'Ruby brooch': 'A vivid red ruby set in gold filigree. A gift fit for nobility and a statement of power.',
+		'Emerald necklace': 'A rich green emerald pendant on a gold chain. Among the most sought-after jewels of the realm.',
+		'Diamond stud': 'A single brilliant-cut diamond earring. The pinnacle of jewelry craftsmanship and wealth.',
+		'Ale (mug)': 'A frothy mug of locally brewed ale. Mildly intoxicating. Common throughout taverns in the realm.',
+		'Ale (gallon)': 'A full gallon of house ale in a sealed jug — enough for a small group or a long evening.',
+		'Wine, common (pitcher)': 'An earthenware pitcher of rough table wine. Drinkable, if not memorable.',
+		'Wine, fine (bottle)': 'A sealed bottle of quality wine from a noted vineyard. Suitable for impressing guests.',
+		'Mead (mug)': 'A golden honey-fermented drink — sweet and stronger than it appears.',
+		'Meal, poor': 'Hard bread, watery stew, and a cup of water. Filling, if not satisfying.',
+		'Meal, modest': 'Bread, a stew with vegetables and small portions of meat, and a small beer.',
+		'Meal, fine': 'A multi-course meal with roasted meats, fresh bread, rich sauces, and fine wine.',
+		'Room, poor (per night)': 'A straw pallet in a shared common room. Drafty and noisy, but a roof overhead.',
+		'Room, modest (per night)': 'A private room with a simple bed, wash basin, and a lock on the door.',
+		'Room, comfortable (per night)': 'A well-furnished room with a featherbed, lit hearth, and a window. A proper night\'s rest.',
+		'Stabling (per night)': 'Secure stabling for one horse or mount with feed, water, and attention from a groom.',
+		'Bread, loaf': 'A fresh-baked loaf of wheat or rye bread. A staple food throughout the land.',
+		'Meat, chunk': 'A cut of salted or smoked meat — pork, beef, or game depending on the region.',
+		'Pipe tobacco (pouch)': 'A small pouch of cured tobacco leaves for a pipe. Popular among halflings and veteran soldiers.',
+		'Common book': 'A printed or hand-copied book on a general topic — history, botany, or heraldry. May grant advantage on relevant checks at the DM\'s discretion.',
+		'History tome': 'A thick illustrated volume covering the history of a region or empire. Thorough research may grant a +2 bonus to relevant History checks.',
+		'Rare tome': 'A scarce or ancient manuscript containing lost knowledge, partial spell research, or unique lore unavailable elsewhere.',
+		'Blank journal': 'A leather-bound blank book with 200 pages of fine vellum — ideal for notes, maps, or a personal chronicle.',
+		'Ink pen': 'A metal-nibbed quill pen for use with bottled ink.',
+		'Paper (sheet)': 'A sheet of fine writing paper, suitable for letters and records.',
+		'Parchment (sheet)': 'A scraped and dried animal skin, more durable than paper. Used for important documents and maps.',
+		'Scroll case': 'A leather or bone tube for safely storing rolled scrolls and documents. Waterproof and compact.',
+		'Map, local area': 'A hand-drawn map showing roads, settlements, and major landmarks within roughly a day\'s ride.',
+		'Map, regional': 'A detailed map of the broader region — towns, rivers, mountain ranges, and borders within several weeks\' travel.',
+		'Sealing wax': 'A stick of colored wax melted to seal letters and documents. Often pressed with a signet ring.',
+		'Star chart': 'A detailed illustration of constellations and celestial bodies. Useful for navigation, identifying the season, and impressing scholars.',
+		'Healing salve (minor)': 'A thick herbal paste applied to wounds. Reduces minor HP loss or speeds recovery at the DM\'s discretion.',
+		'Common herbs (bundle)': 'Dried culinary and medicinal herbs. Useful for cooking, herbal recipes, or trading with herbalists.',
+		'Rare herb (single)': 'A single sprig or root of a hard-to-find plant with concentrated medicinal properties.',
+		'Fever bark (strip)': 'Dried bark from the fever tree. Brewed as a tea, it reduces fever and eases infection symptoms.',
+		'Sleep dust (pinch)': 'A fine powder from valerian and nightshade. Inhaled or ingested, induces drowsiness (Con save DC at DM\'s discretion).',
+		'Wound poultice': 'A pre-made herbal compress for lacerations and bruises. Reduces bleeding and soothes inflammation.',
+		'Dried mushrooms (bundle)': 'Dried fungi for cooking or alchemy. Certain varieties have mild stimulating or narcotic properties.',
+		'Eye drops, clarity': 'A clear liquid applied to the eyes to sharpen vision temporarily. May grant advantage on Perception checks for 1 hour at DM\'s discretion.',
+		'Calming draught': 'A soothing herbal blend. May provide advantage on saves against fear at the DM\'s discretion.',
+		'Fortifying tea (pouch)': 'Dried herbs brewed into a strengthening tea. Popular with soldiers and laborers before hard work.',
+		'Breath tonic (vial)': 'A mentholated liquid for clearing airways. Useful for those suffering from cold, smoke, or illness.',
+		'Shortbow': 'A small, curved bow. Range 80/320. 1d6 piercing damage. Ammunition: arrows.',
+		'Longbow': 'A tall stave bow requiring Str 13+. Range 150/600. 1d8 piercing damage. Heavy. The premier ranged weapon for soldiers.',
+		'Hand crossbow': 'A compact one-handed crossbow. Range 30/120. 1d6 piercing damage. Light — can be used in the off hand.',
+		'Light crossbow': 'A standard two-handed crossbow. Range 80/320. 1d8 piercing damage. Good for those lacking proficiency with bows.',
+		'Heavy crossbow': 'A powerful two-handed crossbow. Range 100/400. 1d10 piercing damage. Heavy property.',
+		'Blowgun': 'A long tube for propelling needles by breath. Range 25/100. 1 piercing damage. Loading property. Needles are often coated in poison.',
+		'Blowgun needles (50)': 'Thin metal needles for a blowgun. Effective delivery system for contact poisons.',
+		'Quiver': 'A leather cylinder worn on the back or hip, holding up to 20 arrows or bolts.',
+		'Net': 'A weighted throwing net. On a hit, a Large or smaller creature is restrained. Escape requires a DC 10 Strength check or cutting free.',
+		'Sling': 'A simple cloth pouch on two cords. Hurls stones or lead bullets. Range 30/120. 1d4 bludgeoning damage. Ammunition not expended on a miss.',
+		'Sling bullets (20)': 'Small lead balls sized for a sling. Heavier than stones for more consistent damage.',
+		'Arrow (silvered)': 'An arrow tipped with pure silver. Bypasses resistance and immunity to piercing from non-silvered weapons. Effective against lycanthropes and certain undead.',
+		'Bowstring (replacement)': 'A waxed hemp or linen string for replacing a snapped or worn bowstring. Any experienced archer carries spares.',
+		'Riding horse': 'A well-tempered horse suited for travel. Speed 60 ft. Carries up to 480 lbs. Cannot make attacks.',
+		'Draft horse': 'A large, powerful horse for pulling carts and plows. Speed 40 ft. Carries up to 540 lbs.',
+		'Warhorse': 'A trained combat mount. Speed 60 ft. Can attack (1d6+4 hooves). Carries 540 lbs. Requires proficiency with Martial weapons to ride in combat.',
+		'Pony': 'A smaller horse. Speed 40 ft. Carries up to 225 lbs. Well suited for small folk and narrow mountain trails.',
+		'Donkey / Mule': 'A hardy, stubborn pack animal. Speed 40 ft. Carries up to 420 lbs. Handles rough terrain better than horses.',
+		'Mastiff (guard dog)': 'A large, trained dog. Speed 40 ft. Attacks for 1d6+3 piercing. Grants advantage on Perception checks. Can be trained to guard, track, or assist.',
+		'Saddle, riding': 'A leather saddle for long journeys. Grants advantage on checks to remain in the saddle.',
+		'Saddle, military': 'A reinforced saddle that lets a rider wield weapons effectively in combat. Advantage on checks to stay mounted.',
+		'Saddle, pack': 'A simple frame and strap system for carrying cargo on a pack animal — no riding comfort.',
+		'Saddlebags': 'A pair of leather bags hanging across a mount\'s flanks. Holds 20 lbs in each bag.',
+		'Cart': 'A two-wheeled wooden vehicle pulled by one horse. Carries up to 200 lbs of cargo.',
+		'Wagon': 'A four-wheeled covered vehicle pulled by two horses. Carries up to 400 lbs. Suitable for long journeys with supplies.',
+		'Bit and bridle': 'The metal bit and head harness used to steer and control a mount. Required for all trained riding.',
+		'Horseshoes (set)': 'A set of four iron horseshoes. Essential for horses traveling on hard, rocky, or paved surfaces.',
+		'Feed (per day)': 'A day\'s supply of hay, oats, and water for one horse or similar mount.',
+		'Moon-Touched Sword': 'In darkness, the blade emits moonlight, shedding dim light in a 15-ft radius. No attunement required — a subtle enchantment prized by scouts.',
+		'Silvered Weapon': 'A weapon coated in pure silver. Bypasses resistance and immunity to non-silvered attacks. Essential against lycanthropes and certain undead.',
+		'Cloak of Billowing': 'Speak the command word and this cloak billows dramatically regardless of the wind. Purely cosmetic — but wonderfully theatrical. No attunement.',
+		'Rope of Mending': 'A 60-ft hempen rope that can magically rejoin itself when cut, simply by speaking the command word. No attunement required.',
+		'Bead of Nourishment': 'A small flavorless bead that sustains a Medium creature for one full day when swallowed. No attunement required.',
+		'Pipe of Smoke Monsters': 'Puffing this pipe produces smoke in the shape of a creature (Tiny to Medium) of your choice. Purely cosmetic. No attunement.',
+		'Clockwork Amulet': 'Once per day when making an attack roll, you may choose not to roll and instead treat the d20 as a 10. No attunement required.',
+		'Hat of Disguise': 'Allows you to cast Disguise Self at will while wearing it. The disguise is purely illusory. Requires attunement.',
+		'Wand of Spark': 'Produces a small spark — enough to ignite tinder, light a candle, or impress easily. Effectively a minor prestidigitation wand.',
+		'Tankard of Sobriety': 'Any liquid poured into this ordinary-looking tankard loses all intoxicating properties when consumed. Useful for staying sharp at the table.',
+		'Sending Stones (pair)': 'Two matched stones. Once per day, speak up to 25 words into one — the holder of the other hears it instantly, regardless of distance.',
+		'Immovable Rod': 'Press the button and this iron rod becomes fixed in place, immovable by any force under 8,000 lbs. Press again to release. 3 uses per day.',
+		'Bag of Holding': 'A cloth bag that holds up to 500 lbs / 64 cubic feet regardless of external size. Creatures inside begin to suffocate after 10 minutes. No attunement.',
+		'Boots of Elvenkind': 'Your footsteps make no sound, granting advantage on Stealth checks that rely on sound. Requires attunement.',
+		'Cloak of Elvenkind': 'Advantage on Stealth checks. Creatures relying on sight have disadvantage on Perception checks to find you. Requires attunement.',
+		'Helm of Comprehending Languages': 'Cast Comprehend Languages at will while wearing this helm. All written and spoken languages become readable and audible. No attunement.',
+		'Pearl of Power': 'Once per day as a bonus action, recover one expended spell slot of up to 3rd level. Requires attunement by a spellcaster.',
+		'Ring of Feather Falling': 'When you fall while wearing this ring, you descend at 60 ft/round and take no falling damage. Requires attunement.',
+		'Wand of Magic Missiles': '7 charges. Expend 1-3 charges to cast Magic Missile as a 1st-3rd level spell. Regains 1d6+1 charges at dawn. No attunement.',
+		'Wand of Web': '7 charges. Cast Web (save DC 15) using 1 charge. Regains 1d6+1 charges at dawn. Requires attunement by a spellcaster.',
+		'Winged Boots': 'Sprout feathery or bat-like wings for up to 4 hours per day (in 1-minute increments), gaining a flying speed equal to your walking speed. Requires attunement.',
+		'Bag of Tricks (Grey)': 'Pull a small furry object from the bag and throw it up to 20 ft. It transforms into a random beast (1d8 on table) that obeys commands for 1 minute. 3 uses per dawn.',
+		'Amulet of Proof vs. Detection': 'You are hidden from divination magic while wearing this amulet. You cannot be targeted by such magic or perceived through magical scrying sensors. Requires attunement.',
+		'Periapt of Health': 'You are immune to contracting diseases while wearing this periapt. Diseases already afflicting you are suppressed, not cured. No attunement.',
+		'Ring of Mind Shielding': 'Immune to magic that senses emotions, reads thoughts, or detects whether you are lying. Your alignment cannot be detected. Requires attunement.',
+		'Ring of Swimming': 'Grants a swimming speed of 40 feet. No attunement required.',
+		'Necklace of Adaptation': 'Breathe normally in any environment and have advantage on saves against harmful gases, vapors, and extreme atmospheric conditions. Requires attunement.',
+		'Bracers of Archery': 'Gain proficiency with longbows and shortbows, and a +2 bonus to damage rolls with them. Requires attunement.',
+		'+1 Dagger': 'A needle-sharp enchanted blade. +1 bonus to attack rolls and damage rolls. Holds an edge that never dulls.',
+		'+1 Shortsword': 'A well-balanced magical shortsword. +1 bonus to attack rolls and damage rolls.',
+		'+1 Longsword': 'A finely crafted magical blade. +1 bonus to attack rolls and damage rolls. Hums faintly when drawn.',
+		'+1 Battleaxe': 'An enchanted battleaxe. +1 bonus to attack rolls and damage rolls. The edge glows faintly in starlight.',
+		'+1 Shield': 'A magically reinforced shield. +3 AC total (shield\'s +2 plus the enchantment). Lighter than it appears.',
+		'+1 Leather Armor': 'Supple enchanted leather that moves with the body. AC 12 + Dex modifier.',
+		'+1 Chain Mail': 'Enchanted mail with no gaps in its rings. AC 17. Requires Str 13. Disadvantage on Stealth.',
+		'Adamantine Armor': 'Reinforced with adamantine, one of the hardest substances known. Any critical hit against the wearer becomes a normal hit instead. Requires attunement.',
+		'Mithral Armor': 'Lightweight and flexible mithral construction. Does not impose disadvantage on Stealth checks. No Bulky property. No attunement.',
+		'+1 Arrows (3)': 'Three arrows bearing minor enchantments. +1 bonus to attack rolls and damage rolls. Once fired they lose their magic.',
+		'+1 Longbow': 'An enchanted longbow. +1 bonus to attack rolls and damage rolls.',
+		'Periapt of Wound Closure': 'You stabilize automatically when reduced to 0 HP, and your hit dice heal double when spent on a short rest. Requires attunement.',
+		'Necklace of Fireballs': 'A string of beads (1d6+3 beads). Throw one or more beads up to 60 ft — they explode as a Fireball (3d6 + 2d6 per extra bead). No attunement.',
+		'Ring of Evasion': '3 charges. When you fail a Dexterity saving throw, use your reaction to succeed instead. Regains 1d3 charges at dawn. Requires attunement.',
+		'Ring of Protection': '+1 bonus to AC and saving throws. A reliable enchantment worn by veterans and nobles alike. Requires attunement.',
+		'Ring of the Ram': '3 charges. Hit a target within 60 ft for 2d10 force damage (1 charge) and push it 5 ft. More charges increase damage and push distance. Requires attunement.',
+		'Staff of Healing': '10 charges. Cast Cure Wounds (1-4 charges), Lesser Restoration (2), or Mass Cure Wounds (5). Regains 1d6+4 charges at dawn. Requires attunement by a cleric, druid, or paladin.',
+		'Staff of Fire': '10 charges. Cast Burning Hands (1), Fireball (3), or Wall of Fire (4). Regains 1d6+4 charges at dawn. Requires attunement by a druid, sorcerer, warlock, or wizard.',
+		'Wand of Fireballs': '7 charges. Cast Fireball at 3rd level (DC 15) for 1 charge, or at higher levels by spending more. Regains 1d6+1 at dawn. Requires attunement by a spellcaster.',
+		'Wand of Lightning Bolts': '7 charges. Cast Lightning Bolt at 3rd level (DC 15) for 1 charge, higher levels by spending more. Regains 1d6+1 at dawn. Requires attunement by a spellcaster.',
+		'Portable Hole': 'A 6-ft-diameter circle of black cloth. Laid flat on a solid surface it creates an extradimensional space 10 ft deep. Folding the cloth seals the hole — and anything inside. No attunement.',
+		'Flame Tongue': 'While drawn and you speak the command word, the blade ignites for 1 minute dealing +2d6 fire damage. Sheds 40 ft bright light and 40 ft dim light. Requires attunement.',
+		'Frost Brand': 'Deals +1d6 cold damage on a hit. When drawn in freezing temperatures it sheds light. When drawn within 30 ft it suppresses nonmagical flames. Requires attunement.',
+		'Sword of Life Stealing': 'On a natural 20 against a living creature, the target takes 10 extra necrotic damage and you gain 10 temporary HP. Requires attunement.',
+		'Sword of Wounding': 'A creature hit by this weapon cannot regain HP until the start of your next turn. This effect stacks with multiple hits. Requires attunement.',
+		'+2 Shield': 'A potently enchanted shield. +4 AC total. Solid, lighter than mundane equivalents. Requires attunement.',
+		'+2 Breastplate': 'A masterwork enchanted breastplate. AC 16 + Dex (max 2). Noticeably lighter and more protective than mundane equivalents. Requires attunement.',
+		'Armor of Resistance': 'Resistance to one type of damage (determined when found or crafted). The specific protection is usually visible in the armor\'s ornamentation. Requires attunement.',
+		'+2 Longbow': 'A finely enchanted longbow. +2 bonus to attack rolls and damage rolls. The wood never warps.',
+		'Amulet of Health': 'Your Constitution score is 19 while wearing this amulet, if not already higher. Requires attunement.',
+		'Spell Scroll (4th level)': 'Inscribed with a 4th-level spell. Appropriate class casters can use it freely; others need a DC 14 Arcana check.',
+		'Spell Scroll (5th level)': 'Inscribed with a 5th-level spell. DC 15 Arcana check for non-class casters. Even partial knowledge can be valuable.',
+		'Horseshoes of Speed': 'These iron horseshoes increase your mount\'s speed by 30 ft. Requires attunement by the horse.',
+		'Potion of Healing (Greater)': 'A shimmering red liquid. Restores 4d4+4 hit points when consumed.',
+		'Potion of Fire Breath': 'After drinking, you can exhale fire in a 30-ft cone (4d6 fire damage, DC 13 Dex save for half) up to 3 times within 1 hour.',
+		'Potion of Invisibility': 'Drink to become invisible for 1 hour. Effect ends if you attack or cast a spell.',
+		'Potion of Resistance': 'Gain resistance to one type of damage for 1 hour. The specific type varies by potion.',
+		'Potion of Water Breathing': 'Breathe underwater for 1 hour. The liquid is bubbly and smells faintly of brine.',
+		'Potion of Healing (Superior)': 'A deep crimson potion, almost glowing. Restores 8d4+8 hit points.',
+		'Potion of Invulnerability': 'Gain resistance to all damage for 1 minute. Smells of iron and looks like liquefied metal.',
+		'Potion of Mind Control': 'Replicates Dominate Monster or Dominate Person — the specific target type depends on the variant.',
+		"Keoghtom's Ointment": 'A glass jar with 1d4+1 doses of sweet-smelling unguent. Each dose removes one curse, disease, or poison and restores 2d8+2 HP.',
+		'Arrow of Slaying': 'A special arrow that deals an extra 6d10 piercing damage to creatures of a specific type on a hit (DC 17 Con save halves). Single use.',
+		'Potion of Animal Friendship': 'Cast Animal Friendship (DC 13) targeting up to 3 beasts for 1 hour without expending a spell slot.',
+		'Amulet of the Planes': 'Name a location on another plane and make a DC 15 Intelligence check — success transports you there instantly; failure sends you to a random location. Requires attunement.',
+		'Carpet of Flying': 'A flying carpet carrying up to 800 lbs. Command it verbally to move up to its fly speed. Size determines capacity and speed (3×5 ft through 5×7 ft). No attunement.',
+		'Crystal Ball': 'A 6-inch glass sphere. Use an action to cast Scrying (Wis save DC 17) targeting a creature you know. Requires attunement.',
+		'Robe of Eyes': 'Covered in eye-like patterns. Grants 120-ft darkvision, advantage on Perception, and 360-degree vision. Blinded by Daylight or Light spells. Requires attunement.',
+		'Staff of the Magi': 'A powerful artifact with 50 charges. Casts dozens of spells and can absorb spells cast at you. Can be broken for a devastating Retributive Strike. Requires attunement by sorcerer, warlock, or wizard.',
+		'Wand of Polymorph': '7 charges. Cast Polymorph (Wis save DC 15) using 1 charge. Regains 1d6+1 charges at dawn. Requires attunement by a spellcaster.',
+		'+3 Longsword': 'A legendary magical blade. +3 bonus to attack rolls and damage rolls. Hums with contained power — sometimes visible as a faint glow.',
+		'+3 Plate Armor': 'The finest magical armor. AC 21. Requires Str 15. Disadvantage on Stealth. Moves with its wearer almost as if alive.',
+		'Ring of Regeneration': 'You regain 1d6 HP every 10 minutes as long as you have at least 1 HP. Severed limbs regrow over 1d6+1 days. Requires attunement.',
+		'Ring of Spell Storing': 'Stores up to 5 levels of spells. Any attuned creature can cast a stored spell. Spells are placed by touching the ring. Requires attunement.',
+		'Manual of Bodily Health': 'Reading over 48 hours (in 6-day periods) permanently increases Constitution score and maximum by 2. The book then loses its magic for 100 years.',
+		'Manual of Gainful Exercise': 'Reading over 48 hours permanently increases Strength score and maximum by 2. Then loses magic for 100 years.',
+		'Tome of Clear Thought': 'Reading over 48 hours permanently increases Intelligence score and maximum by 2. Then loses magic for 100 years.',
+		'Tome of Leadership and Influence': 'Reading over 48 hours permanently increases Charisma score and maximum by 2. Then loses magic for 100 years.',
+		'Tome of Understanding': 'Reading over 48 hours permanently increases Wisdom score and maximum by 2. Then loses magic for 100 years.',
+		'Horseshoes of a Zephyr': 'Your mount moves normally over difficult terrain, doesn\'t provoke opportunity attacks, and can travel 12 hours per day without exhaustion. Requires attunement.',
+		'Potion of Healing (Supreme)': 'Restores 10d4+20 hit points. The pinnacle of healing alchemy — golden and warm to the touch.',
+		'Potion of Longevity': 'Your physical age is reduced by 1d6+6 years (minimum 13). Each use after the first has a 10% cumulative chance of increasing your age instead.',
+		'Deck of Many Things': 'A set of 22 (or 13) cards, each bearing a major arcana. Drawing one triggers a dramatic magical effect — from gaining great power to losing your soul. Approach with extreme caution.',
+		'Ring of Three Wishes': 'Contains 3 charges. Expend a charge to cast Wish. When all charges are spent the ring loses its magic entirely. Use your wishes carefully.',
+		'Sphere of Annihilation': 'A 2-ft-diameter sphere of utter darkness that annihilates everything it touches. Controlled via Arcana checks. Contacting it without control means instant destruction. Requires attunement.',
+		'Holy Avenger': 'A +3 sword dealing +2d10 radiant damage to undead. While attuned, grants you and nearby allies advantage on saves against spells and magical effects. Requires attunement by a paladin.',
+		'Vorpal Sword': 'A +3 sword. On a roll of 20, the target must make a DC 15 Con save or have its head severed — killing it instantly (unless headless creatures are immune). Requires attunement.',
+		'Armor of Invulnerability': 'Resistance to non-magical bludgeoning, piercing, and slashing damage. Once per day, become immune to non-magical damage for 10 minutes. Requires attunement.',
+		'Potion of Storm Giant Strength': 'Strength becomes 29 for 1 hour. Tastes like lightning and sea spray.',
+	};
+	let generatedShopName = $state('');
+	function pickFrom<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
+	function generateShop() {
+		const shop = shopData[shopType];
+		const aff  = affluenceData[shopAffluence];
+		if (!shop || !aff) return;
+		// Pick shop name
+		const namePool = shopNames[shopType] ?? ['The Shop'];
+		generatedShopName = pickFrom(namePool);
+		// Pick mundane items
+		const [lo, hi] = shopItemCount[shopAffluence] ?? [8, 12];
+		const count    = lo + Math.floor(Math.random() * (hi - lo + 1));
+		const shuffled = [...shop.items].sort(() => Math.random() - 0.5);
+		const picked   = shuffled.slice(0, Math.min(count, shuffled.length));
+		// Pick magic items
+		const magicPool = shopMagicItems[shopType] ?? [];
+		const magicSlots = magicByAffluence[shopAffluence] ?? [];
+		const magicPicked: ShopItemDef[] = [];
+		for (const slot of magicSlots) {
+			if (Math.random() > slot.chance) continue;
+			const pool = magicPool.filter(m => m.rarity === slot.rarity);
+			if (!pool.length) continue;
+			const [mlo, mhi] = slot.count;
+			const mc = mlo + Math.floor(Math.random() * (mhi - mlo + 1));
+			const shuffledMagic = [...pool].sort(() => Math.random() - 0.5);
+			shuffledMagic.slice(0, mc).forEach(m => {
+				if (!magicPicked.find(x => x.name === m.name)) magicPicked.push(m);
+			});
+		}
+		const allItems = [...picked, ...magicPicked];
+		generatedShop  = allItems.map(item => {
+			const base = item.price * aff.mult;
+			return {
+				name:     item.name,
+				liked:    formatPrice(base * 0.85),
+				neutral:  formatPrice(base),
+				disliked: formatPrice(base * 1.25),
+				rarity:   item.rarity,
+			};
+		});
+	}
 	function generateNames() {
 		generatedNames = Array.from({ length: 10 }, () => generateOneName(nameType));
 	}
@@ -1260,6 +1877,108 @@
 						</table>
 					</section>
 
+				</div>
+			{/if}
+
+			{#if selected === 'shop'}
+				<div class="space-y-6 text-sm">
+					<div class="flex flex-wrap items-baseline gap-3 mb-4">
+						<h3 class="text-base font-black tracking-widest text-amber-400 uppercase">Shop Generator</h3>
+						{#if generatedShopName}
+							<span class="text-lg font-bold text-white">— {generatedShopName}</span>
+						{/if}
+					</div>
+					<div class="flex flex-wrap items-end gap-4">
+						<div class="flex flex-col gap-1">
+							<label for="shop-type" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Shop Type</label>
+							<select id="shop-type" bind:value={shopType} onchange={() => generatedShop = []} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each Object.entries(shopData) as [key, shop]}<option value={key}>{shop.label}</option>{/each}
+							</select>
+						</div>
+						<div class="flex flex-col gap-1">
+							<label for="shop-affluence" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Town Affluence</label>
+							<select id="shop-affluence" bind:value={shopAffluence} onchange={() => generatedShop = []} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each Object.entries(affluenceData) as [key, aff]}<option value={key}>{aff.label}</option>{/each}
+							</select>
+						</div>
+						<button onclick={generateShop} class="rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95">Stock Shop</button>
+					</div>
+					{#if affluenceData[shopAffluence]}
+						<p class="text-xs text-gray-500 italic">{affluenceData[shopAffluence].note}</p>
+					{/if}
+					{#if generatedShop.length > 0}
+						<div class="overflow-x-auto rounded-xl border border-gray-700">
+							<table class="w-full text-sm">
+								<thead>
+									<tr class="border-b border-gray-700 bg-gray-800/60">
+										<th class="px-4 py-2.5 text-left font-semibold text-gray-300">Item</th>
+										<th class="px-4 py-2.5 text-center font-semibold text-green-400">😊 Friendly</th>
+										<th class="px-4 py-2.5 text-center font-semibold text-gray-300">😐 Neutral</th>
+										<th class="px-4 py-2.5 text-center font-semibold text-red-400">😠 Hostile</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-800">
+									{#each generatedShop as row, i}
+										<tr onclick={() => selectedShopItem = row} class="cursor-pointer {i % 2 === 0 ? 'bg-gray-900/40' : ''} hover:bg-gray-700/60 transition-colors">
+											<td class="px-4 py-2.5">
+												<span class="text-gray-200">{row.name}</span>
+												{#if row.rarity}
+													<span class="ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-widest uppercase border {rarityColors[row.rarity] ?? 'text-gray-400'} border-current/30 bg-current/10">{rarityLabels[row.rarity] ?? row.rarity}</span>
+												{/if}
+											</td>
+											<td class="px-4 py-2.5 text-center font-semibold text-green-300 tabular-nums">{row.liked}</td>
+											<td class="px-4 py-2.5 text-center text-gray-300 tabular-nums">{row.neutral}</td>
+											<td class="px-4 py-2.5 text-center font-semibold text-red-300 tabular-nums">{row.disliked}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						<p class="text-xs text-gray-600">Friendly: −15% · Neutral: base · Hostile: +25% · Click any item for details</p>
+					{:else}
+						<p class="text-sm text-gray-500">Select a shop type and town affluence, then click Stock Shop.</p>
+					{/if}
+					{#if selectedShopItem}
+						<!-- Item detail overlay -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onclick={() => selectedShopItem = null} onkeydown={(e) => e.key === 'Escape' && (selectedShopItem = null)}>
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<div class="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl" onclick={(e) => e.stopPropagation()}>
+								<!-- Header -->
+								<div class="mb-4 flex items-start gap-3">
+									<div class="flex-1">
+										<h4 class="text-base font-bold text-white">{selectedShopItem.name}</h4>
+										{#if selectedShopItem.rarity}
+											<span class="mt-1 inline-block rounded px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase border {rarityColors[selectedShopItem.rarity] ?? 'text-gray-400'} border-current/30 bg-current/10">{rarityLabels[selectedShopItem.rarity] ?? selectedShopItem.rarity}</span>
+										{:else}
+											<span class="mt-1 inline-block text-[10px] font-bold tracking-widest uppercase text-gray-500">Mundane Item</span>
+										{/if}
+									</div>
+									<button onclick={() => selectedShopItem = null} aria-label="Close item detail" class="rounded-lg border border-gray-700 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+									</button>
+								</div>
+								<!-- Prices -->
+								<div class="mb-4 flex gap-5 rounded-lg bg-gray-800/60 px-4 py-3">
+									<div class="text-center">
+										<p class="text-[10px] font-bold tracking-widest text-green-400 uppercase">😊 Friendly</p>
+										<p class="mt-0.5 font-semibold text-green-300 tabular-nums">{selectedShopItem.liked}</p>
+									</div>
+									<div class="text-center">
+										<p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">😐 Neutral</p>
+										<p class="mt-0.5 text-gray-300 tabular-nums">{selectedShopItem.neutral}</p>
+									</div>
+									<div class="text-center">
+										<p class="text-[10px] font-bold tracking-widest text-red-400 uppercase">😠 Hostile</p>
+										<p class="mt-0.5 font-semibold text-red-300 tabular-nums">{selectedShopItem.disliked}</p>
+									</div>
+								</div>
+								<!-- Description -->
+								<p class="text-sm leading-relaxed text-gray-300">{itemDescriptions[selectedShopItem.name] ?? 'No description available.'}</p>
+							</div>
+						</div>
+					{/if}
 				</div>
 			{/if}
 
