@@ -121,11 +121,11 @@
 		const isTemp = /\btemp(orary)?\b/.test(lower);
 		const isDamage =
 			!isTemp &&
-			/\bdamage\b|\bdeals?\b|\bhurt(s|ed)?\b|\bwound(s|ed)?\b|\btakes?\b/.test(lower);
+			/\bdamage\b|\bdeals?\b|\bhurt(s|ed)?\b|\bwound(s|ed)?\b|\btakes?\b|\bloses?\b|\bsuffers?\b|\bhit\s+for\b/.test(lower);
 		const isHeal =
 			!isTemp &&
 			!isDamage &&
-			(/\bheal(s|ed|ing)?\b|\brestore(s|d)?\b|\brecover(s|ed)?\b/.test(lower) ||
+			(/\bheal(s|ed|ing)?\b|\brestore(s|d)?\b|\brecover(s|ed)?\b|\bgains?\b/.test(lower) ||
 				/\b(hp|hit\s*points?|health)\b/.test(lower));
 
 		if (!isTemp && !isDamage && !isHeal) return null;
@@ -160,25 +160,54 @@
 		};
 	}
 
+	// ── AI fallback — fuzzy name matching via /api/voice-command ───────────
+	async function callAiFallback(transcript: string): Promise<boolean> {
+		try {
+			const combatants = combat.combatants
+				.filter((c) => c.type === 'player' || c.type === 'enemy')
+				.map((c) => ({ id: c.id, name: c.name, type: c.type, currentHp: c.currentHp, maxHp: c.maxHp }));
+			const res = await fetch('/api/voice-command', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ transcript, combatants })
+			});
+			if (!res.ok) return false;
+			const data = await res.json();
+			if (data.action === 'damage' && data.targetId && data.amount) {
+				combat.adjustHp(data.targetId, -data.amount);
+				showToast(`⚔ ${data.targetName} takes ${data.amount} damage`);
+				return true;
+			}
+			if (data.action === 'heal' && data.targetId && data.amount) {
+				combat.adjustHp(data.targetId, data.amount);
+				showToast(`💚 ${data.targetName} healed ${data.amount} HP`);
+				return true;
+			}
+		} catch { /* silent fail */ }
+		return false;
+	}
+
 	// ── Transcript dispatcher ─────────────────────────────────────────────────
 	function handleTranscript(text: string) {
 		const transcript = text.trim();
 		if (!transcript) return;
 		console.log('[Whisper] heard:', transcript);
 
-		// Ignore anything that doesn't contain the wake word.
-		if (!/tracker/i.test(transcript)) return;
+		// Strip punctuation and collapse spaces early — Whisper often inserts
+		// commas/periods (e.g. "Tracker, start combat.") that break word-boundary matches.
+		const lower = transcript.toLowerCase().replace(/[',.\-]/g, ' ').replace(/\s+/g, ' ').trim();
 
-		// Static commands first.
+		// Ignore anything that doesn't contain the wake word.
+		if (!/tracker/i.test(lower)) return;
+
+		// Static commands first — tested against cleaned text so punctuation doesn't block them.
 		for (const cmd of COMMANDS) {
-			if (cmd.pattern.test(transcript)) {
+			if (cmd.pattern.test(lower)) {
 				cmd.action();
 				showToast(`✓ ${cmd.label}`);
 				return;
 			}
 		}
-
-		const lower = transcript.toLowerCase().replace(/[',.\-]/g, ' ').replace(/\s+/g, ' ');
 
 		const rollAction = parseRollCommand(lower);
 		if (rollAction) { rollAction(); return; }
@@ -186,7 +215,10 @@
 		const hpAction = parseHpCommand(lower);
 		if (hpAction) { hpAction(); return; }
 
-		showToast('❓ Command not understood');
+		// Fall back to AI for fuzzy name matching and phrasing variations.
+		callAiFallback(transcript).then((handled) => {
+			if (!handled) showToast('❓ Command not understood');
+		});
 	}
 
 	// ── Whisper worker ────────────────────────────────────────────────────────
@@ -343,7 +375,13 @@
 		const resampled = await offCtx.startRendering();
 		const float32 = new Float32Array(resampled.getChannelData(0));
 
-		worker.postMessage({ type: 'transcribe', audio: float32 }, [float32.buffer]);
+		// Build a domain-specific prompt so Whisper biases toward combatant names and D&D terms.
+		const names = combat.combatants
+			.filter((c) => c.type === 'player' || c.type === 'enemy')
+			.map((c) => c.name)
+			.join(', ');
+		const initial_prompt = `D&D combat tracker voice command. Wake word: tracker. Combatants: ${names}. Commands: tracker next, tracker start combat, tracker end combat, roll d20, damage, heal.`;
+		worker.postMessage({ type: 'transcribe', audio: float32, initial_prompt }, [float32.buffer]);
 	}
 
 	// ── Toggle ────────────────────────────────────────────────────────────────

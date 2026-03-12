@@ -57,7 +57,9 @@
       "Bash(mkdir -p \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box\" && cp -r \"C:/Users/mojpo/WebstormProjects/Initiative/node_modules/@3d-dice/dice-box/dist/assets/.\" \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box/\" && echo \"Done\" && ls \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box/\")",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm remove @3d-dice/dice-box && pnpm add @3d-dice/dice-box-threejs 2>&1)",
       "Bash(rm -rf \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box\" && mkdir -p \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs\" && cp -r \"C:/Users/mojpo/WebstormProjects/Initiative/node_modules/@3d-dice/dice-box-threejs/public/.\" \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs/\" && echo \"Done\" && ls \"C:/Users/mojpo/WebstormProjects/Initiative/static/assets/dice-box-threejs/\")",
-      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -Command \"\\(Get-Content 'src/lib/components/DiceRollerModal.svelte' -Raw\\) -replace '\\\\{!diceReady \\\\? ''Loading…'' : rolling \\\\? ''Rolling…'' : ''Roll''\\\\}', '{!virtualDiceDisabled && !diceReady ? ''Loading…'' : rolling ? ''Rolling…'' : ''Roll''}' | Set-Content 'src/lib/components/DiceRollerModal.svelte' -NoNewline\")"
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -Command \"\\(Get-Content 'src/lib/components/DiceRollerModal.svelte' -Raw\\) -replace '\\\\{!diceReady \\\\? ''Loading…'' : rolling \\\\? ''Rolling…'' : ''Roll''\\\\}', '{!virtualDiceDisabled && !diceReady ? ''Loading…'' : rolling ? ''Rolling…'' : ''Roll''}' | Set-Content 'src/lib/components/DiceRollerModal.svelte' -NoNewline\")",
+      "Bash(mv \"C:/Users/mojpo/WebstormProjects/Initiative/fix_voice.js\" \"C:/Users/mojpo/WebstormProjects/Initiative/fix_voice.cjs\" && cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && node fix_voice.cjs)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && node fix_dispatcher.cjs && rm fix_dispatcher.cjs)"
     ]
   }
 }
