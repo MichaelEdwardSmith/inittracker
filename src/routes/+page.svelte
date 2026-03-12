@@ -8,6 +8,7 @@
 	import { untrack } from 'svelte';
 	import GuidePopover from '$lib/components/GuidePopover.svelte';
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
+	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import SessionNotesModal from '$lib/components/SessionNotesModal.svelte';
 	import SessionManagerModal from '$lib/components/SessionManagerModal.svelte';
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
@@ -596,6 +597,8 @@
 		onclose={() => { showSpells = false; spellToOpen = null; }}
 	/>
 {/if}
+
+<DiceOverlay />
 
 <!-- Audio Mixer — mounted once (after first open) and hidden via CSS so audio keeps playing -->
 {#if mixerMounted}
