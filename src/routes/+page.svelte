@@ -14,6 +14,7 @@
 	import SpellsModal from '$lib/components/SpellsModal.svelte';
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
+	import AudioMixer from '$lib/components/AudioMixer.svelte';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
@@ -107,6 +108,9 @@
 
 	// Session manager state
 	let showDiceRoller = $state(false);
+	let showMixer = $state(false);
+	let mixerMounted = $state(false);
+	function openMixer() { mixerMounted = true; showMixer = true; }
 	let showEncounters = $state(false);
 	let showSpells = $state(false);
 	let spellToOpen = $state<string | null>(null);
@@ -251,145 +255,10 @@
 		</div>
 
 		<div class="ml-auto flex items-center gap-2">
-			<!-- Desktop: all buttons (md and up) -->
-			<div class="hidden items-center gap-2 md:flex">
-				<!-- Messages button -->
+			<!-- Hamburger menu -->
+			<div class="relative">
 				<button
-					onclick={openInbox}
-					class="relative flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-semibold transition
-					       {unreadCount > 0
-						? 'border-amber-600/70 bg-amber-900/30 text-amber-400 hover:bg-amber-900/50'
-						: 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-500 hover:text-gray-200'}"
-					title="Player messages"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-					</svg>
-					Messages
-					{#if unreadCount > 0}
-						<span class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
-							{unreadCount}
-						</span>
-					{/if}
-				</button>
-				<button
-					onclick={() => (showNotes = true)}
-					title="Session Notes"
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-					</svg>
-					<span>Notes</span>
-				</button>
-				<button
-					onclick={() => (showDiceRoller = true)}
-					title="Dice Roller"
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-					</svg>
-					<span>Dice</span>
-				</button>
-				<button
-					onclick={() => (showSpells = true)}
-					title="Spell Reference"
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-					</svg>
-					<span>Spells</span>
-				</button>
-				{#if data.showVoiceCommands}<VoiceCommands />{/if}
-				<button
-					onclick={() => (showEncounters = true)}
-					title="Encounter Builder"
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-					</svg>
-					<span>Encounters</span>
-				</button>
-				<button
-					onclick={() => (showSessionManager = true)}
-					title="Manage Sessions"
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5"/>
-					</svg>
-					<span>Sessions</span>
-				</button>
-				<a href="/history" title="Combat Chronicles" class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-					</svg>
-					<span>Chronicle</span>
-				</a>
-				<a id="guide-link" href="/guide" title="User Guide" class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-					</svg>
-					<span>Guide</span>
-				</a>
-				<a href="/display/{activeSession.sessionId}" target="_blank" rel="noopener" title="Open Player Display" class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-					</svg>
-					<span>Player Display</span>
-				</a>
-				<a href="mailto:dm@inittracker.com" title="Contact us" class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-					</svg>
-					<span>Contact</span>
-				</a>
-				<button
-					onclick={toggleFullscreen}
-					title={isFullscreen ? 'Exit full screen' : 'Full screen'}
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					{#if isFullscreen}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
-						</svg>
-					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
-						</svg>
-					{/if}
-				</button>
-				<button
-					onclick={() => theme.toggle()}
-					title={theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-					class="flex items-center gap-1.5 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					{#if theme.isDark}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<circle cx="12" cy="12" r="5"/>
-							<path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-						</svg>
-					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-						</svg>
-					{/if}
-				</button>
-				<form method="POST" action="/logout">
-					<button type="submit" title="Log out" class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-500 transition hover:border-red-800 hover:text-red-400">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-						</svg>
-					</button>
-				</form>
-			</div>
-
-			<!-- Mobile: hamburger (below md) -->
-			<div class="relative md:hidden">
-				<button
+					id="hamburger-btn"
 					onclick={() => (showMobileMenu = !showMobileMenu)}
 					aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
 					class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
@@ -417,8 +286,9 @@
 	{#if showMobileMenu}
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="fixed inset-0 z-40 md:hidden" onclick={() => (showMobileMenu = false)}></div>
-		<div class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl md:hidden">
+		<div class="fixed inset-0 z-40" onclick={() => (showMobileMenu = false)}></div>
+	{/if}
+	<div class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu ? '' : 'hidden'}">
 			<button
 				onclick={() => { openInbox(); showMobileMenu = false; }}
 				class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
@@ -460,6 +330,18 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
 				</svg>
 				Spells
+			</button>
+			{#if data.showVoiceCommands}
+				<VoiceCommands mobile={true} />
+			{/if}
+			<button
+				onclick={() => { openMixer(); showMobileMenu = false; }}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+				</svg>
+				Mixer
 			</button>
 			<button
 				onclick={() => { showEncounters = true; showMobileMenu = false; }}
@@ -566,8 +448,7 @@
 					Log out
 				</button>
 			</form>
-		</div>
-	{/if}
+	</div>
 
 	<!-- Main layout -->
 	<div class="flex min-h-0 flex-1">
@@ -714,4 +595,11 @@
 		initialSpell={spellToOpen ?? undefined}
 		onclose={() => { showSpells = false; spellToOpen = null; }}
 	/>
+{/if}
+
+<!-- Audio Mixer — mounted once (after first open) and hidden via CSS so audio keeps playing -->
+{#if mixerMounted}
+	<div class={showMixer ? '' : 'hidden'}>
+		<AudioMixer onclose={() => (showMixer = false)} />
+	</div>
 {/if}

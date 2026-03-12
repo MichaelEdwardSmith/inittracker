@@ -13,7 +13,7 @@
 	onMount(() => {
 		if (localStorage.getItem(KEY)) return;
 		requestAnimationFrame(() => {
-			const el = document.getElementById('guide-link');
+			const el = document.getElementById('hamburger-btn');
 			if (!el) return;
 			const r = el.getBoundingClientRect();
 			btnRect = { top: r.top, left: r.left, width: r.width, height: r.height };
@@ -85,8 +85,8 @@
 			<div class="p-4">
 				<p class="mb-1 text-sm font-bold text-white">👋 Welcome!</p>
 				<p class="mb-4 text-sm leading-relaxed text-gray-400">
-					Use the <strong class="text-amber-300">Guide</strong> to learn everything about the
-					Initiative Tracker — combat management, conditions, chronicles, sessions, and more.
+					Open the <strong class="text-amber-300">menu</strong> to access the Guide and everything
+					else — combat tools, dice roller, sessions, voice commands, and more.
 				</p>
 				<label class="mb-4 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
 					<input

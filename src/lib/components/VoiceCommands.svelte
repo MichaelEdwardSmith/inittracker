@@ -10,6 +10,9 @@
 	import { combat } from '$lib/store.svelte';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
+	// ── Props ─────────────────────────────────────────────────────────────────
+	const { mobile = false }: { mobile?: boolean } = $props();
+
 	// ── Status ───────────────────────────────────────────────────────────────
 	type Status = 'idle' | 'loading' | 'ready' | 'listening' | 'processing';
 	let status = $state<Status>('idle');
@@ -408,54 +411,94 @@
 	});
 </script>
 
-<!-- Mic toggle button — styled to match other header buttons -->
+<!-- Mic toggle button -->
 {#if browser}
-	<button
-		onclick={toggle}
-		disabled={status === 'loading'}
-		title={
-			status === 'idle'       ? 'Enable voice commands (Whisper AI, runs locally)' :
-			status === 'loading'    ? `Downloading Whisper model… ${loadPct}%` :
-			status === 'listening'  ? 'Voice listening — click to stop' :
-			status === 'processing' ? 'Transcribing…' :
-			'Start voice commands'
-		}
-		class="relative flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-semibold transition
-			{status === 'listening' || status === 'processing'
-				? 'border-amber-600/70 bg-amber-900/30 text-amber-400 hover:bg-amber-900/50'
-				: status === 'loading'
-				? 'cursor-wait border-blue-700/50 bg-blue-900/20 text-blue-400'
-				: 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-500 hover:text-gray-200'}"
-	>
-		{#if status === 'listening'}
-			<!-- Amber pulsing dot: actively listening -->
-			<span class="relative flex h-2 w-2">
-				<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-				<span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
-			</span>
-		{:else if status === 'processing'}
-			<!-- Blue pulsing dot: transcribing audio -->
-			<span class="relative flex h-2 w-2">
-				<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
-				<span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
-			</span>
-		{:else if status === 'loading'}
-			<!-- Spinning ring: model downloading -->
-			<span class="relative flex h-3 w-3">
-				<span class="absolute inline-flex h-full w-full animate-spin rounded-full border border-blue-400 border-t-transparent"></span>
-			</span>
-		{:else}
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-			</svg>
-		{/if}
-
-		{#if status === 'loading'}
-			{loadPct > 0 ? `${loadPct}%` : 'Loading…'}
-		{:else}
-			Voice
-		{/if}
-	</button>
+	{#if mobile}
+		<!-- Full-width hamburger-menu style -->
+		<button
+			onclick={toggle}
+			disabled={status === 'loading'}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm transition
+				{status === 'listening' || status === 'processing'
+					? 'text-amber-400 hover:bg-gray-700'
+					: status === 'loading'
+					? 'cursor-wait text-blue-400'
+					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+		>
+			{#if status === 'listening'}
+				<span class="relative flex h-4 w-4 shrink-0 items-center justify-center">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+				</span>
+			{:else if status === 'processing'}
+				<span class="relative flex h-4 w-4 shrink-0 items-center justify-center">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+				</span>
+			{:else if status === 'loading'}
+				<span class="relative flex h-4 w-4 shrink-0 items-center justify-center">
+					<span class="absolute inline-flex h-full w-full animate-spin rounded-full border border-blue-400 border-t-transparent"></span>
+				</span>
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+				</svg>
+			{/if}
+			{#if status === 'loading'}
+				{loadPct > 0 ? `Voice — Loading ${loadPct}%` : 'Voice — Loading…'}
+			{:else if status === 'listening'}
+				Voice — Listening
+			{:else if status === 'processing'}
+				Voice — Transcribing
+			{:else}
+				Voice Commands
+			{/if}
+		</button>
+	{:else}
+		<!-- Compact header pill style -->
+		<button
+			onclick={toggle}
+			disabled={status === 'loading'}
+			title={
+				status === 'idle'       ? 'Enable voice commands (Whisper AI, runs locally)' :
+				status === 'loading'    ? `Downloading Whisper model… ${loadPct}%` :
+				status === 'listening'  ? 'Voice listening — click to stop' :
+				status === 'processing' ? 'Transcribing…' :
+				'Start voice commands'
+			}
+			class="relative flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-semibold transition
+				{status === 'listening' || status === 'processing'
+					? 'border-amber-600/70 bg-amber-900/30 text-amber-400 hover:bg-amber-900/50'
+					: status === 'loading'
+					? 'cursor-wait border-blue-700/50 bg-blue-900/20 text-blue-400'
+					: 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-500 hover:text-gray-200'}"
+		>
+			{#if status === 'listening'}
+				<span class="relative flex h-2 w-2">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+				</span>
+			{:else if status === 'processing'}
+				<span class="relative flex h-2 w-2">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+				</span>
+			{:else if status === 'loading'}
+				<span class="relative flex h-3 w-3">
+					<span class="absolute inline-flex h-full w-full animate-spin rounded-full border border-blue-400 border-t-transparent"></span>
+				</span>
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+				</svg>
+			{/if}
+			{#if status === 'loading'}
+				{loadPct > 0 ? `${loadPct}%` : 'Loading…'}
+			{:else}
+				Voice
+			{/if}
+		</button>
+	{/if}
 {/if}
 
 <!-- Command feedback toast -->
