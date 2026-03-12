@@ -1,7 +1,7 @@
 <!-- Full-screen Quick Rules reference for DMs. Left column lists categories;
      right panel shows the selected category's content. -->
 <script lang="ts">
-	let { onclose }: { onclose: () => void } = $props();
+	let { onclose, onAddEncounter }: { onclose: () => void; onAddEncounter?: (monsters: { name: string; count: number }[]) => void } = $props();
 
 	type Category = {
 		id: string;
@@ -27,6 +27,7 @@
 		{ id: 'names',         label: 'Name Generator',          icon: '📛' },
 		{ id: 'weather',       label: 'Weather & Travel',        icon: '🌦️' },
 		{ id: 'shop',          label: 'Shop Generator',           icon: '🛒' },
+		{ id: 'encounter',     label: 'Random Encounter',         icon: '🎲' },
 	];
 
 	let selected = $state('actions');
@@ -974,6 +975,431 @@
 				rarity:   item.rarity,
 			};
 		});
+	}
+
+	// ── Random Encounter Generator ──────────────────────────────────────────────
+	type EncounterMonsterDef = { name: string; cr: number; xp: number; role: string; biomes: string[]; mtype: string };
+	type EncounterMonster    = { name: string; count: number; xp: number };
+	type EncounterResult = {
+		title: string; scene: string; description: string; archetype: string;
+		monsters: EncounterMonster[]; rawXp: number; adjustedXp: number;
+		xpPerPlayer: number; multiplier: number; tactics: string; terrain: string;
+		actualDifficulty: string;
+	};
+
+	const encounterBiomeOptions = [
+		{ value: 'forest',     label: 'Forest'              }, { value: 'plains',     label: 'Plains / Grassland'  },
+		{ value: 'mountains',  label: 'Mountains'           }, { value: 'desert',     label: 'Desert'              },
+		{ value: 'arctic',     label: 'Arctic / Tundra'     }, { value: 'coastal',    label: 'Coastal'             },
+		{ value: 'swamp',      label: 'Swamp / Marsh'       }, { value: 'jungle',     label: 'Jungle / Rainforest' },
+		{ value: 'underdark',  label: 'Underdark'           }, { value: 'urban',      label: 'Urban / City'        },
+		{ value: 'dungeon',    label: 'Dungeon'             }, { value: 'ruins',      label: 'Ruins'               },
+	];
+	const difficultyOptions = [
+		{ value: 'easy', label: 'Easy' }, { value: 'medium', label: 'Medium' },
+		{ value: 'hard', label: 'Hard' }, { value: 'deadly', label: 'Deadly' },
+	];
+	const difficultyColors: Record<string, string> = {
+		easy: 'text-green-400 border-green-700/50 bg-green-900/20',
+		medium: 'text-yellow-400 border-yellow-700/50 bg-yellow-900/20',
+		hard: 'text-orange-400 border-orange-700/50 bg-orange-900/20',
+		deadly: 'text-red-400 border-red-700/50 bg-red-900/20',
+	};
+
+	// XP thresholds per character per level [easy, medium, hard, deadly]
+	const xpPerChar: [number,number,number,number][] = [
+		[25,50,75,100],[50,100,150,200],[75,150,225,400],[125,250,375,500],
+		[250,500,750,1100],[300,600,900,1400],[350,750,1100,1700],[450,900,1400,2100],
+		[550,1100,1600,2400],[600,1200,1900,2800],[800,1600,2400,3600],[1000,2000,3000,4500],
+		[1100,2200,3400,5100],[1250,2500,3800,5700],[1400,2800,4300,6400],[1600,3200,4800,7200],
+		[2000,3900,5900,8800],[2100,4200,6300,9500],[2400,4900,7300,10900],[2800,5700,8500,12700],
+	];
+	const diffIdx: Record<string,number> = { easy:0, medium:1, hard:2, deadly:3 };
+
+	function getXpBudget(level: number, diff: string, size: number): number {
+		const row = xpPerChar[Math.min(level, 20) - 1];
+		return row[diffIdx[diff] ?? 1] * size;
+	}
+	function getActualDifficulty(adjustedXp: number, level: number, size: number): string {
+		const row = xpPerChar[Math.min(level, 20) - 1];
+		const pp = adjustedXp / size;
+		if (pp >= row[3]) return 'deadly';
+		if (pp >= row[2]) return 'hard';
+		if (pp >= row[1]) return 'medium';
+		if (pp >= row[0]) return 'easy';
+		return 'trivial';
+	}
+	function monsterMult(count: number, size: number): number {
+		let m = count >= 15 ? 4 : count >= 11 ? 3 : count >= 7 ? 2.5 : count >= 3 ? 2 : count === 2 ? 1.5 : 1;
+		if (size <= 2) m *= 1.5; else if (size >= 6) m *= 0.5;
+		return m;
+	}
+
+	// Monster pool: name, cr, xp, role (solo/leader/minion/swarm), biomes[], mtype
+	const monsterPool: EncounterMonsterDef[] = [
+		// ── Tier 1 (CR 0–3) ──────────────────────────────────────────────────
+		{ name:'Rat',               cr:0,     xp:10,   role:'swarm',  biomes:['urban','dungeon','ruins','swamp'],                     mtype:'beast'     },
+		{ name:'Giant Rat',         cr:0.125, xp:25,   role:'minion', biomes:['urban','dungeon','ruins','swamp','forest'],            mtype:'beast'     },
+		{ name:'Kobold',            cr:0.125, xp:25,   role:'minion', biomes:['dungeon','mountains','forest','ruins'],                mtype:'humanoid'  },
+		{ name:'Bandit',            cr:0.125, xp:25,   role:'minion', biomes:['forest','plains','urban','ruins','coastal'],           mtype:'humanoid'  },
+		{ name:'Guard',             cr:0.125, xp:25,   role:'minion', biomes:['urban','dungeon','ruins'],                            mtype:'humanoid'  },
+		{ name:'Goblin',            cr:0.25,  xp:50,   role:'minion', biomes:['forest','plains','dungeon','ruins','mountains'],       mtype:'humanoid'  },
+		{ name:'Skeleton',          cr:0.25,  xp:50,   role:'minion', biomes:['dungeon','ruins','desert','underdark'],               mtype:'undead'    },
+		{ name:'Zombie',            cr:0.25,  xp:50,   role:'minion', biomes:['dungeon','ruins','swamp','underdark'],                mtype:'undead'    },
+		{ name:'Drow',              cr:0.25,  xp:50,   role:'minion', biomes:['underdark','dungeon'],                               mtype:'humanoid'  },
+		{ name:'Wolf',              cr:0.25,  xp:50,   role:'minion', biomes:['forest','plains','arctic','mountains'],               mtype:'beast'     },
+		{ name:'Shadow',            cr:0.5,   xp:100,  role:'minion', biomes:['dungeon','ruins','underdark','swamp'],                mtype:'undead'    },
+		{ name:'Orc',               cr:0.5,   xp:100,  role:'minion', biomes:['plains','mountains','forest','arctic'],               mtype:'humanoid'  },
+		{ name:'Thug',              cr:0.5,   xp:100,  role:'minion', biomes:['urban','dungeon','ruins'],                            mtype:'humanoid'  },
+		{ name:'Hobgoblin',         cr:0.5,   xp:100,  role:'minion', biomes:['forest','plains','mountains','dungeon'],              mtype:'humanoid'  },
+		{ name:'Lizardfolk',        cr:0.5,   xp:100,  role:'minion', biomes:['swamp','jungle','coastal'],                          mtype:'humanoid'  },
+		{ name:'Gnoll',             cr:0.5,   xp:100,  role:'minion', biomes:['plains','desert','ruins'],                           mtype:'humanoid'  },
+		{ name:'Worg',              cr:0.5,   xp:100,  role:'minion', biomes:['forest','plains','mountains'],                       mtype:'monstrosity'},
+		{ name:'Black Bear',        cr:0.5,   xp:100,  role:'minion', biomes:['forest','mountains'],                                mtype:'beast'     },
+		{ name:'Crocodile',         cr:0.5,   xp:100,  role:'minion', biomes:['swamp','jungle','coastal'],                          mtype:'beast'     },
+		{ name:'Sahuagin',          cr:0.5,   xp:100,  role:'minion', biomes:['coastal'],                                           mtype:'humanoid'  },
+		{ name:'Giant Bat',         cr:0.25,  xp:50,   role:'minion', biomes:['dungeon','underdark','mountains','ruins'],            mtype:'beast'     },
+		{ name:'Piercer',           cr:0.5,   xp:100,  role:'minion', biomes:['dungeon','underdark','caves'],                       mtype:'monstrosity'},
+		{ name:'Winged Kobold',     cr:0.25,  xp:50,   role:'minion', biomes:['dungeon','mountains','ruins'],                       mtype:'humanoid'  },
+		{ name:'Intellect Devourer',cr:2,     xp:450,  role:'minion', biomes:['underdark','dungeon'],                               mtype:'aberration'},
+		{ name:'Specter',           cr:1,     xp:200,  role:'minion', biomes:['dungeon','ruins','underdark'],                       mtype:'undead'    },
+		{ name:'Ghoul',             cr:1,     xp:200,  role:'minion', biomes:['dungeon','ruins','underdark','swamp'],               mtype:'undead'    },
+		{ name:'Giant Spider',      cr:1,     xp:200,  role:'minion', biomes:['forest','dungeon','jungle','underdark','ruins'],      mtype:'beast'     },
+		{ name:'Bugbear',           cr:1,     xp:200,  role:'leader', biomes:['forest','dungeon','mountains','ruins'],              mtype:'humanoid'  },
+		{ name:'Harpy',             cr:1,     xp:200,  role:'minion', biomes:['mountains','coastal','plains','ruins'],              mtype:'monstrosity'},
+		{ name:'Yuan-ti Pureblood', cr:1,     xp:200,  role:'minion', biomes:['jungle','desert','ruins','dungeon'],                 mtype:'humanoid'  },
+		{ name:'Spy',               cr:1,     xp:200,  role:'leader', biomes:['urban'],                                            mtype:'humanoid'  },
+		{ name:'Dire Wolf',         cr:1,     xp:200,  role:'leader', biomes:['forest','plains','arctic','mountains'],              mtype:'beast'     },
+		{ name:'Ghast',             cr:2,     xp:450,  role:'leader', biomes:['dungeon','ruins','underdark','swamp'],               mtype:'undead'    },
+		{ name:'Bandit Captain',    cr:2,     xp:450,  role:'leader', biomes:['forest','plains','urban','ruins','coastal'],         mtype:'humanoid'  },
+		{ name:'Gnoll Pack Lord',   cr:2,     xp:450,  role:'leader', biomes:['plains','desert','ruins'],                          mtype:'humanoid'  },
+		{ name:'Lizardfolk Shaman', cr:2,     xp:450,  role:'leader', biomes:['swamp','jungle','coastal'],                         mtype:'humanoid'  },
+		{ name:'Merrow',            cr:2,     xp:450,  role:'solo',   biomes:['coastal'],                                          mtype:'monstrosity'},
+		{ name:'Grick',             cr:2,     xp:450,  role:'solo',   biomes:['underdark','dungeon','ruins','mountains'],           mtype:'monstrosity'},
+		{ name:'Ogre',              cr:2,     xp:450,  role:'solo',   biomes:['plains','mountains','forest','swamp'],               mtype:'giant'     },
+		{ name:'Quaggoth',          cr:2,     xp:450,  role:'minion', biomes:['underdark','dungeon'],                               mtype:'humanoid'  },
+		{ name:'Giant Hyena',       cr:1,     xp:200,  role:'minion', biomes:['plains','desert'],                                   mtype:'beast'     },
+		{ name:'Giant Constrictor', cr:2,     xp:450,  role:'solo',   biomes:['jungle','swamp','desert'],                          mtype:'beast'     },
+		{ name:'Green Hag',         cr:3,     xp:700,  role:'solo',   biomes:['forest','swamp','ruins'],                           mtype:'fey'       },
+		{ name:'Hobgoblin Captain', cr:3,     xp:700,  role:'leader', biomes:['forest','plains','mountains','dungeon'],             mtype:'humanoid'  },
+		{ name:'Veteran',           cr:3,     xp:700,  role:'leader', biomes:['urban','plains','ruins'],                           mtype:'humanoid'  },
+		{ name:'Wight',             cr:3,     xp:700,  role:'leader', biomes:['dungeon','ruins','underdark','arctic'],              mtype:'undead'    },
+		{ name:'Owlbear',           cr:3,     xp:700,  role:'solo',   biomes:['forest','mountains'],                               mtype:'monstrosity'},
+		{ name:'Manticore',         cr:3,     xp:700,  role:'solo',   biomes:['plains','desert','mountains'],                      mtype:'monstrosity'},
+		{ name:'Basilisk',          cr:3,     xp:700,  role:'solo',   biomes:['dungeon','ruins','mountains','plains'],              mtype:'monstrosity'},
+		{ name:'Yeti',              cr:3,     xp:700,  role:'solo',   biomes:['arctic','mountains'],                               mtype:'monstrosity'},
+		{ name:'Yuan-ti Malison',   cr:3,     xp:700,  role:'leader', biomes:['jungle','desert','ruins','dungeon'],                mtype:'humanoid'  },
+		{ name:'Giant Scorpion',    cr:3,     xp:700,  role:'solo',   biomes:['desert','ruins'],                                   mtype:'beast'     },
+		{ name:'Mummy',             cr:3,     xp:700,  role:'solo',   biomes:['desert','ruins','dungeon'],                         mtype:'undead'    },
+		// ── Tier 2 (CR 4–9) ──────────────────────────────────────────────────
+		{ name:'Orc War Chief',     cr:4,     xp:1100, role:'leader', biomes:['plains','mountains','forest','arctic'],              mtype:'humanoid'  },
+		{ name:'Chuul',             cr:4,     xp:1100, role:'solo',   biomes:['underdark','swamp','coastal','dungeon'],             mtype:'aberration'},
+		{ name:'Ettin',             cr:4,     xp:1100, role:'solo',   biomes:['plains','mountains','forest'],                      mtype:'giant'     },
+		{ name:'Werewolf',          cr:3,     xp:700,  role:'solo',   biomes:['forest','plains','urban'],                          mtype:'humanoid'  },
+		{ name:'Drow Elite Warrior',cr:5,     xp:1800, role:'leader', biomes:['underdark','dungeon'],                              mtype:'humanoid'  },
+		{ name:'Troll',             cr:5,     xp:1800, role:'solo',   biomes:['forest','mountains','swamp','arctic','dungeon'],     mtype:'giant'     },
+		{ name:'Bulette',           cr:5,     xp:1800, role:'solo',   biomes:['plains','desert','mountains'],                      mtype:'monstrosity'},
+		{ name:'Night Hag',         cr:5,     xp:1800, role:'solo',   biomes:['dungeon','ruins','underdark','swamp'],               mtype:'fiend'     },
+		{ name:'Wraith',            cr:5,     xp:1800, role:'leader', biomes:['dungeon','ruins','underdark'],                      mtype:'undead'    },
+		{ name:'Vampire Spawn',     cr:5,     xp:1800, role:'minion', biomes:['dungeon','ruins','urban'],                          mtype:'undead'    },
+		{ name:'Giant Shark',       cr:5,     xp:1800, role:'solo',   biomes:['coastal'],                                          mtype:'beast'     },
+		{ name:'Giant Crocodile',   cr:5,     xp:1800, role:'solo',   biomes:['swamp','jungle','coastal'],                         mtype:'beast'     },
+		{ name:'Sahuagin Baron',    cr:5,     xp:1800, role:'leader', biomes:['coastal'],                                          mtype:'humanoid'  },
+		{ name:'Roper',             cr:5,     xp:1800, role:'solo',   biomes:['dungeon','underdark','mountains'],                   mtype:'monstrosity'},
+		{ name:'Gorgon',            cr:5,     xp:1800, role:'solo',   biomes:['plains','mountains','ruins'],                       mtype:'monstrosity'},
+		{ name:'Chimera',           cr:6,     xp:2300, role:'solo',   biomes:['plains','mountains','coastal','ruins'],              mtype:'monstrosity'},
+		{ name:'Cyclops',           cr:6,     xp:2300, role:'solo',   biomes:['plains','mountains','coastal','ruins'],              mtype:'giant'     },
+		{ name:'Medusa',            cr:6,     xp:2300, role:'solo',   biomes:['ruins','dungeon','desert'],                         mtype:'monstrosity'},
+		{ name:'Wyvern',            cr:6,     xp:2300, role:'solo',   biomes:['mountains','coastal','plains'],                     mtype:'dragon'    },
+		{ name:'Young Black Dragon',cr:7,     xp:2900, role:'solo',   biomes:['swamp','jungle','dungeon'],                         mtype:'dragon'    },
+		{ name:'Mind Flayer',       cr:7,     xp:2900, role:'leader', biomes:['underdark','dungeon'],                              mtype:'aberration'},
+		{ name:'Stone Giant',       cr:7,     xp:2900, role:'solo',   biomes:['mountains'],                                        mtype:'giant'     },
+		{ name:'Young White Dragon',cr:6,     xp:2300, role:'solo',   biomes:['arctic','mountains'],                               mtype:'dragon'    },
+		{ name:'Young Green Dragon',cr:8,     xp:3900, role:'solo',   biomes:['forest','jungle'],                                  mtype:'dragon'    },
+		{ name:'Hydra',             cr:8,     xp:3900, role:'solo',   biomes:['swamp','coastal','dungeon'],                        mtype:'monstrosity'},
+		{ name:'Frost Giant',       cr:8,     xp:3900, role:'solo',   biomes:['arctic','mountains'],                               mtype:'giant'     },
+		{ name:'Young Blue Dragon', cr:9,     xp:5000, role:'solo',   biomes:['desert','plains','coastal'],                        mtype:'dragon'    },
+		{ name:'Fire Giant',        cr:9,     xp:5000, role:'solo',   biomes:['mountains','dungeon'],                              mtype:'giant'     },
+		// ── Tier 3 (CR 10–16) ────────────────────────────────────────────────
+		{ name:'Young Red Dragon',  cr:10,    xp:5900, role:'solo',   biomes:['mountains','dungeon','ruins'],                      mtype:'dragon'    },
+		{ name:'Aboleth',           cr:10,    xp:5900, role:'solo',   biomes:['underdark','dungeon','coastal'],                    mtype:'aberration'},
+		{ name:'Roc',               cr:11,    xp:7200, role:'solo',   biomes:['mountains','coastal','plains'],                     mtype:'monstrosity'},
+		{ name:'Djinni',            cr:11,    xp:7200, role:'solo',   biomes:['desert','plains','coastal'],                        mtype:'elemental' },
+		{ name:'Efreet',            cr:11,    xp:7200, role:'solo',   biomes:['desert','mountains','dungeon'],                     mtype:'elemental' },
+		{ name:'Adult White Dragon',cr:13,    xp:10000,role:'solo',   biomes:['arctic','mountains'],                               mtype:'dragon'    },
+		{ name:'Vampire',           cr:13,    xp:10000,role:'solo',   biomes:['dungeon','ruins','urban'],                          mtype:'undead'    },
+		{ name:'Beholder',          cr:13,    xp:10000,role:'solo',   biomes:['dungeon','underdark'],                              mtype:'aberration'},
+		{ name:'Storm Giant',       cr:13,    xp:10000,role:'solo',   biomes:['coastal','mountains','arctic'],                     mtype:'giant'     },
+		{ name:'Adult Green Dragon',cr:15,    xp:13000,role:'solo',   biomes:['forest','jungle'],                                  mtype:'dragon'    },
+		{ name:'Adult Blue Dragon', cr:16,    xp:15000,role:'solo',   biomes:['desert','plains','coastal'],                        mtype:'dragon'    },
+		// ── Tier 4 (CR 17–24+) ───────────────────────────────────────────────
+		{ name:'Adult Red Dragon',  cr:17,    xp:18000,role:'solo',   biomes:['mountains','dungeon','ruins'],                      mtype:'dragon'    },
+		{ name:'Dragon Turtle',     cr:17,    xp:18000,role:'solo',   biomes:['coastal'],                                          mtype:'dragon'    },
+		{ name:'Lich',              cr:21,    xp:33000,role:'solo',   biomes:['dungeon','ruins','underdark'],                      mtype:'undead'    },
+		{ name:'Ancient White Dragon',cr:20,  xp:25000,role:'solo',   biomes:['arctic','mountains'],                               mtype:'dragon'    },
+		{ name:'Ancient Green Dragon',cr:22,  xp:41000,role:'solo',   biomes:['forest','jungle'],                                  mtype:'dragon'    },
+		{ name:'Ancient Red Dragon', cr:24,   xp:62000,role:'solo',   biomes:['mountains','dungeon','ruins'],                      mtype:'dragon'    },
+	];
+
+	function getEncounterTier(level: number): number {
+		return level <= 4 ? 1 : level <= 10 ? 2 : level <= 16 ? 3 : 4;
+	}
+	function getCrRange(tier: number): [number, number] {
+		if (tier === 1) return [0.125, 3]; if (tier === 2) return [1, 10];
+		if (tier === 3) return [5, 17];    return [12, 25];
+	}
+
+	const biomeScenes: Record<string, string[]> = {
+		forest:    ['The path winds through ancient oaks, canopy filtering green light onto gnarled roots and ferns. Birdsong has gone quiet.',
+		            'Mist clings low among the pines. Footprints in the soft earth lead off the trail — and then stop.',
+		            'A clearing breaks the treeline. Bones of some large creature lie scattered among the wildflowers.'],
+		plains:    ['The grassland stretches to the horizon. Dry wind bends the tall grass in slow waves — and something moves against the wind.',
+		            'The road cuts through open farmland. Cart tracks end abruptly. A crow circles overhead.',
+		            'A lone dead tree stands in the middle of the plains, its bark scored with old claw marks.'],
+		mountains: ['The mountain pass narrows between sheer cliff faces. Loose stones skitter down from somewhere above.',
+		            'Thin air and biting cold at altitude. The trail disappears around a boulder — and a shadow moves.',
+		            'An old watchtower, half-collapsed, overlooks the switchback trail below. Something watches from the arrow loops.'],
+		desert:    ['Heat shimmers off the cracked flats. Vultures circle. The ruins of a way-station loom ahead.',
+		            'Sand dunes give way to a rocky plateau. Tracks wind between the stones — recent, and more than one set.',
+		            'A dry riverbed cuts through sandstone bluffs. The silence here is absolute — unnaturally so.'],
+		arctic:    ['Biting wind scours the tundra. Snow has been disturbed ahead — a wide swathe, as if something large dragged itself through.',
+		            'The frozen lake catches pale sunlight. Cracks web the ice near the far shore. A dark shape moves beneath.',
+		            'Ice-rimed ruins protrude from the snowpack. Frost-covered bones line the approach.'],
+		coastal:   ['Waves crash against black rock below the cliff path. Sea spray and the smell of salt fill the air — and something else: blood.',
+		            'Tide pools glint in the afternoon light. The fisherman\'s hut ahead is dark, its door hanging open.',
+		            'A sea cave yawns in the cliff face. The sound of the tide mixes with a low, rhythmic clicking from inside.'],
+		swamp:     ['Black water reflects a sky the color of pewter. Something slides off a log into the murk ahead.',
+		            'Cypress knees and tangles of root make every step treacherous. A green glow pulses beneath the water\'s surface.',
+		            'The smell hits first — decay and stagnant water. The old village ahead has been abandoned longer than the moss on its walls.'],
+		jungle:    ['The canopy closes overhead, blocking the sky. Heat and humidity press down like a fist. Something screams in the distance.',
+		            'Brilliant flowers and buzzing insects mask the sounds of movement in the undergrowth — until it\'s too close.',
+		            'A massive tree has fallen, opening a shaft of light. Ancient stonework is visible beneath the tangle of roots.'],
+		underdark: ['Phosphorescent fungi cast cold blue light across the cavern floor. The drip of water echoes in impossible distances.',
+		            'The tunnel opens into a vast underground space. Far below, lights move in slow procession — torches, or something else.',
+		            'A worked stone archway, half-collapsed, leads deeper. Carved warnings in an old language flank the door.'],
+		urban:     ['The alley between the warehouses is a dead end — too late, the party realizes they were herded here.',
+		            'The market square is strangely empty for this hour. Shutters are closed. A distant bell begins to toll.',
+		            'Rain slicks the cobblestones of the old quarter. A figure at the corner vanishes as the party approaches.'],
+		dungeon:   ['Torchlight gutters in a draft from ahead. The map shows a door here — but the door is already open.',
+		            'The chamber is large enough that the far wall is invisible. The floor is strewn with old adventuring gear — and bones.',
+		            'A collapsed section of ceiling created a rubble field. Movement comes from the shadows beyond it.'],
+		ruins:     ['The old keep\'s great hall has been swallowed by vines and weather. The floor is treacherous — and occupied.',
+		            'Crumbling walls and overgrown courtyards. Someone has built recent fires here. They haven\'t been out long.',
+		            'Faded frescoes depict a civilization that no longer exists. Whatever claimed this place since is stirring.'],
+	};
+
+	const archetypeTemplates: Record<string, { names: string[]; descriptions: string[]; tactics: string[] }> = {
+		solo: {
+			names: ['Apex Predator', 'The Lone Terror', 'Territorial Encounter', 'Single Threat'],
+			descriptions: [
+				'{MONSTERS} has claimed this territory. It is aggressive, well-fed, and has had practice dealing with intruders.',
+				'A single {MONSTERS} blocks the path. It moves with a predator\'s confidence, sizing up the weakest party members first.',
+				'{MONSTERS} emerges from concealment — it was already aware of the party, and chose its moment carefully.',
+			],
+			tactics: [
+				'Focuses attacks on whoever is dealing the most damage. Uses its full action economy and any legendary actions without hesitation.',
+				'Opens at range or with a powerful strike, then retreats to a defensible position. Will not fight to the death if below 25% HP.',
+				'Targets spellcasters and ranged attackers first. Uses terrain to break line of sight between attacks.',
+			],
+		},
+		pack: {
+			names: ['Pack Ambush', 'Hunting Group', 'Coordinated Attack', 'Pack Tactics'],
+			descriptions: [
+				'{MONSTERS} emerge from multiple directions simultaneously, cutting off easy retreat.',
+				'Working in near-silence, {MONSTERS} have circled around the party. They attack together on a signal.',
+				'{MONSTERS} have been tracking the party for some time. They chose this ground carefully.',
+			],
+			tactics: [
+				'Pack tactics: multiple attackers on the same target. They try to isolate the squishiest party member.',
+				'Half attack while half circle to flank. They attempt to knock prone before piling on.',
+				'They don\'t retreat — but if 60% of the group falls, a Wisdom DC 10 morale check may scatter survivors.',
+			],
+		},
+		mixed: {
+			names: ['Raiding Party', 'Led Assault', 'Commander & Troops', 'Mixed Warband'],
+			descriptions: [
+				'{LEADER} commands {MINIONS} from a protected position while sending them as shock troops.',
+				'{LEADER} drives {MINIONS} forward — they are expendable muscle. The real threat hangs back and watches for openings.',
+				'{MINIONS} hit the front line while {LEADER} prepares a more devastating follow-up strike.',
+			],
+			tactics: [
+				'The leader holds back for 1-2 rounds, letting minions absorb initial blows and reveal party positioning.',
+				'Minions focus one target to drop them fast; the leader attacks whoever responds to help.',
+				'If the leader is killed or incapacitated, minions make a DC 12 Wisdom save or break and flee.',
+			],
+		},
+		ambush: {
+			names: ['Ambush!', 'Surprise Attack', 'Prepared Trap', 'Sprung Ambush'],
+			descriptions: [
+				'{MONSTERS} have been waiting here. The attack is triggered by a tripwire, a signal, or simply patient patience.',
+				'Too late — the signs were there, but {MONSTERS} have already moved to cut off retreat. The party is surprised.',
+				'{MONSTERS} attack from concealment, choosing the most vulnerable moment. First round: advantage on all attacks.',
+			],
+			tactics: [
+				'Ambushers have advantage on attacks in the surprise round. They focus fire to drop one character immediately.',
+				'Half the group attacks from range while the other half rushes the back line to prevent escape.',
+				'If the ambush fails (party wasn\'t surprised), one group attempts to disengage and reset; the other holds.',
+			],
+		},
+		swarm: {
+			names: ['Overwhelming Numbers', 'The Swarm', 'Horde Encounter', 'Endless Wave'],
+			descriptions: [
+				'{MONSTERS} pour from every crevice and shadow. There are too many to count at a glance.',
+				'The ground itself seems to move. {MONSTERS} converge from all directions in a chittering, snarling mass.',
+				'{MONSTERS} don\'t coordinate — they simply overwhelm by volume. Some will die. Most will reach you.',
+			],
+			tactics: [
+				'Area-of-effect spells are devastating here. The swarm prioritizes engulfing melee characters to prevent retreat.',
+				'No tactics — pure pressure. Each creature attacks the nearest target. They do not flee.',
+				'Killing the largest or most aggressive members may trigger a DC 10 Wisdom save to scatter the rest.',
+			],
+		},
+	};
+
+	const biomeTerrain: Record<string, string[]> = {
+		forest:    ['Dense undergrowth: difficult terrain 10 ft off-path. Trees provide half cover.',
+		            'Ancient fallen log bisects the clearing (Athletics DC 12 to vault; half cover when prone behind it).',
+		            'Low fog: visibility limited to 30 ft. Perception checks at disadvantage beyond that range.'],
+		plains:    ['Open ground: no cover, no difficult terrain. Ranged attacks unimpeded in all directions.',
+		            'Tall grass (3+ ft): difficult terrain. Small creatures have half cover; prone creatures are fully hidden.',
+		            'Gentle rise to the north: the high ground grants +1 to ranged attack rolls.'],
+		mountains: ['Loose scree: DC 13 Athletics to move at full speed. Failure = prone.',
+		            'Cliff edge within 30 ft: creatures moved or knocked prone near the edge must save (DC 14 Acrobatics) or fall.',
+		            'Boulder field: provides 3/4 cover but costs 2 ft of movement per 1 ft traveled through the rocks.'],
+		desert:    ['Deep sand: difficult terrain throughout. Constitution saves (DC 12) every hour for non-adapted creatures.',
+		            'Sandstone pillars: plentiful 3/4 cover but line-of-sight is broken in all directions.',
+		            'Sinkholes: 3 random 5-ft squares are sinkholes (DC 14 Perception to notice). Fall = 15 ft, 5d6 bludgeoning.'],
+		arctic:    ['Packed ice: difficult terrain. Creatures who dash or are knocked back must succeed DC 12 Acrobatics or fall prone.',
+		            'Blinding glare: Perception checks at disadvantage when looking toward the sun. Sunglasses or hoods negate.',
+		            'Thin ice patch: up to 20 ft diameter. Each 10 ft of movement requires DC 10 Acrobatics or breaks through (2d6 cold, restrained).'],
+		coastal:   ['Wet rocks: difficult terrain, DC 12 Acrobatics to avoid falling prone when moving quickly.',
+		            'Tidal surge: every 3 rounds, a wave sweeps a 10-ft swath (DC 13 Strength save or pushed 10 ft, prone).',
+		            'Sea cave alcoves: plentiful half cover. The cave entrance is difficult terrain due to wave action.'],
+		swamp:     ['Knee-deep water: difficult terrain throughout. Sheathed weapons must be drawn as an action.',
+		            'Submerged hazard: 3 random squares hide submerged roots/debris (DC 13 Perception). Step = DC 12 Dex or fall prone.',
+		            'Fog bank: 30-ft radius of heavy fog. All creatures within are lightly obscured. Perception heavily disadvantaged.'],
+		jungle:    ['Canopy so thick it blocks direct sunlight: perpetual dim light conditions.',
+		            'Vines and undergrowth: difficult terrain throughout. Perception checks at disadvantage beyond 20 ft.',
+		            'Unstable ground: soft earth and roots. Large creatures have disadvantage on Dexterity saves.'],
+		underdark: ['Stalactites overhead: ranged attacks that miss the target must check if they strike a stalactite (1 in 6 chance of triggering a ceiling collapse in that square).',
+		            'Phosphorescent pools: 10-ft radius of dim bioluminescent light. Creatures in them are visible even in magical darkness.',
+		            'Uneven cavern floor: difficult terrain. DC 12 Perception to spot drop-offs and sudden pits.'],
+		urban:     ['Alley choke points: two-wide passages at three locations. Area-of-effect spells risk hitting bystanders.',
+		            'Rooftops accessible via DC 12 Athletics (10 ft up). Ranged attackers on roofs gain half cover and elevation.',
+		            'Market debris: overturned stalls and crates provide half cover every 15 ft throughout the area.'],
+		dungeon:   ['Low ceiling (8 ft): Large creatures are squeezed. Flying creatures cannot fly.',
+		            'Pressure plates: 2 random squares are trapped (DC 14 Perception). Trigger = 20 ft cone of darts (2d4 piercing, DC 14 Dex save).',
+		            'Darkness: only light sources the party carries illuminate the fight. Creatures beyond their radius are hidden.'],
+		ruins:     ['Unstable flooring: each round each creature has 1-in-6 chance of stepping through (DC 13 Dex save or fall 10 ft).',
+		            'Collapsed walls: abundant 3/4 cover but also chokepoints — 5-ft passages between rubble piles.',
+		            'Overgrowth: vines and undergrowth reduce movement by half throughout. Fire spreads easily here.'],
+	};
+
+	let encounterBiome     = $state('forest');
+	let partySize          = $state(4);
+	let partyLevel         = $state(5);
+	let encounterDifficulty = $state('medium');
+	let generatedEncounter = $state<EncounterResult | null>(null);
+
+	const biomeEncounterLabel: Record<string, string> = {
+		forest:'Forest', plains:'Plains', mountains:'Mountains', desert:'Desert', arctic:'Arctic',
+		coastal:'Coastal', swamp:'Swamp', jungle:'Jungle', underdark:'Underdark', urban:'Urban', dungeon:'Dungeon', ruins:'Ruins',
+	};
+
+	function generateEncounter() {
+		const tier        = getEncounterTier(partyLevel);
+		const [crMin, crMax] = getCrRange(tier);
+		const budget      = getXpBudget(partyLevel, encounterDifficulty, partySize);
+
+		// Filter monsters by biome, CR range, and XP cap so over-budget monsters are excluded
+		let candidates = monsterPool.filter(m => m.biomes.includes(encounterBiome) && m.cr >= crMin * 0.4 && m.cr <= crMax * 1.5 && m.xp <= budget * 1.5);
+		if (!candidates.length) candidates = monsterPool.filter(m => m.cr >= crMin * 0.4 && m.cr <= crMax * 1.5 && m.xp <= budget * 1.5);
+		if (!candidates.length) candidates = monsterPool.filter(m => m.biomes.includes(encounterBiome));
+		if (!candidates.length) candidates = [...monsterPool];
+
+		const leaders  = candidates.filter(m => m.role === 'leader' || m.role === 'solo');
+		const minions  = candidates.filter(m => m.role === 'minion');
+		const solos    = candidates.filter(m => m.role === 'solo');
+		const swarmy   = candidates.filter(m => m.role === 'swarm' || m.role === 'minion');
+
+		// Helper: pick the monster whose XP is closest to a target value, with slight randomness
+		function closestXp<T extends { xp: number }>(pool: T[], target: number): T {
+			const ranked = [...pool].sort((a, b) => Math.abs(a.xp - target) - Math.abs(b.xp - target));
+			return ranked[Math.floor(Math.random() * Math.min(3, ranked.length))];
+		}
+
+		// Pick viable archetypes
+		const archetypes: string[] = [];
+		if (solos.length) archetypes.push('solo');
+		if (minions.length >= 2) archetypes.push('pack', 'swarm');
+		if (leaders.length && minions.length) archetypes.push('mixed');
+		archetypes.push('ambush'); // always viable
+		const archetype = pickFrom(archetypes);
+
+		let encounterMonsters: EncounterMonster[] = [];
+
+		if (archetype === 'solo') {
+			// Prefer solos with at least 30% of budget; find closest match
+			const viable = solos.filter(m => m.xp >= budget * 0.3);
+			const pool = viable.length ? viable : solos;
+			const m = pool.reduce((best, cur) => Math.abs(cur.xp - budget) < Math.abs(best.xp - budget) ? cur : best);
+			encounterMonsters = [{ name: m.name, count: 1, xp: m.xp }];
+		} else if (archetype === 'pack') {
+			// Target ~5 monsters; pick minion whose XP best fits that count
+			const targetXpEach = budget / (5 * monsterMult(5, partySize));
+			const m = closestXp(minions, targetXpEach);
+			let count = 3;
+			for (let c = 3; c <= 10; c++) {
+				if (m.xp * c * monsterMult(c, partySize) >= budget * 0.75) { count = c; break; }
+				count = c;
+			}
+			encounterMonsters = [{ name: m.name, count: Math.min(count, 10), xp: m.xp }];
+		} else if (archetype === 'mixed') {
+			const leader = pickFrom(leaders);
+			const minionPool = minions.filter(m => m.xp <= leader.xp * 1.5);
+			const minionBudget = budget * 0.55;
+			const targetMinionXp = minionBudget / (4 * monsterMult(4, partySize));
+			const minion = closestXp(minionPool.length ? minionPool : minions, targetMinionXp);
+			const minionCount  = Math.max(2, Math.min(6, Math.round(minionBudget / (minion.xp * monsterMult(4, partySize)))));
+			encounterMonsters = [{ name: leader.name, count: 1, xp: leader.xp }, { name: minion.name, count: minionCount, xp: minion.xp }];
+		} else if (archetype === 'swarm') {
+			// Target ~8 monsters; pick swarmer whose XP best fits
+			const targetXpEach = budget / (8 * monsterMult(8, partySize));
+			const m = closestXp(swarmy, targetXpEach);
+			const count = Math.max(6, Math.min(15, Math.round(budget / (m.xp * monsterMult(8, partySize)))));
+			encounterMonsters = [{ name: m.name, count, xp: m.xp }];
+		} else { // ambush
+			// Target ~3 monsters; pick candidate whose XP best fits
+			const targetXpEach = budget / (3 * monsterMult(3, partySize));
+			const m = closestXp(candidates, targetXpEach);
+			const count = Math.max(2, Math.min(5, Math.round(budget / (m.xp * monsterMult(3, partySize)))));
+			encounterMonsters = [{ name: m.name, count, xp: m.xp }];
+		}
+
+		const totalCount = encounterMonsters.reduce((s, m) => s + m.count, 0);
+		const rawXp      = encounterMonsters.reduce((s, m) => s + m.xp * m.count, 0);
+		const mult       = monsterMult(totalCount, partySize);
+		const adjXp      = Math.round(rawXp * mult);
+
+		const scene    = pickFrom(biomeScenes[encounterBiome] ?? biomeScenes['plains']);
+		const archTmpl = archetypeTemplates[archetype];
+		const monsterLine = encounterMonsters.map(m => `${m.count}\xd7 ${m.name}`).join(' + ');
+		const rawDesc  = pickFrom(archTmpl.descriptions);
+		const description = rawDesc
+			.replace('{MONSTERS}', monsterLine)
+			.replace('{LEADER}', encounterMonsters[0]?.name ?? '')
+			.replace('{MINIONS}', encounterMonsters.slice(1).map(m => `${m.count}\xd7 ${m.name}`).join(' + ') || monsterLine);
+		const tactics  = pickFrom(archTmpl.tactics);
+		const terrain  = pickFrom(biomeTerrain[encounterBiome] ?? biomeTerrain['plains']);
+
+		generatedEncounter = {
+			title: `${biomeEncounterLabel[encounterBiome] ?? encounterBiome} — ${pickFrom(archTmpl.names)}`,
+			scene, description, archetype,
+			monsters: encounterMonsters,
+			rawXp, adjustedXp: adjXp, xpPerPlayer: Math.round(rawXp / partySize), multiplier: mult,
+			tactics, terrain,
+			actualDifficulty: getActualDifficulty(adjXp, partyLevel, partySize),
+		};
 	}
 	function generateNames() {
 		generatedNames = Array.from({ length: 10 }, () => generateOneName(nameType));
@@ -1978,6 +2404,105 @@
 								<p class="text-sm leading-relaxed text-gray-300">{itemDescriptions[selectedShopItem.name] ?? 'No description available.'}</p>
 							</div>
 						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if selected === 'encounter'}
+				<div class="space-y-6 text-sm">
+					<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">Random Encounter Generator</h3>
+
+					<!-- Controls -->
+					<div class="flex flex-wrap items-end gap-4">
+						<div class="flex flex-col gap-1">
+							<label for="enc-biome" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Biome / Terrain</label>
+							<select id="enc-biome" bind:value={encounterBiome} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each encounterBiomeOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
+							</select>
+						</div>
+						<div class="flex flex-col gap-1">
+							<label for="enc-size" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Party Size</label>
+							<select id="enc-size" bind:value={partySize} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each [1,2,3,4,5,6,7,8] as n}<option value={n}>{n} player{n !== 1 ? 's' : ''}</option>{/each}
+							</select>
+						</div>
+						<div class="flex flex-col gap-1">
+							<label for="enc-level" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Party Level</label>
+							<select id="enc-level" bind:value={partyLevel} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each Array.from({length:20},(_,i)=>i+1) as lv}<option value={lv}>Level {lv}</option>{/each}
+							</select>
+						</div>
+						<div class="flex flex-col gap-1">
+							<label for="enc-diff" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Difficulty</label>
+							<select id="enc-diff" bind:value={encounterDifficulty} class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none">
+								{#each difficultyOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
+							</select>
+						</div>
+						<button onclick={generateEncounter} class="rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95">Generate</button>
+					</div>
+
+					{#if generatedEncounter}
+						{@const enc = generatedEncounter}
+						<div class="space-y-4 rounded-xl border border-gray-700 bg-gray-900/60 p-5">
+
+							<!-- Title + difficulty badge -->
+							<div class="flex flex-wrap items-center gap-2">
+								<h4 class="text-sm font-black tracking-wide text-white">{enc.title}</h4>
+								<span class="rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase {difficultyColors[enc.actualDifficulty] ?? 'text-gray-400 border-gray-700'}">{enc.actualDifficulty}</span>
+							</div>
+
+							<!-- Scene -->
+							<p class="text-xs italic text-gray-400 leading-relaxed border-l-2 border-amber-700/50 pl-3">{enc.scene}</p>
+
+							<!-- Description -->
+							<p class="text-sm text-gray-300 leading-relaxed">{enc.description}</p>
+
+							<!-- Monsters -->
+							<div>
+								<p class="mb-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase">Monsters</p>
+								<div class="space-y-1">
+									{#each enc.monsters as m}
+										<div class="flex items-center gap-2">
+											<span class="w-6 text-center font-black text-amber-400">{m.count}×</span>
+											<span class="font-semibold text-white">{m.name}</span>
+											<span class="text-gray-500 text-xs tabular-nums">{m.xp} XP each · {m.xp * m.count} total</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+
+							<!-- XP breakdown -->
+							<div class="flex flex-wrap gap-4 rounded-lg bg-gray-800/60 px-4 py-3 text-xs tabular-nums">
+								<div><span class="text-gray-500">Raw XP </span><span class="font-semibold text-gray-200">{enc.rawXp}</span></div>
+								<div><span class="text-gray-500">Multiplier </span><span class="font-semibold text-gray-200">×{enc.multiplier.toFixed(1)}</span></div>
+								<div><span class="text-gray-500">Adjusted XP </span><span class="font-bold text-amber-300">{enc.adjustedXp}</span></div>
+								<div><span class="text-gray-500">Per Player </span><span class="font-semibold text-gray-200">{enc.xpPerPlayer}</span></div>
+							</div>
+
+							<!-- Tactics -->
+							<div>
+								<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">Tactics</p>
+								<p class="text-sm text-gray-300 leading-relaxed">{enc.tactics}</p>
+							</div>
+
+							<!-- Terrain -->
+							<div>
+								<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">Terrain Feature</p>
+								<p class="text-sm text-gray-300 leading-relaxed">{enc.terrain}</p>
+							</div>
+
+							<div class="mt-1 flex gap-2 flex-wrap">
+								<button onclick={generateEncounter} class="rounded-lg border border-gray-700 px-4 py-1.5 text-xs font-bold text-gray-400 transition hover:border-amber-700 hover:text-amber-400">Roll Again</button>
+								{#if onAddEncounter}
+									<button
+										onclick={() => onAddEncounter!(enc.monsters.map(m => ({ name: m.name, count: m.count })))}
+										class="rounded-lg bg-emerald-700 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-600 active:scale-95"
+									>Add to Initiative</button>
+								{/if}
+							</div>
+						</div>
+					{:else}
+						<p class="text-sm text-gray-500">Configure the party details above and click Generate to create a random encounter.</p>
 					{/if}
 				</div>
 			{/if}
