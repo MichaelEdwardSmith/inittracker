@@ -63,6 +63,7 @@
 	const PAD       = 32;  // px — p-4 on each side of the channel area
 
 	interface Channel {
+		id: string;       // stable UUID — IndexedDB key for the saved audio file
 		label: string;
 		fileName: string | null;
 		volume: number;
@@ -71,8 +72,57 @@
 		playing: boolean;
 	}
 
+	// ── IndexedDB helpers — persist audio Blobs across page loads ─────────────
+	const IDB_NAME  = 'dm-mixer-files';
+	const IDB_STORE = 'files';
+
+	function openIDB(): Promise<IDBDatabase> {
+		return new Promise((resolve, reject) => {
+			const req = indexedDB.open(IDB_NAME, 1);
+			req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+			req.onsuccess = () => resolve(req.result);
+			req.onerror   = () => reject(req.error);
+		});
+	}
+
+	async function idbSave(key: string, blob: Blob, name: string) {
+		try {
+			const db = await openIDB();
+			await new Promise<void>((res, rej) => {
+				const tx = db.transaction(IDB_STORE, 'readwrite');
+				tx.objectStore(IDB_STORE).put({ blob, name }, key);
+				tx.oncomplete = () => res();
+				tx.onerror    = () => rej(tx.error);
+			});
+		} catch { /* silent — file just won't persist */ }
+	}
+
+	async function idbLoad(key: string): Promise<{ blob: Blob; name: string } | null> {
+		try {
+			const db = await openIDB();
+			return await new Promise((resolve) => {
+				const tx  = db.transaction(IDB_STORE, 'readonly');
+				const req = tx.objectStore(IDB_STORE).get(key);
+				req.onsuccess = () => resolve((req.result as { blob: Blob; name: string }) ?? null);
+				req.onerror   = () => resolve(null);
+			});
+		} catch { return null; }
+	}
+
+	async function idbDelete(key: string) {
+		try {
+			const db = await openIDB();
+			await new Promise<void>((res) => {
+				const tx = db.transaction(IDB_STORE, 'readwrite');
+				tx.objectStore(IDB_STORE).delete(key);
+				tx.oncomplete = () => res();
+				tx.onerror    = () => res();
+			});
+		} catch { /* silent */ }
+	}
+
 	// ── Persistence ───────────────────────────────────────────────────────────
-	function loadSaved(): { labels?: string[]; volumes?: number[]; master?: number; count?: number } {
+	function loadSaved(): { ids?: string[]; labels?: string[]; volumes?: number[]; master?: number; count?: number } {
 		if (!browser) return {};
 		try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}'); } catch { return {}; }
 	}
@@ -81,6 +131,7 @@
 		if (!browser) return;
 		localStorage.setItem(STORAGE_KEY, JSON.stringify({
 			count:   channels.length,
+			ids:     channels.map((c) => c.id),
 			labels:  channels.map((c) => c.label),
 			volumes: channels.map((c) => c.volume),
 			master:  masterVolume
@@ -94,6 +145,7 @@
 	let masterVolume  = $state(saved.master ?? 0.8);
 	let channels      = $state<Channel[]>(
 		Array.from({ length: initCount }, (_, i) => ({
+			id:       saved.ids?.[i] ?? crypto.randomUUID(),
 			label:    saved.labels?.[i] ?? `Channel ${i + 1}`,
 			fileName: null,
 			volume:   saved.volumes?.[i] ?? 0.8,
@@ -136,6 +188,22 @@
 				return a;
 			})
 		: [];
+
+	// ── Restore saved files from IndexedDB on mount ───────────────────────────
+	if (browser) {
+		(async () => {
+			for (let i = 0; i < channels.length; i++) {
+				const saved = await idbLoad(channels[i].id);
+				if (saved) {
+					const a = audios[i];
+					a.src = URL.createObjectURL(saved.blob);
+					a.load();
+					channels[i].fileName = saved.name;
+					applyVol(i);
+				}
+			}
+		})();
+	}
 
 	const anySolo = $derived(channels.some((c) => c.solo));
 
@@ -191,6 +259,8 @@
 		channels[i].playing = false;
 		if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
 		applyVol(i);
+		// Persist to IndexedDB so the file survives page reloads.
+		idbSave(channels[i].id, file, file.name);
 	}
 
 	function fadeOutAndStop(i: number, duration = 400) {
@@ -258,7 +328,7 @@
 	// ── Add / remove channels ─────────────────────────────────────────────────
 	function addChannel() {
 		const n = channels.length + 1;
-		channels.push({ label: `Channel ${n}`, fileName: null, volume: 0.8, muted: false, solo: false, playing: false });
+		channels.push({ id: crypto.randomUUID(), label: `Channel ${n}`, fileName: null, volume: 0.8, muted: false, solo: false, playing: false });
 		faderHeights.push(0);
 		remainingTimes.push(null);
 		if (browser) {
@@ -271,6 +341,7 @@
 	}
 
 	function removeChannel(i: number) {
+		const channelId = channels[i].id;
 		const a = audios[i];
 		if (a) {
 			a.pause();
@@ -282,6 +353,7 @@
 		channels.splice(i, 1);
 		faderHeights.splice(i, 1);
 		remainingTimes.splice(i, 1);
+		idbDelete(channelId);
 		saveSettings();
 	}
 
