@@ -75,7 +75,10 @@
       "WebFetch(domain:media.wizards.com)",
       "WebFetch(domain:www.sageadvice.eu)",
       "WebFetch(domain:rpg.stackexchange.com)",
-      "Bash(del \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\lib\\\\components\\\\_magic_section.txt\" && pnpm check 2>&1 | tail -5)"
+      "Bash(del \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\lib\\\\components\\\\_magic_section.txt\" && pnpm check 2>&1 | tail -5)",
+      "WebFetch(domain:5thsrd.org)",
+      "WebFetch(domain:www.thievesguild.cc)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm check 2>&1 | tail -5 && rm src/lib/components/_weather_inject.py src/lib/components/_weather_inject2.py)"
     ]
   }
 }
