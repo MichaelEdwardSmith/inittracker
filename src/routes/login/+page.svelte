@@ -107,7 +107,7 @@
 				</button>
 			</form>
 			<p class="mt-2 text-center text-xs text-gray-600">
-				Guest sessions are not saved and will be lost when you close the tab.
+				Guest sessions are not saved and will be<br/>lost when you close the tab.
 			</p>
 		</div>
 
