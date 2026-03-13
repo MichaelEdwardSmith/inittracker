@@ -175,7 +175,7 @@ function createCombatStore() {
 			}
 		},
 
-		addPlayer(name: string, ac: number, maxHp: number, dexMod?: number) {
+		addPlayer(name: string, ac: number, maxHp: number, dexMod?: number, passivePerception?: number) {
 			const c: Combatant = {
 				id: crypto.randomUUID(),
 				name,
@@ -187,7 +187,8 @@ function createCombatStore() {
 				statuses: [],
 				initiative: null,
 				inCombat: true,
-				...(dexMod ? { dexMod } : {})
+				...(dexMod ? { dexMod } : {}),
+				...(passivePerception ? { passivePerception } : {})
 			};
 			combatants = [...combatants, c];
 			if (combatStartedAt !== null) snapshotCombatant(c);

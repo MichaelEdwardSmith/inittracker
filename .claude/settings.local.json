@@ -82,7 +82,8 @@
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm check 2>&1 | tail -6 && rm src/lib/components/_shop_inject.py)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm check 2>&1 | tail -6 && rm src/lib/components/_shop_update.py)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm check 2>&1 | tail -8 && rm src/lib/components/_shop_modal.py)",
-      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && python3 -c \"\nimport sys; sys.stdout.reconfigure\\(encoding='utf-8'\\)\ncontent = open\\('src/lib/components/QuickRulesModal.svelte', encoding='utf-8'\\).read\\(\\)\nold = \\\\\"\\\\t\\\\t'Soap': 'A bar of tallow soap useful for cleaning, disguising scent from animals, or removing grime.',\\\\n\\\\\"\nassert content.count\\(old\\) == 1\ncontent = content.replace\\(old, '', 1\\)\nopen\\('src/lib/components/QuickRulesModal.svelte', 'w', encoding='utf-8'\\).write\\(content\\)\nprint\\('done'\\)\n\")"
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && python3 -c \"\nimport sys; sys.stdout.reconfigure\\(encoding='utf-8'\\)\ncontent = open\\('src/lib/components/QuickRulesModal.svelte', encoding='utf-8'\\).read\\(\\)\nold = \\\\\"\\\\t\\\\t'Soap': 'A bar of tallow soap useful for cleaning, disguising scent from animals, or removing grime.',\\\\n\\\\\"\nassert content.count\\(old\\) == 1\ncontent = content.replace\\(old, '', 1\\)\nopen\\('src/lib/components/QuickRulesModal.svelte', 'w', encoding='utf-8'\\).write\\(content\\)\nprint\\('done'\\)\n\")",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && pnpm check 2>&1 | tail -5 && rm src/lib/components/_shop_save.py)"
     ]
   }
 }

@@ -8,7 +8,9 @@
 	let ac = $state(10);
 	let hp = $state(10);
 	let dexMod = $state(0);
+	let passivePerception = $state(10);
 	let editDexMod = $state(0);
+	let editPassivePerception = $state(10);
 	let editingId = $state<string | null>(null);
 	let confirmDeleteId = $state<string | null>(null);
 	let editAc = $state(0);
@@ -21,24 +23,26 @@
 
 	function addPlayer() {
 		if (!name.trim()) return;
-		combat.addPlayer(name.trim(), ac, hp, dexMod || undefined);
+		combat.addPlayer(name.trim(), ac, hp, dexMod || undefined, passivePerception || undefined);
 		name = '';
 		ac = 10;
 		hp = 10;
 		dexMod = 0;
+		passivePerception = 10;
 	}
 
-	function startEdit(id: string, playerName: string, playerAc: number, playerMaxHp: number, playerDexMod: number) {
+	function startEdit(id: string, playerName: string, playerAc: number, playerMaxHp: number, playerDexMod: number, playerPassivePerception: number) {
 		editingId = id;
 		editName = playerName;
 		editAc = playerAc;
 		editHp = playerMaxHp;
 		editDexMod = playerDexMod;
+		editPassivePerception = playerPassivePerception;
 	}
 
 	function saveEdit(id: string) {
 		if (!editName.trim()) return;
-		combat.update(id, { name: editName.trim(), ac: editAc, maxHp: editHp, currentHp: editHp, dexMod: editDexMod || undefined });
+		combat.update(id, { name: editName.trim(), ac: editAc, maxHp: editHp, currentHp: editHp, dexMod: editDexMod || undefined, passivePerception: editPassivePerception || undefined });
 		editingId = null;
 	}
 
@@ -139,6 +143,16 @@
 					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 				/>
 			</label>
+			<label class="flex flex-1 flex-col gap-1">
+				<span class="text-xs text-gray-400">Passive</span>
+				<input
+					type="number"
+					bind:value={passivePerception}
+					min="1"
+					max="30"
+					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+				/>
+			</label>
 		</div>
 		<button
 			type="submit"
@@ -184,6 +198,16 @@
 								bind:value={editDexMod}
 								min="-10"
 								max="10"
+								class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+							/>
+						</label>
+						<label class="flex flex-1 flex-col gap-1">
+							<span class="text-xs text-gray-400">Passive</span>
+							<input
+								type="number"
+								bind:value={editPassivePerception}
+								min="1"
+								max="30"
 								class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 							/>
 						</label>
@@ -251,7 +275,7 @@
 								>
 							{/if}
 						</div>
-						<div class="text-xs text-gray-400">AC {player.ac} &bull; {player.maxHp} HP{#if player.dexMod} &bull; DEX {player.dexMod > 0 ? '+' : ''}{player.dexMod}{/if}</div>
+						<div class="text-xs text-gray-400">AC {player.ac} &bull; {player.maxHp} HP{#if player.dexMod} &bull; DEX {player.dexMod > 0 ? '+' : ''}{player.dexMod}{/if}{#if player.passivePerception} &bull; Passive {player.passivePerception}{/if}</div>
 					</div>
 					<div class="flex shrink-0 flex-col gap-1">
 						{#if player.inCombat === false}
@@ -273,7 +297,7 @@
 							</button>
 						{/if}
 						<button
-							onclick={() => startEdit(player.id, player.name, player.ac, player.maxHp, player.dexMod ?? 0)}
+							onclick={() => startEdit(player.id, player.name, player.ac, player.maxHp, player.dexMod ?? 0, player.passivePerception ?? 10)}
 							title="Edit"
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-white"
 						>

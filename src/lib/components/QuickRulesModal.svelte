@@ -108,6 +108,37 @@
 	let nameType = $state('human-male');
 	let generatedNames = $state<string[]>([]);
 	let generatedSurnames = $state<string[]>([]);
+	let selectedFirstName = $state('');
+	let selectedLastName = $state('');
+	let nameSaveStatus = $state<'idle'|'saving'|'saved'|'error'>('idle');
+
+	const nameTypeRace: Record<string, string> = {
+		'human-male': 'a Human', 'human-female': 'a Human', 'elf': 'an Elf', 'dwarf': 'a Dwarf',
+		'halfling': 'a Halfling', 'gnome': 'a Gnome', 'orc': 'an Orc', 'tiefling': 'a Tiefling', 'dragonborn': 'a Dragonborn',
+	};
+
+	async function saveNameToNotes() {
+		if (!selectedFirstName) return;
+		const fullName = selectedLastName ? `${selectedFirstName} ${selectedLastName}` : selectedFirstName;
+		const race = nameTypeRace[nameType];
+		const line = `<p>Party met ${fullName}${race ? ', ' + race : ''}</p>`;
+		nameSaveStatus = 'saving';
+		try {
+			const res = await fetch('/api/notes');
+			const data: { notes: { id: string; content: string }[] } = res.ok ? await res.json() : { notes: [] };
+			if (data.notes.length > 0) {
+				const latest = data.notes[0];
+				await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'update', id: latest.id, content: latest.content + line }) });
+			} else {
+				await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', content: line }) });
+			}
+			nameSaveStatus = 'saved';
+			setTimeout(() => { nameSaveStatus = 'idle'; }, 2000);
+		} catch {
+			nameSaveStatus = 'error';
+			setTimeout(() => { nameSaveStatus = 'idle'; }, 2000);
+		}
+	}
 
 	const surnameData: Record<string, NameDef> = {
 		'human-male':   { kind: 'compound',
@@ -493,6 +524,30 @@
 	};
 	let shopType      = $state('general');
 	let shopAffluence = $state('common');
+	let shopSaveStatus = $state<'idle'|'saving'|'saved'|'error'>('idle');
+
+	async function saveShopToNotes() {
+		if (!generatedShopName) return;
+		const aff   = affluenceData[shopAffluence]?.label.toLowerCase() ?? shopAffluence;
+		const type  = shopData[shopType]?.label.toLowerCase() ?? shopType;
+		const line  = `<p>The party went to ${generatedShopName}, a ${aff} ${type}</p>`;
+		shopSaveStatus = 'saving';
+		try {
+			const res = await fetch('/api/notes');
+			const data: { notes: { id: string; content: string }[] } = res.ok ? await res.json() : { notes: [] };
+			if (data.notes.length > 0) {
+				const latest = data.notes[0];
+				await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'update', id: latest.id, content: latest.content + line }) });
+			} else {
+				await fetch('/api/notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', content: line }) });
+			}
+			shopSaveStatus = 'saved';
+			setTimeout(() => { shopSaveStatus = 'idle'; }, 2000);
+		} catch {
+			shopSaveStatus = 'error';
+			setTimeout(() => { shopSaveStatus = 'idle'; }, 2000);
+		}
+	}
 	type ShopRow = { name: string; liked: string; neutral: string; disliked: string; rarity?: string };
 	let generatedShop = $state<ShopRow[]>([]);
 	function formatPrice(gp: number): string {
@@ -2127,7 +2182,7 @@
 					<div class="flex flex-wrap items-center gap-3">
 						<select
 							bind:value={nameType}
-							onchange={() => { generatedNames = []; generatedSurnames = []; }}
+							onchange={() => { generatedNames = []; generatedSurnames = []; selectedFirstName = ''; selectedLastName = ''; }}
 							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
 						>
 							{#each nameTypeOptions as opt}
@@ -2158,9 +2213,12 @@
 									<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">First Names</p>
 									<div class="flex flex-col gap-1.5">
 										{#each generatedNames as name}
-											<div class="rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-2.5 text-sm font-semibold text-white">
+											<button
+												onclick={() => { selectedFirstName = selectedFirstName === name ? '' : name; }}
+												class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedFirstName === name ? 'border-amber-500 bg-amber-900/30 text-amber-200' : 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
+											>
 												{name}
-											</div>
+											</button>
 										{/each}
 									</div>
 								</div>
@@ -2170,15 +2228,33 @@
 									<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Surnames</p>
 									<div class="flex flex-col gap-1.5">
 										{#each generatedSurnames as name}
-											<div class="rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-2.5 text-sm font-semibold text-white">
+											<button
+												onclick={() => { selectedLastName = selectedLastName === name ? '' : name; }}
+												class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedLastName === name ? 'border-amber-500 bg-amber-900/30 text-amber-200' : 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
+											>
 												{name}
-											</div>
+											</button>
 										{/each}
 									</div>
 								</div>
 							{/if}
 						</div>
 					{/if}
+
+				{#if selectedFirstName}
+					<div class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3">
+						<span class="flex-1 text-sm text-gray-300">
+							Party met <strong class="text-white">{selectedFirstName}{selectedLastName ? ' ' + selectedLastName : ''}</strong>{nameTypeRace[nameType] ? ', ' + nameTypeRace[nameType] : ''}
+						</span>
+						<button
+							onclick={saveNameToNotes}
+							disabled={nameSaveStatus === 'saving'}
+							class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {nameSaveStatus === 'saved' ? 'bg-green-700 text-white' : nameSaveStatus === 'error' ? 'bg-red-700 text-white' : 'bg-amber-600 text-white hover:bg-amber-500'}"
+						>
+							{nameSaveStatus === 'saved' ? 'Saved!' : nameSaveStatus === 'error' ? 'Error' : 'Save to Notes'}
+						</button>
+					</div>
+				{/if}
 				</div>
 
 			<!-- ── Weather & Travel ───────────────────────────────── -->
@@ -2405,6 +2481,21 @@
 							</div>
 						</div>
 					{/if}
+
+				{#if generatedShopName}
+					<div class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3">
+						<span class="flex-1 text-sm text-gray-300">
+							The party went to <strong class="text-white">{generatedShopName}</strong>, a {affluenceData[shopAffluence]?.label.toLowerCase()} {shopData[shopType]?.label.toLowerCase()}
+						</span>
+						<button
+							onclick={saveShopToNotes}
+							disabled={shopSaveStatus === 'saving'}
+							class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus === 'saved' ? 'bg-green-700 text-white' : shopSaveStatus === 'error' ? 'bg-red-700 text-white' : 'bg-amber-600 text-white hover:bg-amber-500'}"
+						>
+							{shopSaveStatus === 'saved' ? 'Saved!' : shopSaveStatus === 'error' ? 'Error' : 'Save to Notes'}
+						</button>
+					</div>
+				{/if}
 				</div>
 			{/if}
 

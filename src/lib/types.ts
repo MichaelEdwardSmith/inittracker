@@ -26,6 +26,8 @@ export interface Combatant {
 	inCombat?: boolean;
 	// Players only — DEX modifier used when rolling initiative (e.g. +2, -1, 0)
 	dexMod?: number;
+	// Players only — passive Perception score
+	passivePerception?: number;
 	// Players only — base64 JPEG data URL set by the DM via avatar upload
 	avatarUrl?: string;
 	// Enemies only — avatar image URL (remote for built-ins, base64 for custom monsters)

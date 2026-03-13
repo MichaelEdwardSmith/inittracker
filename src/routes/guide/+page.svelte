@@ -27,7 +27,12 @@
 		{ id: 'player-messaging', label: '15. Player Messaging' },
 		{ id: 'contact', label: '16. Contact & Support' },
 		{ id: 'voice-commands', label: '17. Voice Commands (Beta)' },
-		{ id: 'audio-mixer', label: '18. Audio Mixer' }
+		{ id: 'audio-mixer', label: '18. Audio Mixer' },
+		{ id: 'quick-reference', label: '19. Quick Reference' },
+		{ id: 'qr-name-generator', label: '↳ Name Generator' },
+		{ id: 'qr-weather-travel', label: '↳ Weather & Travel' },
+		{ id: 'qr-shop-generator', label: '↳ Shop Generator' },
+		{ id: 'qr-encounter-generator', label: '↳ Random Encounter Generator' }
 	];
 
 	const conditions = [
@@ -1699,6 +1704,127 @@
 					<li>On Firefox, audio files must be re-selected after every page reload; consider keeping the mixer tab open for long sessions</li>
 					<li><strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset faders or unload files</li>
 				</ul>
+			</section>
+
+			<section id="quick-reference">
+				{@render h2('19', 'Quick Reference')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">Quick Reference</strong> panel is a full-screen reference opened from the <strong class="font-semibold text-white">☰ hamburger menu</strong> in the DM header. It is organised into 17 tabs covering both rules lookups and procedural generation tools.
+				</p>
+
+				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Rules Tabs</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Twelve tabs provide concise, table-formatted lookups for the most commonly referenced 5e rules mid-session:
+				</p>
+				{@render dataTable(
+					['Tab', 'Contents'],
+					[
+						['Actions in Combat', 'Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, Ready, Search, Use an Object'],
+						['Bonus Actions', 'Common bonus actions by class and spell, two-weapon fighting, and healing potions'],
+						['Movement & Position', 'Speed rules, difficult terrain, jumping, climbing, swimming, and prone'],
+						['Conditions', 'All 15 standard 5e conditions with full mechanical effects and colour-coded badges'],
+						['Concentration', 'Damage thresholds, what breaks concentration, and how to check'],
+						['Death Saving Throws', 'Stabilisation, success/failure thresholds, and instant death rules'],
+						['Exhaustion', 'All 6 exhaustion levels and their effects'],
+						['Cover', 'Half cover (+2 AC/Dex saves), three-quarters cover (+5), and total cover'],
+						['Resting', 'Short rest and long rest rules including what each restores'],
+						['Skills & Ability Checks', 'All 18 skills with their associated ability scores and common DC benchmarks'],
+						['Spellcasting', 'Spell slot usage, concentration, components, and ritual casting'],
+						['Magic & Casting', 'Spell attack rolls, saving throws, counterspell, and multi-class slot tables'],
+					]
+				)}
+			</section>
+
+			<section id="qr-name-generator">
+				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Name Generator</h3>
+
+				<p class="mb-3 text-sm leading-relaxed">
+					Generate fantasy names for NPCs, locations, and taverns on the fly.
+				</p>
+				{@render dataTable(
+					['Control', 'Description'],
+					[
+						['Type dropdown', 'Human (Male/Female), Elf, Dwarf, Halfling, Gnome, Orc, Tiefling, Dragonborn, Tavern Name, Town / Village'],
+						['First Names', 'Generates 10 first names for the selected type'],
+						['Surnames', 'Generates 10 surnames (disabled for Tavern / Town types)'],
+						['Selecting a name', 'Click any name to select it (amber highlight). Click again to deselect. First name and surname can each be selected independently.'],
+						['Save to Notes', 'Appears once a first name is selected. Appends "Party met Firstname Lastname, a Dwarf" to the latest session note, or creates a new note if none exists.'],
+					]
+				)}
+			</section>
+
+			<section id="qr-weather-travel">
+				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Weather &amp; Travel</h3>
+
+				<p class="mb-3 text-sm leading-relaxed">
+					Generate a week of weather and calculate adjusted travel speeds for any biome and season combination.
+				</p>
+				{@render dataTable(
+					['Feature', 'Description'],
+					[
+						['Season', 'Spring, Summer, Autumn, or Winter — affects temperature ranges and weather probability'],
+						['Biome', 'Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, or Jungle'],
+						['Generate Week', 'Produces a 7-day table with conditions across five daily time slots: Dawn, Morning, Midday, Afternoon, Night'],
+						['Travel Pace table', 'Fast / Normal / Slow rates (ft/min, mph, miles/day) dynamically adjusted by the biome × season multiplier; a modifier badge shows the combined value'],
+						['Navigation DC table', 'Suggested Survival check DCs for navigation by terrain type'],
+					]
+				)}
+			</section>
+
+			<section id="qr-shop-generator">
+				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Shop Generator</h3>
+
+				<p class="mb-3 text-sm leading-relaxed">
+					Instantly stock a shop with a random inventory scaled to the town's wealth.
+				</p>
+				{@render dataTable(
+					['Control', 'Description'],
+					[
+						['Shop type', '11 options: General Store, Weapon Shop, Armor Shop, Alchemist, Magic Shop, Jeweler, Tavern, Bookshop, Herbalist, Fletcher, Stable'],
+						['Town affluence', '6 tiers from Impoverished (×0.6 prices, 4–6 items) to Opulent (×2.2 prices, 14–18 items)'],
+						['Stock Shop', 'Generates a random shop name and a full item list with three price columns'],
+						['Price columns', '😊 Friendly (−15%), 😐 Neutral (base), 😠 Hostile (+25%)'],
+						['Magic items', 'Higher affluence tiers include magic items of appropriate rarity (Common → Legendary) with colour-coded rarity badges'],
+						['Item detail', 'Click any item row to open a detail overlay with the item description, rarity badge, and all three prices'],
+						['Save to Notes', 'Appends "The party went to [Shop Name], a common general store" to the latest session note, or creates one if none exists'],
+					]
+				)}
+			</section>
+
+			<section id="qr-encounter-generator">
+				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Random Encounter Generator</h3>
+
+				<p class="mb-3 text-sm leading-relaxed">
+					Generate a complete, balanced random encounter — flavor text, monsters, XP breakdown, tactics, and terrain — tuned to your party's level and chosen difficulty.
+				</p>
+				{@render dataTable(
+					['Control', 'Description'],
+					[
+						['Biome / Terrain', '12 options: Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, Jungle, Underdark, Urban, Dungeon, Ruins'],
+						['Party Size', '1–8 players — affects the XP multiplier and monster count'],
+						['Party Level', '1–20 — sets the XP budget tier from the DMG thresholds'],
+						['Difficulty', 'Easy, Medium, Hard, or Deadly — directly controls the XP budget and scales monster strength'],
+					]
+				)}
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Generated Output</h3>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li><strong class="font-semibold text-white">Title & difficulty badge</strong> — encounter name with a colour-coded actual difficulty label (may differ from the requested difficulty)</li>
+					<li><strong class="font-semibold text-white">Scene flavor text</strong> — atmospheric description of the encounter setting</li>
+					<li><strong class="font-semibold text-white">Encounter description</strong> — archetype-flavored narration (Solo, Pack, Mixed, Ambush, or Swarm)</li>
+					<li><strong class="font-semibold text-white">Monster list</strong> — each monster with count and individual XP value</li>
+					<li><strong class="font-semibold text-white">XP breakdown</strong> — Raw XP → Multiplier → Adjusted XP → XP per player</li>
+					<li><strong class="font-semibold text-white">Tactics</strong> — how the monsters behave in this specific encounter</li>
+					<li><strong class="font-semibold text-white">Terrain feature</strong> — an environmental detail to use during the fight</li>
+				</ul>
+				{@render dataTable(
+					['Button', 'Action'],
+					[
+						['Roll Again', 'Re-generates a new encounter with the same settings'],
+						['Add to Initiative', 'Clears current enemies, loads the generated monsters with auto-rolled initiative, and closes the Quick Reference panel'],
+					]
+				)}
 			</section>
 
 			{/if}
