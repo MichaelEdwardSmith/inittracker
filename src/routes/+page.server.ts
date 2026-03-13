@@ -6,6 +6,16 @@ import { listGameSessions } from '$lib/server/dmModel';
 import type { GameSession } from '$lib/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.isGuest) {
+		return {
+			dmFirstName: 'Guest',
+			isGuest: true,
+			showVoiceCommands: false,
+			sessions: [] as GameSession[],
+			activeSession: { id: '', sessionId: locals.gameSessionId ?? '', name: 'Guest Session' } as GameSession
+		};
+	}
+
 	const authSessionId = locals.sessionId ?? '';
 	const gameSessionId = locals.gameSessionId ?? '';
 
@@ -17,6 +27,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
+		isGuest: false,
 		showVoiceCommands: true,
 		sessions,
 		activeSession

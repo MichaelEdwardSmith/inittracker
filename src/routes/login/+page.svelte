@@ -41,6 +41,7 @@
 		<div class="rounded-xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl backdrop-blur">
 			<form
 				method="POST"
+				action="?/login"
 				use:enhance={async ({ formData }) => {
 					const pw = formData.get('password') as string;
 					if (pw) formData.set('password', await sha256(pw));
@@ -92,6 +93,22 @@
 					Enter
 				</button>
 			</form>
+		</div>
+
+		<!-- Guest access -->
+		<div class="mt-4">
+			<form method="POST" action="?/guest">
+				<button
+					type="submit"
+					class="w-full rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3 text-sm font-semibold tracking-widest text-gray-400 uppercase
+					       transition hover:border-gray-500 hover:text-gray-200 active:scale-[0.98]"
+				>
+					Enter as Guest
+				</button>
+			</form>
+			<p class="mt-2 text-center text-xs text-gray-600">
+				Guest sessions are not saved and will be lost when you close the tab.
+			</p>
 		</div>
 
 		<p class="mt-6 text-center text-xs text-gray-600">

@@ -5,16 +5,34 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { loginDM, getDMBySessionId } from '$lib/server/dmModel';
 
+const SESSION_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function randomId(): string {
+	return Array.from({ length: 6 }, () => SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)]).join('');
+}
+
 export const load: PageServerLoad = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
 	if (sessionId) {
 		const dm = await getDMBySessionId(sessionId);
 		if (dm) redirect(303, '/');
 	}
+	// Already in a guest session — go straight to dashboard
+	if (cookies.get('dm_guest')) redirect(303, '/');
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	guest: async ({ cookies }) => {
+		cookies.set('dm_guest', randomId(), {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			// No maxAge → session cookie; cleared when browser closes
+			secure: false
+		});
+		redirect(303, '/');
+	},
+
+	login: async ({ request, cookies }) => {
 		const data = await request.formData();
 		const email = (data.get('email') as string)?.trim().toLowerCase();
 		const password = data.get('password') as string;

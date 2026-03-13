@@ -9,14 +9,24 @@ import { authToGameSession } from '$lib/server/sessionCache';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('dm_auth') ?? null;
+	const guestSessionId = event.cookies.get('dm_guest') ?? null;
 	event.locals.sessionId = sessionId;
 	event.locals.gameSessionId = null;
 	event.locals.dmFirstName = null;
 	event.locals.dmEmail = null;
+	event.locals.isGuest = false;
 
 	// Protect DM-only pages. /display/*, /login, /register, /join, /api/* are open.
 	const { pathname } = event.url;
 	if (pathname === '/' || pathname === '/history') {
+		// Guest access — allowed on dashboard and history.
+		if (!sessionId && guestSessionId) {
+			event.locals.isGuest = true;
+			event.locals.gameSessionId = guestSessionId;
+			event.locals.dmFirstName = 'Guest';
+			return resolve(event);
+		}
+
 		if (!sessionId) redirect(303, '/login');
 		const dm = await getDMBySessionId(sessionId);
 		if (!dm) {
