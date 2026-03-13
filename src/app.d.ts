@@ -9,6 +9,7 @@ declare global {
 			gameSessionId: string | null;
 			dmFirstName: string | null;
 			dmEmail: string | null;
+			isGuest: boolean;
 		}
 		// interface PageData {}
 		// interface PageState {}

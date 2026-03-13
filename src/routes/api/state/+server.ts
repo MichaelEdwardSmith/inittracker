@@ -42,13 +42,24 @@ async function resolveGameSessionId(authSessionId: string): Promise<string | nul
 // ---------------------------------------------------------------------------
 // POST /api/state  — DM screen pushes updated combat state here.
 // Identifies the DM via the dm_auth cookie; resolves their active game session.
+// Guests use the dm_guest cookie — state is cached in memory only, not persisted.
 // ---------------------------------------------------------------------------
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const authSessionId = cookies.get('dm_auth');
-	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
+	const guestSessionId = cookies.get('dm_guest');
 
-	const gameSessionId = await resolveGameSessionId(authSessionId);
-	if (!gameSessionId) return new Response('No active session', { status: 400 });
+	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });
+
+	let gameSessionId: string | null;
+	const isGuest = !authSessionId && !!guestSessionId;
+
+	if (isGuest) {
+		if (!isValidSessionId(guestSessionId!)) return new Response('Invalid guest session', { status: 400 });
+		gameSessionId = guestSessionId!;
+	} else {
+		gameSessionId = await resolveGameSessionId(authSessionId!);
+		if (!gameSessionId) return new Response('No active session', { status: 400 });
+	}
 
 	const raw = await request.json().catch(() => null);
 	const state = validateStorageState(raw);
@@ -57,8 +68,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	sessionStates.set(gameSessionId, state);
 	broadcastToSession(gameSessionId, state);
 
-	// Persist to MongoDB (fire-and-forget — don't block the response)
-	saveCombatState(gameSessionId, state).catch(() => {});
+	// Guests: skip MongoDB persistence
+	if (!isGuest) {
+		saveCombatState(gameSessionId, state).catch(() => {});
+	}
 
 	return new Response(null, { status: 204 });
 };
@@ -72,8 +85,15 @@ export const GET: RequestHandler = async ({ request, url, cookies }) => {
 	const wantsStream = (request.headers.get('accept') ?? '').includes('text/event-stream');
 
 	if (!wantsStream) {
-		// DM screen polling — resolve game session from auth cookie
+		// DM screen polling — resolve game session from auth or guest cookie
 		const authSessionId = cookies.get('dm_auth');
+		const guestSessionId = cookies.get('dm_guest');
+
+		if (!authSessionId && guestSessionId && isValidSessionId(guestSessionId)) {
+			// Guest: read from in-memory cache only
+			return Response.json(sessionStates.get(guestSessionId) ?? { combatants: [], currentTurnId: null, round: 1 });
+		}
+
 		if (!authSessionId) return Response.json({ combatants: [], currentTurnId: null, round: 1 });
 
 		const gameSessionId = await resolveGameSessionId(authSessionId);

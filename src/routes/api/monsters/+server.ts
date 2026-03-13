@@ -9,7 +9,7 @@ import {
 
 export const GET: RequestHandler = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
-	if (!sessionId) return new Response('Unauthorized', { status: 401 });
+	if (!sessionId) return Response.json([]); // guests have no custom monsters
 
 	const monsters = await getCustomMonsters(sessionId);
 	return Response.json(monsters);

@@ -146,6 +146,7 @@
 	const unreadCount = $derived(Math.max(0, messages.length - seenCount));
 
 	$effect(() => {
+		if (data.isGuest) return;
 		async function poll() {
 			try {
 				const r = await fetch('/api/messages');
@@ -190,6 +191,7 @@
 	// Subscribe to the session's SSE stream so external state changes (e.g. player
 	// initiative rolls) are reflected immediately without a manual refresh.
 	$effect(() => {
+		if (data.isGuest) return;
 		const sessionId = activeSession.sessionId;
 		const source = new EventSource(`/api/state?session=${sessionId}`);
 		source.onmessage = (e) => {
@@ -277,7 +279,7 @@
 						</svg>
 					{/if}
 				</button>
-				{#if unreadCount > 0}
+				{#if unreadCount > 0 && !data.isGuest}
 					<span class="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
 						{unreadCount > 9 ? '9+' : unreadCount}
 					</span>
@@ -293,6 +295,7 @@
 		<div class="fixed inset-0 z-40" onclick={() => (showMobileMenu = false)}></div>
 	{/if}
 	<div class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu ? '' : 'hidden'}">
+			{#if !data.isGuest}
 			<button
 				onclick={() => { openInbox(); showMobileMenu = false; }}
 				class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
@@ -308,6 +311,7 @@
 					</span>
 				{/if}
 			</button>
+			{/if}
 			<button
 				onclick={() => { showNotes = true; showMobileMenu = false; }}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
