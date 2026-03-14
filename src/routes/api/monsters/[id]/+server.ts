@@ -16,8 +16,10 @@ export const PUT: RequestHandler = async ({ request, cookies, params }) => {
 	}
 	const ac = Number(body.ac);
 	const hp = Number(body.hp);
-	if (!Number.isInteger(ac) || ac < 1) return Response.json({ error: 'AC must be at least 1.' }, { status: 400 });
-	if (!Number.isInteger(hp) || hp < 1) return Response.json({ error: 'HP must be at least 1.' }, { status: 400 });
+	if (!Number.isInteger(ac) || ac < 1)
+		return Response.json({ error: 'AC must be at least 1.' }, { status: 400 });
+	if (!Number.isInteger(hp) || hp < 1)
+		return Response.json({ error: 'HP must be at least 1.' }, { status: 400 });
 
 	const imgUrl = typeof body.imgUrl === 'string' && body.imgUrl ? body.imgUrl : undefined;
 
@@ -25,7 +27,10 @@ export const PUT: RequestHandler = async ({ request, cookies, params }) => {
 		name: body.name.trim(),
 		ac,
 		hp,
-		cr: String(body.cr ?? '1').trim().slice(0, 10) || '1',
+		cr:
+			String(body.cr ?? '1')
+				.trim()
+				.slice(0, 10) || '1',
 		monsterType: String(body.monsterType ?? 'Humanoid').slice(0, 50),
 		...(imgUrl !== undefined ? { imgUrl } : { imgUrl: undefined })
 	});

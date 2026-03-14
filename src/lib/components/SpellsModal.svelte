@@ -11,7 +11,7 @@
 		formatComponents,
 		formatDuration,
 		getClasses,
-		renderEntries,
+		renderEntries
 	} from '$lib/spellRenderer';
 
 	interface Props {
@@ -47,9 +47,7 @@
 				allSpells = data.spells;
 				loading = false;
 				if (initialSpell) {
-					const match = allSpells.find(
-						(s) => s.name.toLowerCase() === initialSpell.toLowerCase()
-					);
+					const match = allSpells.find((s) => s.name.toLowerCase() === initialSpell.toLowerCase());
 					if (match) selectedSpell = match;
 				}
 			})
@@ -66,12 +64,19 @@
 		{ abbr: 'V', name: 'Evocation' },
 		{ abbr: 'I', name: 'Illusion' },
 		{ abbr: 'N', name: 'Necromancy' },
-		{ abbr: 'T', name: 'Transmutation' },
+		{ abbr: 'T', name: 'Transmutation' }
 	];
 
 	const CLASS_OPTIONS = [
-		'Artificer', 'Bard', 'Cleric', 'Druid', 'Paladin',
-		'Ranger', 'Sorcerer', 'Warlock', 'Wizard',
+		'Artificer',
+		'Bard',
+		'Cleric',
+		'Druid',
+		'Paladin',
+		'Ranger',
+		'Sorcerer',
+		'Warlock',
+		'Wizard'
 	];
 
 	const filteredSpells = $derived.by(() => {
@@ -112,13 +117,15 @@
 				sides: 20,
 				modifier,
 				total: roll + modifier,
-				isAttack: true,
+				isAttack: true
 			};
 		});
 	}
 
 	function handleDiceClick(e: MouseEvent) {
-		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack]') as HTMLElement | null;
+		const target = (e.target as HTMLElement).closest(
+			'[data-dice],[data-attack]'
+		) as HTMLElement | null;
 		if (!target) return;
 		e.stopPropagation();
 		if (target.dataset.dice) rollDice(target.dataset.dice);
@@ -137,7 +144,9 @@
 	aria-label="Spell Reference"
 	class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-10 backdrop-blur-sm"
 	tabindex="-1"
-	onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) onclose();
+	}}
 	onkeydown={handleKeydown}
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -150,9 +159,24 @@
 		<!-- Header -->
 		<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-3">
 			<h3 class="text-base font-black tracking-wide text-violet-300">Spell Reference</h3>
-			<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+			<button
+				onclick={onclose}
+				class="text-gray-500 transition hover:text-white"
+				aria-label="Close"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -179,7 +203,7 @@
 					>
 						<option value={null}>All Levels</option>
 						<option value={0}>Cantrip</option>
-						{#each [1,2,3,4,5,6,7,8,9] as lvl}
+						{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as lvl}
 							<option value={lvl}>{formatLevel(lvl)}</option>
 						{/each}
 					</select>
@@ -212,15 +236,22 @@
 					{:else}
 						{#each filteredSpells as spell}
 							<button
-								onclick={() => { selectedSpell = spell; diceRollResult = null; }}
+								onclick={() => {
+									selectedSpell = spell;
+									diceRollResult = null;
+								}}
 								class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition
 								       {selectedSpell?.name === spell.name && selectedSpell?.source === spell.source
 									? 'bg-violet-900/40 text-violet-200'
 									: 'text-gray-300 hover:bg-gray-800 hover:text-white'}"
 							>
 								<span class="truncate">{spell.name}</span>
-								<span class="ml-1 shrink-0 rounded px-1 py-0.5 text-[10px] font-bold
-								             {spell.level === 0 ? 'bg-emerald-900/60 text-emerald-300' : 'bg-gray-700 text-gray-400'}">
+								<span
+									class="ml-1 shrink-0 rounded px-1 py-0.5 text-[10px] font-bold
+								             {spell.level === 0
+										? 'bg-emerald-900/60 text-emerald-300'
+										: 'bg-gray-700 text-gray-400'}"
+								>
 									{spell.level === 0 ? 'C' : spell.level}
 								</span>
 							</button>
@@ -247,16 +278,26 @@
 						<span>{spell.level === 0 ? 'Cantrip' : `${formatLevel(spell.level)} spell`}</span>
 						<span>·</span>
 						<span>{formatSchool(spell.school)}</span>
-						<span class="rounded bg-indigo-900/60 px-1.5 py-0.5 text-xs font-semibold text-indigo-300">{spell.source}</span>
+						<span
+							class="rounded bg-indigo-900/60 px-1.5 py-0.5 text-xs font-semibold text-indigo-300"
+							>{spell.source}</span
+						>
 						{#if spell.ritual}
-							<span class="rounded bg-amber-900/50 px-1.5 py-0.5 text-xs font-semibold text-amber-300">Ritual</span>
+							<span
+								class="rounded bg-amber-900/50 px-1.5 py-0.5 text-xs font-semibold text-amber-300"
+								>Ritual</span
+							>
 						{/if}
 					</div>
 
 					<!-- Info grid -->
-					<div class="mb-4 grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-700 bg-gray-800/50 p-3 text-sm">
+					<div
+						class="mb-4 grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-700 bg-gray-800/50 p-3 text-sm"
+					>
 						<div>
-							<span class="text-xs font-bold tracking-wider text-gray-500 uppercase">Casting Time</span>
+							<span class="text-xs font-bold tracking-wider text-gray-500 uppercase"
+								>Casting Time</span
+							>
 							<p class="text-gray-200">{formatTime(spell.time as unknown[])}</p>
 						</div>
 						<div>
@@ -264,7 +305,9 @@
 							<p class="text-gray-200">{formatRange(spell.range)}</p>
 						</div>
 						<div>
-							<span class="text-xs font-bold tracking-wider text-gray-500 uppercase">Components</span>
+							<span class="text-xs font-bold tracking-wider text-gray-500 uppercase"
+								>Components</span
+							>
 							<p class="text-gray-200">{formatComponents(spell.components)}</p>
 						</div>
 						<div>
@@ -281,7 +324,9 @@
 					<!-- At higher levels -->
 					{#if spell.entriesHigherLevel && (spell.entriesHigherLevel as unknown[]).length > 0}
 						<div class="mb-4 rounded border border-amber-800/40 bg-amber-900/10 p-3">
-							<p class="mb-1 text-xs font-bold tracking-wider text-amber-400 uppercase">At Higher Levels</p>
+							<p class="mb-1 text-xs font-bold tracking-wider text-amber-400 uppercase">
+								At Higher Levels
+							</p>
 							<div class="spell-body text-sm">
 								{@html renderEntries(spell.entriesHigherLevel as unknown[])}
 							</div>
@@ -311,35 +356,60 @@
 		aria-label="Dice roll result"
 		tabindex="-1"
 		onclick={() => (diceRollResult = null)}
-		onkeydown={(e) => { if (e.key === 'Escape') diceRollResult = null; }}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') diceRollResult = null;
+		}}
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
-			class="min-w-[18rem] max-w-sm rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
+			class="max-w-sm min-w-[18rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
-				<button onclick={() => (diceRollResult = null)} class="text-gray-500 transition hover:text-white" aria-label="Close">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+				<button
+					onclick={() => (diceRollResult = null)}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
 			<div class="mb-4 flex flex-wrap gap-2">
 				{#each r.rolls as roll}
-					<div class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white">
+					<div
+						class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white"
+					>
 						{roll}
 					</div>
 				{/each}
 			</div>
 			{#if r.modifier !== 0}
 				<p class="mb-1 text-sm text-gray-400">
-					{r.isAttack ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
+					{r.isAttack ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span
+						class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}
+					>
+						{r.modifier > 0 ? '+' : ''}{r.modifier}</span
+					>
 				</p>
 			{/if}
-			<p class="text-2xl font-black text-white">Total: <span class="text-amber-300">{r.total}</span></p>
+			<p class="text-2xl font-black text-white">
+				Total: <span class="text-amber-300">{r.total}</span>
+			</p>
 			<button
 				onclick={() => {
 					if (r.isAttack) rollAttack(String(r.modifier));

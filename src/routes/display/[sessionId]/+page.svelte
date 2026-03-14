@@ -51,11 +51,11 @@
 		Prone: 'rgba(161,  98,   7, 1)', // yellow-700
 		Restrained: 'rgba(217, 119,   6, 1)', // amber-600
 		Stunned: 'rgba(234, 179,   8, 1)', // yellow-500
-		Unconscious:          'rgba( 75,  85,  99, 1)', // gray-600
-		'Advantage For':      'rgba( 16, 185, 129, 1)', // emerald-500
-		'Advantage Against':  'rgba(225,  29,  72, 1)', // rose-600
-		'Disadvantage For':   'rgba(234,  88,  12, 1)', // orange-600
-		'Disadvantage Against': 'rgba( 20, 184, 166, 1)'  // teal-500
+		Unconscious: 'rgba( 75,  85,  99, 1)', // gray-600
+		'Advantage For': 'rgba( 16, 185, 129, 1)', // emerald-500
+		'Advantage Against': 'rgba(225,  29,  72, 1)', // rose-600
+		'Disadvantage For': 'rgba(234,  88,  12, 1)', // orange-600
+		'Disadvantage Against': 'rgba( 20, 184, 166, 1)' // teal-500
 	};
 
 	// ── Audio ──────────────────────────────────────────────────────────
@@ -273,7 +273,11 @@
 		});
 	}
 
-	function triggerEffect(soundType: 'damage' | 'heal' | 'condition', color: string, affectedId?: string) {
+	function triggerEffect(
+		soundType: 'damage' | 'heal' | 'condition',
+		color: string,
+		affectedId?: string
+	) {
 		const willPan = !!(affectedId && current && affectedId !== current.id);
 
 		// Pan to the affected combatant first; flash + sound fire after the fly-in completes
@@ -286,19 +290,22 @@
 		}
 
 		// Delay flash and sound until the fly-in transition finishes (500 ms), or fire immediately
-		setTimeout(() => {
-			if (flashTimer) clearTimeout(flashTimer);
-			flashColor = color;
-			flashKey++;
-			flashTimer = setTimeout(() => {
-				flashColor = null;
-			}, 750);
-			if (audioEnabled && audioCtx) {
-				if (soundType === 'damage') playDamageSound(audioCtx);
-				else if (soundType === 'heal') playHealSound(audioCtx);
-				else playConditionSound(audioCtx);
-			}
-		}, willPan ? 500 : 0);
+		setTimeout(
+			() => {
+				if (flashTimer) clearTimeout(flashTimer);
+				flashColor = color;
+				flashKey++;
+				flashTimer = setTimeout(() => {
+					flashColor = null;
+				}, 750);
+				if (audioEnabled && audioCtx) {
+					if (soundType === 'damage') playDamageSound(audioCtx);
+					else if (soundType === 'heal') playHealSound(audioCtx);
+					else playConditionSound(audioCtx);
+				}
+			},
+			willPan ? 500 : 0
+		);
 	}
 
 	// Prevents fanfares from firing when the viewer first loads into an already-active combat
@@ -347,8 +354,13 @@
 						if (!oc) continue;
 						const oldEff = oc.currentHp + (oc.tempHp ?? 0);
 						const newEff = nc.currentHp + (nc.tempHp ?? 0);
-						if (newEff < oldEff) { if (!hadDamage) affectedId = nc.id; hadDamage = true; }
-						else if (nc.currentHp > oc.currentHp) { if (!hadHeal) affectedId = nc.id; hadHeal = true; }
+						if (newEff < oldEff) {
+							if (!hadDamage) affectedId = nc.id;
+							hadDamage = true;
+						} else if (nc.currentHp > oc.currentHp) {
+							if (!hadHeal) affectedId = nc.id;
+							hadHeal = true;
+						}
 						if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
 						if (!addedCondition) {
 							addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
@@ -381,7 +393,9 @@
 	let isFullscreen = $state(false);
 
 	$effect(() => {
-		function onFsChange() { isFullscreen = !!document.fullscreenElement; }
+		function onFsChange() {
+			isFullscreen = !!document.fullscreenElement;
+		}
 		document.addEventListener('fullscreenchange', onFsChange);
 		return () => document.removeEventListener('fullscreenchange', onFsChange);
 	});
@@ -539,8 +553,19 @@
 					class="hidden items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-gray-500 hover:text-gray-200 sm:flex"
 					title="Send a message to the DM"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/>
 					</svg>
 					Message DM
 				</button>
@@ -549,8 +574,19 @@
 					class="hidden items-center gap-1.5 rounded border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300 sm:flex"
 					title="Roll initiative for your character"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+						/>
 					</svg>
 					Roll Initiative
 				</button>
@@ -569,8 +605,19 @@
 				title="Contact us"
 				class="hidden items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400 sm:flex"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3.5 w-3.5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
 				</svg>
 				Contact
 			</a>
@@ -580,12 +627,34 @@
 				class="hidden items-center gap-1.5 rounded border border-gray-800 bg-gray-900/60 px-2 py-1 text-xs text-gray-600 transition hover:border-gray-600 hover:text-gray-400 sm:flex"
 			>
 				{#if isFullscreen}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+						/>
 					</svg>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+						/>
 					</svg>
 				{/if}
 			</button>
@@ -596,11 +665,25 @@
 				class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300 sm:hidden"
 			>
 				{#if showMobileMenu}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
 					</svg>
 				{/if}
@@ -614,12 +697,16 @@
 			onclick={() => (showMobileMenu = false)}
 			aria-hidden="true"
 		></div>
-		<div class="fixed top-12 left-0 right-0 z-[200] border-b border-gray-800 bg-gray-900 px-4 py-3 sm:hidden">
+		<div
+			class="fixed top-12 right-0 left-0 z-[200] border-b border-gray-800 bg-gray-900 px-4 py-3 sm:hidden"
+		>
 			<div class="flex flex-col gap-2">
 				{#if joined}
 					<button
 						onclick={toggleAudio}
-						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm transition {audioEnabled ? 'text-amber-400 hover:bg-amber-950/40' : 'text-gray-500 hover:bg-gray-800/60'}"
+						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm transition {audioEnabled
+							? 'text-amber-400 hover:bg-amber-950/40'
+							: 'text-gray-500 hover:bg-gray-800/60'}"
 					>
 						<span class="text-base">{audioEnabled ? '🔊' : '🔇'}</span>
 						{audioEnabled ? 'Sound On' : 'Sound Off'}
@@ -627,20 +714,48 @@
 				{/if}
 				{#if players.length > 0}
 					<button
-						onclick={() => { showMsgModal = true; showMobileMenu = false; }}
+						onclick={() => {
+							showMsgModal = true;
+							showMobileMenu = false;
+						}}
 						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-400 transition hover:border-gray-600 hover:text-gray-200"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 shrink-0"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+							/>
 						</svg>
 						Message DM
 					</button>
 					<button
-						onclick={() => { showInitModal = true; showMobileMenu = false; }}
+						onclick={() => {
+							showInitModal = true;
+							showMobileMenu = false;
+						}}
 						class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 shrink-0"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+							/>
 						</svg>
 						Roll Initiative
 					</button>
@@ -649,23 +764,59 @@
 					href="mailto:dm@inittracker.com"
 					class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/>
 					</svg>
 					Contact
 				</a>
 				<button
-					onclick={() => { toggleFullscreen(); showMobileMenu = false; }}
+					onclick={() => {
+						toggleFullscreen();
+						showMobileMenu = false;
+					}}
 					class="flex items-center gap-3 rounded-lg border border-gray-800 px-3 py-2.5 text-sm text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
 				>
 					{#if isFullscreen}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 shrink-0"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+							/>
 						</svg>
 						Exit Full Screen
 					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 shrink-0"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+							/>
 						</svg>
 						Full Screen
 					{/if}
@@ -684,7 +835,7 @@
 					The Dungeon Master will begin shortly…
 				</p>
 			</div>
-			</div>
+		</div>
 	{:else}
 		{@const dc = displayCombatant ?? current}
 		<!-- Active combatant display -->
@@ -699,221 +850,257 @@
 					out:fly={{ y: -20, duration: 250 }}
 					class="absolute inset-0 flex flex-col items-center justify-center px-12 pb-4"
 				>
-				<!-- Type label -->
-				<div class="mb-5 flex items-center gap-3">
-					<div class="h-px w-16 bg-gradient-to-r from-transparent to-gray-600"></div>
-					<span
-						class="rounded-full border px-4 py-1 text-xs font-black tracking-[0.25em] uppercase {typeAccent.badge}"
-					>
-						{typeAccent.label}
-					</span>
-					<div class="h-px w-16 bg-gradient-to-l from-transparent to-gray-600"></div>
-				</div>
+					<!-- Type label -->
+					<div class="mb-5 flex items-center gap-3">
+						<div class="h-px w-16 bg-gradient-to-r from-transparent to-gray-600"></div>
+						<span
+							class="rounded-full border px-4 py-1 text-xs font-black tracking-[0.25em] uppercase {typeAccent.badge}"
+						>
+							{typeAccent.label}
+						</span>
+						<div class="h-px w-16 bg-gradient-to-l from-transparent to-gray-600"></div>
+					</div>
 
-				<!-- Avatar token -->
-				{#if dc.type === 'enemy'}
-					{@const style = getMonsterStyle(dc.monsterType)}
-					{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
-					{#if imgUrl}
-						<a
-							href={imgUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 cursor-pointer {isBloodied ? 'ring-red-600 bloodied-avatar' : style.ring}"
-							style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
-						>
-							<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
-						</a>
-					{:else}
-						{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
+					<!-- Avatar token -->
+					{#if dc.type === 'enemy'}
+						{@const style = getMonsterStyle(dc.monsterType)}
+						{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
+						{#if imgUrl}
+							<a
+								href={imgUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {isBloodied
+									? 'bloodied-avatar ring-red-600'
+									: style.ring}"
+								style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+							>
+								<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
+							</a>
+						{:else}
+							{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
+							<div
+								class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {isBloodied
+									? 'bloodied-avatar ring-red-600'
+									: style.ring}"
+								style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+							>
+								<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
+							</div>
+						{/if}
+					{:else if dc.avatarUrl}
 						<div
-							class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {isBloodied ? 'ring-red-600 bloodied-avatar' : style.ring}"
-							style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
+							style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
 						>
-							<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
+							<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
 						</div>
 					{/if}
-				{:else if dc.avatarUrl}
-					<div
-						class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
-						style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
-					>
-						<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
-					</div>
-				{/if}
 
-				<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
-				{#if isBloodied}
-					<div class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1">
-						<span class="text-base leading-none">🩸</span>
-						<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase">Bloodied</span>
-					</div>
-				{/if}
-
-				<!-- Name -->
-				<h1
-					class="mb-2 text-center leading-none font-black tracking-widest uppercase
-					       {dc.type === 'player' ? 'text-blue-50' : dc.type === 'lair' ? 'text-purple-50' : 'text-red-50'}"
-					style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {dc.type === 'player'
-						? '4.5rem'
-						: '3.75rem'}); text-shadow: 0 0 40px {dc.type === 'player'
-						? 'rgba(96,165,250,0.4)'
-						: dc.type === 'lair'
-							? 'rgba(192,132,252,0.4)'
-							: 'rgba(248,113,113,0.4)'};"
-				>
-					{dc.name}
-				</h1>
-
-				<!-- Stats row -->
-				<div class="mt-6 flex items-center gap-10">
-					{#if dc.initiative !== null}
-						<div class="text-center">
-							<div class="text-xs tracking-widest text-gray-500 uppercase">Initiative</div>
-							<div class="text-4xl font-black text-amber-400">{dc.initiative}</div>
+					<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
+					{#if isBloodied}
+						<div
+							class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1"
+						>
+							<span class="text-base leading-none">🩸</span>
+							<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase"
+								>Bloodied</span
+							>
 						</div>
+					{/if}
+
+					<!-- Name -->
+					<h1
+						class="mb-2 text-center leading-none font-black tracking-widest uppercase
+					       {dc.type === 'player'
+							? 'text-blue-50'
+							: dc.type === 'lair'
+								? 'text-purple-50'
+								: 'text-red-50'}"
+						style="font-size: clamp(1.5rem, calc((100vw - 6rem) / 11), {dc.type === 'player'
+							? '4.5rem'
+							: '3.75rem'}); text-shadow: 0 0 40px {dc.type === 'player'
+							? 'rgba(96,165,250,0.4)'
+							: dc.type === 'lair'
+								? 'rgba(192,132,252,0.4)'
+								: 'rgba(248,113,113,0.4)'};"
+					>
+						{dc.name}
+					</h1>
+
+					<!-- Stats row -->
+					<div class="mt-6 flex items-center gap-10">
+						{#if dc.initiative !== null}
+							<div class="text-center">
+								<div class="text-xs tracking-widest text-gray-500 uppercase">Initiative</div>
+								<div class="text-4xl font-black text-amber-400">{dc.initiative}</div>
+							</div>
+							{#if showAc && !isUnconsciousPlayer}
+								<div class="h-10 w-px bg-gray-700"></div>
+							{/if}
+						{/if}
 						{#if showAc && !isUnconsciousPlayer}
+							<div class="text-center">
+								<div class="text-xs tracking-widest text-gray-500 uppercase">Armor Class</div>
+								<div class="text-4xl font-black text-gray-100">{dc.ac}</div>
+							</div>
+						{/if}
+						{#if dc.type === 'player' && !isUnconsciousPlayer}
 							<div class="h-10 w-px bg-gray-700"></div>
+							<div class="text-center">
+								<div class="text-xs tracking-widest text-gray-500 uppercase">Hit Points</div>
+								<div
+									class="text-4xl font-black {pct <= 0
+										? 'text-gray-500'
+										: pct <= 25
+											? 'text-red-400'
+											: pct <= 50
+												? 'text-amber-400'
+												: 'text-green-400'}"
+								>
+									{dc.currentHp}<span class="text-xl text-gray-600">/{dc.maxHp}</span>
+								</div>
+								{#if (dc.tempHp ?? 0) > 0}
+									<div class="mt-1 text-lg font-bold text-yellow-400">+{dc.tempHp} THP</div>
+								{/if}
+							</div>
+						{/if}
+					</div>
+
+					<!-- HP bar + THP extension (players only) -->
+					{#if dc.type === 'player'}
+						{#if dc.currentHp > 0}
+							<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
+								{#if (dc.tempHp ?? 0) > 0}
+									{@const total = dc.maxHp + dc.tempHp}
+									{@const hpW = (dc.currentHp / total) * 100}
+									{@const thpW = (dc.tempHp / total) * 100}
+									<div
+										class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+										style="width: {hpW}%;"
+									></div>
+									<div
+										class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all duration-500"
+										style="left: {hpW}%; width: {thpW}%;"
+									></div>
+								{:else}
+									<div
+										class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
+										style="width: {pct}%;"
+									></div>
+								{/if}
+							</div>
+						{:else}
+							<!-- Death saving throws panel -->
+							{@const ds = dc.deathSaves ?? { successes: 0, failures: 0, stable: false }}
+							{@const isDead = ds.failures >= 3}
+							{@const isStable = ds.stable || ds.successes >= 3}
+							<div class="mt-6 w-full max-w-lg">
+								<div class="mb-3 flex items-center gap-4">
+									<div class="h-px flex-1 bg-gray-700"></div>
+									<span class="text-xs font-black tracking-[0.25em] text-gray-500 uppercase"
+										>☠ Death Saving Throws</span
+									>
+									<div class="h-px flex-1 bg-gray-700"></div>
+								</div>
+								{#if isDead}
+									<div
+										class="flex flex-col items-center gap-2 rounded-xl border border-red-800/60 bg-red-950/50 px-6 py-5"
+									>
+										<span class="text-5xl">☠</span>
+										<span class="text-2xl font-black tracking-[0.3em] text-red-400 uppercase"
+											>Dead</span
+										>
+									</div>
+								{:else if isStable}
+									<div
+										class="flex flex-col items-center gap-2 rounded-xl border border-green-800/60 bg-green-950/50 px-6 py-5"
+									>
+										<span class="text-5xl">♥</span>
+										<span class="text-2xl font-black tracking-[0.3em] text-green-400 uppercase"
+											>Stabilized</span
+										>
+									</div>
+								{:else}
+									<div class="grid grid-cols-2 gap-4">
+										<div
+											class="flex flex-col items-center gap-3 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-4"
+										>
+											<span class="text-xs font-black tracking-[0.2em] text-red-500 uppercase"
+												>Failures</span
+											>
+											<div class="flex gap-3">
+												{#each [0, 1, 2] as i}
+													<div
+														class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.failures >
+														i
+															? 'border-red-600 bg-red-800/60 text-red-300'
+															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
+													>
+														{ds.failures > i ? '☠' : '○'}
+													</div>
+												{/each}
+											</div>
+										</div>
+										<div
+											class="flex flex-col items-center gap-3 rounded-xl border border-green-900/50 bg-green-950/30 px-4 py-4"
+										>
+											<span class="text-xs font-black tracking-[0.2em] text-green-600 uppercase"
+												>Successes</span
+											>
+											<div class="flex gap-3">
+												{#each [0, 1, 2] as i}
+													<div
+														class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.successes >
+														i
+															? 'border-green-600 bg-green-800/60 text-green-300'
+															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
+													>
+														{ds.successes > i ? '♥' : '○'}
+													</div>
+												{/each}
+											</div>
+										</div>
+									</div>
+								{/if}
+							</div>
 						{/if}
 					{/if}
-					{#if showAc && !isUnconsciousPlayer}
-						<div class="text-center">
-							<div class="text-xs tracking-widest text-gray-500 uppercase">Armor Class</div>
-							<div class="text-4xl font-black text-gray-100">{dc.ac}</div>
-						</div>
-					{/if}
-					{#if dc.type === 'player' && !isUnconsciousPlayer}
-						<div class="h-10 w-px bg-gray-700"></div>
-						<div class="text-center">
-							<div class="text-xs tracking-widest text-gray-500 uppercase">Hit Points</div>
-							<div
-								class="text-4xl font-black {pct <= 0
-									? 'text-gray-500'
-									: pct <= 25
-										? 'text-red-400'
-										: pct <= 50
-											? 'text-amber-400'
-											: 'text-green-400'}"
-							>
-								{dc.currentHp}<span class="text-xl text-gray-600">/{dc.maxHp}</span>
-							</div>
-							{#if (dc.tempHp ?? 0) > 0}
-								<div class="mt-1 text-lg font-bold text-yellow-400">+{dc.tempHp} THP</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
 
-				<!-- HP bar + THP extension (players only) -->
-				{#if dc.type === 'player'}
-					{#if dc.currentHp > 0}
-						<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
-							{#if (dc.tempHp ?? 0) > 0}
-								{@const total = dc.maxHp + dc.tempHp}
-								{@const hpW = (dc.currentHp / total) * 100}
-								{@const thpW = (dc.tempHp / total) * 100}
+					<!-- Active conditions -->
+					{#if dc.statuses.length > 0}
+						<div class="mt-5 flex flex-wrap justify-center gap-2">
+							{#each dc.statuses as status}
 								<div
-									class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
-									style="width: {hpW}%;"
-								></div>
-								<div
-									class="absolute top-0 h-full rounded-full bg-yellow-400 transition-all duration-500"
-									style="left: {hpW}%; width: {thpW}%;"
-								></div>
-							{:else}
-								<div
-									class="h-full rounded-full transition-all duration-500 {hpBarColor(pct)}"
-									style="width: {pct}%;"
-								></div>
-							{/if}
-						</div>
-					{:else}
-						<!-- Death saving throws panel -->
-						{@const ds = dc.deathSaves ?? { successes: 0, failures: 0, stable: false }}
-						{@const isDead = ds.failures >= 3}
-						{@const isStable = ds.stable || ds.successes >= 3}
-						<div class="mt-6 w-full max-w-lg">
-							<div class="mb-3 flex items-center gap-4">
-								<div class="h-px flex-1 bg-gray-700"></div>
-								<span class="text-xs font-black tracking-[0.25em] text-gray-500 uppercase">☠ Death Saving Throws</span>
-								<div class="h-px flex-1 bg-gray-700"></div>
-							</div>
-							{#if isDead}
-								<div class="flex flex-col items-center gap-2 rounded-xl border border-red-800/60 bg-red-950/50 px-6 py-5">
-									<span class="text-5xl">☠</span>
-									<span class="text-2xl font-black tracking-[0.3em] text-red-400 uppercase">Dead</span>
-								</div>
-							{:else if isStable}
-								<div class="flex flex-col items-center gap-2 rounded-xl border border-green-800/60 bg-green-950/50 px-6 py-5">
-									<span class="text-5xl">♥</span>
-									<span class="text-2xl font-black tracking-[0.3em] text-green-400 uppercase">Stabilized</span>
-								</div>
-							{:else}
-								<div class="grid grid-cols-2 gap-4">
-									<div class="flex flex-col items-center gap-3 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-4">
-										<span class="text-xs font-black tracking-[0.2em] text-red-500 uppercase">Failures</span>
-										<div class="flex gap-3">
-											{#each [0, 1, 2] as i}
-												<div class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.failures > i
-													? 'border-red-600 bg-red-800/60 text-red-300'
-													: 'border-gray-700 bg-gray-900/60 text-gray-700'}">
-													{ds.failures > i ? '☠' : '○'}
-												</div>
-											{/each}
-										</div>
-									</div>
-									<div class="flex flex-col items-center gap-3 rounded-xl border border-green-900/50 bg-green-950/30 px-4 py-4">
-										<span class="text-xs font-black tracking-[0.2em] text-green-600 uppercase">Successes</span>
-										<div class="flex gap-3">
-											{#each [0, 1, 2] as i}
-												<div class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.successes > i
-													? 'border-green-600 bg-green-800/60 text-green-300'
-													: 'border-gray-700 bg-gray-900/60 text-gray-700'}">
-													{ds.successes > i ? '♥' : '○'}
-												</div>
-											{/each}
-										</div>
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
-				{/if}
-
-				<!-- Active conditions -->
-				{#if dc.statuses.length > 0}
-					<div class="mt-5 flex flex-wrap justify-center gap-2">
-						{#each dc.statuses as status}
-							<div
-								class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[
-									status
-								] ?? 'bg-gray-700 text-gray-200'}"
-							>
-								<span class="py-1 pr-2 pl-3">{status}</span>
-								<button
-									onclick={() => (conditionInfo = status)}
-									title="What is {status}?"
-									class="py-1 pr-2 opacity-50 transition hover:opacity-100"
+									class="flex items-center rounded-full text-sm font-semibold tracking-wide {conditionColors[
+										status
+									] ?? 'bg-gray-700 text-gray-200'}"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-4 w-4"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
+									<span class="py-1 pr-2 pl-3">{status}</span>
+									<button
+										onclick={() => (conditionInfo = status)}
+										title="What is {status}?"
+										class="py-1 pr-2 opacity-50 transition hover:opacity-100"
 									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
-								</button>
-							</div>
-						{/each}
-					</div>
-				{/if}
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				</main>
 			{/key}
 		</div>
@@ -1102,12 +1289,16 @@
 
 <!-- Message DM modal -->
 {#if showMsgModal}
-	<MessageDMModal players={players} sessionId={data.sessionId} onclose={() => (showMsgModal = false)} />
+	<MessageDMModal {players} sessionId={data.sessionId} onclose={() => (showMsgModal = false)} />
 {/if}
 
 <!-- Roll Initiative modal -->
 {#if showInitModal}
-	<InitiativeRollerModal players={players} sessionId={data.sessionId} onclose={() => (showInitModal = false)} />
+	<InitiativeRollerModal
+		{players}
+		sessionId={data.sessionId}
+		onclose={() => (showInitModal = false)}
+	/>
 {/if}
 
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
@@ -1115,8 +1306,17 @@
 <style>
 	/* Bloodied enemy avatar — pulsing crimson ring */
 	@keyframes bloodied-glow {
-		0%, 100% { box-shadow: 0 0 50px -2px rgba(185, 28, 28, 0.85), 0 0 0 4px rgba(220, 38, 38, 0.8); }
-		50%       { box-shadow: 0 0 80px 6px rgba(220, 38, 38, 1),    0 0 0 4px rgba(239, 68, 68, 1); }
+		0%,
+		100% {
+			box-shadow:
+				0 0 50px -2px rgba(185, 28, 28, 0.85),
+				0 0 0 4px rgba(220, 38, 38, 0.8);
+		}
+		50% {
+			box-shadow:
+				0 0 80px 6px rgba(220, 38, 38, 1),
+				0 0 0 4px rgba(239, 68, 68, 1);
+		}
 	}
 	.bloodied-avatar {
 		animation: bloodied-glow 2s ease-in-out infinite;
@@ -1176,24 +1376,54 @@
 	}
 
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%       { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%       { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%       { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%       { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%       { transform: translate(6vw, 9vh) scale(0.94); }
-		68%       { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 </style>

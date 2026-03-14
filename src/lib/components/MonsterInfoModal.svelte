@@ -96,7 +96,9 @@
 	const traitsHtml = $derived(monster?.traits ? linkSpells(linkDice(monster.traits)) : '');
 	const actionsHtml = $derived(monster?.actions ? linkSpells(linkDice(monster.actions)) : '');
 	const reactionsHtml = $derived(monster?.reactions ? linkSpells(linkDice(monster.reactions)) : '');
-	const legendaryHtml = $derived(monster?.legendaryActions ? linkSpells(linkDice(monster.legendaryActions)) : '');
+	const legendaryHtml = $derived(
+		monster?.legendaryActions ? linkSpells(linkDice(monster.legendaryActions)) : ''
+	);
 	const hpHtml = $derived(monster?.hitPoints ? linkDice(monster.hitPoints) : '');
 
 	function rollDice(expr: string) {
@@ -134,7 +136,7 @@
 		{ label: 'CON', key: 'con' as const, modKey: 'conMod' as const, full: 'Constitution' },
 		{ label: 'INT', key: 'int' as const, modKey: 'intMod' as const, full: 'Intelligence' },
 		{ label: 'WIS', key: 'wis' as const, modKey: 'wisMod' as const, full: 'Wisdom' },
-		{ label: 'CHA', key: 'cha' as const, modKey: 'chaMod' as const, full: 'Charisma' },
+		{ label: 'CHA', key: 'cha' as const, modKey: 'chaMod' as const, full: 'Charisma' }
 	];
 
 	function parseSavingThrows(savingThrows: string | undefined): Record<string, number> {
@@ -162,7 +164,7 @@
 				total: roll + modifier,
 				isSavingThrow: true,
 				savingThrowStatLabel: statLabel,
-				savingThrowFromOverride: fromOverride,
+				savingThrowFromOverride: fromOverride
 			};
 		});
 	}
@@ -188,18 +190,21 @@
 				modifier,
 				total: roll + modifier,
 				isSkillCheck: true,
-				skillCheckName: skillName,
+				skillCheckName: skillName
 			};
 		});
 	}
 
 	function handleStatBlockClick(e: MouseEvent) {
-		const target = (e.target as HTMLElement).closest('[data-dice],[data-attack],[data-skill-mod],[data-spell]') as HTMLElement | null;
+		const target = (e.target as HTMLElement).closest(
+			'[data-dice],[data-attack],[data-skill-mod],[data-spell]'
+		) as HTMLElement | null;
 		if (!target) return;
 		e.stopPropagation();
 		if (target.dataset.dice) rollDice(target.dataset.dice);
 		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
-		else if (target.dataset.skillMod !== undefined) rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
+		else if (target.dataset.skillMod !== undefined)
+			rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
 		else if (target.dataset.spell) {
 			const spellName = target.dataset.spell.replace(/[^a-zA-Z0-9 '\-/]/g, '').trim();
 			onclose();
@@ -233,7 +238,9 @@
 					<p class="text-xs text-gray-400 italic">{monster.meta}</p>
 					{#if monster.source}
 						<p class="mt-0.5 text-xs text-gray-500">
-							<span class="rounded bg-indigo-900/60 px-1 py-0.5 font-semibold text-indigo-300">{monster.source}</span>{#if monster.page}&nbsp;p.&nbsp;{monster.page}{/if}
+							<span class="rounded bg-indigo-900/60 px-1 py-0.5 font-semibold text-indigo-300"
+								>{monster.source}</span
+							>{#if monster.page}&nbsp;p.&nbsp;{monster.page}{/if}
 						</p>
 					{/if}
 				</div>
@@ -313,7 +320,9 @@
 							title="Roll {stat.full} saving throw"
 							class="rounded bg-gray-800 px-1 py-2 transition hover:bg-violet-900/50 hover:ring-1 hover:ring-violet-500 active:scale-95"
 						>
-							<div class="text-xs font-bold tracking-wider text-red-400 uppercase">{stat.label}</div>
+							<div class="text-xs font-bold tracking-wider text-red-400 uppercase">
+								{stat.label}
+							</div>
 							<div class="text-sm font-bold text-white">{monster[stat.key]}</div>
 							<div class="text-xs text-gray-400">{monster[stat.modKey]}</div>
 						</button>
@@ -328,16 +337,20 @@
 						</div>
 					{/if}
 					{#if monster.skills}
-						<div><span class="text-gray-500">Skills </span><span>{@html linkSkills(monster.skills)}</span></div>
+						<div>
+							<span class="text-gray-500">Skills </span><span
+								>{@html linkSkills(monster.skills)}</span
+							>
+						</div>
 					{/if}
 					{#if monster.damageVulnerabilities}
-					<div>
-						<span class="text-gray-500">Damage Vulnerabilities </span><span
-							>{monster.damageVulnerabilities}</span
-						>
-					</div>
-				{/if}
-				{#if monster.damageImmunities}
+						<div>
+							<span class="text-gray-500">Damage Vulnerabilities </span><span
+								>{monster.damageVulnerabilities}</span
+							>
+						</div>
+					{/if}
+					{#if monster.damageImmunities}
 						<div>
 							<span class="text-gray-500">Damage Immunities </span><span
 								>{monster.damageImmunities}</span
@@ -428,7 +441,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
-			class="min-w-[18rem] max-w-sm rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
+			class="max-w-sm min-w-[18rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
 			<!-- Title row -->
@@ -439,8 +452,19 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -448,7 +472,9 @@
 			<!-- Individual die results -->
 			<div class="mb-4 flex flex-wrap gap-2">
 				{#each r.rolls as roll}
-					<div class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white">
+					<div
+						class="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white"
+					>
 						{roll}
 					</div>
 				{/each}
@@ -457,8 +483,14 @@
 			<!-- Modifier line (only shown when there is one) -->
 			{#if r.modifier !== 0}
 				<p class="mb-1 text-sm text-gray-400">
-					{r.isSavingThrow ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {r.modifier > 0 ? '+' : ''}{r.modifier}</span>
-					{#if r.isSavingThrow}<span class="text-xs text-gray-600"> ({r.savingThrowFromOverride ? 'saving throw bonus' : 'ability modifier'})</span>{/if}
+					{r.isSavingThrow ? 'd20' : 'Dice sum'}: {r.rolls.reduce((s, v) => s + v, 0)}<span
+						class={r.modifier > 0 ? 'text-green-400' : 'text-red-400'}
+					>
+						{r.modifier > 0 ? '+' : ''}{r.modifier}</span
+					>
+					{#if r.isSavingThrow}<span class="text-xs text-gray-600">
+							({r.savingThrowFromOverride ? 'saving throw bonus' : 'ability modifier'})</span
+						>{/if}
 				</p>
 			{/if}
 

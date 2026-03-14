@@ -6,7 +6,7 @@ import { browser } from '$app/environment';
 export const diceOverlay = $state({
 	diceReady: false,
 	virtualDiceDisabled: browser ? localStorage.getItem('dice-roller-disable-3d') === 'true' : false,
-	pendingRoll: null as { notation: string; id: number } | null,
+	pendingRoll: null as { notation: string; id: number } | null
 });
 
 // Non-reactive — stored alongside the pending roll for the onRollComplete callback.
@@ -44,6 +44,12 @@ export function setVirtualDiceDisabled(v: boolean) {
 }
 
 // Called by DiceOverlay only
-export function _setReady(v: boolean) { diceOverlay.diceReady = v; }
-export function _getRollCallback() { return _onComplete; }
-export function _clearCallback() { _onComplete = null; }
+export function _setReady(v: boolean) {
+	diceOverlay.diceReady = v;
+}
+export function _getRollCallback() {
+	return _onComplete;
+}
+export function _clearCallback() {
+	_onComplete = null;
+}

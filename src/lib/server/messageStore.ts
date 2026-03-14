@@ -14,7 +14,7 @@ export function addMessage(sessionId: string, from: string, text: string): void 
 		id: crypto.randomUUID(),
 		from,
 		text,
-		timestamp: Date.now(),
+		timestamp: Date.now()
 	};
 	const arr = store.get(sessionId) ?? [];
 	arr.push(msg);

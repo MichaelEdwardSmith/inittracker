@@ -24,10 +24,9 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 13. [Encounter Builder](#13-encounter-builder)
 14. [Spell Reference](#14-spell-reference)
 15. [Player Messaging](#15-player-messaging)
-16. [Voice Commands *(Beta)*](#16-voice-commands-beta)
+16. [Voice Commands _(Beta)_](#16-voice-commands-beta)
 17. [Audio Mixer](#17-audio-mixer)
 18. [Contact & Support](#18-contact--support)
-
 
 ---
 
@@ -71,11 +70,11 @@ On the display screen, tap **Join Session** to enable live audio effects, or **C
 
 The dashboard is your command center. It is divided into three panels:
 
-| Panel | Contents |
-|---|---|
-| **Left sidebar** | Party (Players) |
-| **Center** | Initiative Order |
-| **Right sidebar** | Enemy Library |
+| Panel             | Contents         |
+| ----------------- | ---------------- |
+| **Left sidebar**  | Party (Players)  |
+| **Center**        | Initiative Order |
+| **Right sidebar** | Enemy Library    |
 
 On mobile, the sidebars are hidden behind a bottom action bar — tap **Party** or **Enemies** to open them as overlays.
 
@@ -212,12 +211,12 @@ Click **End** to conclude the current combat. The encounter is automatically sav
 
 ### Utility Buttons
 
-| Button | What it does |
-|---|---|
-| **Reset Init** | Clears all initiative values and resets the round counter to 1 |
-| **Reset Players** | Restores all players to max HP, removes temp HP and all conditions |
-| **Clear Enemies** | Removes all enemies from the combat tracker |
-| **Save** | Saves a snapshot of the current combat to Chronicles without ending it |
+| Button            | What it does                                                           |
+| ----------------- | ---------------------------------------------------------------------- |
+| **Reset Init**    | Clears all initiative values and resets the round counter to 1         |
+| **Reset Players** | Restores all players to max HP, removes temp HP and all conditions     |
+| **Clear Enemies** | Removes all enemies from the combat tracker                            |
+| **Save**          | Saves a snapshot of the current combat to Chronicles without ending it |
 
 ---
 
@@ -245,11 +244,11 @@ For **players only**, a separate Temp HP section appears on each row:
 HP values and bars are color-coded based on the percentage of max HP remaining:
 
 | Percentage | Color |
-|---|---|
-| > 50% | Green |
-| 26–50% | Amber |
-| 1–25% | Red |
-| 0 (dead) | Grey |
+| ---------- | ----- |
+| > 50%      | Green |
+| 26–50%     | Amber |
+| 1–25%      | Red   |
+| 0 (dead)   | Grey  |
 
 ### Death Saving Throws
 
@@ -397,17 +396,18 @@ When a player first opens the viewer, an overlay asks them to tap **Join Session
 
 The viewer header contains several actions. On **desktop** they are always visible; on **mobile** they are collapsed behind a **☰ hamburger button** on the right — tap it to expand the menu.
 
-| Action | Description |
-|---|---|
-| **🔊 / 🔇** | Toggle all sound effects on or off |
-| **Message DM** | Send a private message to the DM (appears when party members exist) |
+| Action              | Description                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| **🔊 / 🔇**         | Toggle all sound effects on or off                                                               |
+| **Message DM**      | Send a private message to the DM (appears when party members exist)                              |
 | **Roll Initiative** | Roll your character's initiative and submit it to the tracker (appears when party members exist) |
-| **Contact** | Opens your email client to contact support |
-| **⛶ Fullscreen** | Toggles fullscreen mode — ideal for a TV or projector |
+| **Contact**         | Opens your email client to contact support                                                       |
+| **⛶ Fullscreen**    | Toggles fullscreen mode — ideal for a TV or projector                                            |
 
 ### What Players See
 
 **When combat is not active:**
+
 - A large sword icon with "Awaiting Combat"
 - A list of all combatants with their initiative rolls (if set)
 
@@ -450,25 +450,25 @@ A confirmation appears briefly, then the modal closes. The DM sees a live unread
 
 Combat events trigger a brief full-screen color flash:
 
-| Event | Flash Color |
-|---|---|
-| Damage taken | Red |
-| HP restored | Green |
+| Event             | Flash Color       |
+| ----------------- | ----------------- |
+| Damage taken      | Red               |
+| HP restored       | Green             |
 | Condition applied | Condition's color |
 
 ### Audio Effects
 
 All sounds are procedurally generated (no audio files required):
 
-| Event | Sound |
-|---|---|
-| Damage | Low thud sweep |
-| Heal | Ascending magical chime |
-| Condition | Resonant bell tone |
-| Temp HP granted | Bright shield shimmer |
-| Combat begins | Urgent war-horn fanfare |
-| Combat ends | Triumphant brass fanfare |
-| Turn advances | Sword whoosh |
+| Event           | Sound                    |
+| --------------- | ------------------------ |
+| Damage          | Low thud sweep           |
+| Heal            | Ascending magical chime  |
+| Condition       | Resonant bell tone       |
+| Temp HP granted | Bright shield shimmer    |
+| Combat begins   | Urgent war-horn fanfare  |
+| Combat ends     | Triumphant brass fanfare |
+| Turn advances   | Sword whoosh             |
 
 The **🔊 / 🔇 button** in the header (or hamburger menu) toggles all sounds on or off.
 
@@ -535,6 +535,7 @@ Each record card shows:
 - **Summary stats**: rounds, number of players, casualties, total events logged
 
 **Participants grid** shows every combatant with:
+
 - Their type (PC or NPC)
 - Starting HP → final HP / max HP as a dual-layer bar
 - A **☠ Slain** label for any who died
@@ -556,6 +557,7 @@ Click **Hide Chronicle** to collapse the log.
 Click the **download icon** button on any record card header to generate and download a PDF of that encounter. The button shows a spinner while it prepares; the download begins automatically once the PDF is ready.
 
 The PDF contains:
+
 - A header with the encounter number (Roman numerals), date, time, and duration
 - A stats row — rounds, number of players, casualties, and total XP (if applicable)
 - A participants table with starting HP, final HP, damage dealt, healing done, and outcome (Survived / Slain)
@@ -577,10 +579,10 @@ Click the **Dice** button (cube icon) in the dashboard header to open the Dice R
 
 ### Controls
 
-| Control | Description |
-|---|---|
-| **Die type** | Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber. |
-| **Quantity** | How many dice to roll (1–99). Use the **−** / **+** buttons or type directly. |
+| Control      | Description                                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Die type** | Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber.                      |
+| **Quantity** | How many dice to roll (1–99). Use the **−** / **+** buttons or type directly.                               |
 | **Modifier** | A flat bonus or penalty added to the dice sum (−99 to +99). Color-coded green (positive) or red (negative). |
 
 An expression preview (e.g. `2d6 + 3`) updates live above the **Roll** button so you can confirm your selection before rolling.
@@ -633,16 +635,16 @@ All saved encounters are shown as cards. Each card displays:
 
 Two buttons appear on each card:
 
-| Button | What it does |
-|---|---|
+| Button                 | What it does                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------- |
 | **Load to Initiative** | Adds all enemies in the encounter to the active initiative tracker and closes the modal |
-| **Delete** | Permanently removes the encounter from your account |
+| **Delete**             | Permanently removes the encounter from your account                                     |
 
 ### Building a New Encounter
 
 Click **New Encounter** to expand the builder form.
 
-1. **Encounter Name** — type a descriptive name (e.g. *Goblin Ambush*)
+1. **Encounter Name** — type a descriptive name (e.g. _Goblin Ambush_)
 2. **Add Enemy** — type in the search box to filter the full enemy library (built-in SRD monsters + your custom monsters); click a result to select it
 3. Set a **quantity** in the number input beside the search box
 4. Click **Add** — the enemy group appears in the staging list below; adding the same monster again increases its quantity
@@ -662,13 +664,13 @@ XP and difficulty follow the D&D 5e DMG rules:
 - **Adjusted XP** — raw XP × a multiplier based on total enemy count (×1 for 1 enemy, ×1.5 for 2, ×2 for 3–6, ×2.5 for 7–10, etc.)
 - **Thresholds** — adjusted XP is compared to the party's Easy / Medium / Hard / Deadly thresholds (per-level values from the DMG × number of players)
 
-| Badge | Meaning |
-|---|---|
+| Badge       | Meaning              |
+| ----------- | -------------------- |
 | **Trivial** | Below Easy threshold |
-| **Easy** | At or above Easy |
-| **Medium** | At or above Medium |
-| **Hard** | At or above Hard |
-| **Deadly** | At or above Deadly |
+| **Easy**    | At or above Easy     |
+| **Medium**  | At or above Medium   |
+| **Hard**    | At or above Hard     |
+| **Deadly**  | At or above Deadly   |
 
 ---
 
@@ -680,10 +682,10 @@ Click the **Spells** button in the dashboard header to open the Spell Reference 
 
 The modal is split into two panels:
 
-| Panel | Contents |
-|---|---|
-| **Left** | Search bar, filters, and the scrollable spell list |
-| **Right** | Full spell card for the selected spell |
+| Panel     | Contents                                           |
+| --------- | -------------------------------------------------- |
+| **Left**  | Search bar, filters, and the scrollable spell list |
+| **Right** | Full spell card for the selected spell             |
 
 ### Searching and Filtering
 
@@ -713,7 +715,7 @@ Dice expressions inside spell descriptions (e.g. `8d6`) appear in amber with a d
 
 ### Opening a Spell from a Stat Block
 
-When viewing a monster's stat block, any spell name in a spell list (e.g. in the monster's *Innate Spellcasting* or *Spellcasting* trait) is a clickable button. Click it to close the stat block and open the Spell Reference directly to that spell.
+When viewing a monster's stat block, any spell name in a spell list (e.g. in the monster's _Innate Spellcasting_ or _Spellcasting_ trait) is a clickable button. Click it to close the stat block and open the Spell Reference directly to that spell.
 
 ---
 
@@ -760,17 +762,17 @@ Click **🎚 Mixer** in the header to open the mixer overlay. Click the **✕** 
 
 The mixer starts with **5 channels**. Each channel strip contains:
 
-| Control | Description |
-|---|---|
-| **Label** (text field at top) | Editable channel name — click to rename |
-| **Green dot** | Pulses while audio is playing on this channel |
-| **File area** | Click to pick an audio file from your computer |
-| **Timer** | Counts down the remaining play time for the loaded clip |
-| **Volume fader** | Vertical slider controlling this channel's level |
-| **▶ Play / ■ Stop** | Start or stop playback with a 400 ms fade-out on stop |
-| **S (Solo)** | Mutes all other channels so only soloed channels play |
-| **M (Mute)** | Silences this channel without stopping playback |
-| **✕ (Delete)** | Removes the channel and clears its saved file |
+| Control                       | Description                                             |
+| ----------------------------- | ------------------------------------------------------- |
+| **Label** (text field at top) | Editable channel name — click to rename                 |
+| **Green dot**                 | Pulses while audio is playing on this channel           |
+| **File area**                 | Click to pick an audio file from your computer          |
+| **Timer**                     | Counts down the remaining play time for the loaded clip |
+| **Volume fader**              | Vertical slider controlling this channel's level        |
+| **▶ Play / ■ Stop**           | Start or stop playback with a 400 ms fade-out on stop   |
+| **S (Solo)**                  | Mutes all other channels so only soloed channels play   |
+| **M (Mute)**                  | Silences this channel without stopping playback         |
+| **✕ (Delete)**                | Removes the channel and clears its saved file           |
 
 All clips loop automatically.
 
@@ -784,12 +786,12 @@ Click the **+ Add a Channel** card at the end of the channel row to add a new ch
 
 ### What Is Remembered
 
-| Setting | Persisted |
-|---|---|
-| Channel labels | ✅ Always (localStorage) |
-| Volume levels | ✅ Always (localStorage) |
-| Master volume | ✅ Always (localStorage) |
-| Selected audio files | ✅ Chrome/Edge (File System Access API) |
+| Setting              | Persisted                                                                |
+| -------------------- | ------------------------------------------------------------------------ |
+| Channel labels       | ✅ Always (localStorage)                                                 |
+| Volume levels        | ✅ Always (localStorage)                                                 |
+| Master volume        | ✅ Always (localStorage)                                                 |
+| Selected audio files | ✅ Chrome/Edge (File System Access API)                                  |
 | Selected audio files | ⚠️ Firefox — stored in browser cache; large files may hit storage limits |
 
 ### File Persistence on Chrome / Edge
@@ -803,12 +805,12 @@ When you pick a file on Chrome or Edge, the mixer saves a lightweight **referenc
 
 - Keep the mixer closed during play — the audio keeps running and the tracker remains fully interactive.
 - Use **Solo** to quickly preview one track without changing any volume faders.
-- Label your channels with descriptive names (e.g. *Dungeon Ambience*, *Boss Fight Music*) so you can find them at a glance mid-session.
+- Label your channels with descriptive names (e.g. _Dungeon Ambience_, _Boss Fight Music_) so you can find them at a glance mid-session.
 - For the best experience on Chrome or Edge, pick files from a stable location on your drive (not a USB stick or network share) so they are always accessible when the browser requests permission.
 
 ---
 
-## 16. Voice Commands *(Beta)*
+## 16. Voice Commands _(Beta)_
 
 > ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
 
@@ -822,15 +824,15 @@ Click **Voice** to start listening. The button turns amber with a **pulsing dot*
 
 Speak clearly and naturally. Every command begins with the wake word **"Tracker"** so the app ignores normal table conversation.
 
-| Say | Action |
-|---|---|
-| **"Tracker Next"** | Advance to the next combatant's turn |
-| **"Tracker Previous"** | Go back to the previous combatant's turn |
-| **"Tracker Start Combat"** | Start the combat (equivalent to clicking **Start Combat**) |
-| **"Tracker End Combat"** | End the current combat and save it to Chronicles |
-| **"Tracker roll d20"** | Roll a single d20 — 3D dice animate on screen |
-| **"Tracker roll two d6 plus three"** | Roll 2d6+3 — number words and modifiers are supported |
-| **"Tracker roll a d100"** | Roll a d100 (percentile) |
+| Say                                  | Action                                                     |
+| ------------------------------------ | ---------------------------------------------------------- |
+| **"Tracker Next"**                   | Advance to the next combatant's turn                       |
+| **"Tracker Previous"**               | Go back to the previous combatant's turn                   |
+| **"Tracker Start Combat"**           | Start the combat (equivalent to clicking **Start Combat**) |
+| **"Tracker End Combat"**             | End the current combat and save it to Chronicles           |
+| **"Tracker roll d20"**               | Roll a single d20 — 3D dice animate on screen              |
+| **"Tracker roll two d6 plus three"** | Roll 2d6+3 — number words and modifiers are supported      |
+| **"Tracker roll a d100"**            | Roll a d100 (percentile)                                   |
 
 **Dice rolls via voice** trigger the same 3D virtual dice animation as clicking dice anywhere in the app. The result appears in a toast once the dice settle.
 

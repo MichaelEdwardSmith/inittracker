@@ -35,20 +35,38 @@
 	const SIDEBAR_DEFAULT = 288; // w-72
 	let sidebarWidth = $state(
 		browser
-			? Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, parseInt(localStorage.getItem('enemy-panel-width') ?? '') || SIDEBAR_DEFAULT))
+			? Math.min(
+					SIDEBAR_MAX,
+					Math.max(
+						SIDEBAR_MIN,
+						parseInt(localStorage.getItem('enemy-panel-width') ?? '') || SIDEBAR_DEFAULT
+					)
+				)
 			: SIDEBAR_DEFAULT
 	);
 
-	function startResize(e: MouseEvent) { e.preventDefault(); startResizeFrom(e.clientX); }
-	function startResizeTouch(e: TouchEvent) { e.preventDefault(); startResizeFrom(e.touches[0].clientX); }
+	function startResize(e: MouseEvent) {
+		e.preventDefault();
+		startResizeFrom(e.clientX);
+	}
+	function startResizeTouch(e: TouchEvent) {
+		e.preventDefault();
+		startResizeFrom(e.touches[0].clientX);
+	}
 	function startResizeFrom(startX: number) {
 		const startWidth = sidebarWidth;
 		const onMouseMove = (mv: MouseEvent) => {
-			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + (startX - mv.clientX)));
+			sidebarWidth = Math.min(
+				SIDEBAR_MAX,
+				Math.max(SIDEBAR_MIN, startWidth + (startX - mv.clientX))
+			);
 		};
 		const onTouchMove = (mv: TouchEvent) => {
 			mv.preventDefault();
-			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + (startX - mv.touches[0].clientX)));
+			sidebarWidth = Math.min(
+				SIDEBAR_MAX,
+				Math.max(SIDEBAR_MIN, startWidth + (startX - mv.touches[0].clientX))
+			);
 		};
 		const onUp = () => {
 			document.removeEventListener('mousemove', onMouseMove);
@@ -75,12 +93,24 @@
 	const PLAYER_DEFAULT = 256; // w-64
 	let playerWidth = $state(
 		browser
-			? Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, parseInt(localStorage.getItem('player-panel-width') ?? '') || PLAYER_DEFAULT))
+			? Math.min(
+					PLAYER_MAX,
+					Math.max(
+						PLAYER_MIN,
+						parseInt(localStorage.getItem('player-panel-width') ?? '') || PLAYER_DEFAULT
+					)
+				)
 			: PLAYER_DEFAULT
 	);
 
-	function startResizePlayer(e: MouseEvent) { e.preventDefault(); startResizePlayerFrom(e.clientX); }
-	function startResizePlayerTouch(e: TouchEvent) { e.preventDefault(); startResizePlayerFrom(e.touches[0].clientX); }
+	function startResizePlayer(e: MouseEvent) {
+		e.preventDefault();
+		startResizePlayerFrom(e.clientX);
+	}
+	function startResizePlayerTouch(e: TouchEvent) {
+		e.preventDefault();
+		startResizePlayerFrom(e.touches[0].clientX);
+	}
 	function startResizePlayerFrom(startX: number) {
 		const startWidth = playerWidth;
 		const onMouseMove = (mv: MouseEvent) => {
@@ -88,7 +118,10 @@
 		};
 		const onTouchMove = (mv: TouchEvent) => {
 			mv.preventDefault();
-			playerWidth = Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, startWidth + (mv.touches[0].clientX - startX)));
+			playerWidth = Math.min(
+				PLAYER_MAX,
+				Math.max(PLAYER_MIN, startWidth + (mv.touches[0].clientX - startX))
+			);
 		};
 		const onUp = () => {
 			document.removeEventListener('mousemove', onMouseMove);
@@ -113,12 +146,18 @@
 	let showDiceRoller = $state(false);
 	let showMixer = $state(false);
 	let mixerMounted = $state(false);
-	function openMixer() { mixerMounted = true; showMixer = true; }
+	function openMixer() {
+		mixerMounted = true;
+		showMixer = true;
+	}
 	let showEncounters = $state(false);
 	let showSpells = $state(false);
 	let spellToOpen = $state<string | null>(null);
 
-	setContext('openSpell', (name: string) => { spellToOpen = name; showSpells = true; });
+	setContext('openSpell', (name: string) => {
+		spellToOpen = name;
+		showSpells = true;
+	});
 	let showNotes = $state(false);
 	let showQuickRules = $state(false);
 	let showSessionManager = $state(false);
@@ -128,7 +167,9 @@
 	let isFullscreen = $state(false);
 
 	$effect(() => {
-		function onFsChange() { isFullscreen = !!document.fullscreenElement; }
+		function onFsChange() {
+			isFullscreen = !!document.fullscreenElement;
+		}
 		document.addEventListener('fullscreenchange', onFsChange);
 		return () => document.removeEventListener('fullscreenchange', onFsChange);
 	});
@@ -139,7 +180,12 @@
 	}
 
 	// ── DM inbox ──────────────────────────────────────────────────────────────────────
-	interface DmMessage { id: string; from: string; text: string; timestamp: number; }
+	interface DmMessage {
+		id: string;
+		from: string;
+		text: string;
+		timestamp: number;
+	}
 	let messages = $state<DmMessage[]>([]);
 	let seenCount = $state(0);
 	let showInbox = $state(false);
@@ -151,7 +197,9 @@
 			try {
 				const r = await fetch('/api/messages');
 				if (r.ok) messages = await r.json();
-			} catch { /* ignore */ }
+			} catch {
+				/* ignore */
+			}
 		}
 		poll();
 		const id = setInterval(poll, 5000);
@@ -197,11 +245,12 @@
 		source.onmessage = (e) => {
 			try {
 				combat.applyExternalState(JSON.parse(e.data));
-			} catch { /* ignore malformed messages */ }
+			} catch {
+				/* ignore malformed messages */
+			}
 		};
 		return () => source.close();
 	});
-
 </script>
 
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 text-white">
@@ -270,17 +319,33 @@
 					class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 				>
 					{#if showMobileMenu}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
 						</svg>
 					{/if}
 				</button>
 				{#if unreadCount > 0 && !data.isGuest}
-					<span class="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
+					<span
+						class="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black"
+					>
 						{unreadCount > 9 ? '9+' : unreadCount}
 					</span>
 				{/if}
@@ -294,177 +359,397 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div class="fixed inset-0 z-40" onclick={() => (showMobileMenu = false)}></div>
 	{/if}
-	<div class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu ? '' : 'hidden'}">
-			{#if !data.isGuest}
+	<div
+		class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu
+			? ''
+			: 'hidden'}"
+	>
+		{#if !data.isGuest}
 			<button
-				onclick={() => { openInbox(); showMobileMenu = false; }}
+				onclick={() => {
+					openInbox();
+					showMobileMenu = false;
+				}}
 				class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
-				       {unreadCount > 0 ? 'text-amber-400 hover:bg-amber-900/30' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+				       {unreadCount > 0
+					? 'text-amber-400 hover:bg-amber-900/30'
+					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
 				</svg>
 				Messages
 				{#if unreadCount > 0}
-					<span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black">
+					<span
+						class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black"
+					>
 						{unreadCount}
 					</span>
 				{/if}
 			</button>
-			{/if}
-			<button
-				onclick={() => { showNotes = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		{/if}
+		<button
+			onclick={() => {
+				showNotes = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-				</svg>
-				Notes
-			</button>
-			<button
-				onclick={() => { showDiceRoller = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+				/>
+			</svg>
+			Notes
+		</button>
+		<button
+			onclick={() => {
+				showDiceRoller = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-				</svg>
-				Dice Roller
-			</button>
-			<button
-				onclick={() => { showSpells = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+				/>
+			</svg>
+			Dice Roller
+		</button>
+		<button
+			onclick={() => {
+				showSpells = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-				</svg>
-				Spells
-			</button>
-			{#if data.showVoiceCommands}
-				<VoiceCommands mobile={true} />
-			{/if}
-			<button
-				onclick={() => { openMixer(); showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+				/>
+			</svg>
+			Spells
+		</button>
+		{#if data.showVoiceCommands}
+			<VoiceCommands mobile={true} />
+		{/if}
+		<button
+			onclick={() => {
+				openMixer();
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-				</svg>
-				Mixer
-			</button>
-			<button
-				onclick={() => { showQuickRules = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+				/>
+			</svg>
+			Mixer
+		</button>
+		<button
+			onclick={() => {
+				showQuickRules = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-				</svg>
-				Quick Reference
-			</button>
-			<button
-				onclick={() => { showEncounters = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+				/>
+			</svg>
+			Quick Reference
+		</button>
+		<button
+			onclick={() => {
+				showEncounters = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-				</svg>
-				Encounters
-			</button>
-			<button
-				onclick={() => { showSessionManager = true; showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+				/>
+			</svg>
+			Encounters
+		</button>
+		<button
+			onclick={() => {
+				showSessionManager = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5"/>
-				</svg>
-				Sessions
-			</button>
-			<a
-				href="/history"
-				onclick={() => (showMobileMenu = false)}
-				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5" />
+			</svg>
+			Sessions
+		</button>
+		<a
+			href="/history"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-				</svg>
-				Chronicle
-			</a>
-			<a
-				id="guide-link"
-				href="/guide"
-				onclick={() => (showMobileMenu = false)}
-				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+				/>
+			</svg>
+			Chronicle
+		</a>
+		<a
+			id="guide-link"
+			href="/guide"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				Guide
-			</a>
-			<a
-				href="/display/{activeSession.sessionId}"
-				target="_blank"
-				rel="noopener"
-				onclick={() => (showMobileMenu = false)}
-				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+				/>
+			</svg>
+			Guide
+		</a>
+		<a
+			href="/display/{activeSession.sessionId}"
+			target="_blank"
+			rel="noopener"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-				</svg>
-				Player Display
-			</a>
-			<a
-				href="mailto:dm@inittracker.com"
-				onclick={() => (showMobileMenu = false)}
-				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+				/>
+			</svg>
+			Player Display
+		</a>
+		<a
+			href="mailto:dm@inittracker.com"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-				</svg>
-				Contact
-			</a>
-			<button
-				onclick={() => { toggleFullscreen(); showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-			>
-				{#if isFullscreen}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"/>
-					</svg>
-					Exit Full Screen
-				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
-					</svg>
-					Full Screen
-				{/if}
-			</button>
-			<button
-				onclick={() => { theme.toggle(); showMobileMenu = false; }}
-				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-			>
-				{#if theme.isDark}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="5"/>
-						<path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-					</svg>
-					Light Mode
-				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-					</svg>
-					Dark Mode
-				{/if}
-			</button>
-			<form method="POST" action="/logout" class="border-t border-gray-700">
-				<button
-					type="submit"
-					class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-500 transition hover:bg-red-900/30 hover:text-red-400"
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+				/>
+			</svg>
+			Contact
+		</a>
+		<button
+			onclick={() => {
+				toggleFullscreen();
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			{#if isFullscreen}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-					</svg>
-					Log out
-				</button>
-			</form>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+					/>
+				</svg>
+				Exit Full Screen
+			{:else}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+					/>
+				</svg>
+				Full Screen
+			{/if}
+		</button>
+		<button
+			onclick={() => {
+				theme.toggle();
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			{#if theme.isDark}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<circle cx="12" cy="12" r="5" />
+					<path
+						stroke-linecap="round"
+						d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+					/>
+				</svg>
+				Light Mode
+			{:else}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+					/>
+				</svg>
+				Dark Mode
+			{/if}
+		</button>
+		<form method="POST" action="/logout" class="border-t border-gray-700">
+			<button
+				type="submit"
+				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-500 transition hover:bg-red-900/30 hover:text-red-400"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+					/>
+				</svg>
+				Log out
+			</button>
+		</form>
 	</div>
 
 	<!-- Main layout -->
@@ -477,14 +762,20 @@
 			<!-- Drag handle — right edge -->
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<div
-				class="absolute inset-y-0 right-0 z-10 w-3 cursor-col-resize transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
+				class="absolute inset-y-0 right-0 z-10 flex w-3 cursor-col-resize items-center justify-center transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResizePlayer}
 				ontouchstart={startResizePlayerTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
 				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
 				oncontextmenu={(e) => e.preventDefault()}
-			></div>
+			>
+				<div class="pointer-events-none flex flex-col gap-[3px]">
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+				</div>
+			</div>
 			<PlayerPanel />
 		</aside>
 
@@ -501,14 +792,20 @@
 			<!-- Drag handle — left edge -->
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<div
-				class="absolute inset-y-0 left-0 z-10 w-3 cursor-col-resize transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
+				class="absolute inset-y-0 left-0 z-10 flex w-3 cursor-col-resize items-center justify-center transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResize}
 				ontouchstart={startResizeTouch}
 				role="separator"
 				aria-label="Drag to resize panel"
 				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
 				oncontextmenu={(e) => e.preventDefault()}
-			></div>
+			>
+				<div class="pointer-events-none flex flex-col gap-[3px]">
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
+				</div>
+			</div>
 			<EnemyPanel />
 		</aside>
 	</div>
@@ -610,7 +907,10 @@
 {#if showSpells}
 	<SpellsModal
 		initialSpell={spellToOpen ?? undefined}
-		onclose={() => { showSpells = false; spellToOpen = null; }}
+		onclose={() => {
+			showSpells = false;
+			spellToOpen = null;
+		}}
 	/>
 {/if}
 
@@ -634,7 +934,10 @@
 					combat.addEnemies(template, m.count);
 				} else {
 					// Fallback: create a minimal template for monsters not in the bestiary
-					combat.addEnemies({ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' }, m.count);
+					combat.addEnemies(
+						{ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' },
+						m.count
+					);
 				}
 			}
 			showQuickRules = false;

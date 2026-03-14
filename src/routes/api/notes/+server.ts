@@ -1,7 +1,13 @@
 // GET  /api/notes  — returns { notes: NoteEntry[] } for the active game session (newest first).
 // POST /api/notes  — handles create / update / delete actions on note entries.
 import type { RequestHandler } from '@sveltejs/kit';
-import { listNotes, createNote, updateNote, deleteNote, getActiveGameSessionPublicId } from '$lib/server/dmModel';
+import {
+	listNotes,
+	createNote,
+	updateNote,
+	deleteNote,
+	getActiveGameSessionPublicId
+} from '$lib/server/dmModel';
 import { authToGameSession } from '$lib/server/sessionCache';
 
 async function resolveGameSessionId(authSessionId: string): Promise<string | null> {

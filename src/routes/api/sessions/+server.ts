@@ -23,7 +23,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const sessions = await listGameSessions(authSessionId);
-	const activeId = authToGameSession.get(authSessionId) ?? (await getActiveGameSessionPublicId(authSessionId));
+	const activeId =
+		authToGameSession.get(authSessionId) ?? (await getActiveGameSessionPublicId(authSessionId));
 	const activeSession = sessions.find((s) => s.sessionId === activeId) ?? sessions[0] ?? null;
 
 	return Response.json({ sessions, activeGameSessionId: activeSession?.id ?? null });

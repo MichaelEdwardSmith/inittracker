@@ -140,7 +140,11 @@
 				{#each toc as item}
 					<a
 						href="#{item.id}"
-						class="block truncate rounded py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 {item.label.startsWith('↳') ? 'pl-6 pr-2' : 'px-2'}"
+						class="block truncate rounded py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 {item.label.startsWith(
+							'↳'
+						)
+							? 'pr-2 pl-6'
+							: 'px-2'}"
 					>
 						{item.label}
 					</a>
@@ -162,8 +166,8 @@
 						class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
 						>/register</code
 					>
-					and fill in your first and last name, email address, a password (minimum 8 characters),
-					and a password confirmation. Click
+					and fill in your first and last name, email address, a password (minimum 8 characters), and
+					a password confirmation. Click
 					<strong class="font-semibold text-white">Create Account</strong> — you will land directly on
 					your dashboard.
 				</p>
@@ -241,14 +245,15 @@
 					On mobile, the sidebars are hidden. Tap <strong class="font-semibold text-white"
 						>Party</strong
 					>
-					or <strong class="font-semibold text-white">Enemies</strong> in the bottom action bar to open
-					them full-screen. Tap the <strong class="font-semibold text-white">✕ close button</strong> or
-					press back to return to the main tracker.
+					or <strong class="font-semibold text-white">Enemies</strong> in the bottom action bar to
+					open them full-screen. Tap the
+					<strong class="font-semibold text-white">✕ close button</strong> or press back to return to
+					the main tracker.
 				</p>
 				<p class="mt-0 mb-6 text-sm leading-relaxed">
-					On desktop, the <strong class="font-semibold text-white">Enemy panel</strong> is resizable —
-					drag its <strong class="font-semibold text-white">left edge</strong> left or right to make it
-					wider or narrower (200–520 px). Your preferred width is saved automatically.
+					On desktop, the <strong class="font-semibold text-white">Enemy panel</strong> is resizable
+					— drag its <strong class="font-semibold text-white">left edge</strong> left or right to make
+					it wider or narrower (200–520 px). Your preferred width is saved automatically.
 				</p>
 
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -265,7 +270,11 @@
 						into a green checkmark to confirm).
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Dice</strong> — opens the Dice Roller modal (see <a href="#dice-roller" class="text-amber-400 transition hover:text-amber-300">section 12</a>)
+						<strong class="font-semibold text-white">Dice</strong> — opens the Dice Roller modal
+						(see
+						<a href="#dice-roller" class="text-amber-400 transition hover:text-amber-300"
+							>section 12</a
+						>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Sessions</strong> — opens the Session Manager modal
@@ -413,19 +422,23 @@
 				<ul class="mb-4 ml-4 list-disc space-y-2 text-sm leading-relaxed">
 					<li>
 						<strong class="font-semibold text-white">Damage / HP dice</strong> — any dice expression
-						such as <code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">2d6 + 5</code>
+						such as
+						<code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">2d6 + 5</code>
 						appears in <span class="font-semibold text-amber-300">amber</span> with a dotted underline.
 						Click it to roll those dice and add any modifier.
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Attack rolls</strong> — phrases like
-						<span class="font-semibold" style="color: rgb(196,181,253);">Melee Weapon Attack: +9 to hit</span>
-						appear in violet with a dotted underline. Click the phrase to roll a
-						d20 and add the listed attack bonus.
+						<span class="font-semibold" style="color: rgb(196,181,253);"
+							>Melee Weapon Attack: +9 to hit</span
+						>
+						appear in violet with a dotted underline. Click the phrase to roll a d20 and add the listed
+						attack bonus.
 					</li>
 				</ul>
 				<p class="mb-4 text-sm leading-relaxed">
-					A result popup shows each individual die value, a modifier breakdown when one applies, and a
+					A result popup shows each individual die value, a modifier breakdown when one applies, and
+					a
 					<strong class="font-semibold text-white">Total</strong>. Use
 					<strong class="font-semibold text-white">Roll again</strong> to re-roll the same expression,
 					or click anywhere outside the popup to dismiss it.
@@ -454,41 +467,60 @@
 					Importing a Bestiary
 				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
-					Non-SRD monsters (e.g. Icewind Dale: Rime of the Frostmaiden) cannot be bundled with the app
-					because the stat blocks are WotC IP. You can import them yourself from a 5etools bestiary JSON file.
+					Non-SRD monsters (e.g. Icewind Dale: Rime of the Frostmaiden) cannot be bundled with the
+					app because the stat blocks are WotC IP. You can import them yourself from a 5etools
+					bestiary JSON file.
 				</p>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
 						Download the bestiary JSON from the
 						<strong class="font-semibold text-white">5etools data repository</strong> on GitHub
-						(e.g. <code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">bestiary-idrotf.json</code>)
+						(e.g.
+						<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+							>bestiary-idrotf.json</code
+						>)
 					</li>
 					<li>
 						In the Enemy Panel, click the <strong class="font-semibold text-white">⬆ Import</strong> button
 						next to the Custom button
 					</li>
-					<li>Select the JSON file — the app parses it entirely in your browser (nothing is uploaded to any server)</li>
-					<li>Review the monster count shown and click <strong class="font-semibold text-white">Import</strong></li>
+					<li>
+						Select the JSON file — the app parses it entirely in your browser (nothing is uploaded
+						to any server)
+					</li>
+					<li>
+						Review the monster count shown and click <strong class="font-semibold text-white"
+							>Import</strong
+						>
+					</li>
 				</ol>
 				<p class="mb-3 text-sm leading-relaxed">
 					Imported monsters appear at the top of the library, tagged with a
-					<span class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300">SOURCE</span>
-					badge (e.g. <span class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300">IDRotF</span>).
-					The badge also appears on the combatant row in the initiative tracker so you always know which
-					book a creature came from.
+					<span
+						class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300"
+						>SOURCE</span
+					>
+					badge (e.g.
+					<span
+						class="inline rounded bg-indigo-900/60 px-1 py-0.5 font-mono text-[11px] font-semibold text-indigo-300"
+						>IDRotF</span
+					>). The badge also appears on the combatant row in the initiative tracker so you always
+					know which book a creature came from.
 				</p>
 				<p class="mb-3 text-sm leading-relaxed">
 					Imported monsters carry their full stat block — click the
-					<strong class="font-semibold text-white">ℹ️ info icon</strong> to open the stat block modal just
-					like built-in SRD monsters. Re-importing the same file skips monsters that are already in your
-					library, so it is safe to import repeatedly.
+					<strong class="font-semibold text-white">ℹ️ info icon</strong> to open the stat block modal
+					just like built-in SRD monsters. Re-importing the same file skips monsters that are already
+					in your library, so it is safe to import repeatedly.
 				</p>
 				<div
 					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
 				>
 					<span class="mt-0.5 shrink-0">💡</span>
 					<span
-						>Entries that rely on another monster’s stat block (<code class="rounded bg-amber-900/40 px-1 font-mono text-xs">_copy</code>
+						>Entries that rely on another monster’s stat block (<code
+							class="rounded bg-amber-900/40 px-1 font-mono text-xs">_copy</code
+						>
 						entries) are automatically skipped during import, as they carry no independent stat data.</span
 					>
 				</div>
@@ -513,22 +545,22 @@
 					</h3>
 					<p class="mb-3 text-sm leading-relaxed">
 						When two or more combatants share the same initiative value,
-						<strong class="font-semibold text-white">▲/▼ buttons</strong> appear on the left
-						side of each tied card so you can set the tiebreak order.
+						<strong class="font-semibold text-white">▲/▼ buttons</strong> appear on the left side of each
+						tied card so you can set the tiebreak order.
 					</p>
 					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 						<li>
-							<strong class="font-semibold text-white">▲</strong> — moves this combatant above
-							the one directly ahead of it in the tied group
+							<strong class="font-semibold text-white">▲</strong> — moves this combatant above the one
+							directly ahead of it in the tied group
 						</li>
 						<li>
-							<strong class="font-semibold text-white">▼</strong> — moves this combatant below
-							the one directly behind it in the tied group
+							<strong class="font-semibold text-white">▼</strong> — moves this combatant below the one
+							directly behind it in the tied group
 						</li>
 					</ul>
 					<p class="mb-6 text-sm leading-relaxed">
-						A button is dimmed and inactive when there is no same-initiative neighbour in
-						that direction. The buttons disappear entirely once no tie exists.
+						A button is dimmed and inactive when there is no same-initiative neighbour in that
+						direction. The buttons disappear entirely once no tie exists.
 					</p>
 				</div>
 
@@ -572,9 +604,9 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Every combatant row has a <strong class="font-semibold text-white">pencil icon</strong>
-					beside the remove (✕) button. Click it to open a notes modal where you can type any
-					freeform text — spell concentration reminders, loot notes, roleplay hooks, etc. When a
-					note has been saved the icon glows
+					beside the remove (✕) button. Click it to open a notes modal where you can type any freeform
+					text — spell concentration reminders, loot notes, roleplay hooks, etc. When a note has been
+					saved the icon glows
 					<strong class="font-semibold text-amber-300">amber</strong>
 					as a visual reminder. Notes persist with the rest of the combat state.
 				</p>
@@ -586,7 +618,10 @@
 					['Button', 'What it does'],
 					[
 						['Reset Init', 'Clears all initiative values and resets the round counter to 1'],
-						['Reset Players', 'Restores all players to max HP, removes temp HP, all conditions, and clears death saves'],
+						[
+							'Reset Players',
+							'Restores all players to max HP, removes temp HP, all conditions, and clears death saves'
+						],
 						['Clear Enemies', 'Removes all enemies from the combat tracker'],
 						['Save', 'Saves a snapshot to Chronicles without ending combat']
 					]
@@ -643,12 +678,14 @@
 					</h3>
 					<p class="mb-4 text-sm leading-relaxed">
 						When a <strong class="font-semibold text-white">player</strong> drops to 0 HP they are
-						automatically marked <strong class="font-semibold text-white">Unconscious</strong>. Under
-						D&amp;D 5e rules, they must roll a death saving throw at the start of each of their turns:
-						three successes means they stabilize, three failures means they die.
+						automatically marked <strong class="font-semibold text-white">Unconscious</strong>.
+						Under D&amp;D 5e rules, they must roll a death saving throw at the start of each of
+						their turns: three successes means they stabilize, three failures means they die.
 					</p>
 
-					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">DM Tracker</p>
+					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+						DM Tracker
+					</p>
 					<p class="mb-3 text-sm leading-relaxed">
 						A <strong class="font-semibold text-white">&#9760; Death Saves</strong> row appears at the
 						bottom of that player's initiative card (visible only while HP = 0):
@@ -656,8 +693,8 @@
 					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 						<li>
 							<strong class="font-semibold text-red-400">Failures</strong> (left) and
-							<strong class="font-semibold text-green-400">Successes</strong> (right) — three
-							clickable circles each; filled with &#9760; or &#9829; when recorded
+							<strong class="font-semibold text-green-400">Successes</strong> (right) — three clickable
+							circles each; filled with &#9760; or &#9829; when recorded
 						</li>
 						<li>
 							Click a <strong class="font-semibold text-white">filled</strong> circle to decrement
@@ -665,42 +702,42 @@
 							<strong class="font-semibold text-white">empty</strong> circle to increment
 						</li>
 						<li>
-							<strong class="font-semibold text-white">Stabilize</strong> button — immediately marks
-							the player stable without needing three successes (Medicine check, bonus-action
-							healing, etc.)
+							<strong class="font-semibold text-white">Stabilize</strong> button — immediately marks the
+							player stable without needing three successes (Medicine check, bonus-action healing, etc.)
 						</li>
 						<li>
-							<strong class="font-semibold text-white">reset</strong> link — clears all saves back
-							to 0/0 for corrections
+							<strong class="font-semibold text-white">reset</strong> link — clears all saves back to
+							0/0 for corrections
 						</li>
 					</ul>
 					<p class="mb-4 text-sm leading-relaxed">
 						At <strong class="font-semibold text-red-400">3 failures</strong> a red
-						<strong class="font-semibold text-white">&#9760; Dead</strong> banner replaces the circles
-						and the <strong class="font-semibold text-white">Dead</strong> condition is auto-applied.
-						At <strong class="font-semibold text-green-400">3 successes</strong> or after clicking
-						Stabilize, a green <strong class="font-semibold text-white">&#9829; Stable</strong> banner
-						is shown instead.
+						<strong class="font-semibold text-white">&#9760; Dead</strong> banner replaces the
+						circles and the <strong class="font-semibold text-white">Dead</strong> condition is
+						auto-applied. At <strong class="font-semibold text-green-400">3 successes</strong> or
+						after clicking Stabilize, a green
+						<strong class="font-semibold text-white">&#9829; Stable</strong> banner is shown instead.
 					</p>
 
-					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Player Display</p>
+					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+						Player Display
+					</p>
 					<p class="mb-4 text-sm leading-relaxed">
 						While a player is at 0 HP the HP bar is replaced with a large
 						<strong class="font-semibold text-white">Death Saving Throws panel</strong> — two
 						columns showing failures (red skull circles) and successes (green heart circles),
 						updating in real time via SSE. A large red
 						<strong class="font-semibold text-white">&#9760; DEAD</strong> or green
-						<strong class="font-semibold text-white">&#9829; STABILIZED</strong> banner replaces the
-						circles when the outcome is decided. The panel is read-only — only the DM records the
-						rolls.
+						<strong class="font-semibold text-white">&#9829; STABILIZED</strong> banner replaces the circles
+						when the outcome is decided. The panel is read-only — only the DM records the rolls.
 					</p>
 
 					<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Recovery</p>
 					<p class="mb-6 text-sm leading-relaxed">
 						Any healing above 0 HP clears the Unconscious condition and resets the death saves
 						tracker automatically — the HP bar returns on the player display.
-						<strong class="font-semibold text-white">Reset Players</strong> also clears death saves
-						on all players.
+						<strong class="font-semibold text-white">Reset Players</strong> also clears death saves on
+						all players.
 					</p>
 				</div>
 
@@ -709,33 +746,36 @@
 						Concentration Checks
 					</h3>
 					<p class="mb-3 text-sm leading-relaxed">
-						When any combatant with the <strong class="font-semibold text-white">Concentrating</strong>
-						condition takes damage, a <strong class="font-semibold text-white">Concentration Check</strong>
+						When any combatant with the <strong class="font-semibold text-white"
+							>Concentrating</strong
+						>
+						condition takes damage, a
+						<strong class="font-semibold text-white">Concentration Check</strong>
 						modal appears automatically.
 					</p>
 					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 						<li>
 							Shows the combatant's name, the damage taken, and the
-							<strong class="font-semibold text-white">CON Save DC</strong> — the higher of 10 or
-							half the damage taken, per PHB rules.
+							<strong class="font-semibold text-white">CON Save DC</strong> — the higher of 10 or half
+							the damage taken, per PHB rules.
 						</li>
 						<li>
-							<strong class="font-semibold text-green-400">Success</strong> — closes the modal; the
-							Concentrating condition remains.
+							<strong class="font-semibold text-green-400">Success</strong> — closes the modal; the Concentrating
+							condition remains.
 						</li>
 						<li>
 							<strong class="font-semibold text-red-400">Fail</strong> — closes the modal and
 							automatically removes the
-							<strong class="font-semibold text-white">Concentrating</strong> condition from that
-							combatant.
+							<strong class="font-semibold text-white">Concentrating</strong> condition from that combatant.
 						</li>
 					</ul>
-					<p class="mb-6 text-sm leading-relaxed">
-						This applies to both players and enemies.
-					</p>
+					<p class="mb-6 text-sm leading-relaxed">This applies to both players and enemies.</p>
 				</div>
 
-				<h3 id="legendary-actions" class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+				<h3
+					id="legendary-actions"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
 					Legendary Actions
 				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
@@ -753,12 +793,12 @@
 						actions from that position onward.
 					</li>
 					<li>
-						All dots <strong class="font-semibold text-white">automatically refill</strong> at the
-						start of that creature's turn.
+						All dots <strong class="font-semibold text-white">automatically refill</strong> at the start
+						of that creature's turn.
 					</li>
 					<li>
-						Click the <strong class="font-semibold text-white">ℹ️ icon</strong> beside the dots to
-						open a quick-reference modal showing all of the creature's legendary action options.
+						Click the <strong class="font-semibold text-white">ℹ️ icon</strong> beside the dots to open
+						a quick-reference modal showing all of the creature's legendary action options.
 					</li>
 				</ul>
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
@@ -767,15 +807,20 @@
 					show the tracker.
 				</p>
 
-				<h3 id="lair-actions" class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+				<h3
+					id="lair-actions"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
 					Lair Actions
 				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
-					Some powerful creatures can take <strong class="font-semibold text-white">lair actions</strong>
+					Some powerful creatures can take <strong class="font-semibold text-white"
+						>lair actions</strong
+					>
 					— special effects that trigger on initiative count 20. Click the
 					<strong class="font-semibold text-white">building icon</strong> on any enemy card to add a
-					purple <strong class="font-semibold text-purple-300">Lair Actions</strong> card to the
-					initiative order.
+					purple <strong class="font-semibold text-purple-300">Lair Actions</strong> card to the initiative
+					order.
 				</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
@@ -783,20 +828,20 @@
 						visible when no lair card already exists for that creature.
 					</li>
 					<li>
-						The lair card sits at <strong class="font-semibold text-white">initiative count 20</strong>
-						and participates in the normal turn order — it is highlighted amber when it is that
-						card's turn, prompting you to resolve the lair action.
+						The lair card sits at <strong class="font-semibold text-white"
+							>initiative count 20</strong
+						>
+						and participates in the normal turn order — it is highlighted amber when it is that card's
+						turn, prompting you to resolve the lair action.
 					</li>
-					<li>
-						Only one lair card can exist per creature template at a time.
-					</li>
+					<li>Only one lair card can exist per creature template at a time.</li>
 					<li>
 						When the <strong class="font-semibold text-white">last instance</strong> of a creature is
 						removed from combat, its lair card is automatically removed as well.
 					</li>
 					<li>
-						Click the <strong class="font-semibold text-white">✕ button</strong> on the lair card to
-						dismiss it manually at any time.
+						Click the <strong class="font-semibold text-white">✕ button</strong> on the lair card to dismiss
+						it manually at any time.
 					</li>
 				</ul>
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
@@ -810,10 +855,9 @@
 				<p class="text-sm leading-relaxed">
 					Enemy AC is hidden from the player display by default. Check the <strong
 						class="font-semibold text-white">Show AC</strong
-					> checkbox on an enemy row to reveal it to players. If there are multiple enemies of the
-					same type (e.g. three Goblins), toggling the checkbox on any one of them automatically
-					applies the same setting to all others of that type. Players always see their own
-					character's AC.
+					> checkbox on an enemy row to reveal it to players. If there are multiple enemies of the same
+					type (e.g. three Goblins), toggling the checkbox on any one of them automatically applies the
+					same setting to all others of that type. Players always see their own character's AC.
 				</p>
 			</section>
 
@@ -834,7 +878,9 @@
 					> appears on their row. Enemies at 0 HP are simply removed from the turn order.
 				</p>
 
-				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Standard conditions</p>
+				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+					Standard conditions
+				</p>
 				<div class="mb-4 flex flex-wrap gap-2">
 					{#each conditions as c}
 						<span
@@ -844,7 +890,9 @@
 					{/each}
 				</div>
 
-				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Advantage / Disadvantage</p>
+				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+					Advantage / Disadvantage
+				</p>
 				<div class="mb-6 flex flex-wrap gap-2">
 					{#each advConditions as c}
 						<span
@@ -854,10 +902,10 @@
 					{/each}
 				</div>
 				<p class="mb-4 text-sm leading-relaxed">
-					The four <strong class="font-semibold text-white">Adv / Disadv</strong> conditions behave
-					like any other condition — they appear as color-coded badges on both the DM dashboard and
-					the player display. Use them to track situational modifiers such as the effects of spells,
-					terrain, or class abilities that grant or impose advantage or disadvantage.
+					The four <strong class="font-semibold text-white">Adv / Disadv</strong> conditions behave like
+					any other condition — they appear as color-coded badges on both the DM dashboard and the player
+					display. Use them to track situational modifiers such as the effects of spells, terrain, or
+					class abilities that grant or impose advantage or disadvantage.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1107,11 +1155,12 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					When the chronicle is generated, the XP total for the encounter is automatically
-					calculated from each <strong class="font-semibold text-white">slain enemy's Challenge
-					Rating</strong> using the standard D&amp;D 5e XP-by-CR table. Expand a record to see the
-					full breakdown — each slain enemy listed with its CR and XP value, a total, and an
-					<strong class="font-semibold text-white">even split per player</strong> if your party is
-					listed.
+					calculated from each <strong class="font-semibold text-white"
+						>slain enemy's Challenge Rating</strong
+					>
+					using the standard D&amp;D 5e XP-by-CR table. Expand a record to see the full breakdown —
+					each slain enemy listed with its CR and XP value, a total, and an
+					<strong class="font-semibold text-white">even split per player</strong> if your party is listed.
 				</p>
 
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1136,9 +1185,9 @@
 					Exporting to PDF
 				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">download icon</strong> button on any
-					record card header to generate and download a PDF of that encounter. The button shows a
-					spinner while it prepares; the file downloads automatically once ready.
+					Click the <strong class="font-semibold text-white">download icon</strong> button on any record
+					card header to generate and download a PDF of that encounter. The button shows a spinner while
+					it prepares; the file downloads automatically once ready.
 				</p>
 				<p class="mb-3 text-sm leading-relaxed">The PDF contains:</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
@@ -1181,24 +1230,33 @@
 				{@render h2('12', 'Dice Roller')}
 
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">Dice</strong> button (cube icon) in the
-					dashboard header to open the Dice Roller modal. It is available at any time — in or out of combat.
+					Click the <strong class="font-semibold text-white">Dice</strong> button (cube icon) in the dashboard
+					header to open the Dice Roller modal. It is available at any time — in or out of combat.
 				</p>
 
-				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Controls</h3>
+				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Controls
+				</h3>
 				{@render dataTable(
 					['Control', 'Description'],
 					[
-						['Die type', 'Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber.'],
+						[
+							'Die type',
+							'Seven buttons: d4, d6, d8, d10, d12, d20, d100. The selected die is highlighted amber.'
+						],
 						['Quantity', 'How many dice to roll (1–99). Use the − / + buttons or type directly.'],
-						['Modifier', 'A flat bonus or penalty added to the dice sum (−99 to +99). Displayed green when positive, red when negative.']
+						[
+							'Modifier',
+							'A flat bonus or penalty added to the dice sum (−99 to +99). Displayed green when positive, red when negative.'
+						]
 					]
 				)}
 
 				<p class="mt-4 mb-4 text-sm leading-relaxed">
 					An expression preview (e.g.
-					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">2d6 + 3</code>)
-					updates live above the <strong class="font-semibold text-white">Roll</strong> button so you
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>2d6 + 3</code
+					>) updates live above the <strong class="font-semibold text-white">Roll</strong> button so you
 					can confirm your selection before rolling.
 				</p>
 
@@ -1208,16 +1266,17 @@
 				</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
-						<strong class="font-semibold text-white">Individual die tiles</strong> — one tile per die rolled.
-						On a d20, a natural <strong class="font-semibold text-amber-300">20</strong> glows amber
-						and a natural <strong class="font-semibold text-red-400">1</strong> glows red.
+						<strong class="font-semibold text-white">Individual die tiles</strong> — one tile per
+						die rolled. On a d20, a natural <strong class="font-semibold text-amber-300">20</strong>
+						glows amber and a natural <strong class="font-semibold text-red-400">1</strong> glows red.
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Dice sum + modifier</strong> — shown when a modifier
 						is set, breaking down the raw sum and the adjustment separately.
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Total</strong> — the final result in large amber text.
+						<strong class="font-semibold text-white">Total</strong> — the final result in large amber
+						text.
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Roll Again</strong> — re-rolls the same die type,
@@ -1225,35 +1284,45 @@
 					</li>
 				</ul>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Roll History</h3>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Roll History
+				</h3>
 				<p class="mb-6 text-sm leading-relaxed">
-					The last <strong class="font-semibold text-white">5 rolls</strong> are listed below the result
-					in a compact log showing the expression (e.g.
-					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">2d6+3</code>),
-					the individual die values, and the total. The most recent roll is fully opaque; older entries
-					are dimmed.
+					The last <strong class="font-semibold text-white">5 rolls</strong> are listed below the
+					result in a compact log showing the expression (e.g.
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>2d6+3</code
+					>), the individual die values, and the total. The most recent roll is fully opaque; older
+					entries are dimmed.
 				</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Virtual Dice</h3>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Virtual Dice
+				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
-					By default, every roll triggers a full-screen 3D physics animation — dice tumble across the
-					screen with metal sound effects, and the face values that come to rest are the
-					<strong class="font-semibold text-white">authoritative result</strong>. The result panel only
-					appears once the dice have settled.
+					By default, every roll triggers a full-screen 3D physics animation — dice tumble across
+					the screen with metal sound effects, and the face values that come to rest are the
+					<strong class="font-semibold text-white">authoritative result</strong>. The result panel
+					only appears once the dice have settled.
 				</p>
 				<p class="mb-3 text-sm leading-relaxed">
-					Virtual dice fire on <strong class="font-semibold text-white">every roll surface in the app</strong>:
+					Virtual dice fire on <strong class="font-semibold text-white"
+						>every roll surface in the app</strong
+					>:
 				</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>The Dice Roller modal</li>
-					<li>Clickable dice expressions in monster stat blocks (damage rolls, attack rolls, saving throws, skill checks)</li>
+					<li>
+						Clickable dice expressions in monster stat blocks (damage rolls, attack rolls, saving
+						throws, skill checks)
+					</li>
 					<li>Clickable dice in spell descriptions and legendary action text</li>
 					<li>Voice command dice rolls (e.g. <em>"Tracker roll d20"</em>)</li>
 				</ul>
 				<p class="text-sm leading-relaxed">
-					A <strong class="font-semibold text-white">Disable virtual dice</strong> checkbox at the
-					bottom of the Dice Roller modal switches to instant results with no animation. The preference
-					is saved between sessions and applies to every roll surface across the entire app.
+					A <strong class="font-semibold text-white">Disable virtual dice</strong> checkbox at the bottom
+					of the Dice Roller modal switches to instant results with no animation. The preference is saved
+					between sessions and applies to every roll surface across the entire app.
 				</p>
 			</section>
 
@@ -1262,10 +1331,10 @@
 				{@render h2('13', 'Encounter Builder')}
 
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">Encounters</strong> button (clipboard
-					icon) in the dashboard header to open the Encounter Builder. Use it to plan and save
-					reusable combat encounters — add enemies, preview XP and difficulty, then load the whole
-					encounter into the initiative tracker with one click.
+					Click the <strong class="font-semibold text-white">Encounters</strong> button (clipboard icon)
+					in the dashboard header to open the Encounter Builder. Use it to plan and save reusable combat
+					encounters — add enemies, preview XP and difficulty, then load the whole encounter into the
+					initiative tracker with one click.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1275,39 +1344,38 @@
 					Two small inputs at the top of the modal set the
 					<strong class="font-semibold text-white">Party size</strong> (number of players) and
 					<strong class="font-semibold text-white">Level</strong> (average party level). These affect
-					the difficulty display for every encounter card and the builder preview. They are not
-					persisted — adjust them each session as needed.
+					the difficulty display for every encounter card and the builder preview. They are not persisted
+					— adjust them each session as needed.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Saved Encounters
 				</h3>
-				<p class="mb-3 text-sm leading-relaxed">
-					Each saved encounter card shows:
-				</p>
+				<p class="mb-3 text-sm leading-relaxed">Each saved encounter card shows:</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li><strong class="font-semibold text-white">Name</strong> — the encounter's title</li>
 					<li>
-						<strong class="font-semibold text-white">Difficulty badge</strong> — Trivial / Easy /
-						Medium / Hard / Deadly, calculated from adjusted XP vs. the D&D 5e DMG thresholds for the
-						current party size and level
+						<strong class="font-semibold text-white">Difficulty badge</strong> — Trivial / Easy / Medium
+						/ Hard / Deadly, calculated from adjusted XP vs. the D&D 5e DMG thresholds for the current
+						party size and level
 					</li>
 					<li>
-						<strong class="font-semibold text-white">XP total</strong> — adjusted XP (raw XP × the
-						standard enemy-count multiplier)
+						<strong class="font-semibold text-white">XP total</strong> — adjusted XP (raw XP × the standard
+						enemy-count multiplier)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Enemy summary</strong> — e.g.
 						<em>2× Goblin, 1× Hobgoblin</em>
 					</li>
 				</ul>
-				<p class="mb-4 text-sm leading-relaxed">
-					Two action buttons appear on each card:
-				</p>
+				<p class="mb-4 text-sm leading-relaxed">Two action buttons appear on each card:</p>
 				{@render dataTable(
 					['Button', 'What it does'],
 					[
-						['Load to Initiative', 'Adds all enemies in the encounter to the active tracker and closes the modal'],
+						[
+							'Load to Initiative',
+							'Adds all enemies in the encounter to the active tracker and closes the modal'
+						],
 						['Delete', 'Permanently removes the encounter from your account']
 					]
 				)}
@@ -1316,8 +1384,8 @@
 					Building a New Encounter
 				</h3>
 				<p class="mb-3 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">New Encounter</strong> to expand the
-					builder form.
+					Click <strong class="font-semibold text-white">New Encounter</strong> to expand the builder
+					form.
 				</p>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
@@ -1325,44 +1393,47 @@
 						<em>Goblin Ambush</em>)
 					</li>
 					<li>
-						Type in the <strong class="font-semibold text-white">enemy search box</strong> to filter
-						the full library (SRD monsters + your custom monsters); click a result to select it
-					</li>
-					<li>Set a <strong class="font-semibold text-white">quantity</strong> in the number input beside the search box</li>
-					<li>
-						Click <strong class="font-semibold text-white">Add</strong> — the group appears in the
-						staging list; adding the same monster again merges the quantities
-					</li>
-					<li>Remove any staged entry with the <strong class="font-semibold text-white">✕</strong> button on its row</li>
-					<li>
-						The <strong class="font-semibold text-amber-300">live preview</strong> below the list
-						shows the adjusted XP total and difficulty badge as you build
+						Type in the <strong class="font-semibold text-white">enemy search box</strong> to filter the
+						full library (SRD monsters + your custom monsters); click a result to select it
 					</li>
 					<li>
-						Click <strong class="font-semibold text-white">Save Encounter</strong> — it appears
-						immediately in the saved list above
+						Set a <strong class="font-semibold text-white">quantity</strong> in the number input beside
+						the search box
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Add</strong> — the group appears in the staging
+						list; adding the same monster again merges the quantities
+					</li>
+					<li>
+						Remove any staged entry with the <strong class="font-semibold text-white">✕</strong> button
+						on its row
+					</li>
+					<li>
+						The <strong class="font-semibold text-amber-300">live preview</strong> below the list shows
+						the adjusted XP total and difficulty badge as you build
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Save Encounter</strong> — it appears immediately
+						in the saved list above
 					</li>
 				</ol>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Difficulty Calculation
 				</h3>
-				<p class="mb-3 text-sm leading-relaxed">
-					Difficulty follows the D&D 5e DMG rules:
-				</p>
+				<p class="mb-3 text-sm leading-relaxed">Difficulty follows the D&D 5e DMG rules:</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
-						<strong class="font-semibold text-white">Raw XP</strong> — each enemy's CR XP value ×
-						its quantity, summed
+						<strong class="font-semibold text-white">Raw XP</strong> — each enemy's CR XP value × its
+						quantity, summed
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Adjusted XP</strong> — raw XP × a multiplier
-						based on total enemy count (×1 for 1, ×1.5 for 2, ×2 for 3–6, ×2.5 for 7–10, etc.)
+						<strong class="font-semibold text-white">Adjusted XP</strong> — raw XP × a multiplier based
+						on total enemy count (×1 for 1, ×1.5 for 2, ×2 for 3–6, ×2.5 for 7–10, etc.)
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Thresholds</strong> — adjusted XP is compared
-						to the party's Easy / Medium / Hard / Deadly values (per-level DMG values × number of
-						players)
+						<strong class="font-semibold text-white">Thresholds</strong> — adjusted XP is compared to
+						the party's Easy / Medium / Hard / Deadly values (per-level DMG values × number of players)
 					</li>
 				</ul>
 				{@render dataTable(
@@ -1377,9 +1448,8 @@
 				)}
 
 				<p class="mt-4 text-sm leading-relaxed text-gray-500">
-					<strong class="text-gray-400">Note:</strong> Encounters are stored at the account level
-					and are available in every game session — build your library once, reuse it across
-					campaigns.
+					<strong class="text-gray-400">Note:</strong> Encounters are stored at the account level and
+					are available in every game session — build your library once, reuse it across campaigns.
 				</p>
 			</section>
 
@@ -1388,8 +1458,8 @@
 				{@render h2('14', 'Spell Reference')}
 
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">Spells</strong> button in the dashboard
-					header to open the Spell Reference modal. It is available at any time — in or out of combat.
+					Click the <strong class="font-semibold text-white">Spells</strong> button in the dashboard header
+					to open the Spell Reference modal. It is available at any time — in or out of combat.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1400,43 +1470,41 @@
 				</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
-						<strong class="font-semibold text-white">Search bar</strong> — filters the list by name
-						in real time
+						<strong class="font-semibold text-white">Search bar</strong> — filters the list by name in
+						real time
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Level</strong> — All Levels, Cantrip, or 1st
-						through 9th
+						<strong class="font-semibold text-white">Level</strong> — All Levels, Cantrip, or 1st through
+						9th
 					</li>
 					<li>
-						<strong class="font-semibold text-white">School</strong> — Abjuration, Conjuration,
-						Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation
+						<strong class="font-semibold text-white">School</strong> — Abjuration, Conjuration, Divination,
+						Enchantment, Evocation, Illusion, Necromancy, or Transmutation
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Class</strong> — Artificer, Bard, Cleric,
-						Druid, Paladin, Ranger, Sorcerer, Warlock, or Wizard
+						<strong class="font-semibold text-white">Class</strong> — Artificer, Bard, Cleric, Druid,
+						Paladin, Ranger, Sorcerer, Warlock, or Wizard
 					</li>
 				</ul>
 				<p class="mb-4 text-sm leading-relaxed">
 					Each spell in the list shows its name and a level badge —
 					<strong class="font-semibold text-emerald-400">C</strong> for cantrips,
-					<strong class="font-semibold text-white">1–9</strong> for leveled spells. Click any spell
-					to open its card in the right panel.
+					<strong class="font-semibold text-white">1–9</strong> for leveled spells. Click any spell to
+					open its card in the right panel.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Spell Card
 				</h3>
-				<p class="mb-3 text-sm leading-relaxed">
-					The right panel shows the full spell details:
-				</p>
+				<p class="mb-3 text-sm leading-relaxed">The right panel shows the full spell details:</p>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
-						<strong class="font-semibold text-violet-300">Name</strong>, level, school, and
-						source badge
+						<strong class="font-semibold text-violet-300">Name</strong>, level, school, and source
+						badge
 					</li>
 					<li>
-						<strong class="font-semibold text-amber-300">Ritual</strong> badge — shown when the
-						spell can be cast as a ritual
+						<strong class="font-semibold text-amber-300">Ritual</strong> badge — shown when the spell
+						can be cast as a ritual
 					</li>
 					<li>
 						Info grid — <strong class="font-semibold text-white">Casting Time</strong>,
@@ -1446,12 +1514,11 @@
 					</li>
 					<li>Full <strong class="font-semibold text-white">description</strong></li>
 					<li>
-						<strong class="font-semibold text-amber-300">At Higher Levels</strong> — shown when
-						applicable
+						<strong class="font-semibold text-amber-300">At Higher Levels</strong> — shown when applicable
 					</li>
 					<li>
-						<strong class="font-semibold text-white">Available to</strong> — the classes that can
-						learn the spell
+						<strong class="font-semibold text-white">Available to</strong> — the classes that can learn
+						the spell
 					</li>
 				</ul>
 
@@ -1461,9 +1528,9 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Dice expressions inside spell descriptions (e.g.
 					<code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">8d6</code>) appear
-					in <span class="font-semibold text-amber-300">amber</span> with a dotted underline. Click
-					one to roll it — the same result popup used in stat blocks appears, showing individual die
-					values and the total.
+					in <span class="font-semibold text-amber-300">amber</span> with a dotted underline. Click one
+					to roll it — the same result popup used in stat blocks appears, showing individual die values
+					and the total.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1471,8 +1538,8 @@
 				</h3>
 				<p class="text-sm leading-relaxed">
 					When viewing a monster's stat block, any spell name in a spell list (e.g. in a
-					<em>Spellcasting</em> or <em>Innate Spellcasting</em> trait) is a clickable button. Click
-					it to close the stat block and open the Spell Reference directly to that spell.
+					<em>Spellcasting</em> or <em>Innate Spellcasting</em> trait) is a clickable button. Click it
+					to close the stat block and open the Spell Reference directly to that spell.
 				</p>
 			</section>
 
@@ -1491,17 +1558,17 @@
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
-						Click the <strong class="font-semibold text-white">✉ Message DM</strong> button in the
-						viewer header
+						Click the <strong class="font-semibold text-white">✉ Message DM</strong> button in the viewer
+						header
 					</li>
 					<li>
-						Choose which <strong class="font-semibold text-white">party member</strong> you are
-						sending as from the dropdown — the list shows all players currently in the session
+						Choose which <strong class="font-semibold text-white">party member</strong> you are sending
+						as from the dropdown — the list shows all players currently in the session
 					</li>
 					<li>Type your message in the text field</li>
 					<li>
-						Click <strong class="font-semibold text-white">Send</strong> — the modal closes and
-						your message is delivered instantly
+						Click <strong class="font-semibold text-white">Send</strong> — the modal closes and your message
+						is delivered instantly
 					</li>
 				</ol>
 
@@ -1510,10 +1577,9 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white">Messages</strong> button in the dashboard
-					header shows an <strong class="font-semibold text-amber-300">amber badge</strong> with the
-					unread count whenever new messages arrive. On mobile, the same badge appears on the
-					hamburger menu button so you always know there is something waiting even with the menu
-					collapsed.
+					header shows an <strong class="font-semibold text-amber-300">amber badge</strong> with the unread
+					count whenever new messages arrive. On mobile, the same badge appears on the hamburger menu
+					button so you always know there is something waiting even with the menu collapsed.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1531,8 +1597,8 @@
 					Clearing Messages
 				</h3>
 				<p class="text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">Clear all</strong> in the inbox header to
-					delete all messages for the current session. This action cannot be undone.
+					Click <strong class="font-semibold text-white">Clear all</strong> in the inbox header to delete
+					all messages for the current session. This action cannot be undone.
 				</p>
 			</section>
 
@@ -1549,284 +1615,422 @@
 				</p>
 			</section>
 			{#if data.showVoiceCommands}
-			<!-- 17 ─────────────────────────────────────── -->
-			<section id="voice-commands">
-				{@render h2('17', 'Voice Commands (Beta)')}
+				<!-- 17 ─────────────────────────────────────── -->
+				<section id="voice-commands">
+					{@render h2('17', 'Voice Commands (Beta)')}
 
-				<div class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300">
-					⚠️ <strong>Beta feature — still in testing.</strong> Voice commands use the browser's built-in
-					Speech Recognition API, currently supported in <strong class="text-white">Chrome and Edge</strong>
-					only. Results may vary based on microphone quality, accent, and ambient noise.
-				</div>
+					<div
+						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
+					>
+						⚠️ <strong>Beta feature — still in testing.</strong> Voice commands use the browser's
+						built-in Speech Recognition API, currently supported in
+						<strong class="text-white">Chrome and Edge</strong>
+						only. Results may vary based on microphone quality, accent, and ambient noise.
+					</div>
 
-				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">🎤 Voice</strong> button in the dashboard
-					header to control the tracker hands-free. The button only appears when your browser supports
-					speech recognition.
-				</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						Click the <strong class="font-semibold text-white">🎤 Voice</strong> button in the dashboard
+						header to control the tracker hands-free. The button only appears when your browser supports
+						speech recognition.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Activating
-				</h3>
-				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">Voice</strong> to start listening — the button
-					turns amber with a <strong class="font-semibold text-amber-300">pulsing dot</strong>. Your
-					browser will ask for microphone permission the first time. Click the button again to stop.
-				</p>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Activating
+					</h3>
+					<p class="mb-4 text-sm leading-relaxed">
+						Click <strong class="font-semibold text-white">Voice</strong> to start listening — the
+						button turns amber with a
+						<strong class="font-semibold text-amber-300">pulsing dot</strong>. Your browser will ask
+						for microphone permission the first time. Click the button again to stop.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Commands
-				</h3>
-				<p class="mb-3 text-sm leading-relaxed">
-					Every command begins with <strong class="font-semibold text-amber-300">"Tracker"</strong> so
-					the app ignores normal table conversation. A confirmation toast appears at the bottom of the
-					screen when a command is recognized.
-				</p>
-				{@render dataTable(
-					['Say', 'Action'],
-					[
-						['"Tracker Next"', 'Advance to the next combatant\'s turn'],
-						['"Tracker Previous"', 'Go back to the previous combatant\'s turn'],
-						['"Tracker Start Combat"', 'Start combat (same as clicking Start Combat)'],
-						['"Tracker End Combat"', 'End combat and save it to Chronicles'],
-						['"Tracker roll d20"', 'Roll a single d20 — 3D dice animate on screen'],
-						['"Tracker roll two d6 plus three"', 'Roll 2d6+3 — number words and modifiers supported'],
-						['"Tracker roll a d100"', 'Roll a d100 (percentile)']
-					]
-				)}
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Commands
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						Every command begins with <strong class="font-semibold text-amber-300">"Tracker"</strong
+						> so the app ignores normal table conversation. A confirmation toast appears at the bottom
+						of the screen when a command is recognized.
+					</p>
+					{@render dataTable(
+						['Say', 'Action'],
+						[
+							['"Tracker Next"', "Advance to the next combatant's turn"],
+							['"Tracker Previous"', "Go back to the previous combatant's turn"],
+							['"Tracker Start Combat"', 'Start combat (same as clicking Start Combat)'],
+							['"Tracker End Combat"', 'End combat and save it to Chronicles'],
+							['"Tracker roll d20"', 'Roll a single d20 — 3D dice animate on screen'],
+							[
+								'"Tracker roll two d6 plus three"',
+								'Roll 2d6+3 — number words and modifiers supported'
+							],
+							['"Tracker roll a d100"', 'Roll a d100 (percentile)']
+						]
+					)}
 
-				<p class="mt-4 mb-4 text-sm leading-relaxed">
-					Dice rolls via voice trigger the same
-					<strong class="font-semibold text-white">3D virtual dice animation</strong> as clicking dice
-					anywhere in the app. The result appears in a toast once the dice have settled. Number words
-					(<em>one</em> through <em>twenty</em>, <em>hundred</em>) and modifiers
-					(<em>plus</em> / <em>minus</em> followed by a number) are recognized.
-				</p>
+					<p class="mt-4 mb-4 text-sm leading-relaxed">
+						Dice rolls via voice trigger the same
+						<strong class="font-semibold text-white">3D virtual dice animation</strong> as clicking
+						dice anywhere in the app. The result appears in a toast once the dice have settled.
+						Number words (<em>one</em> through <em>twenty</em>, <em>hundred</em>) and modifiers (<em
+							>plus</em
+						>
+						/ <em>minus</em> followed by a number) are recognized.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Tips
-				</h3>
-				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
-					<li>Commands only fire when valid — <em>Next</em> and <em>Previous</em> do nothing if combat hasn't started</li>
-					<li>If <strong class="font-semibold text-white">"Tracker End Combat"</strong> isn't recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"</li>
-					<li>The mic listens continuously and auto-restarts after silence; no need to re-click between commands</li>
-					<li>Virtual dice can be disabled via the <strong class="font-semibold text-white">Disable virtual dice</strong> checkbox in the Dice Roller modal — voice rolls will then return instant results</li>
-				</ul>
-			</section>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tips</h3>
+					<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							Commands only fire when valid — <em>Next</em> and <em>Previous</em> do nothing if combat
+							hasn't started
+						</li>
+						<li>
+							If <strong class="font-semibold text-white">"Tracker End Combat"</strong> isn't recognized,
+							try saying it slightly more slowly — speech engines sometimes hear "end" as "and"
+						</li>
+						<li>
+							The mic listens continuously and auto-restarts after silence; no need to re-click
+							between commands
+						</li>
+						<li>
+							Virtual dice can be disabled via the <strong class="font-semibold text-white"
+								>Disable virtual dice</strong
+							> checkbox in the Dice Roller modal — voice rolls will then return instant results
+						</li>
+					</ul>
+				</section>
 
-			<!-- 18 ─────────────────────────────────────── -->
-			<section id="audio-mixer">
-				{@render h2('18', 'Audio Mixer')}
+				<!-- 18 ─────────────────────────────────────── -->
+				<section id="audio-mixer">
+					{@render h2('18', 'Audio Mixer')}
 
-				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the
-					dashboard header to open a full-screen ambient audio board. Layer music, atmosphere, and
-					sound effects across as many channels as you need — audio keeps playing in the background
-					when the mixer is closed.
-				</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the dashboard
+						header to open a full-screen ambient audio board. Layer music, atmosphere, and sound effects
+						across as many channels as you need — audio keeps playing in the background when the mixer
+						is closed.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Channel Controls
-				</h3>
-				{@render dataTable(
-					['Control', 'What it does'],
-					[
-						['Label', 'Click to rename the channel — saved automatically'],
-						['Coloured dot', 'Status: grey = stopped, green = playing, amber = solo active'],
-						['File area', 'Click to pick an audio file from your device (see File Persistence below)'],
-						['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
-						['▶ / ■ button', 'Start or stop playback on this channel'],
-						['S (Solo)', 'Solo this channel — mutes all others while active'],
-						['M (Mute)', 'Mute this channel without stopping playback'],
-						['✕', 'Remove the channel and delete its saved file reference']
-					]
-				)}
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Channel Controls
+					</h3>
+					{@render dataTable(
+						['Control', 'What it does'],
+						[
+							['Label', 'Click to rename the channel — saved automatically'],
+							['Coloured dot', 'Status: grey = stopped, green = playing, amber = solo active'],
+							[
+								'File area',
+								'Click to pick an audio file from your device (see File Persistence below)'
+							],
+							['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
+							['▶ / ■ button', 'Start or stop playback on this channel'],
+							['S (Solo)', 'Solo this channel — mutes all others while active'],
+							['M (Mute)', 'Mute this channel without stopping playback'],
+							['✕', 'Remove the channel and delete its saved file reference']
+						]
+					)}
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Master Channel
-				</h3>
-				<p class="mb-4 text-sm leading-relaxed">
-					The leftmost strip is the master channel. Its fader scales every channel simultaneously.
-					The <strong class="font-semibold text-white">Stop All</strong> button stops playback on
-					every channel at once.
-				</p>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Master Channel
+					</h3>
+					<p class="mb-4 text-sm leading-relaxed">
+						The leftmost strip is the master channel. Its fader scales every channel simultaneously.
+						The <strong class="font-semibold text-white">Stop All</strong> button stops playback on every
+						channel at once.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Adding Channels
-				</h3>
-				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end
-					of the mixer to append a new blank channel. The mixer starts with 5 channels; there is no
-					maximum.
-				</p>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Adding Channels
+					</h3>
+					<p class="mb-4 text-sm leading-relaxed">
+						Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end of
+						the mixer to append a new blank channel. The mixer starts with 5 channels; there is no maximum.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					What Is Remembered
-				</h3>
-				{@render dataTable(
-					['Setting', 'Remembered?'],
-					[
-						['Channel count &amp; order', 'Always — saved in browser storage'],
-						['Channel labels', 'Always — saved in browser storage'],
-						['Volume faders (per channel &amp; master)', 'Always — saved in browser storage'],
-						['Selected audio files', 'Chrome / Edge only (see below) — not remembered on Firefox']
-					]
-				)}
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						What Is Remembered
+					</h3>
+					{@render dataTable(
+						['Setting', 'Remembered?'],
+						[
+							['Channel count &amp; order', 'Always — saved in browser storage'],
+							['Channel labels', 'Always — saved in browser storage'],
+							['Volume faders (per channel &amp; master)', 'Always — saved in browser storage'],
+							['Selected audio files', 'Chrome / Edge only (see below) — not remembered on Firefox']
+						]
+					)}
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					File Persistence (Chrome &amp; Edge)
-				</h3>
-				<p class="mb-4 text-sm leading-relaxed">
-					On Chrome and Edge, the mixer uses the browser's
-					<strong class="font-semibold text-white">File System Access API</strong> to remember your
-					chosen files — it stores a lightweight reference to the file on disk rather than copying
-					audio data into browser storage, so there are no storage quota issues.
-				</p>
-				<p class="mb-2 text-sm font-semibold text-gray-200">Same browser session</p>
-				<p class="mb-4 text-sm leading-relaxed">
-					Files reload silently — permission is already held and nothing extra is required.
-				</p>
-				<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
-				<p class="mb-4 text-sm leading-relaxed">
-					The browser clears file permissions on exit. Channels that need re-authorization show a
-					<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber.
-					Click it once — the browser shows a one-time permission prompt — and the file reloads
-					automatically.
-				</p>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						File Persistence (Chrome &amp; Edge)
+					</h3>
+					<p class="mb-4 text-sm leading-relaxed">
+						On Chrome and Edge, the mixer uses the browser's
+						<strong class="font-semibold text-white">File System Access API</strong> to remember your
+						chosen files — it stores a lightweight reference to the file on disk rather than copying audio
+						data into browser storage, so there are no storage quota issues.
+					</p>
+					<p class="mb-2 text-sm font-semibold text-gray-200">Same browser session</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						Files reload silently — permission is already held and nothing extra is required.
+					</p>
+					<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						The browser clears file permissions on exit. Channels that need re-authorization show a
+						<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber. Click
+						it once — the browser shows a one-time permission prompt — and the file reloads automatically.
+					</p>
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Tips
-				</h3>
-				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
-					<li>The mixer keeps playing after you close it — run combat while music plays in the background</li>
-					<li>Use <strong class="font-semibold text-white">Solo</strong> to quickly audition a single channel without changing other faders</li>
-					<li>Use <strong class="font-semibold text-white">Mute</strong> for a clean cut; setting the fader to 0 still leaves the channel technically active</li>
-					<li>On Firefox, audio files must be re-selected after every page reload; consider keeping the mixer tab open for long sessions</li>
-					<li><strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset faders or unload files</li>
-				</ul>
-			</section>
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tips</h3>
+					<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							The mixer keeps playing after you close it — run combat while music plays in the
+							background
+						</li>
+						<li>
+							Use <strong class="font-semibold text-white">Solo</strong> to quickly audition a single
+							channel without changing other faders
+						</li>
+						<li>
+							Use <strong class="font-semibold text-white">Mute</strong> for a clean cut; setting the
+							fader to 0 still leaves the channel technically active
+						</li>
+						<li>
+							On Firefox, audio files must be re-selected after every page reload; consider keeping
+							the mixer tab open for long sessions
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset
+							faders or unload files
+						</li>
+					</ul>
+				</section>
 
-			<section id="quick-reference">
-				{@render h2('19', 'Quick Reference')}
+				<section id="quick-reference">
+					{@render h2('19', 'Quick Reference')}
 
-				<p class="mb-4 text-sm leading-relaxed">
-					The <strong class="font-semibold text-white">Quick Reference</strong> panel is a full-screen reference opened from the <strong class="font-semibold text-white">☰ hamburger menu</strong> in the DM header. It is organised into 17 tabs covering both rules lookups and procedural generation tools.
-				</p>
+					<p class="mb-4 text-sm leading-relaxed">
+						The <strong class="font-semibold text-white">Quick Reference</strong> panel is a
+						full-screen reference opened from the
+						<strong class="font-semibold text-white">☰ hamburger menu</strong> in the DM header. It is
+						organised into 17 tabs covering both rules lookups and procedural generation tools.
+					</p>
 
-				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Rules Tabs</h3>
-				<p class="mb-3 text-sm leading-relaxed">
-					Twelve tabs provide concise, table-formatted lookups for the most commonly referenced 5e rules mid-session:
-				</p>
-				{@render dataTable(
-					['Tab', 'Contents'],
-					[
-						['Actions in Combat', 'Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, Ready, Search, Use an Object'],
-						['Bonus Actions', 'Common bonus actions by class and spell, two-weapon fighting, and healing potions'],
-						['Movement & Position', 'Speed rules, difficult terrain, jumping, climbing, swimming, and prone'],
-						['Conditions', 'All 15 standard 5e conditions with full mechanical effects and colour-coded badges'],
-						['Concentration', 'Damage thresholds, what breaks concentration, and how to check'],
-						['Death Saving Throws', 'Stabilisation, success/failure thresholds, and instant death rules'],
-						['Exhaustion', 'All 6 exhaustion levels and their effects'],
-						['Cover', 'Half cover (+2 AC/Dex saves), three-quarters cover (+5), and total cover'],
-						['Resting', 'Short rest and long rest rules including what each restores'],
-						['Skills & Ability Checks', 'All 18 skills with their associated ability scores and common DC benchmarks'],
-						['Spellcasting', 'Spell slot usage, concentration, components, and ritual casting'],
-						['Magic & Casting', 'Spell attack rolls, saving throws, counterspell, and multi-class slot tables'],
-					]
-				)}
-			</section>
+					<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Rules Tabs
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						Twelve tabs provide concise, table-formatted lookups for the most commonly referenced 5e
+						rules mid-session:
+					</p>
+					{@render dataTable(
+						['Tab', 'Contents'],
+						[
+							[
+								'Actions in Combat',
+								'Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, Ready, Search, Use an Object'
+							],
+							[
+								'Bonus Actions',
+								'Common bonus actions by class and spell, two-weapon fighting, and healing potions'
+							],
+							[
+								'Movement & Position',
+								'Speed rules, difficult terrain, jumping, climbing, swimming, and prone'
+							],
+							[
+								'Conditions',
+								'All 15 standard 5e conditions with full mechanical effects and colour-coded badges'
+							],
+							['Concentration', 'Damage thresholds, what breaks concentration, and how to check'],
+							[
+								'Death Saving Throws',
+								'Stabilisation, success/failure thresholds, and instant death rules'
+							],
+							['Exhaustion', 'All 6 exhaustion levels and their effects'],
+							['Cover', 'Half cover (+2 AC/Dex saves), three-quarters cover (+5), and total cover'],
+							['Resting', 'Short rest and long rest rules including what each restores'],
+							[
+								'Skills & Ability Checks',
+								'All 18 skills with their associated ability scores and common DC benchmarks'
+							],
+							['Spellcasting', 'Spell slot usage, concentration, components, and ritual casting'],
+							[
+								'Magic & Casting',
+								'Spell attack rolls, saving throws, counterspell, and multi-class slot tables'
+							]
+						]
+					)}
+				</section>
 
-			<section id="qr-name-generator">
-				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Name Generator</h3>
+				<section id="qr-name-generator">
+					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Name Generator
+					</h3>
 
-				<p class="mb-3 text-sm leading-relaxed">
-					Generate fantasy names for NPCs, locations, and taverns on the fly.
-				</p>
-				{@render dataTable(
-					['Control', 'Description'],
-					[
-						['Type dropdown', 'Human (Male/Female), Elf, Dwarf, Halfling, Gnome, Orc, Tiefling, Dragonborn, Tavern Name, Town / Village'],
-						['First Names', 'Generates 10 first names for the selected type'],
-						['Surnames', 'Generates 10 surnames (disabled for Tavern / Town types)'],
-						['Selecting a name', 'Click any name to select it (amber highlight). Click again to deselect. First name and surname can each be selected independently.'],
-						['Save to Notes', 'Appears once a first name is selected. Appends "Party met Firstname Lastname, a Dwarf" to the latest session note, or creates a new note if none exists.'],
-					]
-				)}
-			</section>
+					<p class="mb-3 text-sm leading-relaxed">
+						Generate fantasy names for NPCs, locations, and taverns on the fly.
+					</p>
+					{@render dataTable(
+						['Control', 'Description'],
+						[
+							[
+								'Type dropdown',
+								'Human (Male/Female), Elf, Dwarf, Halfling, Gnome, Orc, Tiefling, Dragonborn, Tavern Name, Town / Village'
+							],
+							['First Names', 'Generates 10 first names for the selected type'],
+							['Surnames', 'Generates 10 surnames (disabled for Tavern / Town types)'],
+							[
+								'Selecting a name',
+								'Click any name to select it (amber highlight). Click again to deselect. First name and surname can each be selected independently.'
+							],
+							[
+								'Save to Notes',
+								'Appears once a first name is selected. Appends "Party met Firstname Lastname, a Dwarf" to the latest session note, or creates a new note if none exists.'
+							]
+						]
+					)}
+				</section>
 
-			<section id="qr-weather-travel">
-				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Weather &amp; Travel</h3>
+				<section id="qr-weather-travel">
+					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Weather &amp; Travel
+					</h3>
 
-				<p class="mb-3 text-sm leading-relaxed">
-					Generate a week of weather and calculate adjusted travel speeds for any biome and season combination.
-				</p>
-				{@render dataTable(
-					['Feature', 'Description'],
-					[
-						['Season', 'Spring, Summer, Autumn, or Winter — affects temperature ranges and weather probability'],
-						['Biome', 'Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, or Jungle'],
-						['Generate Week', 'Produces a 7-day table with conditions across five daily time slots: Dawn, Morning, Midday, Afternoon, Night'],
-						['Travel Pace table', 'Fast / Normal / Slow rates (ft/min, mph, miles/day) dynamically adjusted by the biome × season multiplier; a modifier badge shows the combined value'],
-						['Navigation DC table', 'Suggested Survival check DCs for navigation by terrain type'],
-					]
-				)}
-			</section>
+					<p class="mb-3 text-sm leading-relaxed">
+						Generate a week of weather and calculate adjusted travel speeds for any biome and season
+						combination.
+					</p>
+					{@render dataTable(
+						['Feature', 'Description'],
+						[
+							[
+								'Season',
+								'Spring, Summer, Autumn, or Winter — affects temperature ranges and weather probability'
+							],
+							['Biome', 'Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, or Jungle'],
+							[
+								'Generate Week',
+								'Produces a 7-day table with conditions across five daily time slots: Dawn, Morning, Midday, Afternoon, Night'
+							],
+							[
+								'Travel Pace table',
+								'Fast / Normal / Slow rates (ft/min, mph, miles/day) dynamically adjusted by the biome × season multiplier; a modifier badge shows the combined value'
+							],
+							['Navigation DC table', 'Suggested Survival check DCs for navigation by terrain type']
+						]
+					)}
+				</section>
 
-			<section id="qr-shop-generator">
-				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Shop Generator</h3>
+				<section id="qr-shop-generator">
+					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Shop Generator
+					</h3>
 
-				<p class="mb-3 text-sm leading-relaxed">
-					Instantly stock a shop with a random inventory scaled to the town's wealth.
-				</p>
-				{@render dataTable(
-					['Control', 'Description'],
-					[
-						['Shop type', '11 options: General Store, Weapon Shop, Armor Shop, Alchemist, Magic Shop, Jeweler, Tavern, Bookshop, Herbalist, Fletcher, Stable'],
-						['Town affluence', '6 tiers from Impoverished (×0.6 prices, 4–6 items) to Opulent (×2.2 prices, 14–18 items)'],
-						['Stock Shop', 'Generates a random shop name and a full item list with three price columns'],
-						['Price columns', '😊 Friendly (−15%), 😐 Neutral (base), 😠 Hostile (+25%)'],
-						['Magic items', 'Higher affluence tiers include magic items of appropriate rarity (Common → Legendary) with colour-coded rarity badges'],
-						['Item detail', 'Click any item row to open a detail overlay with the item description, rarity badge, and all three prices'],
-						['Save to Notes', 'Appends "The party went to [Shop Name], a common general store" to the latest session note, or creates one if none exists'],
-					]
-				)}
-			</section>
+					<p class="mb-3 text-sm leading-relaxed">
+						Instantly stock a shop with a random inventory scaled to the town's wealth.
+					</p>
+					{@render dataTable(
+						['Control', 'Description'],
+						[
+							[
+								'Shop type',
+								'11 options: General Store, Weapon Shop, Armor Shop, Alchemist, Magic Shop, Jeweler, Tavern, Bookshop, Herbalist, Fletcher, Stable'
+							],
+							[
+								'Town affluence',
+								'6 tiers from Impoverished (×0.6 prices, 4–6 items) to Opulent (×2.2 prices, 14–18 items)'
+							],
+							[
+								'Stock Shop',
+								'Generates a random shop name and a full item list with three price columns'
+							],
+							['Price columns', '😊 Friendly (−15%), 😐 Neutral (base), 😠 Hostile (+25%)'],
+							[
+								'Magic items',
+								'Higher affluence tiers include magic items of appropriate rarity (Common → Legendary) with colour-coded rarity badges'
+							],
+							[
+								'Item detail',
+								'Click any item row to open a detail overlay with the item description, rarity badge, and all three prices'
+							],
+							[
+								'Save to Notes',
+								'Appends "The party went to [Shop Name], a common general store" to the latest session note, or creates one if none exists'
+							]
+						]
+					)}
+				</section>
 
-			<section id="qr-encounter-generator">
-				<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">Random Encounter Generator</h3>
+				<section id="qr-encounter-generator">
+					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Random Encounter Generator
+					</h3>
 
-				<p class="mb-3 text-sm leading-relaxed">
-					Generate a complete, balanced random encounter — flavor text, monsters, XP breakdown, tactics, and terrain — tuned to your party's level and chosen difficulty.
-				</p>
-				{@render dataTable(
-					['Control', 'Description'],
-					[
-						['Biome / Terrain', '12 options: Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, Jungle, Underdark, Urban, Dungeon, Ruins'],
-						['Party Size', '1–8 players — affects the XP multiplier and monster count'],
-						['Party Level', '1–20 — sets the XP budget tier from the DMG thresholds'],
-						['Difficulty', 'Easy, Medium, Hard, or Deadly — directly controls the XP budget and scales monster strength'],
-					]
-				)}
+					<p class="mb-3 text-sm leading-relaxed">
+						Generate a complete, balanced random encounter — flavor text, monsters, XP breakdown,
+						tactics, and terrain — tuned to your party's level and chosen difficulty.
+					</p>
+					{@render dataTable(
+						['Control', 'Description'],
+						[
+							[
+								'Biome / Terrain',
+								'12 options: Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, Jungle, Underdark, Urban, Dungeon, Ruins'
+							],
+							['Party Size', '1–8 players — affects the XP multiplier and monster count'],
+							['Party Level', '1–20 — sets the XP budget tier from the DMG thresholds'],
+							[
+								'Difficulty',
+								'Easy, Medium, Hard, or Deadly — directly controls the XP budget and scales monster strength'
+							]
+						]
+					)}
 
-				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Generated Output</h3>
-				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
-					<li><strong class="font-semibold text-white">Title & difficulty badge</strong> — encounter name with a colour-coded actual difficulty label (may differ from the requested difficulty)</li>
-					<li><strong class="font-semibold text-white">Scene flavor text</strong> — atmospheric description of the encounter setting</li>
-					<li><strong class="font-semibold text-white">Encounter description</strong> — archetype-flavored narration (Solo, Pack, Mixed, Ambush, or Swarm)</li>
-					<li><strong class="font-semibold text-white">Monster list</strong> — each monster with count and individual XP value</li>
-					<li><strong class="font-semibold text-white">XP breakdown</strong> — Raw XP → Multiplier → Adjusted XP → XP per player</li>
-					<li><strong class="font-semibold text-white">Tactics</strong> — how the monsters behave in this specific encounter</li>
-					<li><strong class="font-semibold text-white">Terrain feature</strong> — an environmental detail to use during the fight</li>
-				</ul>
-				{@render dataTable(
-					['Button', 'Action'],
-					[
-						['Roll Again', 'Re-generates a new encounter with the same settings'],
-						['Add to Initiative', 'Clears current enemies, loads the generated monsters with auto-rolled initiative, and closes the Quick Reference panel'],
-					]
-				)}
-			</section>
-
+					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Generated Output
+					</h3>
+					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+						<li>
+							<strong class="font-semibold text-white">Title & difficulty badge</strong> — encounter name
+							with a colour-coded actual difficulty label (may differ from the requested difficulty)
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Scene flavor text</strong> — atmospheric description
+							of the encounter setting
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Encounter description</strong> — archetype-flavored
+							narration (Solo, Pack, Mixed, Ambush, or Swarm)
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Monster list</strong> — each monster with count
+							and individual XP value
+						</li>
+						<li>
+							<strong class="font-semibold text-white">XP breakdown</strong> — Raw XP → Multiplier → Adjusted
+							XP → XP per player
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Tactics</strong> — how the monsters behave in this
+							specific encounter
+						</li>
+						<li>
+							<strong class="font-semibold text-white">Terrain feature</strong> — an environmental detail
+							to use during the fight
+						</li>
+					</ul>
+					{@render dataTable(
+						['Button', 'Action'],
+						[
+							['Roll Again', 'Re-generates a new encounter with the same settings'],
+							[
+								'Add to Initiative',
+								'Clears current enemies, loads the generated monsters with auto-rolled initiative, and closes the Quick Reference panel'
+							]
+						]
+					)}
+				</section>
 			{/if}
 		</main>
 	</div>

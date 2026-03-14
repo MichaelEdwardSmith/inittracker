@@ -47,7 +47,7 @@ html.light body {
 html.light {
 	/* Gray scale: flip dark→light and light→dark so all bg-gray-* and text-gray-*
 	   automatically get the right light-mode value without touching components. */
-	--color-gray-50:  #030712;
+	--color-gray-50: #030712;
 	--color-gray-100: #111827;
 	--color-gray-200: #1f2937;
 	--color-gray-300: #374151;
@@ -63,38 +63,38 @@ html.light {
 
 	/* Amber: darken the pale shades so they're readable on light backgrounds;
 	   flip the dark badge-background shades to pale equivalents. */
-	--color-amber-300: #b45309;   /* amber-700 */
-	--color-amber-400: #d97706;   /* amber-600 */
-	--color-amber-900: #fffbeb;   /* amber-50  */
-	--color-amber-950: #fef3c7;   /* amber-100 */
+	--color-amber-300: #b45309; /* amber-700 */
+	--color-amber-400: #d97706; /* amber-600 */
+	--color-amber-900: #fffbeb; /* amber-50  */
+	--color-amber-950: #fef3c7; /* amber-100 */
 
 	/* Red */
-	--color-red-300: #b91c1c;     /* red-700 */
-	--color-red-400: #dc2626;     /* red-600 */
-	--color-red-900: #fef2f2;     /* red-50   */
+	--color-red-300: #b91c1c; /* red-700 */
+	--color-red-400: #dc2626; /* red-600 */
+	--color-red-900: #fef2f2; /* red-50   */
 
 	/* Blue */
-	--color-blue-300: #1d4ed8;    /* blue-700 */
-	--color-blue-400: #2563eb;    /* blue-600 */
-	--color-blue-900: #eff6ff;    /* blue-50  */
+	--color-blue-300: #1d4ed8; /* blue-700 */
+	--color-blue-400: #2563eb; /* blue-600 */
+	--color-blue-900: #eff6ff; /* blue-50  */
 
 	/* Green */
-	--color-green-300: #15803d;   /* green-700 */
-	--color-green-400: #16a34a;   /* green-600 */
-	--color-green-900: #f0fdf4;   /* green-50  */
+	--color-green-300: #15803d; /* green-700 */
+	--color-green-400: #16a34a; /* green-600 */
+	--color-green-900: #f0fdf4; /* green-50  */
 
 	/* Indigo */
-	--color-indigo-300: #4338ca;  /* indigo-700 */
-	--color-indigo-900: #eef2ff;  /* indigo-50  */
+	--color-indigo-300: #4338ca; /* indigo-700 */
+	--color-indigo-900: #eef2ff; /* indigo-50  */
 
 	/* Violet */
-	--color-violet-300: #6d28d9;  /* violet-700 */
+	--color-violet-300: #6d28d9; /* violet-700 */
 
 	/* Yellow / THP */
-	--color-yellow-300: #a16207;  /* yellow-700 */
-	--color-yellow-700: #fef08a;  /* yellow-200 */
-	--color-yellow-800: #fef9c3;  /* yellow-100 */
-	--color-yellow-900: #fefce8;  /* yellow-50  */
+	--color-yellow-300: #a16207; /* yellow-700 */
+	--color-yellow-700: #fef08a; /* yellow-200 */
+	--color-yellow-800: #fef9c3; /* yellow-100 */
+	--color-yellow-900: #fefce8; /* yellow-50  */
 }
 
 html.light * {

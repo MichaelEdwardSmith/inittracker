@@ -52,12 +52,18 @@ interface RawMonster {
 	'Armor Class': string;
 	'Hit Points': string;
 	Speed: string;
-	STR: string; STR_mod: string;
-	DEX: string; DEX_mod: string;
-	CON: string; CON_mod: string;
-	INT: string; INT_mod: string;
-	WIS: string; WIS_mod: string;
-	CHA: string; CHA_mod: string;
+	STR: string;
+	STR_mod: string;
+	DEX: string;
+	DEX_mod: string;
+	CON: string;
+	CON_mod: string;
+	INT: string;
+	INT_mod: string;
+	WIS: string;
+	WIS_mod: string;
+	CHA: string;
+	CHA_mod: string;
 	'Saving Throws'?: string;
 	Skills?: string;
 	'Damage Immunities'?: string;
@@ -101,12 +107,18 @@ const detailMap = new Map<string, MonsterDetail>(
 			armorClass: m['Armor Class'],
 			hitPoints: m['Hit Points'],
 			speed: m.Speed,
-			str: parseInt(m.STR), strMod: m.STR_mod,
-			dex: parseInt(m.DEX), dexMod: m.DEX_mod,
-			con: parseInt(m.CON), conMod: m.CON_mod,
-			int: parseInt(m.INT), intMod: m.INT_mod,
-			wis: parseInt(m.WIS), wisMod: m.WIS_mod,
-			cha: parseInt(m.CHA), chaMod: m.CHA_mod,
+			str: parseInt(m.STR),
+			strMod: m.STR_mod,
+			dex: parseInt(m.DEX),
+			dexMod: m.DEX_mod,
+			con: parseInt(m.CON),
+			conMod: m.CON_mod,
+			int: parseInt(m.INT),
+			intMod: m.INT_mod,
+			wis: parseInt(m.WIS),
+			wisMod: m.WIS_mod,
+			cha: parseInt(m.CHA),
+			chaMod: m.CHA_mod,
 			savingThrows: m['Saving Throws'],
 			skills: m.Skills,
 			damageImmunities: m['Damage Immunities'],
@@ -149,12 +161,12 @@ export const CONDITIONS = [
 	'Poisoned',
 	'Prone',
 	'Restrained',
-	'Stunned',
+	'Stunned'
 ] as const;
 
 export const ADV_CONDITIONS = [
 	'Advantage For',
 	'Advantage Against',
 	'Disadvantage For',
-	'Disadvantage Against',
+	'Disadvantage Against'
 ] as const;

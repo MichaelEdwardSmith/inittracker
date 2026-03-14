@@ -38,7 +38,9 @@
 			if (e.key === 'Escape') save();
 		}}
 	>
-		<div class="flex w-full max-w-md flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
+		<div
+			class="flex w-full max-w-md flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
+		>
 			<!-- Header -->
 			<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 				<div>
@@ -65,7 +67,11 @@
 
 			<!-- Body -->
 			<div style="height: 260px" class="flex min-h-0 overflow-hidden p-4">
-				<RichTextEditor value={noteValue} onchange={(v) => (noteValue = v)} placeholder="Enter notes for this combatant…" />
+				<RichTextEditor
+					value={noteValue}
+					onchange={(v) => (noteValue = v)}
+					placeholder="Enter notes for this combatant…"
+				/>
 			</div>
 
 			<!-- Footer -->

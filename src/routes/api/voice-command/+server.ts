@@ -61,7 +61,10 @@ Respond with ONLY valid JSON, no explanation:
 	let text = response.content[0].type === 'text' ? response.content[0].text.trim() : '';
 
 	// Strip markdown code fences if present (e.g. ```json ... ```)
-	text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+	text = text
+		.replace(/^```(?:json)?\s*/i, '')
+		.replace(/\s*```$/, '')
+		.trim();
 
 	try {
 		const parsed = JSON.parse(text);

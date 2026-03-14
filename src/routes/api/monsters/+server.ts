@@ -2,10 +2,7 @@
 // POST /api/monsters  — creates a new custom monster; validates name, AC, HP, CR, and type.
 import type { RequestHandler } from './$types';
 import type { CustomMonster } from '$lib/types';
-import {
-	getCustomMonsters,
-	addCustomMonster
-} from '$lib/server/dmModel';
+import { getCustomMonsters, addCustomMonster } from '$lib/server/dmModel';
 
 export const GET: RequestHandler = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
@@ -28,14 +25,20 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 	const ac = Number(body.ac);
 	const hp = Number(body.hp);
-	if (!Number.isInteger(ac) || ac < 1) return Response.json({ error: 'AC must be at least 1.' }, { status: 400 });
-	if (!Number.isInteger(hp) || hp < 1) return Response.json({ error: 'HP must be at least 1.' }, { status: 400 });
+	if (!Number.isInteger(ac) || ac < 1)
+		return Response.json({ error: 'AC must be at least 1.' }, { status: 400 });
+	if (!Number.isInteger(hp) || hp < 1)
+		return Response.json({ error: 'HP must be at least 1.' }, { status: 400 });
 
-	const cr = String(body.cr ?? '1').trim().slice(0, 10) || '1';
+	const cr =
+		String(body.cr ?? '1')
+			.trim()
+			.slice(0, 10) || '1';
 	const monsterType = String(body.monsterType ?? 'Humanoid').slice(0, 50);
 
 	const imgUrl = typeof body.imgUrl === 'string' && body.imgUrl ? body.imgUrl : undefined;
-	const source = typeof body.source === 'string' && body.source ? body.source.slice(0, 30) : undefined;
+	const source =
+		typeof body.source === 'string' && body.source ? body.source.slice(0, 30) : undefined;
 
 	const monster: CustomMonster = {
 		id: crypto.randomUUID(),

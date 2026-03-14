@@ -20,10 +20,7 @@
 	let customMonsters = $state<CustomMonster[]>([]);
 
 	// Combined template list (custom first, then built-ins)
-	const allTemplates = $derived<EnemyTemplate[]>([
-		...customMonsters,
-		...ENEMY_TEMPLATES
-	]);
+	const allTemplates = $derived<EnemyTemplate[]>([...customMonsters, ...ENEMY_TEMPLATES]);
 
 	// ── Build-new-encounter form ─────────────────────────────────────────────
 	let showBuilder = $state(false);
@@ -44,10 +41,7 @@
 
 	async function fetchAll() {
 		loadingList = true;
-		const [encRes, monRes] = await Promise.all([
-			fetch('/api/encounters'),
-			fetch('/api/monsters')
-		]);
+		const [encRes, monRes] = await Promise.all([fetch('/api/encounters'), fetch('/api/monsters')]);
 		if (encRes.ok) encounters = await encRes.json();
 		if (monRes.ok) customMonsters = await monRes.json();
 		loadingList = false;
@@ -74,9 +68,7 @@
 	// ── Template search filter ───────────────────────────────────────────────
 	const filteredTemplates = $derived(
 		enemySearch.trim()
-			? allTemplates.filter((t) =>
-					t.name.toLowerCase().includes(enemySearch.toLowerCase())
-			  )
+			? allTemplates.filter((t) => t.name.toLowerCase().includes(enemySearch.toLowerCase()))
 			: allTemplates
 	);
 
@@ -120,9 +112,7 @@
 		const existing = stagingEnemies.find((e) => e.templateName === pickedTemplate);
 		if (existing) {
 			stagingEnemies = stagingEnemies.map((e) =>
-				e.templateName === pickedTemplate
-					? { ...e, quantity: e.quantity + pickedQty }
-					: e
+				e.templateName === pickedTemplate ? { ...e, quantity: e.quantity + pickedQty } : e
 			);
 		} else {
 			stagingEnemies = [...stagingEnemies, { templateName: pickedTemplate, quantity: pickedQty }];
@@ -138,8 +128,14 @@
 
 	async function saveEncounter() {
 		formError = '';
-		if (!encName.trim()) { formError = 'Encounter name is required.'; return; }
-		if (stagingEnemies.length === 0) { formError = 'Add at least one enemy.'; return; }
+		if (!encName.trim()) {
+			formError = 'Encounter name is required.';
+			return;
+		}
+		if (stagingEnemies.length === 0) {
+			formError = 'Add at least one enemy.';
+			return;
+		}
 		saving = true;
 		try {
 			const res = await fetch('/api/encounters', {
@@ -183,7 +179,9 @@
 	role="dialog"
 	aria-modal="true"
 >
-	<div class="flex h-full max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900 shadow-2xl">
+	<div
+		class="flex h-full max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900 shadow-2xl"
+	>
 		<!-- Header -->
 		<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-3">
 			<h2 class="text-base font-bold tracking-widest text-amber-400 uppercase">Encounters</h2>
@@ -214,7 +212,14 @@
 					class="rounded p-1 text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
@@ -236,8 +241,12 @@
 								<div class="mb-1.5 flex items-start justify-between gap-2">
 									<span class="font-semibold text-white">{enc.name}</span>
 									<div class="flex shrink-0 items-center gap-2">
-										<span class="rounded px-2 py-0.5 text-xs font-bold {difficultyColor(diff)}">{diff}</span>
-										<span class="text-xs text-amber-300">{encounterXpDisplay(enc).toLocaleString()} XP</span>
+										<span class="rounded px-2 py-0.5 text-xs font-bold {difficultyColor(diff)}"
+											>{diff}</span
+										>
+										<span class="text-xs text-amber-300"
+											>{encounterXpDisplay(enc).toLocaleString()} XP</span
+										>
 									</div>
 								</div>
 								<p class="mb-2 text-xs text-gray-400">
@@ -248,8 +257,15 @@
 										onclick={() => loadToInitiative(enc)}
 										class="flex items-center gap-1 rounded border border-amber-700 bg-amber-900/30 px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-900/60"
 									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-3.5 w-3.5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="2"
+										>
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 										</svg>
 										Load to Initiative
 									</button>
@@ -257,8 +273,19 @@
 										onclick={() => deleteEncounter(enc.id)}
 										class="flex items-center gap-1 rounded border border-red-900 px-2 py-1 text-xs text-red-500 transition hover:border-red-700 hover:text-red-400"
 									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-3.5 w-3.5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="2"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+											/>
 										</svg>
 										Delete
 									</button>
@@ -270,13 +297,23 @@
 			</div>
 
 			<!-- Build new encounter toggle -->
-			<div class="shrink-0 px-5 pb-5 pt-4">
+			<div class="shrink-0 px-5 pt-4 pb-5">
 				<button
-					onclick={() => { showBuilder = !showBuilder; formError = ''; }}
+					onclick={() => {
+						showBuilder = !showBuilder;
+						formError = '';
+					}}
 					class="flex items-center gap-1.5 rounded border border-gray-600 px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 					</svg>
 					{showBuilder ? 'Cancel' : 'New Encounter'}
 				</button>
@@ -285,7 +322,9 @@
 					<div class="mt-4 rounded border border-gray-700 bg-gray-800/40 p-4">
 						<!-- Encounter name -->
 						<label class="mb-3 block">
-							<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase">Encounter Name</span>
+							<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase"
+								>Encounter Name</span
+							>
 							<input
 								type="text"
 								bind:value={encName}
@@ -297,7 +336,8 @@
 
 						<!-- Enemy picker -->
 						<div class="mb-3">
-							<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase">Add Enemy</span>
+							<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase">Add Enemy</span
+							>
 							<div class="flex gap-2">
 								<div class="relative flex-1">
 									<input
@@ -307,12 +347,17 @@
 										class="w-full rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
 									/>
 									{#if enemySearch && filteredTemplates.length > 0}
-										<div class="absolute left-0 right-0 top-full z-10 mt-0.5 max-h-48 overflow-y-auto rounded border border-gray-700 bg-gray-900 shadow-lg">
+										<div
+											class="absolute top-full right-0 left-0 z-10 mt-0.5 max-h-48 overflow-y-auto rounded border border-gray-700 bg-gray-900 shadow-lg"
+										>
 											{#each filteredTemplates.slice(0, 50) as tmpl}
 												<button
 													type="button"
 													class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm hover:bg-gray-700"
-													onclick={() => { pickedTemplate = tmpl.name; enemySearch = tmpl.name; }}
+													onclick={() => {
+														pickedTemplate = tmpl.name;
+														enemySearch = tmpl.name;
+													}}
 												>
 													<span class="text-gray-200">{tmpl.name}</span>
 													<span class="ml-2 shrink-0 text-xs text-gray-500">CR {tmpl.cr}</span>
@@ -341,11 +386,15 @@
 						<!-- Staged enemies -->
 						{#if stagingEnemies.length > 0}
 							<div class="mb-3">
-								<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase">Enemies in Encounter</span>
+								<span class="mb-1 block text-xs font-semibold text-gray-400 uppercase"
+									>Enemies in Encounter</span
+								>
 								<div class="flex flex-col gap-1">
 									{#each stagingEnemies as entry}
 										{@const tmpl = allTemplates.find((t) => t.name === entry.templateName)}
-										<div class="flex items-center justify-between rounded border border-gray-700 bg-gray-800 px-3 py-1.5">
+										<div
+											class="flex items-center justify-between rounded border border-gray-700 bg-gray-800 px-3 py-1.5"
+										>
 											<span class="text-sm text-gray-200">
 												{entry.quantity}× {entry.templateName}
 												{#if tmpl}
@@ -357,8 +406,19 @@
 												aria-label="Remove enemy"
 												class="text-gray-600 transition hover:text-red-400"
 											>
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-													<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-3.5 w-3.5"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+													stroke-width="2"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														d="M6 18L18 6M6 6l12 12"
+													/>
 												</svg>
 											</button>
 										</div>
@@ -367,8 +427,14 @@
 
 								<!-- XP / difficulty preview -->
 								<div class="mt-2 flex items-center gap-3 text-xs text-gray-400">
-									<span>Total XP: <span class="font-semibold text-amber-300">{stagingAdjustedXp.toLocaleString()}</span></span>
-									<span class="rounded px-2 py-0.5 font-bold {difficultyColor(stagingDifficulty)}">{stagingDifficulty}</span>
+									<span
+										>Total XP: <span class="font-semibold text-amber-300"
+											>{stagingAdjustedXp.toLocaleString()}</span
+										></span
+									>
+									<span class="rounded px-2 py-0.5 font-bold {difficultyColor(stagingDifficulty)}"
+										>{stagingDifficulty}</span
+									>
 									<span class="text-gray-600">(for {partySize} players, lvl {partyLevel})</span>
 								</div>
 							</div>

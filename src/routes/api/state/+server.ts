@@ -26,7 +26,6 @@ function getClients(sessionId: string): Set<ReadableStreamDefaultController<Uint
 	return sessionClients.get(sessionId)!;
 }
 
-
 /** Resolves the active game session's public ID for a DM auth sessionId.
  *  Uses the shared in-memory cache; falls back to DB on cache miss. */
 async function resolveGameSessionId(authSessionId: string): Promise<string | null> {
@@ -54,7 +53,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const isGuest = !authSessionId && !!guestSessionId;
 
 	if (isGuest) {
-		if (!isValidSessionId(guestSessionId!)) return new Response('Invalid guest session', { status: 400 });
+		if (!isValidSessionId(guestSessionId!))
+			return new Response('Invalid guest session', { status: 400 });
 		gameSessionId = guestSessionId!;
 	} else {
 		gameSessionId = await resolveGameSessionId(authSessionId!);
@@ -91,7 +91,9 @@ export const GET: RequestHandler = async ({ request, url, cookies }) => {
 
 		if (!authSessionId && guestSessionId && isValidSessionId(guestSessionId)) {
 			// Guest: read from in-memory cache only
-			return Response.json(sessionStates.get(guestSessionId) ?? { combatants: [], currentTurnId: null, round: 1 });
+			return Response.json(
+				sessionStates.get(guestSessionId) ?? { combatants: [], currentTurnId: null, round: 1 }
+			);
 		}
 
 		if (!authSessionId) return Response.json({ combatants: [], currentTurnId: null, round: 1 });

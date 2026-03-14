@@ -9,7 +9,7 @@ let cache: Spell5e[] | null = null;
 const SOURCES = [
 	'https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/spells/spells-phb.json',
 	'https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/spells/spells-xge.json',
-	'https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/spells/spells-tce.json',
+	'https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/spells/spells-tce.json'
 ];
 
 export const GET: RequestHandler = async ({ cookies }) => {
@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 			SOURCES.map(async (url) => {
 				const res = await fetch(url);
 				if (!res.ok) return [] as Spell5e[];
-				const data = await res.json() as { spell?: Spell5e[] };
+				const data = (await res.json()) as { spell?: Spell5e[] };
 				return data.spell ?? [];
 			})
 		);

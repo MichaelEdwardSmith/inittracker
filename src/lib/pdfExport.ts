@@ -86,7 +86,10 @@ function eventDesc(e: CombatEvent): string {
 
 // ── Main export function ─────────────────────────────────────────────────────
 
-export async function exportChronicle(record: CombatRecord, encounterNumber: number): Promise<void> {
+export async function exportChronicle(
+	record: CombatRecord,
+	encounterNumber: number
+): Promise<void> {
 	// Lazy-load jsPDF in the browser only
 	const { jsPDF } = await import('jspdf');
 	const { applyPlugin } = await import('jspdf-autotable');
@@ -143,7 +146,7 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 	const statsItems: string[] = [
 		`${record.rounds} ${record.rounds === 1 ? 'Round' : 'Rounds'}`,
 		`${players.length} ${players.length === 1 ? 'Player' : 'Players'}`,
-		`${slain.length} Slain`,
+		`${slain.length} Slain`
 	];
 	if (record.totalXp !== undefined) {
 		statsItems.push(`${record.totalXp.toLocaleString()} XP`);
@@ -174,7 +177,7 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 		`${p.finalHp} / ${p.maxHp}`,
 		p.totalDamage > 0 ? String(p.totalDamage) : '—',
 		p.totalHealing > 0 ? String(p.totalHealing) : '—',
-		p.wasSlain ? 'Slain' : 'Survived',
+		p.wasSlain ? 'Slain' : 'Survived'
 	]);
 
 	// @ts-expect-error jspdf-autotable augments doc at runtime
@@ -188,13 +191,13 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 			cellPadding: 2,
 			textColor: textDark,
 			lineColor: [210, 210, 215],
-			lineWidth: 0.1,
+			lineWidth: 0.1
 		},
 		headStyles: {
 			fillColor: [55, 55, 65],
 			textColor: [220, 220, 225],
 			fontStyle: 'bold',
-			fontSize: 7.5,
+			fontSize: 7.5
 		},
 		alternateRowStyles: { fillColor: [248, 248, 250] },
 		columnStyles: {
@@ -204,18 +207,24 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 			3: { cellWidth: 22, halign: 'center' },
 			4: { cellWidth: 14, halign: 'center' },
 			5: { cellWidth: 16, halign: 'center' },
-			6: { cellWidth: 22, halign: 'center' },
+			6: { cellWidth: 22, halign: 'center' }
 		},
-		didParseCell: (data: { section: string; column: { index: number }; cell: { text: string[]; styles: { textColor: number[] } } }) => {
+		didParseCell: (data: {
+			section: string;
+			column: { index: number };
+			cell: { text: string[]; styles: { textColor: number[] } };
+		}) => {
 			if (data.section === 'body') {
 				if (data.column.index === 1) {
 					data.cell.styles.textColor = data.cell.text[0] === 'PC' ? accentBlue : accentRed;
 				}
 				if (data.column.index === 6) {
-					data.cell.styles.textColor = data.cell.text[0].includes('Slain') ? accentRed : accentGreen;
+					data.cell.styles.textColor = data.cell.text[0].includes('Slain')
+						? accentRed
+						: accentGreen;
 				}
 			}
-		},
+		}
 	});
 
 	// @ts-expect-error autoTable adds lastAutoTable
@@ -235,13 +244,16 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 		const xpRows = slainWithCr.map((p) => [
 			p.name,
 			`CR ${p.cr}`,
-			`${crToXp(p.cr!).toLocaleString()} XP`,
+			`${crToXp(p.cr!).toLocaleString()} XP`
 		]);
 
 		const footerRow = [
 			{ content: 'Total XP', styles: { fontStyle: 'bold' as const, textColor: accentAmber } },
 			{ content: '', styles: {} },
-			{ content: `${record.totalXp!.toLocaleString()} XP`, styles: { fontStyle: 'bold' as const, textColor: accentAmber } },
+			{
+				content: `${record.totalXp!.toLocaleString()} XP`,
+				styles: { fontStyle: 'bold' as const, textColor: accentAmber }
+			}
 		];
 
 		// @ts-expect-error jspdf-autotable augments doc at runtime
@@ -254,14 +266,19 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 			margin: { left: margin, right: margin },
 			tableWidth: contentW / 2, // only half width
 			styles: { fontSize: 8, cellPadding: 2, textColor: textDark },
-			headStyles: { fillColor: [55, 55, 65], textColor: [220, 220, 225], fontStyle: 'bold', fontSize: 7.5 },
+			headStyles: {
+				fillColor: [55, 55, 65],
+				textColor: [220, 220, 225],
+				fontStyle: 'bold',
+				fontSize: 7.5
+			},
 			footStyles: { fillColor: lightGray, fontStyle: 'bold' },
 			alternateRowStyles: { fillColor: [248, 248, 250] },
 			columnStyles: {
 				0: { cellWidth: 'auto' },
 				1: { cellWidth: 20, halign: 'center' },
-				2: { cellWidth: 30, halign: 'right' },
-			},
+				2: { cellWidth: 30, halign: 'right' }
+			}
 		});
 
 		// @ts-expect-error autoTable adds lastAutoTable
@@ -273,11 +290,7 @@ export async function exportChronicle(record: CombatRecord, encounterNumber: num
 			doc.setFont('helvetica', 'normal');
 			doc.setTextColor(...textMid);
 			const splitXp = Math.floor(record.totalXp / players.length);
-			doc.text(
-				`Split ${players.length} ways: ${splitXp.toLocaleString()} XP each`,
-				margin,
-				y
-			);
+			doc.text(`Split ${players.length} ways: ${splitXp.toLocaleString()} XP each`, margin, y);
 		}
 
 		y += 7;
@@ -480,9 +493,7 @@ export async function exportNotesPdf(
 	// ── Download ─────────────────────────────────────────────────────────────
 	const dateSlug = new Date().toISOString().slice(0, 10);
 	const filename =
-		mode === 'single'
-			? `notes-${isoDate(notes[0].date)}.pdf`
-			: `notes-all-${dateSlug}.pdf`;
+		mode === 'single' ? `notes-${isoDate(notes[0].date)}.pdf` : `notes-all-${dateSlug}.pdf`;
 
 	const blob = doc.output('blob');
 	const url = URL.createObjectURL(blob);

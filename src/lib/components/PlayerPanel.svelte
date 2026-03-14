@@ -31,7 +31,14 @@
 		passivePerception = 10;
 	}
 
-	function startEdit(id: string, playerName: string, playerAc: number, playerMaxHp: number, playerDexMod: number, playerPassivePerception: number) {
+	function startEdit(
+		id: string,
+		playerName: string,
+		playerAc: number,
+		playerMaxHp: number,
+		playerDexMod: number,
+		playerPassivePerception: number
+	) {
 		editingId = id;
 		editName = playerName;
 		editAc = playerAc;
@@ -42,7 +49,14 @@
 
 	function saveEdit(id: string) {
 		if (!editName.trim()) return;
-		combat.update(id, { name: editName.trim(), ac: editAc, maxHp: editHp, currentHp: editHp, dexMod: editDexMod || undefined, passivePerception: editPassivePerception || undefined });
+		combat.update(id, {
+			name: editName.trim(),
+			ac: editAc,
+			maxHp: editHp,
+			currentHp: editHp,
+			dexMod: editDexMod || undefined,
+			passivePerception: editPassivePerception || undefined
+		});
 		editingId = null;
 	}
 
@@ -275,7 +289,13 @@
 								>
 							{/if}
 						</div>
-						<div class="text-xs text-gray-400">AC {player.ac} &bull; {player.maxHp} HP{#if player.dexMod} &bull; DEX {player.dexMod > 0 ? '+' : ''}{player.dexMod}{/if}{#if player.passivePerception} &bull; Passive {player.passivePerception}{/if}</div>
+						<div class="text-xs text-gray-400">
+							AC {player.ac} &bull; {player.maxHp} HP{#if player.dexMod}
+								&bull; DEX {player.dexMod > 0
+									? '+'
+									: ''}{player.dexMod}{/if}{#if player.passivePerception}
+								&bull; Passive {player.passivePerception}{/if}
+						</div>
 					</div>
 					<div class="flex shrink-0 flex-col gap-1">
 						{#if player.inCombat === false}
@@ -297,7 +317,15 @@
 							</button>
 						{/if}
 						<button
-							onclick={() => startEdit(player.id, player.name, player.ac, player.maxHp, player.dexMod ?? 0, player.passivePerception ?? 10)}
+							onclick={() =>
+								startEdit(
+									player.id,
+									player.name,
+									player.ac,
+									player.maxHp,
+									player.dexMod ?? 0,
+									player.passivePerception ?? 10
+								)}
 							title="Edit"
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-white"
 						>
@@ -319,13 +347,18 @@
 						{#if confirmDeleteId === player.id}
 							<div class="flex items-center gap-1">
 								<button
-									onclick={() => { combat.remove(player.id); confirmDeleteId = null; }}
+									onclick={() => {
+										combat.remove(player.id);
+										confirmDeleteId = null;
+									}}
 									class="rounded bg-red-800/70 px-1.5 py-0.5 text-[10px] font-bold text-red-200 transition hover:bg-red-700"
-								>Yes</button>
+									>Yes</button
+								>
 								<button
 									onclick={() => (confirmDeleteId = null)}
 									class="rounded bg-gray-700 px-1.5 py-0.5 text-[10px] text-gray-300 transition hover:bg-gray-600"
-								>No</button>
+									>No</button
+								>
 							</div>
 						{:else}
 							<button

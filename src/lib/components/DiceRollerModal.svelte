@@ -2,11 +2,7 @@
      Keeps the last 5 rolls in a compact history list.
      3D dice rendered via the global DiceOverlay (dice-box-threejs). -->
 <script lang="ts">
-	import {
-		diceOverlay,
-		triggerRoll,
-		setVirtualDiceDisabled
-	} from '$lib/diceOverlay.svelte';
+	import { diceOverlay, triggerRoll, setVirtualDiceDisabled } from '$lib/diceOverlay.svelte';
 
 	interface Props {
 		onclose: () => void;
@@ -45,10 +41,16 @@
 		if (dieType === 100) {
 			// Percentile: two d10s — one for tens (0,10,20…90), one for ones (0–9)
 			triggerRoll('1d100+1d10', ([tensRoll, onesRoll]) => {
-				const tens = tensRoll % 100;  // d100 returns 10-100; 100 ÷ 100 = 0 (shows 00)
-				const ones = onesRoll % 10;   // d10 returns 1-10; 10 mod 10 = 0
+				const tens = tensRoll % 100; // d100 returns 10-100; 100 ÷ 100 = 0 (shows 00)
+				const ones = onesRoll % 10; // d10 returns 1-10; 10 mod 10 = 0
 				const base = tens === 0 && ones === 0 ? 100 : tens + ones;
-				const newResult: RollResult = { dieType: 100, quantity: 1, modifier: mod, rolls: [tens, ones], total: base + mod };
+				const newResult: RollResult = {
+					dieType: 100,
+					quantity: 1,
+					modifier: mod,
+					rolls: [tens, ones],
+					total: base + mod
+				};
 				result = newResult;
 				history = [newResult, ...history].slice(0, 5);
 				rolling = false;
@@ -102,11 +104,14 @@
 	aria-label="Dice roller"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 	tabindex="-1"
-	onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
-	onkeydown={(e) => { if (e.key === 'Escape') onclose(); }}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) onclose();
+	}}
+	onkeydown={(e) => {
+		if (e.key === 'Escape') onclose();
+	}}
 >
 	<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
-
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 			<h3 class="font-black tracking-wide text-amber-400">🎲 Dice Roller</h3>
@@ -115,21 +120,34 @@
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12"
+					/>
 				</svg>
 			</button>
 		</div>
 
 		<!-- Body -->
 		<div class="px-5 py-4">
-
 			<!-- Die type selection -->
 			<p class="mb-2 text-xs font-semibold tracking-widest text-gray-500 uppercase">Die Type</p>
 			<div class="mb-4 flex flex-wrap gap-1.5">
 				{#each DICE_TYPES as die}
 					<button
-						onclick={() => { selectedDie = die; result = null; }}
+						onclick={() => {
+							selectedDie = die;
+							result = null;
+						}}
 						class="rounded px-3 py-1.5 text-sm font-bold transition
 						       {selectedDie === die
 							? 'bg-amber-600 text-white'
@@ -144,13 +162,15 @@
 			<div class="mb-4 flex gap-4">
 				<!-- Quantity -->
 				<div class="flex-1">
-					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">Quantity</p>
+					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+						Quantity
+					</p>
 					<div class="flex items-center gap-1">
 						<button
 							onclick={() => adjustQuantity(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease quantity"
-						>−</button>
+							aria-label="Decrease quantity">−</button
+						>
 						<input
 							type="number"
 							min="1"
@@ -162,20 +182,22 @@
 						<button
 							onclick={() => adjustQuantity(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase quantity"
-						>+</button>
+							aria-label="Increase quantity">+</button
+						>
 					</div>
 				</div>
 
 				<!-- Modifier -->
 				<div class="flex-1">
-					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">Modifier</p>
+					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+						Modifier
+					</p>
 					<div class="flex items-center gap-1">
 						<button
 							onclick={() => adjustModifier(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease modifier"
-						>−</button>
+							aria-label="Decrease modifier">−</button
+						>
 						<input
 							type="number"
 							min="-99"
@@ -189,15 +211,18 @@
 						<button
 							onclick={() => adjustModifier(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase modifier"
-						>+</button>
+							aria-label="Increase modifier">+</button
+						>
 					</div>
 				</div>
 			</div>
 
 			<!-- Expression preview + Roll button -->
 			<div class="mb-4 flex items-center gap-3">
-				<span class="flex-1 rounded border border-gray-700 bg-gray-800/60 px-3 py-1.5 font-mono text-sm text-amber-300">{expr}</span>
+				<span
+					class="flex-1 rounded border border-gray-700 bg-gray-800/60 px-3 py-1.5 font-mono text-sm text-amber-300"
+					>{expr}</span
+				>
 				<button
 					onclick={roll}
 					disabled={rolling}
@@ -214,13 +239,17 @@
 					{#if result.dieType === 100}
 						<div class="mb-3 flex gap-3">
 							<div class="flex flex-col items-center gap-1">
-								<div class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 font-black text-lg text-white">
+								<div
+									class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white"
+								>
 									{String(result.rolls[0]).padStart(2, '0')}
 								</div>
 								<span class="text-xs text-gray-500">Tens</span>
 							</div>
 							<div class="flex flex-col items-center gap-1">
-								<div class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 font-black text-lg text-white">
+								<div
+									class="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-gray-600 bg-gray-800 text-lg font-black text-white"
+								>
 									{result.rolls[1]}
 								</div>
 								<span class="text-xs text-gray-500">Ones</span>
@@ -230,12 +259,12 @@
 						<div class="mb-3 flex flex-wrap gap-2">
 							{#each result.rolls as r, i}
 								<div
-									class="flex h-11 w-11 items-center justify-center rounded-lg border-2 font-black text-lg
+									class="flex h-11 w-11 items-center justify-center rounded-lg border-2 text-lg font-black
 									       {result.dieType === 20 && r === 20
 										? 'border-amber-400 bg-amber-900/40 text-amber-300'
 										: result.dieType === 20 && r === 1
-										? 'border-red-600 bg-red-900/40 text-red-300'
-										: 'border-gray-600 bg-gray-800 text-white'}"
+											? 'border-red-600 bg-red-900/40 text-red-300'
+											: 'border-gray-600 bg-gray-800 text-white'}"
 									title="Die {i + 1}"
 								>
 									{r}
@@ -247,7 +276,11 @@
 					<!-- Modifier line -->
 					{#if result.modifier !== 0}
 						<p class="mb-1 text-sm text-gray-400">
-							Dice sum: {result.rolls.reduce((s, r) => s + r, 0)}<span class={result.modifier > 0 ? 'text-green-400' : 'text-red-400'}> {result.modifier > 0 ? '+' : '−'} {Math.abs(result.modifier)}</span>
+							Dice sum: {result.rolls.reduce((s, r) => s + r, 0)}<span
+								class={result.modifier > 0 ? 'text-green-400' : 'text-red-400'}
+							>
+								{result.modifier > 0 ? '+' : '−'} {Math.abs(result.modifier)}</span
+							>
 						</p>
 					{/if}
 
@@ -269,10 +302,17 @@
 			<!-- History -->
 			{#if history.length > 0}
 				<div>
-					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">Recent Rolls</p>
+					<p class="mb-1.5 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+						Recent Rolls
+					</p>
 					<div class="flex flex-col gap-1">
 						{#each history as h, i}
-							<div class="flex items-center justify-between rounded bg-gray-800/60 px-3 py-1.5 text-xs {i === 0 ? 'opacity-100' : 'opacity-60'}">
+							<div
+								class="flex items-center justify-between rounded bg-gray-800/60 px-3 py-1.5 text-xs {i ===
+								0
+									? 'opacity-100'
+									: 'opacity-60'}"
+							>
 								<span class="font-mono text-gray-400">{historyExpr(h)}</span>
 								<div class="flex items-center gap-2">
 									<span class="text-gray-500">[{h.rolls.join(', ')}]</span>
@@ -283,7 +323,7 @@
 					</div>
 				</div>
 			{/if}
-		<!-- Disable virtual dice -->
+			<!-- Disable virtual dice -->
 			<label class="mt-3 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
 				<input
 					type="checkbox"

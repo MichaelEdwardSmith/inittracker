@@ -65,7 +65,10 @@ export const DELETE: RequestHandler = async ({ url, cookies }) => {
 		const id = url.searchParams.get('id');
 		if (id) {
 			const records = guestHistory.get(guestSessionId) ?? [];
-			guestHistory.set(guestSessionId, records.filter((r) => r.id !== id));
+			guestHistory.set(
+				guestSessionId,
+				records.filter((r) => r.id !== id)
+			);
 		} else {
 			guestHistory.delete(guestSessionId);
 		}

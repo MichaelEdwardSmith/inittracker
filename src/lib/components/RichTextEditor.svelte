@@ -71,7 +71,7 @@
 		{ hex: '#60a5fa', label: 'Blue' },
 		{ hex: '#c084fc', label: 'Purple' },
 		{ hex: '#f472b6', label: 'Pink' },
-		{ hex: '#6b7280', label: 'Gray' },
+		{ hex: '#6b7280', label: 'Gray' }
 	];
 </script>
 
@@ -85,38 +85,46 @@
 			onmousedown={(e) => e.preventDefault()}
 			onclick={() => execCmd('bold')}
 			class="rounded px-2 py-1 text-xs font-bold transition
-			       {boldActive ? 'bg-amber-600/30 text-amber-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
+			       {boldActive
+				? 'bg-amber-600/30 text-amber-300'
+				: 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
 			title="Bold (Ctrl+B)"
-			aria-label="Bold"
-		>B</button>
+			aria-label="Bold">B</button
+		>
 		<button
 			type="button"
 			onmousedown={(e) => e.preventDefault()}
 			onclick={() => execCmd('italic')}
-			class="rounded px-2 py-1 text-xs italic font-semibold transition
-			       {italicActive ? 'bg-amber-600/30 text-amber-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
+			class="rounded px-2 py-1 text-xs font-semibold italic transition
+			       {italicActive
+				? 'bg-amber-600/30 text-amber-300'
+				: 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
 			title="Italic (Ctrl+I)"
-			aria-label="Italic"
-		>I</button>
+			aria-label="Italic">I</button
+		>
 		<button
 			type="button"
 			onmousedown={(e) => e.preventDefault()}
 			onclick={() => execCmd('underline')}
-			class="rounded px-2 py-1 text-xs underline font-semibold transition
-			       {underlineActive ? 'bg-amber-600/30 text-amber-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
+			class="rounded px-2 py-1 text-xs font-semibold underline transition
+			       {underlineActive
+				? 'bg-amber-600/30 text-amber-300'
+				: 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
 			title="Underline (Ctrl+U)"
-			aria-label="Underline"
-		>U</button>
+			aria-label="Underline">U</button
+		>
 		<div class="mx-1 h-4 w-px bg-gray-700"></div>
 		<button
 			type="button"
 			onmousedown={(e) => e.preventDefault()}
 			onclick={() => execCmd('insertUnorderedList')}
 			class="rounded px-2 py-1 text-xs font-semibold transition
-			       {listActive ? 'bg-amber-600/30 text-amber-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
+			       {listActive
+				? 'bg-amber-600/30 text-amber-300'
+				: 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
 			title="Bullet list"
-			aria-label="Bullet list"
-		>• List</button>
+			aria-label="Bullet list">• List</button
+		>
 		<div class="mx-1 h-4 w-px bg-gray-700"></div>
 		<!-- Color picker -->
 		<div class="relative">
@@ -125,10 +133,12 @@
 				onmousedown={(e) => e.preventDefault()}
 				onclick={() => (showColorPicker = !showColorPicker)}
 				class="rounded px-2 py-1 text-xs font-bold transition
-				       {showColorPicker ? 'bg-amber-600/30 text-amber-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
+				       {showColorPicker
+					? 'bg-amber-600/30 text-amber-300'
+					: 'text-gray-400 hover:bg-gray-700 hover:text-white'}"
 				title="Text color"
-				aria-label="Text color"
-			>A</button>
+				aria-label="Text color">A</button
+			>
 			{#if showColorPicker}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div

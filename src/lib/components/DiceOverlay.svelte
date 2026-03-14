@@ -29,8 +29,14 @@
 	}
 
 	function cancelTimers() {
-		if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
-		if (fadeTimer) { clearTimeout(fadeTimer); fadeTimer = null; }
+		if (clearTimer) {
+			clearTimeout(clearTimer);
+			clearTimer = null;
+		}
+		if (fadeTimer) {
+			clearTimeout(fadeTimer);
+			fadeTimer = null;
+		}
 		fading = false;
 	}
 

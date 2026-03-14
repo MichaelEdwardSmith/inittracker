@@ -33,43 +33,46 @@ const MODEL_ID = 'Xenova/whisper-base.en';
 let asr: any = null;
 
 // ── Message handler ───────────────────────────────────────────────────────
-self.addEventListener('message', async (e: MessageEvent<{ type: string; audio?: Float32Array; initial_prompt?: string }>) => {
-	const msg = e.data;
+self.addEventListener(
+	'message',
+	async (e: MessageEvent<{ type: string; audio?: Float32Array; initial_prompt?: string }>) => {
+		const msg = e.data;
 
-	if (msg.type === 'load') {
-		try {
-			asr = await pipeline('automatic-speech-recognition', MODEL_ID, {
-				dtype: 'fp32',  // fp32 is most reliable in browser WASM (fp16 needs WebGPU)
-				progress_callback: (p: Record<string, unknown>) => {
-					if (typeof p.progress === 'number') {
-						self.postMessage({ type: 'loading', pct: Math.round(p.progress) });
+		if (msg.type === 'load') {
+			try {
+				asr = await pipeline('automatic-speech-recognition', MODEL_ID, {
+					dtype: 'fp32', // fp32 is most reliable in browser WASM (fp16 needs WebGPU)
+					progress_callback: (p: Record<string, unknown>) => {
+						if (typeof p.progress === 'number') {
+							self.postMessage({ type: 'loading', pct: Math.round(p.progress) });
+						}
 					}
-				}
-			});
-			self.postMessage({ type: 'ready' });
-		} catch (err) {
-			self.postMessage({ type: 'error', message: String(err) });
-		}
-		return;
-	}
-
-	if (msg.type === 'transcribe' && msg.audio) {
-		if (!asr) {
-			self.postMessage({ type: 'error', message: 'Model not loaded yet' });
+				});
+				self.postMessage({ type: 'ready' });
+			} catch (err) {
+				self.postMessage({ type: 'error', message: String(err) });
+			}
 			return;
 		}
-		try {
-			// sampling_rate is not in the TS types but the model expects 16 kHz PCM —
-		// we enforce that in the main thread via OfflineAudioContext before sending.
-		// .en models are English-only — don't pass language/task (multilingual-only options).
-		// initial_prompt biases the decoder toward domain vocab (combatant names, D&D terms).
-		const opts: Record<string, unknown> = {};
-		if (msg.initial_prompt) opts.initial_prompt = msg.initial_prompt;
-		const result = await asr(msg.audio, opts);
-			const text = (result as { text: string }).text.trim();
-			self.postMessage({ type: 'transcript', text });
-		} catch (err) {
-			self.postMessage({ type: 'error', message: String(err) });
+
+		if (msg.type === 'transcribe' && msg.audio) {
+			if (!asr) {
+				self.postMessage({ type: 'error', message: 'Model not loaded yet' });
+				return;
+			}
+			try {
+				// sampling_rate is not in the TS types but the model expects 16 kHz PCM —
+				// we enforce that in the main thread via OfflineAudioContext before sending.
+				// .en models are English-only — don't pass language/task (multilingual-only options).
+				// initial_prompt biases the decoder toward domain vocab (combatant names, D&D terms).
+				const opts: Record<string, unknown> = {};
+				if (msg.initial_prompt) opts.initial_prompt = msg.initial_prompt;
+				const result = await asr(msg.audio, opts);
+				const text = (result as { text: string }).text.trim();
+				self.postMessage({ type: 'transcript', text });
+			} catch (err) {
+				self.postMessage({ type: 'error', message: String(err) });
+			}
 		}
 	}
-});
+);

@@ -7,7 +7,10 @@ import { loginDM, getDMBySessionId } from '$lib/server/dmModel';
 
 const SESSION_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function randomId(): string {
-	return Array.from({ length: 6 }, () => SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)]).join('');
+	return Array.from(
+		{ length: 6 },
+		() => SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)]
+	).join('');
 }
 
 export const load: PageServerLoad = async ({ cookies }) => {

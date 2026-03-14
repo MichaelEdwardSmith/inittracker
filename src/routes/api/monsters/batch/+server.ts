@@ -46,10 +46,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			name,
 			ac: Math.round(ac),
 			hp: Math.round(hp),
-			cr: String(item.cr ?? '1').trim().slice(0, 10) || '1',
+			cr:
+				String(item.cr ?? '1')
+					.trim()
+					.slice(0, 10) || '1',
 			monsterType: String(item.monsterType ?? 'Humanoid').slice(0, 50),
 			...(typeof item.dexMod === 'number' ? { dexMod: item.dexMod } : {}),
-			...(typeof item.source === 'string' && item.source ? { source: item.source.slice(0, 30) } : {}),
+			...(typeof item.source === 'string' && item.source
+				? { source: item.source.slice(0, 30) }
+				: {}),
 			...(detail ? { detail } : {})
 		};
 

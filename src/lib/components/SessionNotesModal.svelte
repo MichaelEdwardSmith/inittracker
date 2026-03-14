@@ -130,8 +130,12 @@
 	aria-label="Session notes"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 	tabindex="-1"
-	onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
-	onkeydown={(e) => { if (e.key === 'Escape') onclose(); }}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) onclose();
+	}}
+	onkeydown={(e) => {
+		if (e.key === 'Escape') onclose();
+	}}
 >
 	<div
 		class="flex w-full max-w-4xl flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
@@ -159,12 +163,34 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingNote}
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5 animate-spin"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+									/>
 								</svg>
 							{:else}
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+									/>
 								</svg>
 							{/if}
 							Note
@@ -179,34 +205,82 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingAll}
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5 animate-spin"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+									/>
 								</svg>
 							{:else}
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+									/>
 								</svg>
 							{/if}
 							All
 						</button>
 					{/if}
-					<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					<button
+						onclick={onclose}
+						class="text-gray-500 transition hover:text-white"
+						aria-label="Close"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
 						</svg>
 					</button>
 				</div>
 			</div>
 			<!-- Search bar -->
 			<div class="relative mt-3">
-				<svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+					/>
 				</svg>
 				<input
 					type="text"
 					bind:value={search}
 					placeholder="Search notes…"
-					class="w-full rounded-lg border border-gray-600 bg-gray-800 py-2 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-amber-500"
+					class="w-full rounded-lg border border-gray-600 bg-gray-800 py-2 pr-4 pl-9 text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-amber-500"
 				/>
 			</div>
 		</div>
@@ -221,37 +295,65 @@
 						onclick={createNew}
 						class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-amber-600 px-3 py-2 text-sm font-semibold text-amber-500 transition hover:border-amber-400 hover:text-amber-400"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 4v16m8-8H4"
+							/>
 						</svg>
 						New Notes
 					</button>
 				</div>
 
 				<!-- Note entries -->
-				<ul class="min-h-0 flex-1 overflow-y-auto p-2 pt-0 space-y-1">
+				<ul class="min-h-0 flex-1 space-y-1 overflow-y-auto p-2 pt-0">
 					{#each filteredNotes as note (note.id)}
 						<li>
 							<!-- svelte-ignore a11y_interactive_supports_focus -->
 							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<div
 								role="button"
-								onclick={() => { selectedId = note.id; saveStatus = 'idle'; }}
+								onclick={() => {
+									selectedId = note.id;
+									saveStatus = 'idle';
+								}}
 								class="group flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
 									{selectedId === note.id
-										? 'bg-amber-600/20 text-amber-400'
-										: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'}"
+									? 'bg-amber-600/20 text-amber-400'
+									: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'}"
 							>
 								<span class="truncate">{formatDate(note.date)}</span>
 								{#if selectedId === note.id}
 									<button
-										onclick={(e) => { e.stopPropagation(); deleteSelected(); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											deleteSelected();
+										}}
 										class="ml-1 shrink-0 text-gray-600 transition hover:text-red-400"
 										aria-label="Delete note"
 										title="Delete"
 									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-3.5 w-3.5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M6 18L18 6M6 6l12 12"
+											/>
 										</svg>
 									</button>
 								{/if}

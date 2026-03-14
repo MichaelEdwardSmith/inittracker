@@ -6,7 +6,14 @@ import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
-import type { StorageState, CustomMonster, CombatRecord, GameSession, NoteEntry, Encounter } from '$lib/types';
+import type {
+	StorageState,
+	CustomMonster,
+	CombatRecord,
+	GameSession,
+	NoteEntry,
+	Encounter
+} from '$lib/types';
 
 // ---------------------------------------------------------------------------
 // Internal full game-session shape (includes server-only fields)
@@ -145,9 +152,7 @@ export async function loginDM(
 }
 
 /** Look up a DM by their auth sessionId (cookie value). */
-export async function getDMBySessionId(
-	sessionId: string
-): Promise<(WithId<Document> & DM) | null> {
+export async function getDMBySessionId(sessionId: string): Promise<(WithId<Document> & DM) | null> {
 	const c = await col();
 	return (await c.findOne({ sessionId })) as unknown as (WithId<Document> & DM) | null;
 }
@@ -171,9 +176,7 @@ export async function getActiveGameSessionPublicId(authSessionId: string): Promi
 	const c = await col();
 	const dm = await c.findOne({ sessionId: authSessionId });
 	if (!dm?.gameSessions?.length) return null;
-	const active = (dm.gameSessions as DMGameSession[]).find(
-		(s) => s.id === dm.activeGameSessionId
-	);
+	const active = (dm.gameSessions as DMGameSession[]).find((s) => s.id === dm.activeGameSessionId);
 	return active?.sessionId ?? (dm.gameSessions[0] as DMGameSession).sessionId;
 }
 
@@ -191,9 +194,7 @@ export async function saveCombatState(gameSessionId: string, state: StorageState
 export async function getCombatState(gameSessionId: string): Promise<StorageState> {
 	const c = await col();
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find(
-		(s) => s.sessionId === gameSessionId
-	);
+	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	return session?.combatState ?? { combatants: [], currentTurnId: null, round: 1 };
 }
 
@@ -206,16 +207,16 @@ export async function getCombatState(gameSessionId: string): Promise<StorageStat
 export async function listNotes(gameSessionId: string): Promise<NoteEntry[]> {
 	const c = await col();
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find(
-		(s) => s.sessionId === gameSessionId
-	);
+	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	if (!session) return [];
 
 	const raw = session.notes as unknown;
 
 	// Migration: legacy single string → single NoteEntry
 	if (typeof raw === 'string' && raw.length > 0) {
-		const migrated: NoteEntry[] = [{ id: randomUUID(), date: new Date().toISOString(), content: raw }];
+		const migrated: NoteEntry[] = [
+			{ id: randomUUID(), date: new Date().toISOString(), content: raw }
+		];
 		await c.updateOne(
 			{ 'gameSessions.sessionId': gameSessionId },
 			{ $set: { 'gameSessions.$.notes': migrated } }
@@ -239,15 +240,19 @@ export async function createNote(gameSessionId: string, content: string): Promis
 }
 
 /** Updates the content of an existing note entry. */
-export async function updateNote(gameSessionId: string, noteId: string, content: string): Promise<void> {
+export async function updateNote(
+	gameSessionId: string,
+	noteId: string,
+	content: string
+): Promise<void> {
 	const c = await col();
 	// MongoDB positional operator can't target nested array element by id in one shot,
 	// so fetch → modify → replace the whole notes array.
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find(s => s.sessionId === gameSessionId);
+	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	if (!session) return;
 	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
-	const updated = notes.map(n => n.id === noteId ? { ...n, content } : n);
+	const updated = notes.map((n) => (n.id === noteId ? { ...n, content } : n));
 	await c.updateOne(
 		{ 'gameSessions.sessionId': gameSessionId },
 		{ $set: { 'gameSessions.$.notes': updated } }
@@ -258,10 +263,10 @@ export async function updateNote(gameSessionId: string, noteId: string, content:
 export async function deleteNote(gameSessionId: string, noteId: string): Promise<void> {
 	const c = await col();
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find(s => s.sessionId === gameSessionId);
+	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	if (!session) return;
 	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
-	const filtered = notes.filter(n => n.id !== noteId);
+	const filtered = notes.filter((n) => n.id !== noteId);
 	await c.updateOne(
 		{ 'gameSessions.sessionId': gameSessionId },
 		{ $set: { 'gameSessions.$.notes': filtered } }
@@ -277,10 +282,7 @@ export async function getCustomMonsters(sessionId: string): Promise<CustomMonste
 	return (dm?.customMonsters as CustomMonster[]) ?? [];
 }
 
-export async function addCustomMonster(
-	sessionId: string,
-	monster: CustomMonster
-): Promise<void> {
+export async function addCustomMonster(sessionId: string, monster: CustomMonster): Promise<void> {
 	const c = await col();
 	await c.updateOne({ sessionId }, { $push: { customMonsters: monster } as never });
 }
@@ -330,9 +332,7 @@ export async function saveCombatRecord(gameSessionId: string, record: CombatReco
 export async function getCombatHistory(gameSessionId: string): Promise<CombatRecord[]> {
 	const c = await col();
 	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find(
-		(s) => s.sessionId === gameSessionId
-	);
+	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	return (session?.combatHistory as CombatRecord[]) ?? [];
 }
 
@@ -443,17 +443,13 @@ export async function deleteGameSession(
 	if (dm.activeGameSessionId === sessionUUID) {
 		const other = sessions.find((s) => s.id !== sessionUUID);
 		if (other) {
-			await c.updateOne(
-				{ sessionId: authSessionId },
-				{ $set: { activeGameSessionId: other.id } }
-			);
+			await c.updateOne({ sessionId: authSessionId }, { $set: { activeGameSessionId: other.id } });
 		}
 	}
 
-	await c.updateOne(
-		{ sessionId: authSessionId },
-		{ $pull: { gameSessions: { id: sessionUUID } } } as never
-	);
+	await c.updateOne({ sessionId: authSessionId }, {
+		$pull: { gameSessions: { id: sessionUUID } }
+	} as never);
 	return { ok: true };
 }
 
@@ -494,5 +490,7 @@ export async function saveEncounter(authSessionId: string, encounter: Encounter)
 
 export async function deleteEncounter(authSessionId: string, encounterId: string): Promise<void> {
 	const c = await col();
-	await c.updateOne({ sessionId: authSessionId }, { $pull: { encounters: { id: encounterId } } } as never);
+	await c.updateOne({ sessionId: authSessionId }, {
+		$pull: { encounters: { id: encounterId } }
+	} as never);
 }

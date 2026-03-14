@@ -31,18 +31,52 @@
 	// ── Constants ──────────────────────────────────────────────────────────────
 
 	const SIZE_MAP: Record<string, string> = {
-		F: 'Fine', D: 'Diminutive', T: 'Tiny', S: 'Small', M: 'Medium',
-		L: 'Large', H: 'Huge', G: 'Gargantuan', C: 'Colossal'
+		F: 'Fine',
+		D: 'Diminutive',
+		T: 'Tiny',
+		S: 'Small',
+		M: 'Medium',
+		L: 'Large',
+		H: 'Huge',
+		G: 'Gargantuan',
+		C: 'Colossal'
 	};
 
 	const CR_XP: Record<string, string> = {
-		'0': '10', '1/8': '25', '1/4': '50', '1/2': '100',
-		'1': '200', '2': '450', '3': '700', '4': '1,100', '5': '1,800',
-		'6': '2,300', '7': '2,900', '8': '3,900', '9': '5,000', '10': '5,900',
-		'11': '7,200', '12': '8,400', '13': '10,000', '14': '11,500', '15': '13,000',
-		'16': '15,000', '17': '18,000', '18': '20,000', '19': '22,000', '20': '25,000',
-		'21': '33,000', '22': '41,000', '23': '50,000', '24': '62,000', '25': '75,000',
-		'26': '90,000', '27': '105,000', '28': '120,000', '29': '135,000', '30': '155,000'
+		'0': '10',
+		'1/8': '25',
+		'1/4': '50',
+		'1/2': '100',
+		'1': '200',
+		'2': '450',
+		'3': '700',
+		'4': '1,100',
+		'5': '1,800',
+		'6': '2,300',
+		'7': '2,900',
+		'8': '3,900',
+		'9': '5,000',
+		'10': '5,900',
+		'11': '7,200',
+		'12': '8,400',
+		'13': '10,000',
+		'14': '11,500',
+		'15': '13,000',
+		'16': '15,000',
+		'17': '18,000',
+		'18': '20,000',
+		'19': '22,000',
+		'20': '25,000',
+		'21': '33,000',
+		'22': '41,000',
+		'23': '50,000',
+		'24': '62,000',
+		'25': '75,000',
+		'26': '90,000',
+		'27': '105,000',
+		'28': '120,000',
+		'29': '135,000',
+		'30': '155,000'
 	};
 
 	// ── Rendering helpers ──────────────────────────────────────────────────────
@@ -54,29 +88,31 @@
 
 	/** Convert 5etools inline tags to HTML. */
 	function renderInline(text: string): string {
-		return text
-			.replace(/\{@recharge (\d+)\}/g, (_, n) => `(Recharge ${n}–6)`)
-			.replace(/\{@h\}/g, 'Hit: ')
-			.replace(/\{@atk ([^}]+)\}/g, (_, types: string) => {
-				if (types.includes('mw') && types.includes('rw')) return 'Melee or Ranged Weapon Attack';
-				if (types.includes('ms') && types.includes('rs')) return 'Melee or Ranged Spell Attack';
-				if (types.includes('mw')) return 'Melee Weapon Attack';
-				if (types.includes('rw')) return 'Ranged Weapon Attack';
-				if (types.includes('ms')) return 'Melee Spell Attack';
-				if (types.includes('rs')) return 'Ranged Spell Attack';
-				return types;
-			})
-			.replace(/\{@hit ([^}]+)\}/g, '$1')
-			.replace(/\{@dc ([^}]+)\}/g, 'DC $1')
-			.replace(/\{@damage ([^}]+)\}/g, '$1')
-			.replace(/\{@dice ([^|}]+)(?:\|[^}]*)?\}/g, '$1')
-			.replace(/\{@d20 ([^|}]+)(?:\|[^}]*)?\}/g, '$1')
-			.replace(/\{@b ([^}]+)\}/g, '<strong>$1</strong>')
-			.replace(/\{@bold ([^}]+)\}/g, '<strong>$1</strong>')
-			.replace(/\{@i ([^}]+)\}/g, '<em>$1</em>')
-			.replace(/\{@italic ([^}]+)\}/g, '<em>$1</em>')
-			// Generic: take the display text (first segment before |)
-			.replace(/\{@[a-zA-Z]+ ([^|}]+)(?:\|[^}]*)?\}/g, '$1');
+		return (
+			text
+				.replace(/\{@recharge (\d+)\}/g, (_, n) => `(Recharge ${n}–6)`)
+				.replace(/\{@h\}/g, 'Hit: ')
+				.replace(/\{@atk ([^}]+)\}/g, (_, types: string) => {
+					if (types.includes('mw') && types.includes('rw')) return 'Melee or Ranged Weapon Attack';
+					if (types.includes('ms') && types.includes('rs')) return 'Melee or Ranged Spell Attack';
+					if (types.includes('mw')) return 'Melee Weapon Attack';
+					if (types.includes('rw')) return 'Ranged Weapon Attack';
+					if (types.includes('ms')) return 'Melee Spell Attack';
+					if (types.includes('rs')) return 'Ranged Spell Attack';
+					return types;
+				})
+				.replace(/\{@hit ([^}]+)\}/g, '$1')
+				.replace(/\{@dc ([^}]+)\}/g, 'DC $1')
+				.replace(/\{@damage ([^}]+)\}/g, '$1')
+				.replace(/\{@dice ([^|}]+)(?:\|[^}]*)?\}/g, '$1')
+				.replace(/\{@d20 ([^|}]+)(?:\|[^}]*)?\}/g, '$1')
+				.replace(/\{@b ([^}]+)\}/g, '<strong>$1</strong>')
+				.replace(/\{@bold ([^}]+)\}/g, '<strong>$1</strong>')
+				.replace(/\{@i ([^}]+)\}/g, '<em>$1</em>')
+				.replace(/\{@italic ([^}]+)\}/g, '<em>$1</em>')
+				// Generic: take the display text (first segment before |)
+				.replace(/\{@[a-zA-Z]+ ([^|}]+)(?:\|[^}]*)?\}/g, '$1')
+		);
 	}
 
 	/** Recursively render a 5etools entry object or string to HTML. */
@@ -99,7 +135,9 @@
 		// List
 		if (obj.type === 'list') {
 			const items = Array.isArray(obj.items)
-				? obj.items.map((i) => `<li>${typeof i === 'string' ? renderInline(i) : renderEntry(i)}</li>`).join('')
+				? obj.items
+						.map((i) => `<li>${typeof i === 'string' ? renderInline(i) : renderEntry(i)}</li>`)
+						.join('')
 				: '';
 			return `<ul class="list-disc ml-4 mb-2">${items}</ul>`;
 		}
@@ -128,58 +166,41 @@
 	/** Convert a 5etools feature array (trait/action/reaction/legendary) to HTML. */
 	function parseFeatures(features: unknown): string | undefined {
 		if (!Array.isArray(features) || features.length === 0) return undefined;
-		const html = features.map((f) => {
-			if (!f || typeof f !== 'object') return '';
-			const feat = f as Record<string, unknown>;
-			const rawName = typeof feat.name === 'string' ? feat.name : '';
-			const recharge = feat.recharge !== undefined ? ` (Recharge ${feat.recharge}–6)` : '';
-			const namePart = rawName ? `<em><strong>${rawName}${recharge}.</strong></em> ` : '';
-			const entries = Array.isArray(feat.entries) ? feat.entries : [];
-			if (entries.length === 0) return '';
-			const [first, ...rest] = entries;
-			const firstHtml = typeof first === 'string' ? renderInline(first) : renderEntry(first);
-			const restHtml = rest.map(renderEntry).join('');
-			return `<p>${namePart}${firstHtml}</p>${restHtml}`;
-		}).join('');
+		const html = features
+			.map((f) => {
+				if (!f || typeof f !== 'object') return '';
+				const feat = f as Record<string, unknown>;
+				const rawName = typeof feat.name === 'string' ? feat.name : '';
+				const recharge = feat.recharge !== undefined ? ` (Recharge ${feat.recharge}–6)` : '';
+				const namePart = rawName ? `<em><strong>${rawName}${recharge}.</strong></em> ` : '';
+				const entries = Array.isArray(feat.entries) ? feat.entries : [];
+				if (entries.length === 0) return '';
+				const [first, ...rest] = entries;
+				const firstHtml = typeof first === 'string' ? renderInline(first) : renderEntry(first);
+				const restHtml = rest.map(renderEntry).join('');
+				return `<p>${namePart}${firstHtml}</p>${restHtml}`;
+			})
+			.join('');
 		return html || undefined;
 	}
 
 	/** Convert a 5etools spellcasting array to HTML, appended to traits. */
 	function renderSpellcasting(spellcasting: unknown[]): string {
-		return spellcasting.map((sc) => {
-			if (!sc || typeof sc !== 'object') return '';
-			const s = sc as Record<string, unknown>;
-			const name = typeof s.name === 'string' ? s.name : 'Spellcasting';
-			const headers = Array.isArray(s.headerEntries)
-				? s.headerEntries.map((h) => (typeof h === 'string' ? renderInline(h) : '')).join(' ')
-				: '';
-			const header = `<p><em><strong>${name}.</strong></em> ${headers}</p>`;
+		return spellcasting
+			.map((sc) => {
+				if (!sc || typeof sc !== 'object') return '';
+				const s = sc as Record<string, unknown>;
+				const name = typeof s.name === 'string' ? s.name : 'Spellcasting';
+				const headers = Array.isArray(s.headerEntries)
+					? s.headerEntries.map((h) => (typeof h === 'string' ? renderInline(h) : '')).join(' ')
+					: '';
+				const header = `<p><em><strong>${name}.</strong></em> ${headers}</p>`;
 
-			const lines: string[] = [];
+				const lines: string[] = [];
 
-			// At will
-			if (Array.isArray(s.will) && s.will.length > 0) {
-				const spells = s.will
-					.map((sp) => {
-						if (typeof sp === 'string') return renderInline(sp);
-						if (sp && typeof sp === 'object') {
-							const o = sp as Record<string, unknown>;
-							return typeof o.entry === 'string' ? renderInline(o.entry) : '';
-						}
-						return '';
-					})
-					.filter(Boolean)
-					.join(', ');
-				if (spells) lines.push(`<p>At will: ${spells}</p>`);
-			}
-
-			// Daily (1/day, 2/day, etc. — keys like "1", "2", "1e", "2e")
-			if (s.daily && typeof s.daily === 'object') {
-				const daily = s.daily as Record<string, unknown>;
-				for (const [key, val] of Object.entries(daily)) {
-					if (!Array.isArray(val)) continue;
-					const num = key.replace('e', '');
-					const spells = val
+				// At will
+				if (Array.isArray(s.will) && s.will.length > 0) {
+					const spells = s.will
 						.map((sp) => {
 							if (typeof sp === 'string') return renderInline(sp);
 							if (sp && typeof sp === 'object') {
@@ -190,32 +211,57 @@
 						})
 						.filter(Boolean)
 						.join(', ');
-					if (spells) lines.push(`<p>${num}/day each: ${spells}</p>`);
+					if (spells) lines.push(`<p>At will: ${spells}</p>`);
 				}
-			}
 
-			// Slot-based (level-keyed spells object)
-			if (s.spells && typeof s.spells === 'object') {
-				const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
-				for (const [level, data] of Object.entries(s.spells as Record<string, unknown>)) {
-					if (!data || typeof data !== 'object') continue;
-					const d = data as Record<string, unknown>;
-					const spells = Array.isArray(d.spells)
-						? d.spells.map((sp) => (typeof sp === 'string' ? renderInline(sp) : '')).filter(Boolean).join(', ')
-						: '';
-					if (!spells) continue;
-					if (level === '0') {
-						lines.push(`<p>Cantrips (at will): ${spells}</p>`);
-					} else {
-						const lvlName = levelNames[parseInt(level)] ?? `${level}th`;
-						const slots = typeof d.slots === 'number' ? ` (${d.slots} slot${d.slots !== 1 ? 's' : ''})` : '';
-						lines.push(`<p>${lvlName} level${slots}: ${spells}</p>`);
+				// Daily (1/day, 2/day, etc. — keys like "1", "2", "1e", "2e")
+				if (s.daily && typeof s.daily === 'object') {
+					const daily = s.daily as Record<string, unknown>;
+					for (const [key, val] of Object.entries(daily)) {
+						if (!Array.isArray(val)) continue;
+						const num = key.replace('e', '');
+						const spells = val
+							.map((sp) => {
+								if (typeof sp === 'string') return renderInline(sp);
+								if (sp && typeof sp === 'object') {
+									const o = sp as Record<string, unknown>;
+									return typeof o.entry === 'string' ? renderInline(o.entry) : '';
+								}
+								return '';
+							})
+							.filter(Boolean)
+							.join(', ');
+						if (spells) lines.push(`<p>${num}/day each: ${spells}</p>`);
 					}
 				}
-			}
 
-			return header + lines.join('');
-		}).join('');
+				// Slot-based (level-keyed spells object)
+				if (s.spells && typeof s.spells === 'object') {
+					const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+					for (const [level, data] of Object.entries(s.spells as Record<string, unknown>)) {
+						if (!data || typeof data !== 'object') continue;
+						const d = data as Record<string, unknown>;
+						const spells = Array.isArray(d.spells)
+							? d.spells
+									.map((sp) => (typeof sp === 'string' ? renderInline(sp) : ''))
+									.filter(Boolean)
+									.join(', ')
+							: '';
+						if (!spells) continue;
+						if (level === '0') {
+							lines.push(`<p>Cantrips (at will): ${spells}</p>`);
+						} else {
+							const lvlName = levelNames[parseInt(level)] ?? `${level}th`;
+							const slots =
+								typeof d.slots === 'number' ? ` (${d.slots} slot${d.slots !== 1 ? 's' : ''})` : '';
+							lines.push(`<p>${lvlName} level${slots}: ${spells}</p>`);
+						}
+					}
+				}
+
+				return header + lines.join('');
+			})
+			.join('');
 	}
 
 	// ── Stat block field parsers ───────────────────────────────────────────────
@@ -225,7 +271,8 @@
 		if (Array.isArray(ac)) {
 			const first = ac[0];
 			if (typeof first === 'number') return first;
-			if (first && typeof first === 'object') return Number((first as Record<string, unknown>).ac ?? 10);
+			if (first && typeof first === 'object')
+				return Number((first as Record<string, unknown>).ac ?? 10);
 		}
 		return 10;
 	}
@@ -238,7 +285,8 @@
 			if (first && typeof first === 'object') {
 				const o = first as Record<string, unknown>;
 				const base = String(o.ac ?? 10);
-				const from = Array.isArray(o.from) && o.from.length ? ` (${(o.from as string[]).join(', ')})` : '';
+				const from =
+					Array.isArray(o.from) && o.from.length ? ` (${(o.from as string[]).join(', ')})` : '';
 				return base + from;
 			}
 		}
@@ -282,8 +330,17 @@
 			if (aligns.includes('U')) alignStr = 'unaligned';
 			else if (aligns.includes('A')) alignStr = 'any alignment';
 			else {
-				const AM: Record<string, string> = { L: 'lawful', N: 'neutral', C: 'chaotic', G: 'good', E: 'evil' };
-				alignStr = aligns.map((a) => AM[a] ?? a.toLowerCase()).filter(Boolean).join(' ');
+				const AM: Record<string, string> = {
+					L: 'lawful',
+					N: 'neutral',
+					C: 'chaotic',
+					G: 'good',
+					E: 'evil'
+				};
+				alignStr = aligns
+					.map((a) => AM[a] ?? a.toLowerCase())
+					.filter(Boolean)
+					.join(' ');
 			}
 		}
 		return `${sizes} ${typeStr}${alignStr ? `, ${alignStr}` : ''}`.trim();
@@ -340,7 +397,8 @@
 
 	function parseSenses(senses: unknown, passive: unknown): string {
 		const parts: string[] = [];
-		if (Array.isArray(senses)) parts.push(...(senses.filter((s) => typeof s === 'string') as string[]));
+		if (Array.isArray(senses))
+			parts.push(...(senses.filter((s) => typeof s === 'string') as string[]));
 		parts.push(`passive Perception ${typeof passive === 'number' ? passive : 10}`);
 		return parts.join(', ');
 	}
@@ -363,10 +421,13 @@
 				parts.push(item);
 			} else if (item && typeof item === 'object') {
 				const o = item as Record<string, unknown>;
-				const dmg = Array.isArray(o.immune) ? o.immune
-					: Array.isArray(o.resist) ? o.resist
-					: Array.isArray(o.vulnerable) ? o.vulnerable
-					: [];
+				const dmg = Array.isArray(o.immune)
+					? o.immune
+					: Array.isArray(o.resist)
+						? o.resist
+						: Array.isArray(o.vulnerable)
+							? o.vulnerable
+							: [];
 				const note = typeof o.note === 'string' ? ` (${o.note})` : '';
 				if (dmg.length) parts.push((dmg as string[]).join(', ') + note);
 			}
@@ -403,10 +464,13 @@
 
 		// Legendary actions (optional header text + feature list)
 		const legendaryHeader = Array.isArray(m.legendaryHeader)
-			? (m.legendaryHeader as unknown[]).map((h) => (typeof h === 'string' ? `<p>${renderInline(h)}</p>` : '')).join('')
+			? (m.legendaryHeader as unknown[])
+					.map((h) => (typeof h === 'string' ? `<p>${renderInline(h)}</p>` : ''))
+					.join('')
 			: '';
 		const legendaryBody = parseFeatures(m.legendary) ?? '';
-		const legendaryActions = legendaryHeader || legendaryBody ? legendaryHeader + legendaryBody : undefined;
+		const legendaryActions =
+			legendaryHeader || legendaryBody ? legendaryHeader + legendaryBody : undefined;
 
 		// Traits: native trait array + spellcasting (which is a separate field in 5etools)
 		const traitHtml = parseFeatures(m.trait) ?? '';
@@ -421,12 +485,18 @@
 			armorClass: parseAcString(m.ac),
 			hitPoints: parseHpString(m.hp),
 			speed: parseSpeed(m.speed),
-			str, strMod: modStr(str),
-			dex, dexMod: modStr(dex),
-			con, conMod: modStr(con),
-			int, intMod: modStr(int),
-			wis, wisMod: modStr(wis),
-			cha, chaMod: modStr(cha),
+			str,
+			strMod: modStr(str),
+			dex,
+			dexMod: modStr(dex),
+			con,
+			conMod: modStr(con),
+			int,
+			intMod: modStr(int),
+			wis,
+			wisMod: modStr(wis),
+			cha,
+			chaMod: modStr(cha),
 			savingThrows: parseSaves(m.save),
 			skills: parseSkills(m.skill),
 			damageVulnerabilities: parseDamageList(m.vulnerable),
@@ -515,7 +585,7 @@
 			});
 			if (!res.ok) {
 				const data = await res.json().catch(() => ({}));
-				parseError = (data as Record<string, unknown>).error as string ?? 'Import failed.';
+				parseError = ((data as Record<string, unknown>).error as string) ?? 'Import failed.';
 				return;
 			}
 			result = await res.json();
@@ -535,8 +605,12 @@
 		aria-label="Import bestiary"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"
 		tabindex="-1"
-		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
-		onkeydown={(e) => { if (e.key === 'Escape') close(); }}
+		onclick={(e) => {
+			if (e.target === e.currentTarget) close();
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') close();
+		}}
 	>
 		<div
 			class="flex w-full max-w-lg flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
@@ -544,10 +618,27 @@
 		>
 			<!-- Header -->
 			<div class="flex shrink-0 items-center justify-between border-b border-gray-700 px-5 py-4">
-				<h3 class="font-black tracking-widest text-indigo-400 uppercase">Import 5etools Bestiary</h3>
-				<button onclick={close} class="text-gray-500 transition hover:text-white" aria-label="Close">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				<h3 class="font-black tracking-widest text-indigo-400 uppercase">
+					Import 5etools Bestiary
+				</h3>
+				<button
+					onclick={close}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -560,15 +651,19 @@
 						href="https://github.com/5etools-mirror-3/5etools-src/tree/master/data/bestiary"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-indigo-400 underline hover:text-indigo-300"
-					>5etools data repository</a>
-					(e.g. <code class="rounded bg-gray-800 px-1 text-xs text-indigo-300">bestiary-idrof.json</code>)
+						class="text-indigo-400 underline hover:text-indigo-300">5etools data repository</a
+					>
+					(e.g.
+					<code class="rounded bg-gray-800 px-1 text-xs text-indigo-300">bestiary-idrof.json</code>)
 					and select it below. Full stat blocks are imported and shown in info cards.
 				</p>
 
 				<!-- File picker -->
 				<div>
-					<label for="bestiary-file" class="mb-1 block text-xs font-bold tracking-wider text-gray-500 uppercase">
+					<label
+						for="bestiary-file"
+						class="mb-1 block text-xs font-bold tracking-wider text-gray-500 uppercase"
+					>
 						Bestiary JSON file
 					</label>
 					<input
@@ -581,7 +676,9 @@
 				</div>
 
 				{#if parseError}
-					<p class="rounded border border-red-700/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">{parseError}</p>
+					<p class="rounded border border-red-700/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">
+						{parseError}
+					</p>
 				{/if}
 
 				{#if parsed.length > 0 && !result}
@@ -600,12 +697,16 @@
 				{/if}
 
 				{#if result}
-					<div class="rounded border border-green-700/50 bg-green-900/20 px-3 py-3 text-sm text-green-300">
+					<div
+						class="rounded border border-green-700/50 bg-green-900/20 px-3 py-3 text-sm text-green-300"
+					>
 						<p class="font-semibold">Import complete!</p>
 						<p class="mt-1 text-gray-400">
-							Imported <strong class="text-white">{result.imported}</strong> monsters with stat blocks
+							Imported <strong class="text-white">{result.imported}</strong> monsters with stat
+							blocks
 							{#if result.skipped > 0}
-								&bull; <strong class="text-gray-300">{result.skipped}</strong> skipped (already exist or invalid)
+								&bull; <strong class="text-gray-300">{result.skipped}</strong> skipped (already exist
+								or invalid)
 							{/if}
 						</p>
 					</div>

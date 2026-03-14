@@ -203,10 +203,16 @@
 	let statTotalRounds = $derived(records.reduce((s, r) => s + r.rounds, 0));
 	let statTotalXp = $derived(records.reduce((s, r) => s + (r.totalXp ?? 0), 0));
 	let statEnemiesSlain = $derived(
-		records.reduce((s, r) => s + r.participants.filter((p) => p.type === 'enemy' && p.wasSlain).length, 0)
+		records.reduce(
+			(s, r) => s + r.participants.filter((p) => p.type === 'enemy' && p.wasSlain).length,
+			0
+		)
 	);
 	let statPlayersFallen = $derived(
-		records.reduce((s, r) => s + r.participants.filter((p) => p.type === 'player' && p.wasSlain).length, 0)
+		records.reduce(
+			(s, r) => s + r.participants.filter((p) => p.type === 'player' && p.wasSlain).length,
+			0
+		)
 	);
 	let statCombatMinutes = $derived(
 		records.reduce((s, r) => {
@@ -341,7 +347,9 @@
 			<!-- ── Campaign Stats ──────────────────────────────────────────────── -->
 			<div class="mb-8 overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
 				<div class="border-b border-gray-800/60 px-5 py-3">
-					<span class="text-xs font-bold tracking-widest text-amber-600/80 uppercase">Campaign Overview</span>
+					<span class="text-xs font-bold tracking-widest text-amber-600/80 uppercase"
+						>Campaign Overview</span
+					>
 				</div>
 				<div class="grid grid-cols-3 divide-x divide-gray-800 sm:grid-cols-6">
 					<div class="flex flex-col items-center gap-0.5 px-4 py-4">
@@ -353,7 +361,9 @@
 						<span class="text-center text-xs text-gray-500">Rounds</span>
 					</div>
 					<div class="flex flex-col items-center gap-0.5 px-4 py-4">
-						<span class="text-2xl font-bold text-amber-300">{statTotalXp > 0 ? statTotalXp.toLocaleString() : '—'}</span>
+						<span class="text-2xl font-bold text-amber-300"
+							>{statTotalXp > 0 ? statTotalXp.toLocaleString() : '—'}</span
+						>
 						<span class="text-center text-xs text-gray-500">XP Earned</span>
 					</div>
 					<div class="flex flex-col items-center gap-0.5 px-4 py-4">
@@ -361,11 +371,17 @@
 						<span class="text-center text-xs text-gray-500">Enemies Slain</span>
 					</div>
 					<div class="flex flex-col items-center gap-0.5 px-4 py-4">
-						<span class="text-2xl font-bold {statPlayersFallen > 0 ? 'text-orange-400' : 'text-green-500'}">{statPlayersFallen}</span>
+						<span
+							class="text-2xl font-bold {statPlayersFallen > 0
+								? 'text-orange-400'
+								: 'text-green-500'}">{statPlayersFallen}</span
+						>
 						<span class="text-center text-xs text-gray-500">Players Fallen</span>
 					</div>
 					<div class="flex flex-col items-center gap-0.5 px-4 py-4">
-						<span class="text-2xl font-bold text-blue-400">{formatCombatTime(statCombatMinutes)}</span>
+						<span class="text-2xl font-bold text-blue-400"
+							>{formatCombatTime(statCombatMinutes)}</span
+						>
 						<span class="text-center text-xs text-gray-500">Combat Time</span>
 					</div>
 				</div>
@@ -382,13 +398,18 @@
 						viewBox="0 0 24 24"
 						stroke="currentColor"
 					>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"
+						/>
 					</svg>
 					<input
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search by combatant name…"
-						class="w-full rounded-lg border border-gray-700 bg-gray-900 py-2 pr-4 pl-9 text-sm text-gray-200 placeholder-gray-600 outline-none transition focus:border-amber-700 focus:ring-1 focus:ring-amber-800"
+						class="w-full rounded-lg border border-gray-700 bg-gray-900 py-2 pr-4 pl-9 text-sm text-gray-200 placeholder-gray-600 transition outline-none focus:border-amber-700 focus:ring-1 focus:ring-amber-800"
 					/>
 					{#if searchQuery}
 						<button
@@ -396,8 +417,19 @@
 							title="Clear search"
 							class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-gray-400"
 						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
 							</svg>
 						</button>
 					{/if}
@@ -411,9 +443,7 @@
 							<button
 								onclick={() => (filterCasualties = val as typeof filterCasualties)}
 								class="rounded px-3 py-1 text-xs font-medium transition
-									{filterCasualties === val
-										? 'bg-amber-700/40 text-amber-300'
-										: 'text-gray-500 hover:text-gray-300'}"
+									{filterCasualties === val ? 'bg-amber-700/40 text-amber-300' : 'text-gray-500 hover:text-gray-300'}"
 							>
 								{label}
 							</button>
@@ -425,7 +455,7 @@
 						<span class="text-xs text-gray-600">Sort:</span>
 						<select
 							bind:value={sortBy}
-							class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1.5 text-xs text-gray-300 outline-none transition focus:border-amber-700"
+							class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1.5 text-xs text-gray-300 transition outline-none focus:border-amber-700"
 						>
 							<option value="newest">Newest First</option>
 							<option value="oldest">Oldest First</option>
@@ -447,7 +477,10 @@
 				<div class="flex flex-col items-center justify-center py-16 text-center">
 					<p class="text-base font-semibold text-gray-700">No encounters match your search</p>
 					<button
-						onclick={() => { searchQuery = ''; filterCasualties = 'all'; }}
+						onclick={() => {
+							searchQuery = '';
+							filterCasualties = 'all';
+						}}
 						class="mt-3 text-xs text-amber-700 hover:text-amber-500"
 					>
 						Clear filters
@@ -509,12 +542,34 @@
 											class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-amber-400 disabled:opacity-40"
 										>
 											{#if exportingId === record.id}
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V4" />
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-4 w-4 animate-spin"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M4 12a8 8 0 018-8V4"
+													/>
 												</svg>
 											{:else}
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-4 w-4"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+													/>
 												</svg>
 											{/if}
 										</button>
@@ -621,7 +676,10 @@
 													></div>
 													<!-- Final HP -->
 													<div
-														class="h-full rounded-full transition-all {hpBgColor(p.finalHp, p.maxHp)}"
+														class="h-full rounded-full transition-all {hpBgColor(
+															p.finalHp,
+															p.maxHp
+														)}"
 														style="width: {finalPct}%"
 													></div>
 												</div>
@@ -672,23 +730,28 @@
 										{@const slainWithCr = record.participants.filter(
 											(p) => p.wasSlain && p.cr !== undefined
 										)}
-										{@const slainWithLoot = record.participants.filter(p => p.wasSlain && p.loot?.length)}
+										{@const slainWithLoot = record.participants.filter(
+											(p) => p.wasSlain && p.loot?.length
+										)}
 										<div class="border-t border-gray-800/40 bg-gray-950/60 px-5 py-4">
 											<!-- Loot -->
 											{#if slainWithLoot.length > 0}
 												<div class="mb-5">
 													<div class="mb-2 flex items-center gap-2">
-														<span class="text-xs font-bold tracking-widest text-amber-700/80 uppercase">Loot</span>
+														<span
+															class="text-xs font-bold tracking-widest text-amber-700/80 uppercase"
+															>Loot</span
+														>
 														<div class="h-px flex-1 bg-amber-900/20"></div>
 													</div>
 													<div class="flex flex-col gap-3 pl-2">
 														{#each slainWithLoot as p}
 															<div>
-																<div class="flex items-center gap-2 text-xs mb-1">
+																<div class="mb-1 flex items-center gap-2 text-xs">
 																	<span class="w-4 shrink-0 text-center text-red-400">☠</span>
 																	<span class="font-semibold text-gray-300">{p.name}</span>
 																</div>
-																<div class="pl-6 flex flex-col gap-0.5">
+																<div class="flex flex-col gap-0.5 pl-6">
 																	{#each p.loot! as item}
 																		<div class="flex items-center gap-2 text-xs text-gray-400">
 																			<span class="text-amber-600">•</span>
@@ -736,7 +799,8 @@
 																<span class="w-4 shrink-0"></span>
 																<span class="flex-1">Split {players.length} ways</span>
 																<span class="w-20 text-right font-mono"
-																	>{Math.floor(record.totalXp! / players.length).toLocaleString()} XP ea.</span
+																	>{Math.floor(record.totalXp! / players.length).toLocaleString()} XP
+																	ea.</span
 																>
 															</div>
 														{/if}

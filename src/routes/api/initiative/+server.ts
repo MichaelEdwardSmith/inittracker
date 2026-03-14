@@ -16,7 +16,12 @@ export const POST: RequestHandler = async ({ request }) => {
 		return new Response('Invalid sessionId', { status: 400 });
 	if (typeof playerId !== 'string' || !playerId)
 		return new Response('Invalid playerId', { status: 400 });
-	if (typeof initiative !== 'number' || !Number.isInteger(initiative) || initiative < -10 || initiative > 40)
+	if (
+		typeof initiative !== 'number' ||
+		!Number.isInteger(initiative) ||
+		initiative < -10 ||
+		initiative > 40
+	)
 		return new Response('Invalid initiative value', { status: 400 });
 
 	// Load state from cache or DB
@@ -24,7 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!state) {
 		const dm = await getDMByGameSessionId(sessionId);
 		if (!dm) return new Response('Session not found', { status: 404 });
-		state = await getCombatState(sessionId) ?? { combatants: [], currentTurnId: null, round: 1 };
+		state = (await getCombatState(sessionId)) ?? { combatants: [], currentTurnId: null, round: 1 };
 		sessionStates.set(sessionId, state);
 	}
 

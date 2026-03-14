@@ -12,7 +12,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			isGuest: true,
 			showVoiceCommands: false,
 			sessions: [] as GameSession[],
-			activeSession: { id: '', sessionId: locals.gameSessionId ?? '', name: 'Guest Session' } as GameSession
+			activeSession: {
+				id: '',
+				sessionId: locals.gameSessionId ?? '',
+				name: 'Guest Session'
+			} as GameSession
 		};
 	}
 
@@ -21,8 +25,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const sessions = await listGameSessions(authSessionId);
 
-	const activeSession: GameSession =
-		sessions.find((s) => s.sessionId === gameSessionId) ??
+	const activeSession: GameSession = sessions.find((s) => s.sessionId === gameSessionId) ??
 		sessions[0] ?? { id: '', sessionId: gameSessionId, name: 'Session' };
 
 	return {

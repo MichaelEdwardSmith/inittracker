@@ -146,16 +146,16 @@ export interface NoteEntry {
 
 export interface Spell5e {
 	name: string;
-	source: string;        // "PHB" | "XGE" | "TCE"
-	level: number;         // 0 = cantrip
-	school: string;        // "A" | "C" | "D" | "E" | "V" | "I" | "N" | "T"
-	time: unknown[];       // raw 5etools time array
-	range: unknown;        // raw 5etools range object
+	source: string; // "PHB" | "XGE" | "TCE"
+	level: number; // 0 = cantrip
+	school: string; // "A" | "C" | "D" | "E" | "V" | "I" | "N" | "T"
+	time: unknown[]; // raw 5etools time array
+	range: unknown; // raw 5etools range object
 	components: Record<string, unknown>; // {v, s, m}
-	duration: unknown[];   // raw 5etools duration array
-	entries: unknown[];    // rich text entries
+	duration: unknown[]; // raw 5etools duration array
+	entries: unknown[]; // rich text entries
 	entriesHigherLevel?: unknown[];
-	classes?: unknown;     // 5etools classes object
+	classes?: unknown; // 5etools classes object
 	ritual?: true;
 }
 
@@ -165,12 +165,18 @@ export interface MonsterDetail {
 	armorClass: string;
 	hitPoints: string;
 	speed: string;
-	str: number; strMod: string;
-	dex: number; dexMod: string;
-	con: number; conMod: string;
-	int: number; intMod: string;
-	wis: number; wisMod: string;
-	cha: number; chaMod: string;
+	str: number;
+	strMod: string;
+	dex: number;
+	dexMod: string;
+	con: number;
+	conMod: string;
+	int: number;
+	intMod: string;
+	wis: number;
+	wisMod: string;
+	cha: number;
+	chaMod: string;
 	savingThrows?: string;
 	skills?: string;
 	damageVulnerabilities?: string;

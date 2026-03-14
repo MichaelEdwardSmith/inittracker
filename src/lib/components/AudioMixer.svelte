@@ -17,8 +17,8 @@
 		let dir = 1;
 		let lastTime = 0;
 		let pauseUntil = 0;
-		const SPEED_PX_S = 30;   // px per second
-		const PAUSE_MS   = 1500; // pause at each end
+		const SPEED_PX_S = 30; // px per second
+		const PAUSE_MS = 1500; // pause at each end
 
 		function tick(timestamp: number) {
 			if (lastTime === 0) lastTime = timestamp;
@@ -30,8 +30,15 @@
 				if (max > 0) {
 					if (timestamp >= pauseUntil) {
 						pos += dir * SPEED_PX_S * dt;
-						if (pos >= max) { pos = max; dir = -1; pauseUntil = timestamp + PAUSE_MS; }
-						else if (pos <= 0) { pos = 0;   dir =  1; pauseUntil = timestamp + PAUSE_MS; }
+						if (pos >= max) {
+							pos = max;
+							dir = -1;
+							pauseUntil = timestamp + PAUSE_MS;
+						} else if (pos <= 0) {
+							pos = 0;
+							dir = 1;
+							pauseUntil = timestamp + PAUSE_MS;
+						}
 						node.scrollLeft = pos;
 					}
 				}
@@ -39,31 +46,40 @@
 			rafId = requestAnimationFrame(tick);
 		}
 
-		function onFocus() { pos = 0; node.scrollLeft = 0; lastTime = 0; pauseUntil = 0; }
-		function onBlur()  { pos = 0; dir = 1; lastTime = 0; pauseUntil = 0; }
+		function onFocus() {
+			pos = 0;
+			node.scrollLeft = 0;
+			lastTime = 0;
+			pauseUntil = 0;
+		}
+		function onBlur() {
+			pos = 0;
+			dir = 1;
+			lastTime = 0;
+			pauseUntil = 0;
+		}
 
 		rafId = requestAnimationFrame(tick);
 		node.addEventListener('focus', onFocus);
-		node.addEventListener('blur',  onBlur);
+		node.addEventListener('blur', onBlur);
 
 		return {
 			destroy() {
 				cancelAnimationFrame(rafId);
 				node.removeEventListener('focus', onFocus);
-				node.removeEventListener('blur',  onBlur);
+				node.removeEventListener('blur', onBlur);
 			}
 		};
 	}
 
-
 	const DEFAULT_COUNT = 5;
 	const STORAGE_KEY = 'dm-mixer-settings';
 	const CHANNEL_W = 118; // px — must match w-[118px] in template
-	const GAP       = 12;  // px — gap-3
-	const PAD       = 32;  // px — p-4 on each side of the channel area
+	const GAP = 12; // px — gap-3
+	const PAD = 32; // px — p-4 on each side of the channel area
 
 	interface Channel {
-		id: string;       // stable UUID — IndexedDB key for the saved file handle
+		id: string; // stable UUID — IndexedDB key for the saved file handle
 		label: string;
 		fileName: string | null;
 		// Set when the handle was restored but permission hasn't been granted yet
@@ -81,7 +97,7 @@
 	const hasFSA = browser && 'showOpenFilePicker' in window;
 
 	// ── IndexedDB helpers ─────────────────────────────────────────────────────
-	const IDB_NAME  = 'dm-mixer-files';
+	const IDB_NAME = 'dm-mixer-files';
 	const IDB_STORE = 'files';
 
 	function openFreshIDB(): Promise<IDBDatabase> {
@@ -89,7 +105,7 @@
 			const req = indexedDB.open(IDB_NAME, 1);
 			req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
 			req.onsuccess = () => resolve(req.result);
-			req.onerror   = () => reject(req.error);
+			req.onerror = () => reject(req.error);
 		});
 	}
 
@@ -98,38 +114,60 @@
 		try {
 			db = await openFreshIDB();
 			await new Promise<void>((res, rej) => {
-				const tx  = db!.transaction(IDB_STORE, 'readwrite');
+				const tx = db!.transaction(IDB_STORE, 'readwrite');
 				const req = tx.objectStore(IDB_STORE).put(value, key);
-				req.onerror = (e) => { e.preventDefault(); rej(req.error); };
+				req.onerror = (e) => {
+					e.preventDefault();
+					rej(req.error);
+				};
 				tx.oncomplete = () => res();
-				tx.onabort    = () => rej(tx.error ?? new Error('IDB transaction aborted'));
+				tx.onabort = () => rej(tx.error ?? new Error('IDB transaction aborted'));
 			});
 			return true;
-		} catch (err) { console.warn('[Mixer] idbPut failed:', err); return false; }
-		finally { db?.close(); }
+		} catch (err) {
+			console.warn('[Mixer] idbPut failed:', err);
+			return false;
+		} finally {
+			db?.close();
+		}
 	}
 
 	type IdbEntry =
 		| { kind: 'handle'; handle: FileSystemFileHandle; name: string }
-		| { kind: 'blob';   blob: Blob;                   name: string };
+		| { kind: 'blob'; blob: Blob; name: string };
 
 	async function idbLoad(key: string): Promise<IdbEntry | null> {
 		let db: IDBDatabase | null = null;
 		try {
 			db = await openFreshIDB();
 			const raw = await new Promise<Record<string, unknown> | null>((resolve) => {
-				const tx  = db!.transaction(IDB_STORE, 'readonly');
+				const tx = db!.transaction(IDB_STORE, 'readonly');
 				const req = tx.objectStore(IDB_STORE).get(key);
 				req.onsuccess = () => resolve((req.result as Record<string, unknown>) ?? null);
-				req.onerror   = () => resolve(null);
+				req.onerror = () => resolve(null);
 			});
 			if (!raw) return null;
-			if (raw.handle)                        return { kind: 'handle', handle: raw.handle as FileSystemFileHandle, name: raw.name as string };
-			if (raw.buffer instanceof ArrayBuffer) return { kind: 'blob', blob: new Blob([raw.buffer], { type: raw.type as string }), name: raw.name as string };
-			if (raw.blob   instanceof Blob)        return { kind: 'blob', blob: raw.blob as Blob, name: raw.name as string };
+			if (raw.handle)
+				return {
+					kind: 'handle',
+					handle: raw.handle as FileSystemFileHandle,
+					name: raw.name as string
+				};
+			if (raw.buffer instanceof ArrayBuffer)
+				return {
+					kind: 'blob',
+					blob: new Blob([raw.buffer], { type: raw.type as string }),
+					name: raw.name as string
+				};
+			if (raw.blob instanceof Blob)
+				return { kind: 'blob', blob: raw.blob as Blob, name: raw.name as string };
 			return null;
-		} catch (err) { console.warn('[Mixer] idbLoad failed:', err); return null; }
-		finally { db?.close(); }
+		} catch (err) {
+			console.warn('[Mixer] idbLoad failed:', err);
+			return null;
+		} finally {
+			db?.close();
+		}
 	}
 
 	async function idbDelete(key: string) {
@@ -140,10 +178,13 @@
 				const tx = db!.transaction(IDB_STORE, 'readwrite');
 				tx.objectStore(IDB_STORE).delete(key);
 				tx.oncomplete = () => res();
-				tx.onabort    = () => res();
+				tx.onabort = () => res();
 			});
-		} catch { /* silent */ }
-		finally { db?.close(); }
+		} catch {
+			/* silent */
+		} finally {
+			db?.close();
+		}
 	}
 
 	// ── File System Access API path (Chrome/Edge) ─────────────────────────────
@@ -151,10 +192,14 @@
 	async function showFilePicker(i: number) {
 		try {
 			type FSAPicker = { showOpenFilePicker: (o?: unknown) => Promise<FileSystemFileHandle[]> };
-		const [handle] = await (window as unknown as FSAPicker)
-			.showOpenFilePicker({ types: [{ description: 'Audio', accept: { 'audio/*': [] } }], multiple: false });
+			const [handle] = await (window as unknown as FSAPicker).showOpenFilePicker({
+				types: [{ description: 'Audio', accept: { 'audio/*': [] } }],
+				multiple: false
+			});
 			await applyHandle(i, handle, /* saveToIdb */ true);
-		} catch { /* user cancelled */ }
+		} catch {
+			/* user cancelled */
+		}
 	}
 
 	// Reads the file from a handle, wires up the audio element, optionally saves.
@@ -167,18 +212,23 @@
 			if (a.src.startsWith('blob:')) URL.revokeObjectURL(a.src);
 			a.src = URL.createObjectURL(file);
 			a.load();
-			channels[i].fileName     = file.name;
+			channels[i].fileName = file.name;
 			channels[i].pendingHandle = null;
 			channels[i].persistFailed = false;
-			channels[i].playing       = false;
-			if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
+			channels[i].playing = false;
+			if (wasPlaying) {
+				a.play().catch(() => {});
+				channels[i].playing = true;
+			}
 			applyVol(i);
 			if (saveToIdb) {
 				const ok = await idbPut(channels[i].id, { handle, name: file.name });
 				channels[i].persistFailed = !ok;
 				saveSettings();
 			}
-		} catch (err) { console.warn('[Mixer] applyHandle failed:', err); }
+		} catch (err) {
+			console.warn('[Mixer] applyHandle failed:', err);
+		}
 	}
 
 	// Called when user clicks "Tap to restore" on a channel with a pending handle.
@@ -188,9 +238,11 @@
 		if (!handle) return;
 		try {
 			type WithPerm = { requestPermission(o: { mode: string }): Promise<PermissionState> };
-		const perm = await (handle as unknown as WithPerm).requestPermission({ mode: 'read' });
+			const perm = await (handle as unknown as WithPerm).requestPermission({ mode: 'read' });
 			if (perm === 'granted') await applyHandle(i, handle, /* saveToIdb */ false);
-		} catch (err) { console.warn('[Mixer] restoreFromHandle failed:', err); }
+		} catch (err) {
+			console.warn('[Mixer] restoreFromHandle failed:', err);
+		}
 	}
 
 	// ── Fallback path (Firefox / non-FSA browsers) — store ArrayBuffer in IDB ─
@@ -203,54 +255,73 @@
 		if (a.src.startsWith('blob:')) URL.revokeObjectURL(a.src);
 		a.src = URL.createObjectURL(file);
 		a.load();
-		channels[i].fileName     = file.name;
+		channels[i].fileName = file.name;
 		channels[i].pendingHandle = null;
 		channels[i].persistFailed = false;
-		channels[i].playing       = false;
-		if (wasPlaying) { a.play().catch(() => {}); channels[i].playing = true; }
+		channels[i].playing = false;
+		if (wasPlaying) {
+			a.play().catch(() => {});
+			channels[i].playing = true;
+		}
 		applyVol(i);
 		saveSettings();
 		idbPut(channels[i].id, { buffer: null, name: file.name, _needsBuffer: true });
 		// Read the ArrayBuffer async and then overwrite with the real entry.
 		file.arrayBuffer().then((buffer) =>
-			idbPut(channels[i].id, { buffer, type: file.type || 'audio/mpeg', name: file.name })
-				.then((ok) => { channels[i].persistFailed = !ok; })
+			idbPut(channels[i].id, { buffer, type: file.type || 'audio/mpeg', name: file.name }).then(
+				(ok) => {
+					channels[i].persistFailed = !ok;
+				}
+			)
 		);
 	}
 
 	// ── Persistence ───────────────────────────────────────────────────────────
-	function loadSaved(): { ids?: string[]; labels?: string[]; volumes?: number[]; master?: number; count?: number } {
+	function loadSaved(): {
+		ids?: string[];
+		labels?: string[];
+		volumes?: number[];
+		master?: number;
+		count?: number;
+	} {
 		if (!browser) return {};
-		try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}'); } catch { return {}; }
+		try {
+			return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
+		} catch {
+			return {};
+		}
 	}
 
 	function saveSettings() {
 		if (!browser) return;
-		localStorage.setItem(STORAGE_KEY, JSON.stringify({
-			count:   channels.length,
-			ids:     channels.map((c) => c.id),
-			labels:  channels.map((c) => c.label),
-			volumes: channels.map((c) => c.volume),
-			master:  masterVolume
-		}));
+		localStorage.setItem(
+			STORAGE_KEY,
+			JSON.stringify({
+				count: channels.length,
+				ids: channels.map((c) => c.id),
+				labels: channels.map((c) => c.label),
+				volumes: channels.map((c) => c.volume),
+				master: masterVolume
+			})
+		);
 	}
 
-	const saved      = loadSaved();
-	const initCount  = saved.count ?? DEFAULT_COUNT;
+	const saved = loadSaved();
+	const initCount = saved.count ?? DEFAULT_COUNT;
 
 	// ── State ─────────────────────────────────────────────────────────────────
-	let masterVolume  = $state(saved.master ?? 0.8);
-	let channels      = $state<Channel[]>(
+	let masterVolume = $state(saved.master ?? 0.8);
+	let channels = $state<Channel[]>(
 		Array.from({ length: initCount }, (_, i) => ({
-			id:            saved.ids?.[i] ?? crypto.randomUUID(),
-			label:         saved.labels?.[i] ?? `Channel ${i + 1}`,
-			fileName:      null,
+			id: saved.ids?.[i] ?? crypto.randomUUID(),
+			label: saved.labels?.[i] ?? `Channel ${i + 1}`,
+			fileName: null,
 			pendingHandle: null,
 			persistFailed: false,
-			volume:        saved.volumes?.[i] ?? 0.8,
-			muted:         false,
-			solo:          false,
-			playing:       false
+			volume: saved.volumes?.[i] ?? 0.8,
+			muted: false,
+			solo: false,
+			playing: false
 		}))
 	);
 
@@ -303,12 +374,14 @@
 					if (entry.kind === 'handle') {
 						// Check permission without requiring a user gesture.
 						type WithQuery = { queryPermission(o: { mode: string }): Promise<PermissionState> };
-						const perm = await (entry.handle as unknown as WithQuery).queryPermission({ mode: 'read' });
+						const perm = await (entry.handle as unknown as WithQuery).queryPermission({
+							mode: 'read'
+						});
 						if (perm === 'granted') {
 							await applyHandle(i, entry.handle, /* saveToIdb */ false);
 						} else {
 							// Permission needs re-granting — show the "Tap to restore" UI.
-							channels[i].fileName     = entry.name;
+							channels[i].fileName = entry.name;
 							channels[i].pendingHandle = entry.handle;
 						}
 					} else {
@@ -337,15 +410,18 @@
 	const singleRowWidth = $derived(
 		(channels.length + 1) * (CHANNEL_W + GAP) + CHANNEL_W // +1 for master channel; last term = add button
 	);
-	const twoRows    = $derived(containerWidth > 0 && singleRowWidth > containerWidth - PAD);
-	const row1Count  = $derived(Math.ceil(channels.length / 2));
-	const isMobile   = $derived(containerWidth > 0 && containerWidth < 768);
+	const twoRows = $derived(containerWidth > 0 && singleRowWidth > containerWidth - PAD);
+	const row1Count = $derived(Math.ceil(channels.length / 2));
+	const isMobile = $derived(containerWidth > 0 && containerWidth < 768);
 
 	// When the layout flips between single and double row, channel strip heights change.
 	// Reset faderHeights to 0 so bind:clientHeight remeasures them cleanly.
 	$effect(() => {
 		twoRows; // reactive dependency — only runs when twoRows changes
-		untrack(() => { faderHeights = Array(channels.length).fill(0); masterFaderHeight = 0; });
+		untrack(() => {
+			faderHeights = Array(channels.length).fill(0);
+			masterFaderHeight = 0;
+		});
 	});
 
 	// ── Volume helpers ────────────────────────────────────────────────────────
@@ -386,7 +462,7 @@
 
 	function togglePlay(i: number) {
 		const ch = channels[i];
-		const a  = audios[i];
+		const a = audios[i];
 		if (!ch.fileName) return;
 		if (ch.playing) {
 			fadeOutAndStop(i);
@@ -414,7 +490,9 @@
 	}
 
 	function stopAll() {
-		channels.forEach((ch, i) => { if (ch.playing) fadeOutAndStop(i); });
+		channels.forEach((ch, i) => {
+			if (ch.playing) fadeOutAndStop(i);
+		});
 	}
 
 	function setMaster(v: number) {
@@ -431,7 +509,17 @@
 	// ── Add / remove channels ─────────────────────────────────────────────────
 	function addChannel() {
 		const n = channels.length + 1;
-		channels.push({ id: crypto.randomUUID(), label: `Channel ${n}`, fileName: null, pendingHandle: null, persistFailed: false, volume: 0.8, muted: false, solo: false, playing: false });
+		channels.push({
+			id: crypto.randomUUID(),
+			label: `Channel ${n}`,
+			fileName: null,
+			pendingHandle: null,
+			persistFailed: false,
+			volume: 0.8,
+			muted: false,
+			solo: false,
+			playing: false
+		});
 		faderHeights.push(0);
 		remainingTimes.push(null);
 		if (browser) {
@@ -461,7 +549,9 @@
 	}
 
 	// ── Close / keyboard ──────────────────────────────────────────────────────
-	function close() { onclose(); }
+	function close() {
+		onclose();
+	}
 
 	function onKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') close();
@@ -480,8 +570,9 @@
 
 <!-- ── Channel strip snippet (reused in both single-row and two-row layouts) ── -->
 {#snippet strip(ch: Channel, i: number)}
-	<div class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg">
-
+	<div
+		class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg"
+	>
 		<!-- Label + delete row -->
 		<div class="flex items-center gap-1">
 			<input
@@ -489,15 +580,22 @@
 				value={ch.label}
 				onchange={(e) => renameChannel(i, (e.target as HTMLInputElement).value)}
 				use:scrollMarquee
-				class="min-w-0 flex-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-center text-xs font-bold text-amber-300 transition focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+				class="min-w-0 flex-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-center text-xs font-bold text-amber-300 transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 focus:outline-none"
 			/>
 			<button
 				onclick={() => removeChannel(i)}
 				title="Remove channel"
 				class="shrink-0 rounded p-0.5 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3.5 w-3.5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2.5"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</button>
 		</div>
@@ -506,7 +604,9 @@
 		<div class="flex justify-center">
 			{#if ch.playing}
 				<span class="relative flex h-2.5 w-2.5">
-					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+					<span
+						class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"
+					></span>
 					<span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
 				</span>
 			{:else}
@@ -523,7 +623,10 @@
 					class="block w-full rounded border border-dashed border-amber-600/60 bg-amber-950/20 px-2 py-2 text-center transition hover:border-amber-500 hover:bg-amber-900/30"
 					title="Click to restore — browser needs permission to re-read this file"
 				>
-					<span class="block w-full truncate text-[10px] leading-tight text-amber-400/80" title={ch.fileName ?? ''}>🔒 {ch.fileName}</span>
+					<span
+						class="block w-full truncate text-[10px] leading-tight text-amber-400/80"
+						title={ch.fileName ?? ''}>🔒 {ch.fileName}</span
+					>
 				</button>
 			{:else}
 				<button
@@ -531,7 +634,10 @@
 					class="block w-full rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10"
 				>
 					{#if ch.fileName}
-						<span class="block w-full truncate text-[10px] leading-tight text-amber-300" title={ch.fileName}>{ch.fileName}</span>
+						<span
+							class="block w-full truncate text-[10px] leading-tight text-amber-300"
+							title={ch.fileName}>{ch.fileName}</span
+						>
 					{:else}
 						<span class="text-[10px] text-gray-500">Upload audio</span>
 					{/if}
@@ -541,23 +647,35 @@
 			<!-- Fallback for Firefox / non-FSA browsers -->
 			<label class="block cursor-pointer">
 				<input type="file" accept="audio/*" class="sr-only" onchange={(e) => handleFile(i, e)} />
-				<div class="rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10">
+				<div
+					class="rounded border border-dashed border-gray-600 bg-gray-800/50 px-2 py-2 text-center transition hover:border-amber-600 hover:bg-amber-900/10"
+				>
 					{#if ch.fileName}
-						<span class="block w-full truncate text-[10px] leading-tight text-amber-300" title={ch.fileName}>{ch.fileName}</span>
+						<span
+							class="block w-full truncate text-[10px] leading-tight text-amber-300"
+							title={ch.fileName}>{ch.fileName}</span
+						>
 					{:else}
 						<span class="text-[10px] text-gray-500">Upload audio</span>
 					{/if}
 				</div>
 			</label>
 			{#if ch.persistFailed}
-				<div class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400" title="File too large for browser storage — plays this session only">
+				<div
+					class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400"
+					title="File too large for browser storage — plays this session only"
+				>
 					⚠ won't persist
 				</div>
 			{/if}
 		{/if}
 
 		<!-- Time remaining -->
-		<div class="text-center font-mono text-[10px] tabular-nums {remainingTimes[i] != null ? 'text-gray-400' : 'text-gray-700'}">
+		<div
+			class="text-center font-mono text-[10px] tabular-nums {remainingTimes[i] != null
+				? 'text-gray-400'
+				: 'text-gray-700'}"
+		>
 			{remainingTimes[i] != null ? formatTime(remainingTimes[i]!) : '--:--:--'}
 		</div>
 
@@ -569,18 +687,27 @@
 					<button
 						onclick={() => setChannelVol(i, Math.max(0, ch.volume - 0.01))}
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>−</button>
+						>−</button
+					>
 					<input
 						type="number"
-						min="0" max="100" step="1"
+						min="0"
+						max="100"
+						step="1"
 						value={Math.round(ch.volume * 100)}
-						oninput={(e) => setChannelVol(i, Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) / 100)}
+						oninput={(e) =>
+							setChannelVol(
+								i,
+								Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) /
+									100
+							)}
 						class="w-12 rounded border border-gray-700 bg-gray-800 py-1 text-center font-mono text-xs text-amber-300 focus:border-amber-500 focus:outline-none"
 					/>
 					<button
 						onclick={() => setChannelVol(i, Math.min(1, ch.volume + 0.01))}
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>+</button>
+						>+</button
+					>
 				</div>
 			</div>
 		{:else}
@@ -594,7 +721,10 @@
 					{#if faderHeights[i] > 0}
 						<div class="relative" style="width: 28px; height: {faderHeights[i]}px;">
 							<input
-								type="range" min="0" max="1" step="0.01"
+								type="range"
+								min="0"
+								max="1"
+								step="0.01"
 								value={ch.volume}
 								oninput={(e) => setChannelVol(i, parseFloat((e.target as HTMLInputElement).value))}
 								class="fader absolute"
@@ -622,17 +752,27 @@
 			title={ch.fileName ? (ch.playing ? 'Stop' : 'Play') : 'Upload a file first'}
 			class="flex items-center justify-center gap-1 rounded border py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-30
 				{ch.playing
-					? 'border-green-700/70 bg-green-900/30 text-green-400 hover:bg-green-900/50'
-					: 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500 hover:text-white'}"
+				? 'border-green-700/70 bg-green-900/30 text-green-400 hover:bg-green-900/50'
+				: 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500 hover:text-white'}"
 		>
 			{#if ch.playing}
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
-					<rect x="6" y="6" width="12" height="12" rx="1.5"/>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+				>
+					<rect x="6" y="6" width="12" height="12" rx="1.5" />
 				</svg>
 				Stop
 			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
-					<path d="M8 5v14l11-7z"/>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+				>
+					<path d="M8 5v14l11-7z" />
 				</svg>
 				Play
 			{/if}
@@ -643,33 +783,39 @@
 			<button
 				onclick={() => toggleSolo(i)}
 				title="Solo"
-				class="flex-1 rounded border py-1 text-[11px] font-black uppercase tracking-wide transition
+				class="flex-1 rounded border py-1 text-[11px] font-black tracking-wide uppercase transition
 					{ch.solo
-						? 'border-amber-500/70 bg-amber-900/40 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
-						: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-amber-700 hover:text-amber-500'}"
-			>S</button>
+					? 'border-amber-500/70 bg-amber-900/40 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
+					: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-amber-700 hover:text-amber-500'}"
+				>S</button
+			>
 			<button
 				onclick={() => toggleMute(i)}
 				title="Mute"
-				class="flex-1 rounded border py-1 text-[11px] font-black uppercase tracking-wide transition
+				class="flex-1 rounded border py-1 text-[11px] font-black tracking-wide uppercase transition
 					{ch.muted
-						? 'border-red-600/70 bg-red-900/40 text-red-400 shadow-[0_0_8px_rgba(220,38,38,0.3)]'
-						: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-red-800 hover:text-red-500'}"
-			>M</button>
+					? 'border-red-600/70 bg-red-900/40 text-red-400 shadow-[0_0_8px_rgba(220,38,38,0.3)]'
+					: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-red-800 hover:text-red-500'}"
+				>M</button
+			>
 		</div>
 
 		<!-- Channel number -->
-		<div class="text-center text-[10px] font-semibold tracking-widest text-gray-600 uppercase">CH {i + 1}</div>
+		<div class="text-center text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
+			CH {i + 1}
+		</div>
 	</div>
 {/snippet}
 
-
 <!-- ── Master channel strip ────────────────────────────────────────────────── -->
 {#snippet masterStrip()}
-	<div class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg">
-
+	<div
+		class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg"
+	>
 		<!-- Label (non-editable) -->
-		<div class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold text-amber-400 tracking-widest uppercase">
+		<div
+			class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold tracking-widest text-amber-400 uppercase"
+		>
 			Master
 		</div>
 
@@ -681,18 +827,26 @@
 					<button
 						onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>−</button>
+						>−</button
+					>
 					<input
 						type="number"
-						min="0" max="100" step="1"
+						min="0"
+						max="100"
+						step="1"
 						value={Math.round(masterVolume * 100)}
-						oninput={(e) => setMaster(Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) / 100)}
+						oninput={(e) =>
+							setMaster(
+								Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) /
+									100
+							)}
 						class="w-12 rounded border border-gray-700 bg-gray-800 py-1 text-center font-mono text-xs text-amber-300 focus:border-amber-500 focus:outline-none"
 					/>
 					<button
 						onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>+</button>
+						>+</button
+					>
 				</div>
 			</div>
 		{:else}
@@ -706,7 +860,10 @@
 					{#if masterFaderHeight > 0}
 						<div class="relative" style="width: 28px; height: {masterFaderHeight}px;">
 							<input
-								type="range" min="0" max="1" step="0.01"
+								type="range"
+								min="0"
+								max="1"
+								step="0.01"
 								value={masterVolume}
 								oninput={(e) => setMaster(parseFloat((e.target as HTMLInputElement).value))}
 								class="fader absolute"
@@ -727,17 +884,22 @@
 			</div>
 		{/if}
 
-	<!-- Stop All -->
-	<button
-		onclick={stopAll}
-		title="Fade out and stop all playing channels"
-		class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
-	>
-		<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
-			<rect x="6" y="6" width="12" height="12" rx="1.5"/>
-		</svg>
-		Stop All
-	</button>
+		<!-- Stop All -->
+		<button
+			onclick={stopAll}
+			title="Fade out and stop all playing channels"
+			class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-3 w-3"
+				viewBox="0 0 24 24"
+				fill="currentColor"
+			>
+				<rect x="6" y="6" width="12" height="12" rx="1.5" />
+			</svg>
+			Stop All
+		</button>
 	</div>
 {/snippet}
 
@@ -747,10 +909,17 @@
 		onclick={addChannel}
 		class="flex w-[118px] shrink-0 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
 	>
-		<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-7 w-7"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+			stroke-width="1.5"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
 		</svg>
-		<span class="text-xs font-semibold leading-tight text-center">Add a<br/>Channel</span>
+		<span class="text-center text-xs leading-tight font-semibold">Add a<br />Channel</span>
 	</button>
 {/snippet}
 
@@ -760,10 +929,23 @@
 	aria-label="Audio Mixer"
 >
 	<!-- ── Header ──────────────────────────────────────────────────────────── -->
-	<header class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3">
+	<header
+		class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3"
+	>
 		<div class="flex items-center gap-3">
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-5 w-5 text-amber-400"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+				/>
 			</svg>
 			<h2 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Audio Mixer</h2>
 		</div>
@@ -773,26 +955,30 @@
 			title="Close mixer (Esc)"
 			class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>
 		</button>
 	</header>
 
 	<!-- ── Channel area ────────────────────────────────────────────────────── -->
-	<div
-		class="flex flex-1 flex-col gap-3 overflow-hidden p-4"
-		bind:clientWidth={containerWidth}
-	>
+	<div class="flex flex-1 flex-col gap-3 overflow-hidden p-4" bind:clientWidth={containerWidth}>
 		{#if twoRows}
 			<!-- Two rows: channels split evenly, add button at end of row 2 -->
-			<div class="flex flex-1 min-h-0 gap-3">
+			<div class="flex min-h-0 flex-1 gap-3">
 				{@render masterStrip()}
 				{#each channels.slice(0, row1Count) as ch, li}
 					{@render strip(ch, li)}
 				{/each}
 			</div>
-			<div class="flex flex-1 min-h-0 gap-3">
+			<div class="flex min-h-0 flex-1 gap-3">
 				{#each channels.slice(row1Count) as ch, li}
 					{@render strip(ch, li + row1Count)}
 				{/each}
@@ -839,7 +1025,7 @@
 		border-radius: 3px;
 		cursor: pointer;
 		margin-top: -11.5px;
-		box-shadow: 0 0 4px rgba(0,0,0,0.6);
+		box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 	}
 	.fader::-moz-range-thumb {
 		width: 6px;
@@ -848,7 +1034,7 @@
 		border: none;
 		border-radius: 3px;
 		cursor: pointer;
-		box-shadow: 0 0 4px rgba(0,0,0,0.6);
+		box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 	}
 	.fader:focus-visible::-webkit-slider-thumb {
 		outline: 2px solid #f59e0b;

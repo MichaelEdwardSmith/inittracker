@@ -37,13 +37,21 @@
 
 	let popoverLeft = $derived(
 		btnRect
-			? Math.max(8, Math.min(btnRect.left + btnRect.width / 2 - POPOVER_W / 2, (browser ? window.innerWidth : 800) - POPOVER_W - 8))
+			? Math.max(
+					8,
+					Math.min(
+						btnRect.left + btnRect.width / 2 - POPOVER_W / 2,
+						(browser ? window.innerWidth : 800) - POPOVER_W - 8
+					)
+				)
 			: 0
 	);
 	let popoverTop = $derived(btnRect ? btnRect.top + btnRect.height + PAD + 8 : 0);
 
 	let arrowLeft = $derived(
-		btnRect ? Math.max(12, Math.min(btnRect.left + btnRect.width / 2 - popoverLeft - 6, POPOVER_W - 24)) : 136
+		btnRect
+			? Math.max(12, Math.min(btnRect.left + btnRect.width / 2 - popoverLeft - 6, POPOVER_W - 24))
+			: 136
 	);
 </script>
 
@@ -77,7 +85,7 @@
 		>
 			<!-- Upward-pointing arrow -->
 			<div
-				class="absolute -top-[7px] h-3 w-3 rotate-45 border-l border-t border-gray-700 bg-gray-900"
+				class="absolute -top-[7px] h-3 w-3 rotate-45 border-t border-l border-gray-700 bg-gray-900"
 				style="left:{arrowLeft}px;"
 			></div>
 
@@ -85,10 +93,12 @@
 			<div class="p-4">
 				<p class="mb-1 text-sm font-bold text-white">👋 Welcome!</p>
 				<p class="mb-4 text-sm leading-relaxed text-gray-400">
-					Open the <strong class="text-amber-300">menu</strong> to access the Guide and everything
-					else — combat tools, dice roller, sessions, voice commands, and more.
+					Open the <strong class="text-amber-300">menu</strong> to access the Guide and everything else
+					— combat tools, dice roller, sessions, voice commands, and more.
 				</p>
-				<label class="mb-4 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
+				<label
+					class="mb-4 flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none"
+				>
 					<input
 						type="checkbox"
 						checked={dontShow}

@@ -11,7 +11,7 @@ const SCHOOL_NAMES: Record<string, string> = {
 	V: 'Evocation',
 	I: 'Illusion',
 	N: 'Necromancy',
-	T: 'Transmutation',
+	T: 'Transmutation'
 };
 
 export function formatSchool(abbr: string): string {
@@ -64,7 +64,8 @@ export function formatComponents(components: Record<string, unknown>): string {
 	if (components.m) {
 		const mat = components.m;
 		if (typeof mat === 'string') parts.push(`M (${mat})`);
-		else if (mat && typeof mat === 'object' && 'text' in mat) parts.push(`M (${(mat as { text: string }).text})`);
+		else if (mat && typeof mat === 'object' && 'text' in mat)
+			parts.push(`M (${(mat as { text: string }).text})`);
 		else parts.push('M');
 	}
 	return parts.join(', ');
@@ -134,7 +135,11 @@ function renderTag(tag: string, content: string): string {
 		case 'recharge':
 			return `(Recharge ${content})`;
 		case 'atk':
-			return content === 'mw' ? 'Melee Weapon Attack' : content === 'rw' ? 'Ranged Weapon Attack' : content;
+			return content === 'mw'
+				? 'Melee Weapon Attack'
+				: content === 'rw'
+					? 'Ranged Weapon Attack'
+					: content;
 		case 'creature':
 		case 'item':
 		case 'sense':
@@ -149,7 +154,9 @@ function renderTag(tag: string, content: string): string {
 
 /** Convert 5etools inline tags in a string to HTML. */
 export function renderInline(text: string): string {
-	return text.replace(/\{@(\w+) ([^}]*)\}/g, (_, tag: string, content: string) => renderTag(tag, content));
+	return text.replace(/\{@(\w+) ([^}]*)\}/g, (_, tag: string, content: string) =>
+		renderTag(tag, content)
+	);
 }
 
 /** Recursively render a 5etools entries array to HTML. */
@@ -184,18 +191,24 @@ export function renderEntries(entries: unknown[]): string {
 			if (e.type === 'table') {
 				const caption = e.caption ? `<caption>${e.caption}</caption>` : '';
 				const cols = (e.colLabels as string[] | undefined) ?? [];
-				const thead = cols.length > 0
-					? `<thead><tr>${cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead>`
-					: '';
+				const thead =
+					cols.length > 0
+						? `<thead><tr>${cols.map((c) => `<th>${c}</th>`).join('')}</tr></thead>`
+						: '';
 				const rows = ((e.rows as unknown[][]) ?? [])
-					.map((row) => `<tr>${row.map((cell) => {
-						if (typeof cell === 'object' && cell !== null && 'roll' in cell) {
-							const r = cell as { roll: { min?: number; max?: number; exact?: number } };
-							const rv = r.roll;
-							return `<td>${rv.exact !== undefined ? rv.exact : `${rv.min}–${rv.max}`}</td>`;
-						}
-						return `<td>${renderInline(String(cell))}</td>`;
-					}).join('')}</tr>`)
+					.map(
+						(row) =>
+							`<tr>${row
+								.map((cell) => {
+									if (typeof cell === 'object' && cell !== null && 'roll' in cell) {
+										const r = cell as { roll: { min?: number; max?: number; exact?: number } };
+										const rv = r.roll;
+										return `<td>${rv.exact !== undefined ? rv.exact : `${rv.min}–${rv.max}`}</td>`;
+									}
+									return `<td>${renderInline(String(cell))}</td>`;
+								})
+								.join('')}</tr>`
+					)
 					.join('');
 				return `<table>${caption}${thead}<tbody>${rows}</tbody></table>`;
 			}

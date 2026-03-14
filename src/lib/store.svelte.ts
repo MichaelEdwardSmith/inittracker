@@ -1,7 +1,15 @@
 // Client-side combat store (Svelte 5 runes). Holds the full combat state in a
 // reactive $state class, syncs to the server via POST /api/state on every mutation,
 // and exposes all DM actions (addPlayer, addEnemy, damage, heal, nextTurn, endCombat, etc.).
-import type { Combatant, EnemyTemplate, StorageState, CombatEvent, CombatRecord, CombatantSummary, LootItem } from './types';
+import type {
+	Combatant,
+	EnemyTemplate,
+	StorageState,
+	CombatEvent,
+	CombatRecord,
+	CombatantSummary,
+	LootItem
+} from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
 import { ENEMY_TEMPLATES, getMonsterDetail } from './enemies';
@@ -14,7 +22,8 @@ function detectsLairActions(templateName: string): boolean {
 	const detail = getMonsterDetail(templateName);
 	if (!detail) return false;
 	const text = [detail.traits, detail.actions, detail.legendaryActions, detail.reactions]
-		.filter(Boolean).join(' ');
+		.filter(Boolean)
+		.join(' ');
 	return /lair action/i.test(text);
 }
 
@@ -87,24 +96,23 @@ function createCombatStore() {
 		const participants: CombatantSummary[] = combatants
 			.filter((c): c is Combatant & { type: 'player' | 'enemy' } => c.type !== 'lair')
 			.map((c) => {
-			const stats = participantStats.get(c.id);
-			const cr = c.type === 'enemy'
-				? (c.cr ?? crByTemplateName.get(c.templateName ?? ''))
-				: undefined;
-			return {
-				id: c.id,
-				name: c.name,
-				type: c.type,
-				maxHp: c.maxHp,
-				startHp: stats?.startHp ?? c.maxHp,
-				finalHp: c.currentHp,
-				totalDamage: stats?.totalDamage ?? 0,
-				totalHealing: stats?.totalHealing ?? 0,
-				wasSlain: c.type === 'enemy' && c.currentHp <= 0,
-				cr,
-				loot: c.type === 'enemy' && c.currentHp <= 0 ? (c.loot ?? []) : undefined
-			};
-		});
+				const stats = participantStats.get(c.id);
+				const cr =
+					c.type === 'enemy' ? (c.cr ?? crByTemplateName.get(c.templateName ?? '')) : undefined;
+				return {
+					id: c.id,
+					name: c.name,
+					type: c.type,
+					maxHp: c.maxHp,
+					startHp: stats?.startHp ?? c.maxHp,
+					finalHp: c.currentHp,
+					totalDamage: stats?.totalDamage ?? 0,
+					totalHealing: stats?.totalHealing ?? 0,
+					wasSlain: c.type === 'enemy' && c.currentHp <= 0,
+					cr,
+					loot: c.type === 'enemy' && c.currentHp <= 0 ? (c.loot ?? []) : undefined
+				};
+			});
 
 		const totalXp = participants
 			.filter((p) => p.wasSlain && p.cr !== undefined)
@@ -175,7 +183,13 @@ function createCombatStore() {
 			}
 		},
 
-		addPlayer(name: string, ac: number, maxHp: number, dexMod?: number, passivePerception?: number) {
+		addPlayer(
+			name: string,
+			ac: number,
+			maxHp: number,
+			dexMod?: number,
+			passivePerception?: number
+		) {
 			const c: Combatant = {
 				id: crypto.randomUUID(),
 				name,
@@ -226,19 +240,22 @@ function createCombatStore() {
 				(c) => c.type === 'lair' && c.templateName === templateName
 			);
 			if (alreadyExists) return;
-			combatants = [...combatants, {
-				id: crypto.randomUUID(),
-				name: 'Lair Actions',
-				type: 'lair',
-				initiative: 20,
-				ac: 0,
-				maxHp: 0,
-				currentHp: 1,
-				tempHp: 0,
-				statuses: [],
-				templateName,
-				inCombat: true
-			}];
+			combatants = [
+				...combatants,
+				{
+					id: crypto.randomUUID(),
+					name: 'Lair Actions',
+					type: 'lair',
+					initiative: 20,
+					ac: 0,
+					maxHp: 0,
+					currentHp: 1,
+					tempHp: 0,
+					statuses: [],
+					templateName,
+					inCombat: true
+				}
+			];
 			sync();
 		},
 
@@ -317,7 +334,6 @@ function createCombatStore() {
 			sync();
 		},
 
-
 		adjustHp(id: string, delta: number) {
 			let hpBefore = 0;
 			let hpAfter = 0;
@@ -331,7 +347,11 @@ function createCombatStore() {
 				if (delta < 0 && c.tempHp > 0) {
 					const absorbed = Math.min(c.tempHp, -delta);
 					const spill = -delta - absorbed;
-					updated = { ...c, tempHp: c.tempHp - absorbed, currentHp: Math.max(0, c.currentHp - spill) };
+					updated = {
+						...c,
+						tempHp: c.tempHp - absorbed,
+						currentHp: Math.max(0, c.currentHp - spill)
+					};
 				} else {
 					updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
 				}
@@ -353,24 +373,31 @@ function createCombatStore() {
 				const c = combatantRef;
 				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
 				const actorFields = actor
-					? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
+					? {
+							actorId: actor.id,
+							actorName: actor.name,
+							actorType: actor.type as 'player' | 'enemy'
+						}
 					: {};
 				const actualDelta = hpAfter - hpBefore;
 				if (actualDelta < 0) {
 					const dmg = -actualDelta;
 					const causedDown = hpBefore > 0 && hpAfter === 0;
-					combatEvents = [...combatEvents, {
-						type: 'damage',
-						round,
-						...actorFields,
-						combatantId: id,
-						combatantName: c.name,
-						combatantType: c.type as 'player' | 'enemy',
-						value: dmg,
-						hpBefore,
-						hpAfter,
-						causedDown: causedDown || undefined
-					}];
+					combatEvents = [
+						...combatEvents,
+						{
+							type: 'damage',
+							round,
+							...actorFields,
+							combatantId: id,
+							combatantName: c.name,
+							combatantType: c.type as 'player' | 'enemy',
+							value: dmg,
+							hpBefore,
+							hpAfter,
+							causedDown: causedDown || undefined
+						}
+					];
 					const stats = participantStats.get(id);
 					if (stats) {
 						participantStats.set(id, {
@@ -380,17 +407,20 @@ function createCombatStore() {
 						});
 					}
 				} else if (actualDelta > 0) {
-					combatEvents = [...combatEvents, {
-						type: 'heal',
-						round,
-						...actorFields,
-						combatantId: id,
-						combatantName: c.name,
-						combatantType: c.type as 'player' | 'enemy',
-						value: actualDelta,
-						hpBefore,
-						hpAfter
-					}];
+					combatEvents = [
+						...combatEvents,
+						{
+							type: 'heal',
+							round,
+							...actorFields,
+							combatantId: id,
+							combatantName: c.name,
+							combatantType: c.type as 'player' | 'enemy',
+							value: actualDelta,
+							hpBefore,
+							hpAfter
+						}
+					];
 					const stats = participantStats.get(id);
 					if (stats) {
 						participantStats.set(id, { ...stats, totalHealing: stats.totalHealing + actualDelta });
@@ -449,17 +479,24 @@ function createCombatStore() {
 			if (combatStartedAt !== null && combatantRef) {
 				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
 				const actorFields = actor
-					? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
+					? {
+							actorId: actor.id,
+							actorName: actor.name,
+							actorType: actor.type as 'player' | 'enemy'
+						}
 					: {};
-				combatEvents = [...combatEvents, {
-					type: adding ? 'condition_add' : 'condition_remove',
-					round,
-					...actorFields,
-					combatantId: id,
-					combatantName: combatantRef.name,
-					combatantType: combatantRef.type as 'player' | 'enemy',
-					condition: status
-				}];
+				combatEvents = [
+					...combatEvents,
+					{
+						type: adding ? 'condition_add' : 'condition_remove',
+						round,
+						...actorFields,
+						combatantId: id,
+						combatantName: combatantRef.name,
+						combatantType: combatantRef.type as 'player' | 'enemy',
+						condition: status
+					}
+				];
 			}
 
 			sync();
@@ -483,7 +520,16 @@ function createCombatStore() {
 		resetPlayers() {
 			combatants = combatants.map((c) =>
 				c.type === 'player'
-					? { ...c, currentHp: c.maxHp, tempHp: 0, statuses: [], conditionRounds: undefined, initiative: null, inCombat: true, deathSaves: undefined }
+					? {
+							...c,
+							currentHp: c.maxHp,
+							tempHp: 0,
+							statuses: [],
+							conditionRounds: undefined,
+							initiative: null,
+							inCombat: true,
+							deathSaves: undefined
+						}
 					: c
 			);
 			sync();
@@ -519,13 +565,16 @@ function createCombatStore() {
 					if (nextIdx === 0) {
 						round += 1;
 						if (combatStartedAt !== null) {
-							combatEvents = [...combatEvents, {
-								type: 'round_advance',
-								round,
-								combatantId: '',
-								combatantName: '',
-								combatantType: 'player'
-							}];
+							combatEvents = [
+								...combatEvents,
+								{
+									type: 'round_advance',
+									round,
+									combatantId: '',
+									combatantName: '',
+									combatantType: 'player'
+								}
+							];
 						}
 						// Decrement timed conditions; remove any that hit 0
 						const expiredEvents: import('./types').CombatEvent[] = [];
@@ -534,15 +583,30 @@ function createCombatStore() {
 							const nr = { ...c.conditionRounds };
 							const expired: string[] = [];
 							for (const [cond, remaining] of Object.entries(nr)) {
-								if (remaining <= 1) { expired.push(cond); delete nr[cond]; }
-								else { nr[cond] = remaining - 1; }
+								if (remaining <= 1) {
+									expired.push(cond);
+									delete nr[cond];
+								} else {
+									nr[cond] = remaining - 1;
+								}
 							}
 							if (expired.length === 0) return { ...c, conditionRounds: nr };
 							for (const condition of expired) {
-								expiredEvents.push({ type: 'condition_remove', round, combatantId: c.id, combatantName: c.name, combatantType: c.type as 'player' | 'enemy', condition });
+								expiredEvents.push({
+									type: 'condition_remove',
+									round,
+									combatantId: c.id,
+									combatantName: c.name,
+									combatantType: c.type as 'player' | 'enemy',
+									condition
+								});
 							}
 							const statuses = c.statuses.filter((s) => !expired.includes(s));
-							return { ...c, statuses, conditionRounds: Object.keys(nr).length > 0 ? nr : undefined };
+							return {
+								...c,
+								statuses,
+								conditionRounds: Object.keys(nr).length > 0 ? nr : undefined
+							};
 						});
 						if (expiredEvents.length > 0) combatEvents = [...combatEvents, ...expiredEvents];
 					}
@@ -560,12 +624,14 @@ function createCombatStore() {
 		},
 
 		setLegendaryActionsSpent(id: string, spent: number) {
-			combatants = combatants.map((c) => c.id === id ? { ...c, legendaryActionsSpent: spent } : c);
+			combatants = combatants.map((c) =>
+				c.id === id ? { ...c, legendaryActionsSpent: spent } : c
+			);
 			sync();
 		},
 
 		setLoot(id: string, loot: LootItem[]) {
-			combatants = combatants.map((c) => c.id === id ? { ...c, loot } : c);
+			combatants = combatants.map((c) => (c.id === id ? { ...c, loot } : c));
 			sync();
 		},
 

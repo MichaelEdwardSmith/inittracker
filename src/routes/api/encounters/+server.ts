@@ -11,7 +11,7 @@ export async function GET({ cookies }: RequestEvent) {
 
 	const encounters = await getEncounters(sessionId);
 	return Response.json(encounters);
-};
+}
 
 export async function POST({ request, cookies }: RequestEvent) {
 	const sessionId = cookies.get('dm_auth');
@@ -39,7 +39,7 @@ export async function POST({ request, cookies }: RequestEvent) {
 
 	await saveEncounter(sessionId, encounter);
 	return Response.json(encounter, { status: 201 });
-};
+}
 
 export async function DELETE({ url, cookies }: RequestEvent) {
 	const sessionId = cookies.get('dm_auth');
@@ -50,4 +50,4 @@ export async function DELETE({ url, cookies }: RequestEvent) {
 
 	await deleteEncounter(sessionId, id);
 	return new Response(null, { status: 204 });
-};
+}

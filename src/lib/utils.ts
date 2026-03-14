@@ -4,27 +4,43 @@
 import type { Combatant } from './types';
 
 export const conditionDescriptions: Record<string, string> = {
-	Blinded:       "Can't see. Automatically fails ability checks requiring sight. Attack rolls against it have advantage; its attack rolls have disadvantage.",
-	Charmed:       "Can't attack the charmer or target them with harmful abilities or magical effects. The charmer has advantage on social ability checks against this creature.",
-	Concentrating: "Maintaining concentration on a spell. Taking damage requires a CON save (DC 10 or half the damage taken, whichever is higher) or the spell ends.",
-	Deafened:      "Can't hear. Automatically fails ability checks that require hearing.",
-	Dead:          "The creature has died and can't take actions, move, or speak.",
-	Exhausted:     "Cumulative (levels 1–6). Lvl 1: Disadvantage on ability checks. Lvl 2: Speed halved. Lvl 3: Disadvantage on attacks & saves. Lvl 4: HP maximum halved. Lvl 5: Speed 0. Lvl 6: Death.",
-	Frightened:    "Disadvantage on ability checks and attack rolls while the source of its fear is in line of sight. Can't willingly move closer to the source of fear.",
-	Grappled:      "Speed becomes 0 and can't benefit from bonuses to speed. Ends if the grappler is incapacitated or the creature is moved beyond the grappler's reach.",
+	Blinded:
+		"Can't see. Automatically fails ability checks requiring sight. Attack rolls against it have advantage; its attack rolls have disadvantage.",
+	Charmed:
+		"Can't attack the charmer or target them with harmful abilities or magical effects. The charmer has advantage on social ability checks against this creature.",
+	Concentrating:
+		'Maintaining concentration on a spell. Taking damage requires a CON save (DC 10 or half the damage taken, whichever is higher) or the spell ends.',
+	Deafened: "Can't hear. Automatically fails ability checks that require hearing.",
+	Dead: "The creature has died and can't take actions, move, or speak.",
+	Exhausted:
+		'Cumulative (levels 1–6). Lvl 1: Disadvantage on ability checks. Lvl 2: Speed halved. Lvl 3: Disadvantage on attacks & saves. Lvl 4: HP maximum halved. Lvl 5: Speed 0. Lvl 6: Death.',
+	Frightened:
+		"Disadvantage on ability checks and attack rolls while the source of its fear is in line of sight. Can't willingly move closer to the source of fear.",
+	Grappled:
+		"Speed becomes 0 and can't benefit from bonuses to speed. Ends if the grappler is incapacitated or the creature is moved beyond the grappler's reach.",
 	Incapacitated: "Can't take actions or reactions.",
-	Invisible:     "Can't be seen without magic or a special sense. Attacks against it have disadvantage; its attacks have advantage. It still makes noise and leaves tracks.",
-	Paralyzed:     "Incapacitated and can't move or speak. Automatically fails STR and DEX saves. Attack rolls against it have advantage. Any attack that hits within 5 ft. is a critical hit.",
-	Petrified:     "Transformed into solid inanimate matter. Incapacitated, unaware of surroundings, weight ×10. Automatically fails STR and DEX saves. Resistance to all damage; immune to poison and disease.",
-	Poisoned:      "Disadvantage on attack rolls and ability checks.",
-	Prone:         "Can only crawl or use half speed to stand up. Disadvantage on attack rolls. Attacks against it from within 5 ft. have advantage; attacks from farther away have disadvantage.",
-	Restrained:    "Speed becomes 0. Attack rolls against it have advantage; its attack rolls have disadvantage. Disadvantage on DEX saving throws.",
-	Stunned:       "Incapacitated, can't move, and can speak only falteringly. Automatically fails STR and DEX saves. Attack rolls against it have advantage.",
-	Unconscious:          "Incapacitated, can't move or speak, unaware of surroundings. Drops held items, falls prone. Automatically fails STR and DEX saves. Attacks have advantage and hits within 5 ft. are critical hits.",
-	'Advantage For':      "This creature has advantage on its attack rolls or ability checks (DM-tracked reminder).",
-	'Advantage Against':  "Attack rolls against this creature have advantage (DM-tracked reminder).",
-	'Disadvantage For':   "This creature has disadvantage on its attack rolls or ability checks (DM-tracked reminder).",
-	'Disadvantage Against': "Attack rolls against this creature have disadvantage (DM-tracked reminder).",
+	Invisible:
+		"Can't be seen without magic or a special sense. Attacks against it have disadvantage; its attacks have advantage. It still makes noise and leaves tracks.",
+	Paralyzed:
+		"Incapacitated and can't move or speak. Automatically fails STR and DEX saves. Attack rolls against it have advantage. Any attack that hits within 5 ft. is a critical hit.",
+	Petrified:
+		'Transformed into solid inanimate matter. Incapacitated, unaware of surroundings, weight ×10. Automatically fails STR and DEX saves. Resistance to all damage; immune to poison and disease.',
+	Poisoned: 'Disadvantage on attack rolls and ability checks.',
+	Prone:
+		'Can only crawl or use half speed to stand up. Disadvantage on attack rolls. Attacks against it from within 5 ft. have advantage; attacks from farther away have disadvantage.',
+	Restrained:
+		'Speed becomes 0. Attack rolls against it have advantage; its attack rolls have disadvantage. Disadvantage on DEX saving throws.',
+	Stunned:
+		"Incapacitated, can't move, and can speak only falteringly. Automatically fails STR and DEX saves. Attack rolls against it have advantage.",
+	Unconscious:
+		"Incapacitated, can't move or speak, unaware of surroundings. Drops held items, falls prone. Automatically fails STR and DEX saves. Attacks have advantage and hits within 5 ft. are critical hits.",
+	'Advantage For':
+		'This creature has advantage on its attack rolls or ability checks (DM-tracked reminder).',
+	'Advantage Against': 'Attack rolls against this creature have advantage (DM-tracked reminder).',
+	'Disadvantage For':
+		'This creature has disadvantage on its attack rolls or ability checks (DM-tracked reminder).',
+	'Disadvantage Against':
+		'Attack rolls against this creature have disadvantage (DM-tracked reminder).'
 };
 
 export const conditionColors: Record<string, string> = {
@@ -45,10 +61,10 @@ export const conditionColors: Record<string, string> = {
 	Restrained: 'bg-amber-800 text-amber-200',
 	Stunned: 'bg-yellow-700 text-yellow-100',
 	Unconscious: 'bg-gray-800 text-gray-500',
-	'Advantage For':      'bg-emerald-700 text-emerald-100',
-	'Advantage Against':  'bg-rose-800 text-rose-200',
-	'Disadvantage For':   'bg-orange-800 text-orange-200',
-	'Disadvantage Against': 'bg-teal-700 text-teal-100',
+	'Advantage For': 'bg-emerald-700 text-emerald-100',
+	'Advantage Against': 'bg-rose-800 text-rose-200',
+	'Disadvantage For': 'bg-orange-800 text-orange-200',
+	'Disadvantage Against': 'bg-teal-700 text-teal-100'
 };
 
 export function sortCombatants(list: Combatant[]): Combatant[] {
@@ -81,15 +97,40 @@ export function hpTextColor(pct: number): string {
 
 // D&D 5e XP awards by Challenge Rating (DMG table)
 const XP_BY_CR: Record<string, number> = {
-	'0': 10, '1/8': 25, '1/4': 50, '1/2': 100,
-	'1': 200, '2': 450, '3': 700, '4': 1100,
-	'5': 1800, '6': 2300, '7': 2900, '8': 3900,
-	'9': 5000, '10': 5900, '11': 7200, '12': 8400,
-	'13': 10000, '14': 11500, '15': 13000, '16': 15000,
-	'17': 18000, '18': 20000, '19': 22000, '20': 25000,
-	'21': 33000, '22': 41000, '23': 50000, '24': 62000,
-	'25': 75000, '26': 90000, '27': 105000, '28': 120000,
-	'29': 135000, '30': 155000
+	'0': 10,
+	'1/8': 25,
+	'1/4': 50,
+	'1/2': 100,
+	'1': 200,
+	'2': 450,
+	'3': 700,
+	'4': 1100,
+	'5': 1800,
+	'6': 2300,
+	'7': 2900,
+	'8': 3900,
+	'9': 5000,
+	'10': 5900,
+	'11': 7200,
+	'12': 8400,
+	'13': 10000,
+	'14': 11500,
+	'15': 13000,
+	'16': 15000,
+	'17': 18000,
+	'18': 20000,
+	'19': 22000,
+	'20': 25000,
+	'21': 33000,
+	'22': 41000,
+	'23': 50000,
+	'24': 62000,
+	'25': 75000,
+	'26': 90000,
+	'27': 105000,
+	'28': 120000,
+	'29': 135000,
+	'30': 155000
 };
 
 export function crToXp(cr: string): number {
@@ -98,17 +139,17 @@ export function crToXp(cr: string): number {
 
 // D&D 5e XP thresholds per player per level [easy, medium, hard, deadly]
 const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
-	1:  [25,   50,   75,   100],
-	2:  [50,   100,  150,  200],
-	3:  [75,   150,  225,  400],
-	4:  [125,  250,  375,  500],
-	5:  [250,  500,  750,  1100],
-	6:  [300,  600,  900,  1400],
-	7:  [350,  750,  1100, 1700],
-	8:  [450,  900,  1400, 2100],
-	9:  [550,  1100, 1600, 2400],
-	10: [600,  1200, 1900, 2800],
-	11: [800,  1600, 2400, 3600],
+	1: [25, 50, 75, 100],
+	2: [50, 100, 150, 200],
+	3: [75, 150, 225, 400],
+	4: [125, 250, 375, 500],
+	5: [250, 500, 750, 1100],
+	6: [300, 600, 900, 1400],
+	7: [350, 750, 1100, 1700],
+	8: [450, 900, 1400, 2100],
+	9: [550, 1100, 1600, 2400],
+	10: [600, 1200, 1900, 2800],
+	11: [800, 1600, 2400, 3600],
 	12: [1000, 2000, 3000, 4500],
 	13: [1100, 2200, 3400, 5100],
 	14: [1250, 2500, 3800, 5700],
@@ -117,7 +158,7 @@ const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 	17: [2000, 3900, 5900, 8800],
 	18: [2100, 4200, 6300, 9500],
 	19: [2400, 4900, 7300, 10900],
-	20: [2800, 5700, 8500, 12700],
+	20: [2800, 5700, 8500, 12700]
 };
 
 /** D&D 5e encounter multiplier based on total enemy count. */
