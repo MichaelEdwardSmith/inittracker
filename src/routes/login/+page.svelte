@@ -43,8 +43,8 @@
 				method="POST"
 				action="?/login"
 				use:enhance={async ({ formData }) => {
-					const pw = formData.get('password') as string;
-					if (pw) formData.set('password', await sha256(pw));
+					const pw = formData.get('password');
+					if (typeof pw === 'string' && pw) formData.set('password', await sha256(pw));
 				}}
 			>
 				<label
