@@ -14,6 +14,7 @@ import {
 
 const base = OAUTH_REDIRECT_BASE || 'http://localhost:5173';
 
+
 export const google = new Google(
 	GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET,
