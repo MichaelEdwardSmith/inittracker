@@ -151,6 +151,70 @@ export async function loginDM(
 	return valid ? (dm as unknown as WithId<Document> & DM) : null;
 }
 
+// ---------------------------------------------------------------------------
+// OAuth — find-or-create a DM account via a third-party provider.
+// ---------------------------------------------------------------------------
+export interface OAuthProfile {
+	provider: 'google' | 'facebook';
+	providerId: string; // stable user ID from the provider
+	email: string | null;
+	firstName: string;
+	lastName: string;
+}
+
+export async function findOrCreateDMByOAuth(
+	profile: OAuthProfile
+): Promise<{ sessionId: string }> {
+	const c = await col();
+
+	// 1. Exact match on provider ID
+	const providerField = `oauth.${profile.provider}`;
+	let dm = await c.findOne({ [providerField]: profile.providerId });
+	if (dm) return { sessionId: dm.sessionId };
+
+	// 2. Email match — link the OAuth identity to an existing account
+	if (profile.email) {
+		dm = await c.findOne({ email: profile.email });
+		if (dm) {
+			await c.updateOne({ email: profile.email }, { $set: { [providerField]: profile.providerId } });
+			return { sessionId: dm.sessionId };
+		}
+	}
+
+	// 3. Create a brand-new DM account
+	let sessionId: string;
+	do {
+		sessionId = randomSessionId();
+	} while (
+		(await c.findOne({ sessionId })) ||
+		(await c.findOne({ 'gameSessions.sessionId': sessionId }))
+	);
+
+	const firstSession: DMGameSession = {
+		id: randomUUID(),
+		sessionId,
+		name: 'Default Session',
+		combatState: { combatants: [], currentTurnId: null, round: 1 },
+		combatHistory: [],
+		createdAt: new Date()
+	};
+
+	await c.insertOne({
+		firstName: profile.firstName,
+		lastName: profile.lastName,
+		email: profile.email ?? '',
+		passwordHash: '', // OAuth accounts cannot use password login
+		sessionId,
+		activeGameSessionId: firstSession.id,
+		gameSessions: [firstSession],
+		customMonsters: [],
+		createdAt: new Date(),
+		[providerField]: profile.providerId
+	} as unknown as DM);
+
+	return { sessionId };
+}
+
 /** Look up a DM by their auth sessionId (cookie value). */
 export async function getDMBySessionId(sessionId: string): Promise<(WithId<Document> & DM) | null> {
 	const c = await col();

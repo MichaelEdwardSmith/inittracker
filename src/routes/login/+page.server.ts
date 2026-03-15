@@ -13,7 +13,7 @@ function randomId(): string {
 	).join('');
 }
 
-export const load: PageServerLoad = async ({ cookies }) => {
+export const load: PageServerLoad = async ({ cookies, url }) => {
 	const sessionId = cookies.get('dm_auth');
 	if (sessionId) {
 		const dm = await getDMBySessionId(sessionId);
@@ -21,6 +21,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	}
 	// Already in a guest session — go straight to dashboard
 	if (cookies.get('dm_guest')) redirect(303, '/dashboard');
+
+	// Surface OAuth errors (e.g. invalid_state, token_exchange) to the page
+	const oauthError = url.searchParams.get('oauth_error');
+	if (oauthError) return { oauthError };
 };
 
 export const actions: Actions = {
