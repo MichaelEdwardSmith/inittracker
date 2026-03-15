@@ -1,0 +1,38 @@
+// Server load for the DM dashboard (/).
+// Fetches all game sessions for the authenticated DM and resolves the active one,
+// passing both down as page data.
+import type { PageServerLoad } from './$types';
+import { listGameSessions } from '$lib/server/dmModel';
+import type { GameSession } from '$lib/types';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.isGuest) {
+		return {
+			dmFirstName: 'Guest',
+			isGuest: true,
+			showVoiceCommands: false,
+			sessions: [] as GameSession[],
+			activeSession: {
+				id: '',
+				sessionId: locals.gameSessionId ?? '',
+				name: 'Guest Session'
+			} as GameSession
+		};
+	}
+
+	const authSessionId = locals.sessionId ?? '';
+	const gameSessionId = locals.gameSessionId ?? '';
+
+	const sessions = await listGameSessions(authSessionId);
+
+	const activeSession: GameSession = sessions.find((s) => s.sessionId === gameSessionId) ??
+		sessions[0] ?? { id: '', sessionId: gameSessionId, name: 'Session' };
+
+	return {
+		dmFirstName: locals.dmFirstName ?? '',
+		isGuest: false,
+		showVoiceCommands: true,
+		sessions,
+		activeSession
+	};
+};

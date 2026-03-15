@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
 	if (sessionId) {
 		const dm = await getDMBySessionId(sessionId);
-		if (dm) redirect(303, '/');
+		if (dm) redirect(303, '/dashboard');
 	}
 };
 

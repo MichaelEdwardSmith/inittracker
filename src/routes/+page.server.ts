@@ -1,38 +1,14 @@
-// Server load for the DM dashboard (/).
-// Fetches all game sessions for the authenticated DM and resolves the active one,
-// passing both down as page data.
+// Public landing page (/).
+// Redirects already-authenticated DMs straight to the dashboard.
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { listGameSessions } from '$lib/server/dmModel';
-import type { GameSession } from '$lib/types';
+import { getDMBySessionId } from '$lib/server/dmModel';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.isGuest) {
-		return {
-			dmFirstName: 'Guest',
-			isGuest: true,
-			showVoiceCommands: false,
-			sessions: [] as GameSession[],
-			activeSession: {
-				id: '',
-				sessionId: locals.gameSessionId ?? '',
-				name: 'Guest Session'
-			} as GameSession
-		};
+export const load: PageServerLoad = async ({ cookies }) => {
+	const sessionId = cookies.get('dm_auth');
+	if (sessionId) {
+		const dm = await getDMBySessionId(sessionId);
+		if (dm) redirect(303, '/dashboard');
 	}
-
-	const authSessionId = locals.sessionId ?? '';
-	const gameSessionId = locals.gameSessionId ?? '';
-
-	const sessions = await listGameSessions(authSessionId);
-
-	const activeSession: GameSession = sessions.find((s) => s.sessionId === gameSessionId) ??
-		sessions[0] ?? { id: '', sessionId: gameSessionId, name: 'Session' };
-
-	return {
-		dmFirstName: locals.dmFirstName ?? '',
-		isGuest: false,
-		showVoiceCommands: true,
-		sessions,
-		activeSession
-	};
+	if (cookies.get('dm_guest')) redirect(303, '/dashboard');
 };

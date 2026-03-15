@@ -20,12 +20,13 @@
 	<title>DM Login — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col items-center justify-center bg-gray-950 text-white">
-	<!-- Subtle background glow -->
-	<div
-		class="pointer-events-none absolute inset-0"
-		style="background: radial-gradient(ellipse 60% 50% at 50% 45%, rgba(180,130,20,0.07) 0%, transparent 70%);"
-	></div>
+<div class="flex h-screen flex-col items-center justify-center overflow-hidden bg-gray-950 text-white">
+	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+		<div class="bg-orb orb-1"></div>
+		<div class="bg-orb orb-2"></div>
+		<div class="bg-orb orb-3"></div>
+		<div class="bg-orb orb-4"></div>
+	</div>
 
 	<div class="relative z-10 w-full max-w-sm px-6">
 		<!-- Header -->
@@ -127,3 +128,57 @@
 		</p>
 	</div>
 </div>
+
+<style>
+	.bg-orb {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(90px);
+	}
+	.orb-1 {
+		width: min(65vw, 700px); height: min(65vw, 700px);
+		background: rgba(88, 28, 135, 0.45);
+		top: -15%; left: -12%;
+		animation: orb-drift-1 24s ease-in-out infinite;
+	}
+	.orb-2 {
+		width: min(55vw, 620px); height: min(55vw, 620px);
+		background: rgba(30, 58, 138, 0.45);
+		bottom: -18%; right: -10%;
+		animation: orb-drift-2 30s ease-in-out infinite;
+	}
+	.orb-3 {
+		width: min(45vw, 520px); height: min(45vw, 520px);
+		background: rgba(120, 53, 15, 0.35);
+		top: 35%; left: 42%;
+		transform: translate(-50%, -50%);
+		animation: orb-drift-3 20s ease-in-out infinite;
+	}
+	.orb-4 {
+		width: min(38vw, 440px); height: min(38vw, 440px);
+		background: rgba(49, 46, 129, 0.4);
+		top: 15%; right: 18%;
+		animation: orb-drift-4 26s ease-in-out infinite;
+	}
+	@keyframes orb-drift-1 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		25%       { transform: translate(8vw, 6vh) scale(1.06); }
+		55%       { transform: translate(3vw, 12vh) scale(0.94); }
+		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+	}
+	@keyframes orb-drift-2 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
+		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+	}
+	@keyframes orb-drift-3 {
+		0%, 100% { transform: translate(-50%, -50%) scale(1); }
+		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
+		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+	}
+	@keyframes orb-drift-4 {
+		0%, 100% { transform: translate(0, 0) scale(1); }
+		35%      { transform: translate(6vw, 9vh) scale(0.94); }
+		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+	}
+</style>

@@ -18,7 +18,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Protect DM-only pages. /display/*, /login, /register, /join, /api/* are open.
 	const { pathname } = event.url;
-	if (pathname === '/' || pathname === '/history') {
+	if (pathname === '/dashboard' || pathname === '/history') {
 		// Guest access — allowed on dashboard and history.
 		if (!sessionId && guestSessionId) {
 			event.locals.isGuest = true;
