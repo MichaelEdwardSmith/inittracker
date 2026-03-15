@@ -541,10 +541,13 @@
 								</div>
 							</div>
 							<!-- AC -->
-							<div class="flex flex-col items-center gap-0.5">
-								<span class="text-xs tracking-wide text-gray-500 uppercase">AC</span>
-								<div class="flex items-center gap-1">
-									<span class="text-xl font-bold text-gray-200">{c.ac}</span>
+							<div class="relative flex items-center justify-center" style="width:48px;height:54px;">
+								<svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 w-full h-full">
+									<path d="M24 2 L44 10 L44 28 C44 40 34 50 24 52 C14 50 4 40 4 28 L4 10 Z" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+								</svg>
+								<div class="relative flex flex-col items-center leading-none" style="margin-top:2px;">
+									<span class="text-[9px] font-bold tracking-widest text-gray-400 uppercase">AC</span>
+									<span class="text-lg font-bold text-gray-100 leading-none">{c.ac}</span>
 								</div>
 							</div>
 						</div>
