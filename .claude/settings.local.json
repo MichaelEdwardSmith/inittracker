@@ -95,7 +95,8 @@
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File remove_fb.ps1 && rm remove_fb.ps1)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc.ps1 && rm fix_bmc.ps1)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc2.ps1 && rm fix_bmc2.ps1)",
-      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc3.ps1 && rm fix_bmc3.ps1)"
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc3.ps1 && rm fix_bmc3.ps1)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_reg.ps1 && rm fix_reg.ps1 && pnpm check 2>&1 | tail -5)"
     ]
   }
 }
