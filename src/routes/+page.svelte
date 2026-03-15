@@ -182,6 +182,13 @@
 			</p>
 
 			<div class="flex flex-wrap items-center justify-center gap-4">
+				<a href="https://www.buymeacoffee.com/inittracker" target="_blank" rel="noopener noreferrer" class="mr-2">
+					<img
+						src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png"
+						alt="Buy Me A Coffee"
+						style="height: 45px; width: 163px;"
+					/>
+				</a>
 				<a
 					href="/register"
 					class="rounded border border-amber-600 bg-amber-900/40 px-8 py-3 text-sm font-bold text-amber-300 transition hover:bg-amber-900/70 hover:text-amber-200"

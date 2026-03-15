@@ -92,7 +92,10 @@
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\fix_history.ps1\")",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\fix_landing.ps1\" && rm \"C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\fix_landing.ps1\")",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File check_fb.ps1 && rm check_fb.ps1 check_fb2.ps1 check_endings.ps1 hide_fb.ps1 hide_fb2.ps1)",
-      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File remove_fb.ps1 && rm remove_fb.ps1)"
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File remove_fb.ps1 && rm remove_fb.ps1)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc.ps1 && rm fix_bmc.ps1)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc2.ps1 && rm fix_bmc2.ps1)",
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc3.ps1 && rm fix_bmc3.ps1)"
     ]
   }
 }
