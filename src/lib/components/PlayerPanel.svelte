@@ -129,7 +129,7 @@
 		/>
 		<div class="flex gap-2">
 			<label class="flex flex-1 flex-col gap-1">
-				<span class="text-xs text-gray-400">AC</span>
+				<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class">AC</span>
 				<input
 					type="number"
 					bind:value={ac}
@@ -139,7 +139,7 @@
 				/>
 			</label>
 			<label class="flex flex-1 flex-col gap-1">
-				<span class="text-xs text-gray-400">Max HP</span>
+				<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP">HP</span>
 				<input
 					type="number"
 					bind:value={hp}
@@ -148,7 +148,7 @@
 				/>
 			</label>
 			<label class="flex flex-1 flex-col gap-1">
-				<span class="text-xs text-gray-400">DEX Mod</span>
+				<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier">DEX</span>
 				<input
 					type="number"
 					bind:value={dexMod}
@@ -158,7 +158,7 @@
 				/>
 			</label>
 			<label class="flex flex-1 flex-col gap-1">
-				<span class="text-xs text-gray-400">Passive</span>
+				<span class="cursor-help text-xs text-gray-400" title="This is your player's Passive Perception">Passive</span>
 				<input
 					type="number"
 					bind:value={passivePerception}
@@ -187,7 +187,7 @@
 					/>
 					<div class="flex gap-2">
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="text-xs text-gray-400">AC</span>
+							<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class">AC</span>
 							<input
 								type="number"
 								bind:value={editAc}
@@ -197,7 +197,7 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="text-xs text-gray-400">Max HP</span>
+							<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP">HP</span>
 							<input
 								type="number"
 								bind:value={editHp}
@@ -206,7 +206,7 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="text-xs text-gray-400">DEX Mod</span>
+							<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier">DEX</span>
 							<input
 								type="number"
 								bind:value={editDexMod}
@@ -216,7 +216,7 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="text-xs text-gray-400">Passive</span>
+							<span class="cursor-help text-xs text-gray-400" title="This is your player's Passive Perception">Passive</span>
 							<input
 								type="number"
 								bind:value={editPassivePerception}

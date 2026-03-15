@@ -139,8 +139,29 @@
 	}
 
 	// ── Dynamic HP / temp-HP command parsing ─────────────────────────────────
+
+	/** Levenshtein edit distance between two strings. */
+	function editDist(a: string, b: string): number {
+		const m = a.length,
+			n = b.length;
+		let row = Array.from({ length: n + 1 }, (_, i) => i);
+		for (let i = 1; i <= m; i++) {
+			const next: number[] = [i];
+			for (let j = 1; j <= n; j++) {
+				next[j] =
+					a[i - 1] === b[j - 1]
+						? row[j - 1]
+						: 1 + Math.min(row[j], next[j - 1], row[j - 1]);
+			}
+			row = next;
+		}
+		return row[n];
+	}
+
 	function findCombatantByName(lower: string) {
 		const candidates = combat.combatants.filter((c) => c.type === 'player' || c.type === 'enemy');
+
+		// Pass 1: exact substring match (longest name wins).
 		let best: (typeof candidates)[0] | null = null;
 		let bestLen = 0;
 		for (const c of candidates) {
@@ -148,6 +169,29 @@
 			if (lower.includes(name) && name.length > bestLen) {
 				best = c;
 				bestLen = name.length;
+			}
+		}
+		if (best) return best;
+
+		// Pass 2: fuzzy match — Whisper may split or slightly misspell fantasy names
+		// (e.g. "Kalstag" → "Cal Stag" or "Kalstack"). Try every consecutive word
+		// combination in the transcript and accept the closest name within ~25% edit
+		// distance.
+		const words = lower.split(/\s+/);
+		let bestScore = Infinity;
+		for (const c of candidates) {
+			const name = c.name.toLowerCase().replace(/\s+/g, '');
+			const threshold = Math.max(2, Math.floor(name.length * 0.25));
+			for (let start = 0; start < words.length; start++) {
+				let phrase = '';
+				for (let end = start; end < words.length && phrase.length <= name.length * 1.5; end++) {
+					phrase += words[end];
+					const dist = editDist(phrase, name);
+					if (dist <= threshold && dist < bestScore) {
+						bestScore = dist;
+						best = c;
+					}
+				}
 			}
 		}
 		return best;
@@ -443,11 +487,16 @@
 		const float32 = new Float32Array(resampled.getChannelData(0));
 
 		// Build a domain-specific prompt so Whisper biases toward combatant names and D&D terms.
+		// Including a name inside example sentences gives Whisper contextual exposure,
+		// which significantly improves recognition of unusual/fantasy names.
 		const names = combat.combatants
 			.filter((c) => c.type === 'player' || c.type === 'enemy')
 			.map((c) => c.name)
 			.join(', ');
-		const initial_prompt = `D&D combat tracker voice command. Wake word: tracker. Combatants: ${names}. Commands: tracker next, tracker start combat, tracker end combat, roll d20, damage, heal.`;
+		const example =
+			combat.combatants.find((c) => c.type === 'player' || c.type === 'enemy')?.name ??
+			'Aragorn';
+		const initial_prompt = `D&D combat tracker. Combatants: ${names}. Wake word: tracker. Commands: "tracker next", "tracker start combat", "tracker end combat", "tracker roll d20", "${example} takes 8 damage", "${example} heals 4 HP".`;
 		worker.postMessage({ type: 'transcribe', audio: float32, initial_prompt }, [float32.buffer]);
 	}
 

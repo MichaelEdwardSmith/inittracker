@@ -17,10 +17,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
 	if (sessionId) {
 		const dm = await getDMBySessionId(sessionId);
-		if (dm) redirect(303, '/');
+		if (dm) redirect(303, '/dashboard');
 	}
 	// Already in a guest session — go straight to dashboard
-	if (cookies.get('dm_guest')) redirect(303, '/');
+	if (cookies.get('dm_guest')) redirect(303, '/dashboard');
 };
 
 export const actions: Actions = {
@@ -32,7 +32,7 @@ export const actions: Actions = {
 			// No maxAge → session cookie; cleared when browser closes
 			secure: false
 		});
-		redirect(303, '/');
+		redirect(303, '/dashboard');
 	},
 
 	login: async ({ request, cookies }) => {
@@ -57,6 +57,6 @@ export const actions: Actions = {
 			secure: false // allow plain HTTP for local use
 		});
 
-		redirect(303, '/');
+		redirect(303, '/dashboard');
 	}
 };
