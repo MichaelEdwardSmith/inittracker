@@ -436,6 +436,7 @@
 				>
 			</div>
 			<div class="flex items-center gap-6 text-xs text-gray-700">
+				<a href="/privacy" class="transition hover:text-gray-400">Privacy Policy</a>
 				<a href="/guide?back=/" class="transition hover:text-gray-400">User Guide</a>
 				<a href="/login" class="transition hover:text-gray-400">Sign In</a>
 				<a href="/register" class="transition hover:text-gray-400">Register</a>
