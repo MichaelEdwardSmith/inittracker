@@ -96,7 +96,20 @@
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc.ps1 && rm fix_bmc.ps1)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc2.ps1 && rm fix_bmc2.ps1)",
       "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_bmc3.ps1 && rm fix_bmc3.ps1)",
-      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_reg.ps1 && rm fix_reg.ps1 && pnpm check 2>&1 | tail -5)"
+      "Bash(cd \"C:/Users/mojpo/WebstormProjects/Initiative\" && powershell -File fix_reg.ps1 && rm fix_reg.ps1 && pnpm check 2>&1 | tail -5)",
+      "WebFetch(domain:ondras.github.io)",
+      "WebFetch(domain:kenney.nl)",
+      "WebFetch(domain:roguebasin.com)",
+      "WebFetch(domain:blog.logrocket.com)",
+      "WebFetch(domain:kenney-assets.itch.io)",
+      "WebFetch(domain:klepinger.dev)",
+      "WebFetch(domain:codesandbox.io)",
+      "WebFetch(domain:www.kenney.nl)",
+      "WebFetch(domain:opengameart.org)",
+      "WebFetch(domain:daviddever.net)",
+      "WebFetch(domain:mizar999.github.io)",
+      "Bash(cd:*)",
+      "Bash(find:*)"
     ]
   }
 }

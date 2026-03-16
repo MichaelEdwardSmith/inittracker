@@ -3,10 +3,12 @@
 <script lang="ts">
 	let {
 		onclose,
-		onAddEncounter
+		onAddEncounter,
+		onOpenDungeon
 	}: {
 		onclose: () => void;
 		onAddEncounter?: (monsters: { name: string; count: number }[]) => void;
+		onOpenDungeon?: () => void;
 	} = $props();
 
 	type Category = {
@@ -33,7 +35,8 @@
 		{ id: 'names', label: 'Name Generator', icon: '📛' },
 		{ id: 'weather', label: 'Weather & Travel', icon: '🌦️' },
 		{ id: 'shop', label: 'Shop Generator', icon: '🛒' },
-		{ id: 'encounter', label: 'Random Encounter', icon: '🎲' }
+		{ id: 'encounter', label: 'Random Encounter', icon: '🎲' },
+		{ id: 'dungeon', label: 'Dungeon Generator', icon: '🗺️' }
 	];
 
 	let selected = $state('actions');
@@ -4066,7 +4069,7 @@
 		<nav class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-gray-900/60 py-3">
 			{#each categories as cat}
 				<button
-					onclick={() => (selected = cat.id)}
+					onclick={() => cat.id === 'dungeon' ? (onOpenDungeon?.(), onclose()) : (selected = cat.id)}
 					class="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition
 					       {selected === cat.id
 						? 'bg-amber-900/30 font-semibold text-amber-300'

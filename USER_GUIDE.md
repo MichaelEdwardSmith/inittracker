@@ -27,6 +27,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 16. [Voice Commands _(Beta)_](#16-voice-commands-beta)
 17. [Audio Mixer](#17-audio-mixer)
 18. [Contact & Support](#18-contact--support)
+19. [Random Dungeon Generator](#19-random-dungeon-generator)
 
 ---
 
@@ -807,6 +808,104 @@ When you pick a file on Chrome or Edge, the mixer saves a lightweight **referenc
 - Use **Solo** to quickly preview one track without changing any volume faders.
 - Label your channels with descriptive names (e.g. _Dungeon Ambience_, _Boss Fight Music_) so you can find them at a glance mid-session.
 - For the best experience on Chrome or Edge, pick files from a stable location on your drive (not a USB stick or network share) so they are always accessible when the browser requests permission.
+
+---
+
+## 19. Random Dungeon Generator
+
+Click the **🗺 Dungeon** button in the DM dashboard header to open the Random Dungeon Generator. This tool procedurally creates a complete multi-room dungeon map with level-appropriate encounters, traps, loot, and stairs between floors.
+
+### Configuration
+
+Set the following options before generating:
+
+| Setting            | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| **Party Size**     | Number of players (affects encounter XP budgets)                            |
+| **Party Level**    | Average party level (scales encounters, loot, and trap DCs)                 |
+| **Dungeon Size**   | Small, Medium, or Large — controls the overall grid size and room count     |
+| **Difficulty**     | Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier          |
+| **Include Boss**   | Toggle on to guarantee a boss room with a harder encounter at the end       |
+| **Floors**         | 1–5 floors; each floor is generated independently and connected by stairs   |
+
+Click **Generate Dungeon** to build the map. Regenerating replaces the entire dungeon.
+
+### Reading the Map
+
+The map is a tile-based top-down grid rendered on canvas. Use the **zoom controls** (− / +) in the top-right corner to scale the view. On smaller screens the map scrolls both horizontally and vertically — slide left and right to reach the full width.
+
+**Cell types:**
+
+| Visual                        | Meaning                                    |
+| ----------------------------- | ------------------------------------------ |
+| Dark void                     | Impassable wall / empty space              |
+| Stone floor (with grid lines) | Walkable room tile                         |
+| Corridor (with grid lines)    | Hallway connecting rooms                   |
+| Door tile                     | Entry between a corridor and a room        |
+| Red-framed door with **!**    | Trapped door (see [Trapped Doors](#trapped-doors-1)) |
+| 💰 icon                       | Room contains loot (see [Loot](#loot-1))   |
+| ▲ / ▼ icon (white circle)     | Staircase (see [Multiple Floors](#multiple-floors-1)) |
+
+**Room labels** appear on the map in each room: the entrance room is marked **Entrance**, the boss room is marked **Boss**, and all other rooms are given a themed name (e.g. _Crypt of Shadows_, _Guard Post_).
+
+A north-pointing **compass** is drawn in the top-left corner of the map.
+
+### Room Encounters
+
+Click any room on the map to open the **Encounter Panel** below (or to the side on wider screens). The panel shows:
+
+- **Room name** and type
+- **Enemy list** — the monsters in that encounter with their count, CR, and XP
+- **XP summary** — total raw XP and adjusted XP for the encounter
+- **Difficulty badge** — Trivial / Easy / Medium / Hard / Deadly
+
+The "Click a room to view its encounter" hint disappears once a room is selected. Click the same room again to deselect it.
+
+### Trapped Doors
+
+Approximately **25% of doors** are randomly trapped. Trapped doors are drawn with a **red frame** and a white **!** in the center.
+
+Click a trapped door to open the **Trap modal**, which shows:
+
+| Field       | Description                                                          |
+| ----------- | -------------------------------------------------------------------- |
+| **Name**    | The type of trap (e.g. _Poison Needle Trap_, _Collapsing Ceiling_)   |
+| **Trigger** | How it activates (e.g. _pressure plate_, _tripwire_, _arcane glyph_) |
+| **DC**      | The Perception or Disarm DC to detect/disable it                     |
+| **Effect**  | The damage or condition the trap inflicts on a failed save           |
+
+Close the modal with the **✕** button or by clicking outside it.
+
+### Loot
+
+**25% of non-entrance rooms** contain a **💰 moneybag icon** in the room's bottom-right inner corner. Click the icon to open the **Loot modal**, which shows level-appropriate treasure:
+
+- **Coins** — a gold piece total scaled to the party level
+- **Items** — 0–2 items drawn from a tier-appropriate table:
+
+| Party Level | Loot Tier  | Example Items                                  |
+| ----------- | ---------- | ---------------------------------------------- |
+| 1–4         | Common     | Healing Potion, Thieves' Tools, Torch Bundle   |
+| 5–10        | Uncommon   | Bag of Holding, Cloak of Protection, Sending Stones |
+| 11–16       | Rare       | Ring of Evasion, Staff of Fire, Carpet of Flying |
+| 17–20       | Very Rare  | Cloak of Invisibility, Manual of Bodily Health  |
+
+Close the modal with the **✕** button or by clicking outside it.
+
+### Multiple Floors
+
+When **Floors** is set to 2 or more, each floor is generated as an independent dungeon and connected by staircases.
+
+**Stair icons:**
+
+- **▼ (down arrow)** — stairs going deeper into the dungeon (to the next floor below)
+- **▲ (up arrow)** — stairs going back up (to the floor above)
+
+Stairs are drawn as white circular icons placed in the **corner of their room**. Click a stair icon to open the **Stairs modal**, which tells you the direction and destination floor. Click **Go to Floor X** to jump directly to that floor.
+
+**Floor selector:** When a dungeon has more than one floor, a **Floor dropdown** appears in the top-right corner next to the zoom controls. Select any floor from the list to view it. Switching floors resets the selected room.
+
+> **Floor 1** is the ground floor (entry level). Higher floor numbers go deeper underground — Floor 2 is one level below Floor 1, Floor 3 is one level below Floor 2, and so on.
 
 ---
 

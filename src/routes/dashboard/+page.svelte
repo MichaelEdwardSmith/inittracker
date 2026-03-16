@@ -17,6 +17,7 @@
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
 	import QuickRulesModal from '$lib/components/QuickRulesModal.svelte';
+	import DungeonGeneratorModal from '$lib/components/DungeonGeneratorModal.svelte';
 	import { ENEMY_TEMPLATES } from '$lib/enemies';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
@@ -160,6 +161,7 @@
 	});
 	let showNotes = $state(false);
 	let showQuickRules = $state(false);
+	let showDungeon = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -933,6 +935,7 @@
 {#if showQuickRules}
 	<QuickRulesModal
 		onclose={() => (showQuickRules = false)}
+		onOpenDungeon={() => { showQuickRules = false; showDungeon = true; }}
 		onAddEncounter={(monsters) => {
 			combat.clearEnemies();
 			for (const m of monsters) {
@@ -951,6 +954,26 @@
 		}}
 	/>
 {/if}
+
+<div style="display:{showDungeon ? 'block' : 'none'}">
+	<DungeonGeneratorModal
+		onclose={() => (showDungeon = false)}
+		onAddEncounter={(monsters) => {
+			for (const m of monsters) {
+				const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
+				if (template) {
+					combat.addEnemies(template, m.count);
+				} else {
+					combat.addEnemies(
+						{ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' },
+						m.count
+					);
+				}
+			}
+			showDungeon = false;
+		}}
+	/>
+</div>
 
 <style>
 	.bg-orb {
