@@ -13,12 +13,7 @@
 		{ id: 'managing-players', label: '4. Managing Your Party' },
 		{ id: 'managing-enemies', label: '5. Managing Enemies' },
 		{ id: 'running-combat', label: '6. Running Combat' },
-		{ id: 'initiative-ties', label: '↳ Initiative Ties' },
 		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
-		{ id: 'death-saves', label: '↳ Death Saving Throws' },
-		{ id: 'concentration-check', label: '↳ Concentration Checks' },
-		{ id: 'legendary-actions', label: '↳ Legendary Actions' },
-		{ id: 'lair-actions', label: '↳ Lair Actions' },
 		{ id: 'conditions', label: '8. Conditions & Statuses' },
 		{ id: 'player-display', label: '9. The Player Display' },
 		{ id: 'game-sessions', label: '10. Game Sessions' },
@@ -31,10 +26,7 @@
 		{ id: 'voice-commands', label: '17. Voice Commands (Beta)' },
 		{ id: 'audio-mixer', label: '18. Audio Mixer' },
 		{ id: 'quick-reference', label: '19. Quick Reference' },
-		{ id: 'qr-name-generator', label: '↳ Name Generator' },
-		{ id: 'qr-weather-travel', label: '↳ Weather & Travel' },
-		{ id: 'qr-shop-generator', label: '↳ Shop Generator' },
-		{ id: 'qr-encounter-generator', label: '↳ Random Encounter Generator' }
+		{ id: 'dungeon-generator', label: '20. Random Dungeon Generator' }
 	];
 
 	const conditions = [
@@ -2041,6 +2033,167 @@
 					)}
 				</section>
 			{/if}
+
+			<!-- 20 ─────────────────────────────────────── -->
+			<section id="dungeon-generator">
+				{@render h2('20', 'Random Dungeon Generator')}
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">🗺 Dungeon</strong> button in the DM
+					header to open the Random Dungeon Generator. Configure your options and click
+					<strong class="font-semibold text-white">Generate Dungeon</strong> to produce a complete
+					tile-based dungeon map with level-appropriate encounters, trapped doors, loot, and optional
+					multi-floor stairs.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Configuration
+				</h3>
+				{@render dataTable(
+					['Setting', 'Description'],
+					[
+						['Party Size', 'Number of players — affects encounter XP budgets'],
+						['Party Level', 'Average party level — scales encounters, loot, and trap DCs'],
+						[
+							'Dungeon Size',
+							'Small, Medium, or Large — controls the overall grid size and room count'
+						],
+						[
+							'Difficulty',
+							'Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier'
+						],
+						[
+							'Include Boss',
+							'Toggle on to guarantee a boss room with a harder encounter at the end'
+						],
+						[
+							'Floors',
+							'1–5 floors; each floor is generated independently and connected by stairs'
+						]
+					]
+				)}
+
+				<!-- Reading the Map -->
+				<section id="dungeon-map">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Reading the Map
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						The map is a tile-based top-down grid. Use the
+						<strong class="font-semibold text-white">− / +</strong> zoom controls in the top-right
+						corner to scale the view. On smaller screens the map scrolls both horizontally and
+						vertically. A north-pointing compass appears in the top-left corner.
+					</p>
+					{@render dataTable(
+						['Visual', 'Meaning'],
+						[
+							['Dark void', 'Impassable wall / empty space'],
+							['Stone floor with grid lines', 'Walkable room tile'],
+							['Corridor with grid lines', 'Hallway connecting rooms'],
+							['Door tile', 'Entry between a corridor and a room'],
+							['Red-framed door with !', 'Trapped door — click for trap details'],
+							['💰 icon', 'Room contains loot — click for treasure'],
+							['▲ / ▼ icon (white circle)', 'Staircase — click to navigate between floors']
+						]
+					)}
+					<p class="mt-3 text-sm leading-relaxed">
+						<strong class="font-semibold text-white">Room labels</strong> appear inside each room:
+						the entrance is marked <em>Entrance</em>, the boss room is marked <em>Boss</em>, and
+						all other rooms receive a themed name (e.g. <em>Crypt of Shadows</em>,
+						<em>Guard Post</em>).
+					</p>
+				</section>
+
+				<!-- Room Encounters -->
+				<section id="dungeon-encounters">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Room Encounters
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						Click any room on the map to open the
+						<strong class="font-semibold text-white">Encounter Panel</strong>. The panel shows the
+						room name and type, the enemy list with CR and individual XP values, a total XP
+						breakdown, and a difficulty badge (Trivial / Easy / Medium / Hard / Deadly). Click the
+						same room again to deselect it.
+					</p>
+				</section>
+
+				<!-- Trapped Doors -->
+				<section id="dungeon-traps">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Trapped Doors
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						Approximately <strong class="font-semibold text-white">25% of doors</strong> are
+						randomly trapped. They are drawn with a <strong class="font-semibold text-white"
+							>red frame</strong
+						> and a white <strong class="font-semibold text-white">!</strong> in the center. Click a
+						trapped door to open the Trap modal:
+					</p>
+					{@render dataTable(
+						['Field', 'Description'],
+						[
+							['Name', 'The trap type — e.g. Poison Needle Trap, Collapsing Ceiling'],
+							['Trigger', 'How it activates — e.g. pressure plate, tripwire, arcane glyph'],
+							['DC', 'The Perception or Disarm DC to detect or disable the trap'],
+							['Effect', 'Damage or condition inflicted on a failed save']
+						]
+					)}
+				</section>
+
+				<!-- Loot -->
+				<section id="dungeon-loot">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Loot
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						<strong class="font-semibold text-white">25% of non-entrance rooms</strong> contain a
+						<strong class="font-semibold text-white">💰 moneybag icon</strong> in the room's bottom-right
+						inner corner. Click it to open the Loot modal showing a level-appropriate coin total and
+						0–2 items from the appropriate tier:
+					</p>
+					{@render dataTable(
+						['Party Level', 'Loot Tier', 'Example Items'],
+						[
+							['1–4', 'Common', 'Healing Potion, Thieves\' Tools, Torch Bundle'],
+							['5–10', 'Uncommon', 'Bag of Holding, Cloak of Protection, Sending Stones'],
+							['11–16', 'Rare', 'Ring of Evasion, Staff of Fire, Carpet of Flying'],
+							['17–20', 'Very Rare', 'Cloak of Invisibility, Manual of Bodily Health']
+						]
+					)}
+				</section>
+
+				<!-- Multiple Floors -->
+				<section id="dungeon-floors">
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+						Multiple Floors
+					</h3>
+					<p class="mb-3 text-sm leading-relaxed">
+						When <strong class="font-semibold text-white">Floors</strong> is set to 2 or more, each
+						floor is generated independently and linked by staircases. Stair icons are placed in the
+						corner of their room:
+					</p>
+					{@render dataTable(
+						['Icon', 'Meaning'],
+						[
+							['▼', 'Stairs going deeper — down to the next floor below'],
+							['▲', 'Stairs going back up — to the floor above']
+						]
+					)}
+					<p class="mt-3 text-sm leading-relaxed">
+						Click any stair icon to open the <strong class="font-semibold text-white"
+							>Stairs modal</strong
+						>, which shows the direction and destination floor. Click
+						<strong class="font-semibold text-white">Go to Floor X</strong> to jump there. A
+						<strong class="font-semibold text-white">Floor dropdown</strong> also appears in the top-right
+						corner next to the zoom controls — select any floor directly from the list.
+					</p>
+					<p class="mt-3 text-sm leading-relaxed">
+						<strong class="font-semibold text-white">Floor 1</strong> is the ground floor (entry
+						level). Higher numbers go deeper underground — Floor 2 is one level below Floor 1,
+						Floor 3 is one level below Floor 2, and so on.
+					</p>
+				</section>
+			</section>
 		</main>
 	</div>
 </div>
