@@ -505,3 +505,185 @@ export async function exportNotesPdf(
 	document.body.removeChild(a);
 	URL.revokeObjectURL(url);
 }
+
+// ── Dungeon PDF export ────────────────────────────────────────────────────────
+
+type DungeonMonster = { name: string; count: number };
+type DungeonEncounter = { monsters: DungeonMonster[]; xp: number; difficulty: string };
+type DungeonRoom = {
+	id: number; name: string; isEntrance: boolean; isBoss: boolean;
+	encounter: DungeonEncounter | null;
+	loot?: { coins: string; items: string[] };
+};
+type DungeonFloorData = { rooms: DungeonRoom[] };
+
+const DIFF_COLOR: Record<string, [number, number, number]> = {
+	trivial: [120, 120, 130],
+	easy:    [60, 160, 90],
+	medium:  [180, 160, 40],
+	hard:    [200, 120, 40],
+	deadly:  [190, 50, 50],
+};
+
+export async function exportDungeonPdf(
+	floors: DungeonFloorData[],
+	floorImages: string[]
+): Promise<void> {
+	const { jsPDF } = await import('jspdf');
+	const { applyPlugin } = await import('jspdf-autotable');
+	applyPlugin(jsPDF);
+
+	// A4 portrait
+	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+	const pageW = doc.internal.pageSize.getWidth();   // 210
+	const pageH = doc.internal.pageSize.getHeight();  // 297
+	const margin = 12;
+	const contentW = pageW - margin * 2; // 186
+
+	const darkHeader  = [30, 30, 35]    as [number, number, number];
+	const accentAmber = [180, 120, 30]  as [number, number, number];
+	const textMid     = [80, 80, 90]    as [number, number, number];
+	const textDark    = [20, 20, 25]    as [number, number, number];
+
+	const MAP_W = contentW;             // 186mm
+	const MAP_H = Math.round(MAP_W * (672 / 992)); // ~126mm — matches canvas aspect ratio
+
+	for (let fi = 0; fi < floors.length; fi++) {
+		if (fi > 0) doc.addPage();
+
+		let y = margin;
+
+		// ── Page header ────────────────────────────────────────────────────
+		doc.setFillColor(...darkHeader);
+		doc.rect(margin, y, contentW, 14, 'F');
+
+		doc.setTextColor(180, 130, 40);
+		doc.setFontSize(7);
+		doc.setFont('helvetica', 'bold');
+		doc.text('DUNGEON MAP', margin + 4, y + 5);
+
+		doc.setTextColor(255, 255, 255);
+		doc.setFontSize(12);
+		doc.text(
+			floors.length > 1 ? `Floor ${fi + 1} of ${floors.length}` : 'Floor Plan',
+			margin + 4,
+			y + 11
+		);
+
+		if (floors.length > 1) {
+			const floorLabel = fi === 0 ? 'Ground Floor' : `${fi} Level${fi > 1 ? 's' : ''} Below Ground`;
+			doc.setFontSize(7);
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(160, 160, 170);
+			doc.text(floorLabel, pageW - margin - 4, y + 5, { align: 'right' });
+		}
+
+		y += 14 + 4;
+
+		// ── Map image ──────────────────────────────────────────────────────
+		const img = floorImages[fi];
+		if (img) {
+			doc.addImage(img, 'PNG', margin, y, MAP_W, MAP_H);
+		}
+		y += MAP_H + 6;
+
+		// ── Encounters section ─────────────────────────────────────────────
+		const roomsWithEnc = floors[fi].rooms.filter(
+			(r) => !r.isEntrance && r.encounter && r.encounter.monsters.length > 0
+		);
+		const entrance = floors[fi].rooms.find((r) => r.isEntrance);
+
+		doc.setFontSize(7.5);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...accentAmber);
+		doc.text('ROOM ENCOUNTERS', margin, y);
+		y += 4;
+
+		if (roomsWithEnc.length === 0) {
+			doc.setFontSize(8);
+			doc.setFont('helvetica', 'italic');
+			doc.setTextColor(...textMid);
+			doc.text('No encounters on this floor.', margin, y);
+		} else {
+			const tableRows = roomsWithEnc.map((r) => {
+				const monsterStr = r.encounter!.monsters
+					.map((m) => `${m.count}x ${m.name}`)
+					.join(', ');
+				const diffLabel = r.encounter!.difficulty
+					.charAt(0).toUpperCase() + r.encounter!.difficulty.slice(1);
+				return [
+					`${r.id + 1}. ${r.name}${r.isBoss ? ' *' : ''}`,
+					monsterStr,
+					diffLabel,
+					r.encounter!.xp.toLocaleString()
+				];
+			});
+
+			// @ts-expect-error jspdf-autotable augments doc at runtime
+			doc.autoTable({
+				startY: y,
+				head: [['Room', 'Monsters', 'Difficulty', 'XP']],
+				body: tableRows,
+				margin: { left: margin, right: margin },
+				styles: { fontSize: 7.5, cellPadding: 1.8, textColor: textDark },
+				headStyles: {
+					fillColor: [50, 50, 60],
+					textColor: [220, 220, 225],
+					fontStyle: 'bold',
+					fontSize: 7
+				},
+				alternateRowStyles: { fillColor: [248, 248, 250] },
+				columnStyles: {
+					0: { cellWidth: 44 },
+					1: { cellWidth: 'auto' },
+					2: { cellWidth: 22, halign: 'center' },
+					3: { cellWidth: 20, halign: 'right' }
+				},
+				didParseCell: (data: {
+					section: string;
+					column: { index: number };
+					cell: { text: string[]; styles: { textColor: number[]; fontStyle: string } };
+				}) => {
+					if (data.section === 'body' && data.column.index === 2) {
+						const diff = (data.cell.text[0] || '').toLowerCase();
+						data.cell.styles.textColor = DIFF_COLOR[diff] ?? textMid;
+						data.cell.styles.fontStyle = 'bold';
+					}
+					if (data.section === 'body' && data.column.index === 0 && data.cell.text[0]?.includes('*')) {
+						data.cell.styles.textColor = [190, 50, 50];
+						data.cell.styles.fontStyle = 'bold';
+					}
+				}
+			});
+		}
+
+		// ── Entrance note ──────────────────────────────────────────────────
+		const afterTable: number = roomsWithEnc.length > 0
+			? ((doc as unknown) as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4
+			: y + 4;
+
+		if (entrance) {
+			doc.setFontSize(7.5);
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(...textMid);
+			doc.text(
+				`Room ${entrance.id + 1} (${entrance.name}) is the party entrance.`,
+				margin,
+				Math.min(afterTable, pageH - margin - 4)
+			);
+		}
+	}
+
+	// ── Download ───────────────────────────────────────────────────────────────
+	const dateSlug = new Date().toISOString().slice(0, 10);
+	const filename = `dungeon-map-${dateSlug}.pdf`;
+	const blob = doc.output('blob');
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = filename;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}

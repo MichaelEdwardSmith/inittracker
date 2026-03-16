@@ -3,6 +3,7 @@
      Rendering:  HTML5 canvas, graph-paper dungeon aesthetic -->
 <script lang="ts">
 	import { getMonsterDetail } from '$lib/enemies';
+	import { exportDungeonPdf } from '$lib/pdfExport';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 	import type { MonsterDetail } from '$lib/types';
 
@@ -80,6 +81,7 @@
 	let currentFloor = $state(0);
 	let activeStair = $state<{ dir: 'up' | 'down'; floor: number } | null>(null);
 	let zoom = $state(1);
+	let isExporting = $state(false);
 	const ZOOM_MIN = 0.5, ZOOM_MAX = 4, ZOOM_STEP = 0.25;
 
 	// ── Mobile panels ──────────────────────────────────────────────────────────
@@ -554,13 +556,8 @@
 	};
 
 	// ── Rendering ──────────────────────────────────────────────────────────────
-	function renderCanvas() {
-		if (!canvasEl || !dungeon) return;
-		const ctx = canvasEl.getContext('2d');
-		if (!ctx) return;
-		ctx.imageSmoothingEnabled = false;
-
-		const { cells, rooms, traps, stairs } = dungeon.floors[currentFloor];
+	function renderFloorToContext(ctx: CanvasRenderingContext2D, floor: DungeonFloor, selectedId: number | null) {
+		const { cells, rooms, traps, stairs } = floor;
 
 		// Build room lookup
 		const roomOf: (DungeonRoom | null)[][] = Array.from(
@@ -664,8 +661,8 @@
 		}
 
 		// ── Pass 4: Selected room highlight ───────────────────────────────────
-		if (selectedRoomId !== null) {
-			const sel = rooms.find(r => r.id === selectedRoomId);
+		if (selectedId !== null) {
+			const sel = rooms.find(r => r.id === selectedId);
 			if (sel) {
 				ctx.fillStyle = C.selOverlay;
 				for (let y = sel.top; y <= sel.bottom; y++)
@@ -766,6 +763,24 @@
 		drawCompassRose(ctx, CVS_W - 32, CVS_H - 32, 20);
 	}
 
+	function renderCanvas() {
+		if (!canvasEl || !dungeon) return;
+		const ctx = canvasEl.getContext('2d');
+		if (!ctx) return;
+		ctx.imageSmoothingEnabled = false;
+		renderFloorToContext(ctx, dungeon.floors[currentFloor], selectedRoomId);
+	}
+
+	function renderFloorToDataUrl(floor: DungeonFloor): string {
+		const offscreen = document.createElement('canvas');
+		offscreen.width = CVS_W;
+		offscreen.height = CVS_H;
+		const ctx = offscreen.getContext('2d')!;
+		ctx.imageSmoothingEnabled = false;
+		renderFloorToContext(ctx, floor, null);
+		return offscreen.toDataURL('image/png');
+	}
+
 	function drawCompassRose(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
 		ctx.save();
 		ctx.translate(cx, cy);
@@ -811,6 +826,17 @@
 		ctx.fillText('N', 0, -(r + 7));
 
 		ctx.restore();
+	}
+
+	async function downloadPdf() {
+		if (!dungeon) return;
+		isExporting = true;
+		try {
+			const images = dungeon.floors.map(renderFloorToDataUrl);
+			await exportDungeonPdf(dungeon.floors, images);
+		} finally {
+			isExporting = false;
+		}
 	}
 
 	// ── Canvas interaction ─────────────────────────────────────────────────────
@@ -1050,7 +1076,22 @@
 						{/each}
 					</select>
 				{/if}
-				<div class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 shadow-lg">
+				{#if dungeon}
+				<button
+					onclick={downloadPdf}
+					disabled={isExporting}
+					class="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 text-xs text-gray-300 shadow-lg transition hover:border-amber-600 hover:text-amber-300 disabled:opacity-50"
+					title="Download all floors as PDF"
+				>
+					{#if isExporting}
+						<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-500 border-t-amber-400"></span>
+					{:else}
+						⤓
+					{/if}
+					PDF
+				</button>
+			{/if}
+			<div class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 shadow-lg">
 					<button
 						onclick={() => (zoom = Math.max(ZOOM_MIN, zoom - ZOOM_STEP))}
 						class="flex h-6 w-6 items-center justify-center rounded text-gray-300 transition hover:text-amber-300"
