@@ -109,7 +109,14 @@
       "WebFetch(domain:daviddever.net)",
       "WebFetch(domain:mizar999.github.io)",
       "Bash(cd:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:anyflip.com)",
+      "WebFetch(domain:online.anyflip.com)",
+      "WebFetch(domain:www.scribd.com)",
+      "WebFetch(domain:nerdarchy.com)",
+      "WebFetch(domain:www.thegamer.com)",
+      "WebFetch(domain:chartopia.d12dev.com)",
+      "WebFetch(domain:www.cbr.com)"
     ]
   }
 }
