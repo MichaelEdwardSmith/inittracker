@@ -17,6 +17,7 @@
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
 	import QuickRulesModal from '$lib/components/QuickRulesModal.svelte';
+	import GeneratorsModal from '$lib/components/GeneratorsModal.svelte';
 	import DungeonGeneratorModal from '$lib/components/DungeonGeneratorModal.svelte';
 	import { ENEMY_TEMPLATES } from '$lib/enemies';
 	import { combat } from '$lib/store.svelte';
@@ -161,6 +162,7 @@
 	});
 	let showNotes = $state(false);
 	let showQuickRules = $state(false);
+	let showGenerators = $state(false);
 	let showDungeon = $state(false);
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
@@ -373,13 +375,35 @@
 			? ''
 			: 'hidden'}"
 	>
+		<a
+			id="guide-link"
+			href="/guide"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+				/>
+			</svg>
+			Guide
+		</a>
 		{#if !data.isGuest}
 			<button
 				onclick={() => {
 					openInbox();
 					showMobileMenu = false;
 				}}
-				class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
+				class="relative flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm transition
 				       {unreadCount > 0
 					? 'text-amber-400 hover:bg-amber-900/30'
 					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
@@ -528,6 +552,30 @@
 		</button>
 		<button
 			onclick={() => {
+				showGenerators = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+				/>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+			</svg>
+			Generators
+		</button>
+		<button
+			onclick={() => {
 				showEncounters = true;
 				showMobileMenu = false;
 			}}
@@ -588,28 +636,6 @@
 				/>
 			</svg>
 			Chronicle
-		</a>
-		<a
-			id="guide-link"
-			href="/guide"
-			onclick={() => (showMobileMenu = false)}
-			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-				/>
-			</svg>
-			Guide
 		</a>
 		<a
 			href="/display/{activeSession.sessionId}"
@@ -935,7 +961,13 @@
 {#if showQuickRules}
 	<QuickRulesModal
 		onclose={() => (showQuickRules = false)}
-		onOpenDungeon={() => { showQuickRules = false; showDungeon = true; }}
+	/>
+{/if}
+
+{#if showGenerators}
+	<GeneratorsModal
+		onclose={() => (showGenerators = false)}
+		onOpenDungeon={() => { showGenerators = false; showDungeon = true; }}
 		onAddEncounter={(monsters) => {
 			combat.clearEnemies();
 			for (const m of monsters) {
@@ -950,7 +982,7 @@
 					);
 				}
 			}
-			showQuickRules = false;
+			showGenerators = false;
 		}}
 	/>
 {/if}
