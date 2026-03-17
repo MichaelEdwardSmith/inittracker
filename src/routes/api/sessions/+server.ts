@@ -11,7 +11,8 @@ import {
 	renameGameSession,
 	deleteGameSession,
 	switchActiveGameSession,
-	getActiveGameSessionPublicId
+	getActiveGameSessionPublicId,
+	setSessionRuleset
 } from '$lib/server/dmModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 
@@ -85,6 +86,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			authToGameSession.set(authSessionId, newPublicId);
 			authToRuleset.delete(authSessionId);
 			return Response.json({ sessionId: newPublicId });
+		}
+
+		case 'set-ruleset': {
+			if (!id) return new Response('Missing id', { status: 400 });
+			const rs = ruleset === '2024' ? '2024' : '2014';
+			const ok = await setSessionRuleset(authSessionId, id, rs);
+			if (!ok) return new Response('Session not found', { status: 404 });
+			// Invalidate ruleset cache so next request re-reads the updated value
+			authToRuleset.delete(authSessionId);
+			return new Response(null, { status: 200 });
 		}
 
 		default:

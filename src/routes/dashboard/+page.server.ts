@@ -2,21 +2,22 @@
 // Fetches all game sessions for the authenticated DM and resolves the active one,
 // passing both down as page data.
 import type { PageServerLoad } from './$types';
-import { listGameSessions } from '$lib/server/dmModel';
+import { listGameSessions, activeSessionNeedsRulesetSetup } from '$lib/server/dmModel';
 import type { GameSession } from '$lib/types';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, cookies }) => {
 	if (locals.isGuest) {
 		return {
 			dmFirstName: 'Guest',
 			isGuest: true,
 			showVoiceCommands: false,
 			sessions: [] as GameSession[],
+			needsEditionSetup: true, // guests always choose on each visit
 			activeSession: {
 				id: '',
 				sessionId: locals.gameSessionId ?? '',
 				name: 'Guest Session',
-				ruleset: '2014'
+				ruleset: '2014' as const // placeholder until guest picks
 			} as GameSession
 		};
 	}
@@ -24,7 +25,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const authSessionId = locals.sessionId ?? '';
 	const gameSessionId = locals.gameSessionId ?? '';
 
-	const sessions = await listGameSessions(authSessionId);
+	const [sessions, needsEditionSetup] = await Promise.all([
+		listGameSessions(authSessionId),
+		activeSessionNeedsRulesetSetup(authSessionId)
+	]);
 
 	const activeSession: GameSession =
 		sessions.find((s) => s.sessionId === gameSessionId) ??
@@ -35,6 +39,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		isGuest: false,
 		showVoiceCommands: true,
 		sessions,
-		activeSession
+		activeSession,
+		needsEditionSetup
 	};
 };

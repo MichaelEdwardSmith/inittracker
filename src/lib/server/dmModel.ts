@@ -122,7 +122,7 @@ export async function createDM(
 		id: randomUUID(),
 		sessionId, // first game session shares the auth sessionId
 		name: 'Default Session',
-		ruleset: '2014',
+		// ruleset intentionally omitted — user will choose on first login
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		combatHistory: [],
 		createdAt: new Date()
@@ -197,7 +197,7 @@ export async function findOrCreateDMByOAuth(
 		id: randomUUID(),
 		sessionId,
 		name: 'Default Session',
-		ruleset: '2014',
+		// ruleset intentionally omitted — user will choose on first login
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		combatHistory: [],
 		createdAt: new Date()
@@ -581,4 +581,40 @@ export async function deleteEncounter(authSessionId: string, encounterId: string
 	await c.updateOne({ sessionId: authSessionId }, {
 		$pull: { encounters: { id: encounterId } }
 	} as never);
+}
+
+// ---------------------------------------------------------------------------
+// Edition setup — first-run detection and ruleset confirmation
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true if the active game session has no explicit ruleset set —
+ * meaning this is a brand-new account that hasn't chosen an edition yet.
+ */
+export async function activeSessionNeedsRulesetSetup(authSessionId: string): Promise<boolean> {
+	await ensureGameSessions(authSessionId);
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm?.gameSessions?.length) return false;
+	const active =
+		(dm.gameSessions as DMGameSession[]).find((s) => s.id === dm.activeGameSessionId) ??
+		(dm.gameSessions as DMGameSession[])[0];
+	return !active?.ruleset;
+}
+
+/**
+ * Sets the ruleset on a specific game session (identified by its internal UUID).
+ * Used to confirm the edition on first login.
+ */
+export async function setSessionRuleset(
+	authSessionId: string,
+	sessionUUID: string,
+	ruleset: '2014' | '2024'
+): Promise<boolean> {
+	const c = await col();
+	const result = await c.updateOne(
+		{ sessionId: authSessionId, 'gameSessions.id': sessionUUID },
+		{ $set: { 'gameSessions.$.ruleset': ruleset } }
+	);
+	return result.matchedCount > 0;
 }

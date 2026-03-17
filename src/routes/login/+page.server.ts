@@ -29,6 +29,8 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 export const actions: Actions = {
 	guest: async ({ cookies }) => {
+		// Clear any lingering auth cookie so the guest branch in hooks is guaranteed to run
+		cookies.delete('dm_auth', { path: '/' });
 		cookies.set('dm_guest', randomId(), {
 			path: '/',
 			httpOnly: true,

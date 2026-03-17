@@ -11,6 +11,7 @@
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import SessionNotesModal from '$lib/components/SessionNotesModal.svelte';
 	import SessionManagerModal from '$lib/components/SessionManagerModal.svelte';
+	import FirstRunEditionModal from '$lib/components/FirstRunEditionModal.svelte';
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
 	import SpellsModal from '$lib/components/SpellsModal.svelte';
 	import SpellsModal2024 from '$lib/components/SpellsModal2024.svelte';
@@ -169,6 +170,7 @@
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
 	let showMobileMenu = $state(false);
+	let guestEditionPicked = $state(false);
 	let isFullscreen = $state(false);
 
 	$effect(() => {
@@ -1018,6 +1020,17 @@
 		}}
 	/>
 </div>
+
+{#if data.needsEditionSetup && !guestEditionPicked}
+	<FirstRunEditionModal
+		sessionId={activeSession.id}
+		isGuest={data.isGuest}
+		onpick={(ruleset) => {
+			activeSession = { ...activeSession, ruleset };
+			guestEditionPicked = true;
+		}}
+	/>
+{/if}
 
 <style>
 	.bg-orb {
