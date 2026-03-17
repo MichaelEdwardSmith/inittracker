@@ -124,6 +124,68 @@ export interface GameSession {
 	id: string; // UUID — internal identifier
 	sessionId: string; // 6-char public ID — used in viewer URLs
 	name: string; // user-defined name
+	ruleset: '2014' | '2024'; // D&D edition; defaults to '2014' for existing sessions
+}
+
+// ---------------------------------------------------------------------------
+// 2024 Monster Manual stat block (structured arrays, not HTML strings)
+// ---------------------------------------------------------------------------
+
+export interface MonsterAbility2024 {
+	score: number;
+	mod: string;
+	save: string;
+}
+
+export interface MonsterAbilities2024 {
+	STR: MonsterAbility2024;
+	DEX: MonsterAbility2024;
+	CON: MonsterAbility2024;
+	INT: MonsterAbility2024;
+	WIS: MonsterAbility2024;
+	CHA: MonsterAbility2024;
+}
+
+export interface MonsterAction2024 {
+	name: string;
+	description: string;
+}
+
+export interface MonsterDetail2024 {
+	slug: string;
+	name: string;
+	size: string;
+	type: string;
+	alignment: string;
+	initiative: { mod: string; score: number };
+	ac: string;
+	hp: string;
+	speed: string;
+	abilities: MonsterAbilities2024;
+	skills?: string;
+	senses?: string;
+	languages?: string;
+	cr: string;
+	xp?: number;
+	proficiencyBonus?: string;
+	immunities?: string;
+	resistances?: string;
+	vulnerabilities?: string;
+	conditionImmunities?: string;
+	traits: MonsterAction2024[];
+	actions: MonsterAction2024[];
+	bonusActions: MonsterAction2024[];
+	reactions: MonsterAction2024[];
+	legendary: {
+		preamble: string | null;
+		actions: MonsterAction2024[];
+	};
+	lair: {
+		preamble: string | null;
+		actions: MonsterAction2024[];
+	} | null;
+	imgUrl?: string;
+	source?: string;
 }
 
 export interface EncounterEnemy {
@@ -142,6 +204,29 @@ export interface NoteEntry {
 	id: string;
 	date: string; // ISO date string
 	content: string;
+}
+
+// ---------------------------------------------------------------------------
+// 2024 Spell (flat structure — plain text, not 5etools nested entries)
+// ---------------------------------------------------------------------------
+
+export interface Spell2024 {
+	name: string;
+	level: number; // 0 = cantrip
+	school: string; // full lowercase name, e.g. "evocation"
+	classes: string[]; // e.g. ["bard", "sorcerer"]
+	actionType: 'action' | 'bonusAction' | 'reaction';
+	castingTime?: string; // overrides actionType if present, e.g. "1 minute"
+	castingTrigger?: string; // reaction condition description
+	concentration: boolean;
+	ritual: boolean;
+	range: string;
+	components: string[]; // e.g. ["v", "s", "m"]
+	material?: string;
+	duration: string;
+	description: string;
+	higherLevelSlot?: string;
+	cantripUpgrade?: string;
 }
 
 export interface Spell5e {

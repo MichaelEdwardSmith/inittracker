@@ -16,6 +16,16 @@
 	let combatState: StorageState = $state({ combatants: [], currentTurnId: null, round: 1 });
 	let connected = $state(false);
 	let conditionInfo = $state<string | null>(null);
+	let ruleset = $state<'2014' | '2024'>('2014');
+
+	$effect(() => {
+		fetch(`/api/session-ruleset?session=${data.sessionId}`)
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d) => {
+				if (d?.ruleset === '2024') ruleset = '2024';
+			})
+			.catch(() => {});
+	});
 
 	// ── Player → DM messaging ───────────────────────────────────────────
 	let showMsgModal = $state(false);
@@ -1301,7 +1311,7 @@
 	/>
 {/if}
 
-<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
+<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
 
 <style>
 	/* Bloodied enemy avatar — pulsing crimson ring */

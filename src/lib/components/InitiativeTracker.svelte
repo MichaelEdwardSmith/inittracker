@@ -16,6 +16,8 @@
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
 	import LootModal from '$lib/components/LootModal.svelte';
 
+	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
+
 	async function scrollToActive() {
 		await tick();
 		document
@@ -849,7 +851,7 @@
 </div>
 
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
-<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} />
+<ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
 <CombatantNoteModal
 	combatant={noteTarget}
 	onclose={() => (noteTarget = null)}

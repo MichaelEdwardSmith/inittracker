@@ -3,6 +3,7 @@
 	import { combat } from '$lib/store.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import type { GameSession } from '$lib/types';
+	import RulesetPickerModal from './RulesetPickerModal.svelte';
 
 	interface Props {
 		sessions: GameSession[];
@@ -16,8 +17,7 @@
 	let busy = $state(false);
 	let renamingId = $state<string | null>(null);
 	let renameValue = $state('');
-	let newSessionName = $state('');
-	let showNewSessionInput = $state(false);
+	let showRulesetPicker = $state(false);
 	let deleteConfirmId = $state<string | null>(null);
 
 	async function switchSession(session: GameSession) {
@@ -59,21 +59,17 @@
 		if (res.ok) await invalidateAll();
 	}
 
-	async function createSession() {
+	async function createSession(name: string, ruleset: '2014' | '2024') {
 		if (busy) return;
-		const name = newSessionName.trim() || `Session ${sessions.length + 1}`;
+		showRulesetPicker = false;
 		busy = true;
 		try {
 			const res = await fetch('/api/sessions', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'create', name })
+				body: JSON.stringify({ action: 'create', name, ruleset })
 			});
-			if (res.ok) {
-				newSessionName = '';
-				showNewSessionInput = false;
-				await invalidateAll();
-			}
+			if (res.ok) await invalidateAll();
 		} finally {
 			busy = false;
 		}
@@ -301,75 +297,35 @@
 
 		<!-- New session footer -->
 		<div class="border-t border-gray-700 px-4 py-3">
-			{#if showNewSessionInput}
-				<div class="flex items-center gap-2">
-					<!-- svelte-ignore a11y_autofocus -->
-					<input
-						autofocus
-						type="text"
-						placeholder="Session name…"
-						class="flex-1 rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-500"
-						bind:value={newSessionName}
-						onkeydown={(e) => {
-							if (e.key === 'Enter') createSession();
-							if (e.key === 'Escape') {
-								showNewSessionInput = false;
-								newSessionName = '';
-							}
-						}}
-					/>
-					<button
-						onclick={createSession}
-						disabled={busy}
-						class="rounded bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-500 disabled:opacity-50"
-						>Create</button
-					>
-					<button
-						aria-label="Cancel"
-						onclick={() => {
-							showNewSessionInput = false;
-							newSessionName = '';
-						}}
-						class="rounded p-1.5 text-gray-500 transition hover:text-gray-300"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
-					</button>
-				</div>
-			{:else}
-				<button
-					onclick={() => (showNewSessionInput = true)}
-					class="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray-700 py-2 text-xs font-semibold text-gray-500 transition hover:border-amber-600/60 hover:text-amber-400"
+			<button
+				onclick={() => (showRulesetPicker = true)}
+				disabled={busy}
+				class="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray-700 py-2 text-xs font-semibold text-gray-500 transition hover:border-amber-600/60 hover:text-amber-400 disabled:opacity-40"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3.5 w-3.5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-3.5 w-3.5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 4v16m8-8H4"
-						/>
-					</svg>
-					New Session
-				</button>
-			{/if}
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 4v16m8-8H4"
+					/>
+				</svg>
+				New Session
+			</button>
 		</div>
 	</div>
 </div>
+
+{#if showRulesetPicker}
+	<RulesetPickerModal
+		defaultName="Session {sessions.length + 1}"
+		oncreate={createSession}
+		oncancel={() => (showRulesetPicker = false)}
+	/>
+{/if}

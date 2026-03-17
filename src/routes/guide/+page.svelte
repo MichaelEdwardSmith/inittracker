@@ -9,24 +9,25 @@
 	const toc = [
 		{ id: 'getting-started-dm', label: '1. Getting Started (DM)' },
 		{ id: 'getting-started-players', label: '2. Getting Started (Players)' },
-		{ id: 'dm-dashboard', label: '3. The DM Dashboard' },
-		{ id: 'managing-players', label: '4. Managing Your Party' },
-		{ id: 'managing-enemies', label: '5. Managing Enemies' },
-		{ id: 'running-combat', label: '6. Running Combat' },
-		{ id: 'hit-points', label: '7. Hit Points & Armor Class' },
-		{ id: 'conditions', label: '8. Conditions & Statuses' },
-		{ id: 'player-display', label: '9. The Player Display' },
-		{ id: 'game-sessions', label: '10. Game Sessions' },
-		{ id: 'chronicles', label: '11. Combat Chronicles' },
-		{ id: 'dice-roller', label: '12. Dice Roller' },
-		{ id: 'encounter-builder', label: '13. Encounter Builder' },
-		{ id: 'spell-reference', label: '14. Spell Reference' },
-		{ id: 'player-messaging', label: '15. Player Messaging' },
-		{ id: 'contact', label: '16. Contact & Support' },
-		{ id: 'voice-commands', label: '17. Voice Commands (Beta)' },
-		{ id: 'audio-mixer', label: '18. Audio Mixer' },
-		{ id: 'quick-reference', label: '19. Quick Reference' },
-		{ id: 'dungeon-generator', label: '20. Random Dungeon Generator' }
+		{ id: 'choosing-edition', label: '3. Choosing Your Edition' },
+		{ id: 'dm-dashboard', label: '4. The DM Dashboard' },
+		{ id: 'managing-players', label: '5. Managing Your Party' },
+		{ id: 'managing-enemies', label: '6. Managing Enemies' },
+		{ id: 'running-combat', label: '7. Running Combat' },
+		{ id: 'hit-points', label: '8. Hit Points & Armor Class' },
+		{ id: 'conditions', label: '9. Conditions & Statuses' },
+		{ id: 'player-display', label: '10. The Player Display' },
+		{ id: 'game-sessions', label: '11. Game Sessions' },
+		{ id: 'chronicles', label: '12. Combat Chronicles' },
+		{ id: 'dice-roller', label: '13. Dice Roller' },
+		{ id: 'encounter-builder', label: '14. Encounter Builder' },
+		{ id: 'spell-reference', label: '15. Spell Reference' },
+		{ id: 'player-messaging', label: '16. Player Messaging' },
+		{ id: 'contact', label: '17. Contact & Support' },
+		{ id: 'voice-commands', label: '18. Voice Commands (Beta)' },
+		{ id: 'audio-mixer', label: '19. Audio Mixer' },
+		{ id: 'quick-reference', label: '20. Quick Reference' },
+		{ id: 'dungeon-generator', label: '21. Random Dungeon Generator' }
 	];
 
 	const conditions = [
@@ -228,8 +229,59 @@
 			</section>
 
 			<!-- 3 ─────────────────────────────────────── -->
+			<section id="choosing-edition">
+				{@render h2('3', 'Choosing Your Edition')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					When you create a new game session, Initiative asks you to choose which edition of D&D 5e
+					you are playing. This choice shapes the bestiary, spell list, encounter difficulty system,
+					and Quick Reference rules available to you throughout that session.
+				</p>
+
+				<div class="mb-6 grid gap-4 sm:grid-cols-2">
+					<!-- 2014 card -->
+					<div class="rounded-lg border border-amber-800/50 bg-amber-950/20 p-4">
+						<p class="mb-1 text-sm font-black tracking-wide text-amber-400">D&D 5e (2014)</p>
+						<p class="mb-3 text-xs text-gray-400 italic">Player's Handbook · Monster Manual · DMG</p>
+						<ul class="space-y-1 text-xs text-gray-300">
+							<li>• Original 2014 Monster Manual bestiary</li>
+							<li>• Classic spell list (PHB / XGE / TCE)</li>
+							<li>• 6-tier Exhaustion table</li>
+							<li>• Encounter difficulty uses XP multiplier</li>
+							<li>• Bonus-action spell restricts action to cantrip</li>
+						</ul>
+					</div>
+					<!-- 2024 card -->
+					<div class="rounded-lg border border-blue-800/50 bg-blue-950/20 p-4">
+						<p class="mb-1 text-sm font-black tracking-wide text-blue-400">D&D 2024</p>
+						<p class="mb-3 text-xs text-gray-400 italic">2024 Player's Handbook · Monster Manual</p>
+						<ul class="space-y-1 text-xs text-gray-300">
+							<li>• 2024 Monster Manual bestiary</li>
+							<li>• 2024 spell list (339 spells, flat format)</li>
+							<li>• Stacking −1 Exhaustion (10 levels)</li>
+							<li>• Encounter difficulty uses XP budget</li>
+							<li>• Bonus-action spell no longer restricts action</li>
+						</ul>
+					</div>
+				</div>
+
+				<div
+					class="mb-4 rounded-lg border border-orange-800/40 bg-orange-950/20 px-4 py-3 text-sm text-orange-200"
+				>
+					<strong class="text-white">This choice is permanent.</strong> Once a session is created with
+					an edition, it cannot be changed. If you need to switch editions, create a new session — your
+					existing sessions are unaffected.
+				</div>
+
+				<p class="text-sm leading-relaxed">
+					Existing sessions created before this feature was added are automatically treated as
+					<strong class="text-white">2014 edition</strong> sessions.
+				</p>
+			</section>
+
+			<!-- 4 ─────────────────────────────────────── -->
 			<section id="dm-dashboard">
-				{@render h2('3', 'The DM Dashboard')}
+				{@render h2('4', 'The DM Dashboard')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					The dashboard is your command center, divided into three panels:
@@ -298,7 +350,7 @@
 
 			<!-- 4 ─────────────────────────────────────── -->
 			<section id="managing-players">
-				{@render h2('4', 'Managing Your Party (Players)')}
+				{@render h2('5', 'Managing Your Party (Players)')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Adding a Player
@@ -351,9 +403,9 @@
 				</p>
 			</section>
 
-			<!-- 5 ─────────────────────────────────────── -->
+			<!-- 6 ─────────────────────────────────────── -->
 			<section id="managing-enemies">
-				{@render h2('5', 'Managing Enemies')}
+				{@render h2('6', 'Managing Enemies')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					The Enemy Library
@@ -527,9 +579,9 @@
 				</div>
 			</section>
 
-			<!-- 6 ─────────────────────────────────────── -->
+			<!-- 7 ─────────────────────────────────────── -->
 			<section id="running-combat">
-				{@render h2('6', 'Running Combat')}
+				{@render h2('7', 'Running Combat')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Setting Initiatives
@@ -629,9 +681,9 @@
 				)}
 			</section>
 
-			<!-- 7 ─────────────────────────────────────── -->
+			<!-- 8 ─────────────────────────────────────── -->
 			<section id="hit-points">
-				{@render h2('7', 'Hit Points, Temp HP & Armor Class')}
+				{@render h2('8', 'Hit Points, Temp HP & Armor Class')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Dealing Damage
@@ -862,9 +914,9 @@
 				</p>
 			</section>
 
-			<!-- 8 ─────────────────────────────────────── -->
+			<!-- 9 ─────────────────────────────────────── -->
 			<section id="conditions">
-				{@render h2('8', 'Conditions & Status Effects')}
+				{@render h2('9', 'Conditions & Status Effects')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Adding a Condition
@@ -931,9 +983,9 @@
 				</p>
 			</section>
 
-			<!-- 9 ─────────────────────────────────────── -->
+			<!-- 10 ─────────────────────────────────────── -->
 			<section id="player-display">
-				{@render h2('9', 'The Player Display (Viewer Screen)')}
+				{@render h2('10', 'The Player Display (Viewer Screen)')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					The viewer at <code
@@ -1045,9 +1097,9 @@
 				</ul>
 			</section>
 
-			<!-- 10 ─────────────────────────────────────── -->
+			<!-- 11 ─────────────────────────────────────── -->
 			<section id="game-sessions">
-				{@render h2('10', 'Game Sessions')}
+				{@render h2('11', 'Game Sessions')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Each DM account can have multiple independent game sessions — useful if you run more than
@@ -1115,9 +1167,9 @@
 				</p>
 			</section>
 
-			<!-- 11 ─────────────────────────────────────── -->
+			<!-- 12 ─────────────────────────────────────── -->
 			<section id="chronicles">
-				{@render h2('11', 'Combat Chronicles (History)')}
+				{@render h2('12', 'Combat Chronicles (History)')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white">Chronicle</strong> page keeps a permanent record
@@ -1226,9 +1278,9 @@
 				</ul>
 			</section>
 
-			<!-- 12 ─────────────────────────────────────── -->
+			<!-- 13 ─────────────────────────────────────── -->
 			<section id="dice-roller">
-				{@render h2('12', 'Dice Roller')}
+				{@render h2('13', 'Dice Roller')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">Dice</strong> button (cube icon) in the dashboard
@@ -1327,9 +1379,9 @@
 				</p>
 			</section>
 
-			<!-- 13 ─────────────────────────────────────── -->
+			<!-- 14 ─────────────────────────────────────── -->
 			<section id="encounter-builder">
-				{@render h2('13', 'Encounter Builder')}
+				{@render h2('14', 'Encounter Builder')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">Encounters</strong> button (clipboard icon)
@@ -1454,9 +1506,9 @@
 				</p>
 			</section>
 
-			<!-- 14 ─────────────────────────────────────── -->
+			<!-- 15 ─────────────────────────────────────── -->
 			<section id="spell-reference">
-				{@render h2('14', 'Spell Reference')}
+				{@render h2('15', 'Spell Reference')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">Spells</strong> button in the dashboard header
@@ -1544,9 +1596,9 @@
 				</p>
 			</section>
 
-			<!-- 15 ───────────────────────────────────────── -->
+			<!-- 16 ───────────────────────────────────────── -->
 			<section id="player-messaging">
-				{@render h2('15', 'Player Messaging')}
+				{@render h2('16', 'Player Messaging')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Players on the viewer screen can send a private message directly to the DM — useful for
@@ -1603,9 +1655,9 @@
 				</p>
 			</section>
 
-			<!-- 16 ─────────────────────────────────────── -->
+			<!-- 17 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('16', 'Contact & Support')}
+				{@render h2('17', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
@@ -1616,9 +1668,9 @@
 				</p>
 			</section>
 			{#if data.showVoiceCommands}
-				<!-- 17 ─────────────────────────────────────── -->
+				<!-- 18 ─────────────────────────────────────── -->
 				<section id="voice-commands">
-					{@render h2('17', 'Voice Commands (Beta)')}
+					{@render h2('18', 'Voice Commands (Beta)')}
 
 					<div
 						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
@@ -1701,9 +1753,9 @@
 					</ul>
 				</section>
 
-				<!-- 18 ─────────────────────────────────────── -->
+				<!-- 19 ─────────────────────────────────────── -->
 				<section id="audio-mixer">
-					{@render h2('18', 'Audio Mixer')}
+					{@render h2('19', 'Audio Mixer')}
 
 					<p class="mb-4 text-sm leading-relaxed">
 						Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the dashboard
@@ -1808,7 +1860,7 @@
 				</section>
 
 				<section id="quick-reference">
-					{@render h2('19', 'Quick Reference')}
+					{@render h2('20', 'Quick Reference')}
 
 					<p class="mb-4 text-sm leading-relaxed">
 						The <strong class="font-semibold text-white">Quick Reference</strong> panel is a
@@ -2034,9 +2086,9 @@
 				</section>
 			{/if}
 
-			<!-- 20 ─────────────────────────────────────── -->
+			<!-- 21 ─────────────────────────────────────── -->
 			<section id="dungeon-generator">
-				{@render h2('20', 'Random Dungeon Generator')}
+				{@render h2('21', 'Random Dungeon Generator')}
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">🗺 Dungeon</strong> button in the DM
 					header to open the Random Dungeon Generator. Configure your options and click

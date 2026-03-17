@@ -4,9 +4,17 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail } from '$lib/enemies';
-	import type { EnemyTemplate, CustomMonster, MonsterDetail } from '$lib/types';
+	import { ENEMY_TEMPLATES_2024, MONSTER_TYPES_2024, getMonsterDetail2024 } from '$lib/enemies2024';
+	import type { EnemyTemplate, CustomMonster, MonsterDetail, MonsterDetail2024 } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
+	import MonsterInfoModal2024 from '$lib/components/MonsterInfoModal2024.svelte';
 	import ImportBestiaryModal from '$lib/components/ImportBestiaryModal.svelte';
+
+	interface Props {
+		ruleset?: '2014' | '2024';
+	}
+
+	let { ruleset = '2014' }: Props = $props();
 
 	// Extended display type — built-ins have no id/isCustom/detail
 	type DisplayTemplate = EnemyTemplate & {
@@ -24,10 +32,15 @@
 	let quantity = $state(1);
 
 	// ── Monster info modal ───────────────────────────────────────────────────
-	let infoMonster = $state<MonsterDetail | null>(null);
+	let infoMonster2014 = $state<MonsterDetail | null>(null);
+	let infoMonster2024 = $state<MonsterDetail2024 | null>(null);
 
 	function showInfo(e: DisplayTemplate) {
-		infoMonster = e.detail ?? getMonsterDetail(e.name) ?? null;
+		if (ruleset === '2024') {
+			infoMonster2024 = getMonsterDetail2024(e.name) ?? null;
+		} else {
+			infoMonster2014 = e.detail ?? getMonsterDetail(e.name) ?? null;
+		}
 	}
 
 	// ── Custom monsters ──────────────────────────────────────────────────────
@@ -83,9 +96,13 @@
 	}
 
 	// ── Derived lists ────────────────────────────────────────────────────────
+	const builtinTemplates = $derived(
+		ruleset === '2024' ? ENEMY_TEMPLATES_2024 : ENEMY_TEMPLATES
+	);
+
 	const allTemplates = $derived<DisplayTemplate[]>([
 		...customMonsters.map((m) => ({ ...m, isCustom: true as const })),
-		...ENEMY_TEMPLATES.map((m) => ({ ...m, isCustom: false as const }))
+		...builtinTemplates.map((m) => ({ ...m, isCustom: false as const }))
 	]);
 
 	const availableSources = $derived(
@@ -114,7 +131,12 @@
 		return [...custom, ...builtin];
 	});
 
-	// Monster types for the form select (no "All")
+	// Monster types for the filter dropdown
+	const monsterTypesForFilter = $derived(
+		ruleset === '2024' ? ['All', ...MONSTER_TYPES_2024] : MONSTER_TYPES
+	);
+
+	// Monster types for the custom monster form select (no "All")
 	const formTypes = $derived(MONSTER_TYPES.filter((t) => t !== 'All'));
 
 	// ── Selection helpers ────────────────────────────────────────────────────
@@ -323,7 +345,7 @@
 				bind:value={typeFilter}
 				class="flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
 			>
-				{#each MONSTER_TYPES as t}
+				{#each monsterTypesForFilter as t}
 					<option value={t}>{t}</option>
 				{/each}
 			</select>
@@ -783,6 +805,10 @@
 	</div>
 {/if}
 
-<MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
+{#if ruleset === '2024'}
+	<MonsterInfoModal2024 monster={infoMonster2024} onclose={() => (infoMonster2024 = null)} />
+{:else}
+	<MonsterInfoModal monster={infoMonster2014} onclose={() => (infoMonster2014 = null)} />
+{/if}
 
 <ImportBestiaryModal bind:open={showImportModal} onImport={loadCustomMonsters} />

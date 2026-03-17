@@ -13,6 +13,7 @@
 	import SessionManagerModal from '$lib/components/SessionManagerModal.svelte';
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
 	import SpellsModal from '$lib/components/SpellsModal.svelte';
+	import SpellsModal2024 from '$lib/components/SpellsModal2024.svelte';
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
@@ -816,7 +817,7 @@
 
 		<!-- Center: Initiative tracker -->
 		<main class="flex min-w-0 flex-1 flex-col p-4">
-			<InitiativeTracker />
+			<InitiativeTracker ruleset={activeSession.ruleset} />
 		</main>
 
 		<!-- Right sidebar: Enemies (desktop only, resizable) -->
@@ -841,7 +842,7 @@
 					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
 				</div>
 			</div>
-			<EnemyPanel />
+			<EnemyPanel ruleset={activeSession.ruleset} />
 		</aside>
 	</div>
 
@@ -904,7 +905,7 @@
 			{#if openPanel === 'players'}
 				<PlayerPanel />
 			{:else}
-				<EnemyPanel />
+				<EnemyPanel ruleset={activeSession.ruleset} />
 			{/if}
 		</div>
 	</div>
@@ -936,17 +937,27 @@
 {/if}
 
 {#if showEncounters}
-	<EncounterBuilderModal onclose={() => (showEncounters = false)} />
+	<EncounterBuilderModal onclose={() => (showEncounters = false)} ruleset={activeSession.ruleset} />
 {/if}
 
 {#if showSpells}
-	<SpellsModal
-		initialSpell={spellToOpen ?? undefined}
-		onclose={() => {
-			showSpells = false;
-			spellToOpen = null;
-		}}
-	/>
+	{#if activeSession.ruleset === '2024'}
+		<SpellsModal2024
+			initialSpell={spellToOpen ?? undefined}
+			onclose={() => {
+				showSpells = false;
+				spellToOpen = null;
+			}}
+		/>
+	{:else}
+		<SpellsModal
+			initialSpell={spellToOpen ?? undefined}
+			onclose={() => {
+				showSpells = false;
+				spellToOpen = null;
+			}}
+		/>
+	{/if}
 {/if}
 
 <DiceOverlay />
@@ -961,6 +972,7 @@
 {#if showQuickRules}
 	<QuickRulesModal
 		onclose={() => (showQuickRules = false)}
+		ruleset={activeSession.ruleset}
 	/>
 {/if}
 

@@ -1,14 +1,15 @@
 <!-- Read-only reference modal that shows the name, colour, and 5e rule description
      for a single condition (e.g. Blinded, Poisoned). Closed by clicking outside or pressing Escape. -->
 <script lang="ts">
-	import { conditionColors, conditionDescriptions } from '$lib/utils';
+	import { conditionColors, getConditionDescription } from '$lib/utils';
 
 	interface Props {
 		condition: string | null;
 		onclose: () => void;
+		ruleset?: '2014' | '2024';
 	}
 
-	let { condition, onclose }: Props = $props();
+	let { condition, onclose, ruleset = '2014' }: Props = $props();
 </script>
 
 {#if condition}
@@ -61,7 +62,7 @@
 			<!-- Body -->
 			<div class="px-5 py-4">
 				<p class="text-sm leading-relaxed text-gray-300">
-					{conditionDescriptions[condition] ?? 'No description available.'}
+					{getConditionDescription(condition, ruleset)}
 				</p>
 			</div>
 		</div>

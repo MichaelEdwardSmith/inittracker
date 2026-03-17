@@ -7,6 +7,8 @@ declare global {
 			sessionId: string | null;
 			/** Active game session's public 6-char ID. Set after migration in hooks.server.ts. */
 			gameSessionId: string | null;
+			/** D&D edition for the active game session. */
+			ruleset: '2014' | '2024';
 			dmFirstName: string | null;
 			dmEmail: string | null;
 			isGuest: boolean;

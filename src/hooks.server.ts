@@ -4,14 +4,15 @@
 // event.locals for downstream load functions.
 import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
-import { getDMBySessionId, getActiveGameSessionPublicId } from '$lib/server/dmModel';
-import { authToGameSession } from '$lib/server/sessionCache';
+import { getDMBySessionId, getActiveGameSession } from '$lib/server/dmModel';
+import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('dm_auth') ?? null;
 	const guestSessionId = event.cookies.get('dm_guest') ?? null;
 	event.locals.sessionId = sessionId;
 	event.locals.gameSessionId = null;
+	event.locals.ruleset = '2014';
 	event.locals.dmFirstName = null;
 	event.locals.dmEmail = null;
 	event.locals.isGuest = false;
@@ -38,11 +39,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		// Resolve active game session (triggers migration for legacy documents).
 		let gameSessionId = authToGameSession.get(sessionId) ?? null;
-		if (!gameSessionId) {
-			gameSessionId = await getActiveGameSessionPublicId(sessionId);
-			if (gameSessionId) authToGameSession.set(sessionId, gameSessionId);
+		let ruleset = authToRuleset.get(sessionId) ?? null;
+		if (!gameSessionId || !ruleset) {
+			const active = await getActiveGameSession(sessionId);
+			if (active) {
+				gameSessionId = active.publicId;
+				ruleset = active.ruleset;
+				authToGameSession.set(sessionId, active.publicId);
+				authToRuleset.set(sessionId, active.ruleset);
+			}
 		}
 		event.locals.gameSessionId = gameSessionId;
+		event.locals.ruleset = ruleset ?? '2014';
 	}
 
 	return resolve(event);
