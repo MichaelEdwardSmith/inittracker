@@ -18,11 +18,12 @@ import type {
 // ---------------------------------------------------------------------------
 // Internal full game-session shape (includes server-only fields)
 // ---------------------------------------------------------------------------
-interface DMGameSession extends GameSession {
+interface DMGameSession extends Omit<GameSession, 'ruleset'> {
 	combatState: StorageState;
 	combatHistory: CombatRecord[];
 	notes?: NoteEntry[];
 	createdAt: Date;
+	ruleset?: '2014' | '2024';
 }
 
 export interface DM {
@@ -74,6 +75,7 @@ export async function ensureGameSessions(authSessionId: string): Promise<void> {
 		// Preserve the existing auth sessionId as the public ID so viewer bookmarks still work.
 		sessionId: authSessionId,
 		name: 'Default Session',
+		ruleset: '2014',
 		combatState: (dm.combatState as StorageState) ?? {
 			combatants: [],
 			currentTurnId: null,
@@ -120,6 +122,7 @@ export async function createDM(
 		id: randomUUID(),
 		sessionId, // first game session shares the auth sessionId
 		name: 'Default Session',
+		ruleset: '2014',
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		combatHistory: [],
 		createdAt: new Date()
@@ -194,6 +197,7 @@ export async function findOrCreateDMByOAuth(
 		id: randomUUID(),
 		sessionId,
 		name: 'Default Session',
+		ruleset: '2014',
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		combatHistory: [],
 		createdAt: new Date()
@@ -242,6 +246,23 @@ export async function getActiveGameSessionPublicId(authSessionId: string): Promi
 	if (!dm?.gameSessions?.length) return null;
 	const active = (dm.gameSessions as DMGameSession[]).find((s) => s.id === dm.activeGameSessionId);
 	return active?.sessionId ?? (dm.gameSessions[0] as DMGameSession).sessionId;
+}
+
+/**
+ * Returns both the active game session's public ID and its ruleset.
+ * Also triggers migration for legacy DM documents.
+ */
+export async function getActiveGameSession(
+	authSessionId: string
+): Promise<{ publicId: string; ruleset: '2014' | '2024' } | null> {
+	await ensureGameSessions(authSessionId);
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm?.gameSessions?.length) return null;
+	const sessions = dm.gameSessions as DMGameSession[];
+	const active = sessions.find((s) => s.id === dm.activeGameSessionId) ?? sessions[0];
+	if (!active) return null;
+	return { publicId: active.sessionId, ruleset: active.ruleset ?? '2014' };
 }
 
 // ---------------------------------------------------------------------------
@@ -428,10 +449,11 @@ export async function listGameSessions(authSessionId: string): Promise<GameSessi
 	const c = await col();
 	const dm = await c.findOne({ sessionId: authSessionId });
 	if (!dm?.gameSessions) return [];
-	return (dm.gameSessions as DMGameSession[]).map(({ id, sessionId, name }) => ({
+	return (dm.gameSessions as DMGameSession[]).map(({ id, sessionId, name, ruleset }) => ({
 		id,
 		sessionId,
-		name
+		name,
+		ruleset: ruleset ?? '2014'
 	}));
 }
 
@@ -441,8 +463,9 @@ export async function listGameSessions(authSessionId: string): Promise<GameSessi
  */
 export async function createGameSession(
 	authSessionId: string,
-	name: string
-): Promise<{ id: string; sessionId: string } | null> {
+	name: string,
+	ruleset: '2014' | '2024' = '2014'
+): Promise<{ id: string; sessionId: string; ruleset: '2014' | '2024' } | null> {
 	const c = await col();
 
 	// Generate a public session ID that isn't used anywhere
@@ -458,6 +481,7 @@ export async function createGameSession(
 		id: randomUUID(),
 		sessionId: gameSessionId,
 		name: name.trim() || 'New Session',
+		ruleset,
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
 		combatHistory: [],
 		createdAt: new Date()
@@ -469,7 +493,7 @@ export async function createGameSession(
 	);
 	if (!result.matchedCount) return null;
 
-	return { id: newSession.id, sessionId: newSession.sessionId };
+	return { id: newSession.id, sessionId: newSession.sessionId, ruleset: newSession.ruleset! };
 }
 
 /** Renames an existing game session. */

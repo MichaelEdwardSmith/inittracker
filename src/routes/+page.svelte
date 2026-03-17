@@ -50,7 +50,7 @@
 		{
 			icon: '🐉',
 			title: 'Monster Library',
-			desc: 'Built-in D&D 5e stat blocks with lair actions, legendary actions, and full spell lists. Add custom homebrew monsters too.',
+			desc: 'Built-in D&D 5e and 5.5e stat blocks with lair actions, legendary actions, and full spell lists. Add custom homebrew monsters too.',
 			color: 'text-red-400',
 			screenshot: '/screenshots/MonsterLibrary.jpg'
 		},
@@ -177,7 +177,7 @@
 			</h1>
 
 			<p class="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-gray-400">
-				The DM's command center for D&D 5e. Track initiative, HP, and conditions in real time —
+				The DM's command center for D&D 5e (2014) and 5.5e (2024). Track initiative, HP, and conditions in real time —
 				with a live display your players can follow from their own screens.
 			</p>
 

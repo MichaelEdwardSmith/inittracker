@@ -13,7 +13,7 @@ import {
 	switchActiveGameSession,
 	getActiveGameSessionPublicId
 } from '$lib/server/dmModel';
-import { authToGameSession } from '$lib/server/sessionCache';
+import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 
 // ---------------------------------------------------------------------------
 // GET /api/sessions — list all game sessions for the authenticated DM
@@ -38,18 +38,19 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const authSessionId = cookies.get('dm_auth');
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
-	let body: { action: string; id?: string; name?: string };
+	let body: { action: string; id?: string; name?: string; ruleset?: '2014' | '2024' };
 	try {
 		body = await request.json();
 	} catch {
 		return new Response('Invalid JSON', { status: 400 });
 	}
 
-	const { action, id, name } = body;
+	const { action, id, name, ruleset } = body;
 
 	switch (action) {
 		case 'create': {
-			const result = await createGameSession(authSessionId, name ?? '');
+			const rs = ruleset === '2024' ? '2024' : '2014';
+			const result = await createGameSession(authSessionId, name ?? '', rs);
 			if (!result) return new Response('Failed to create session', { status: 500 });
 			return Response.json(result, { status: 201 });
 		}
@@ -71,6 +72,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			// If the deleted session was the cached active one, clear the cache entry
 			// so the next request re-resolves from DB.
 			authToGameSession.delete(authSessionId);
+			authToRuleset.delete(authSessionId);
 			return new Response(null, { status: 200 });
 		}
 
@@ -78,8 +80,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			if (!id) return new Response('Missing id', { status: 400 });
 			const newPublicId = await switchActiveGameSession(authSessionId, id);
 			if (!newPublicId) return new Response('Session not found', { status: 404 });
-			// Update the shared cache so POST /api/state immediately uses the new session
+			// Update the shared cache so POST /api/state immediately uses the new session.
+			// Invalidate ruleset cache so next request re-reads the new session's ruleset.
 			authToGameSession.set(authSessionId, newPublicId);
+			authToRuleset.delete(authSessionId);
 			return Response.json({ sessionId: newPublicId });
 		}
 

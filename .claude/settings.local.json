@@ -116,7 +116,25 @@
       "WebFetch(domain:nerdarchy.com)",
       "WebFetch(domain:www.thegamer.com)",
       "WebFetch(domain:chartopia.d12dev.com)",
-      "WebFetch(domain:www.cbr.com)"
+      "WebFetch(domain:www.cbr.com)",
+      "Bash(winget install:*)",
+      "Bash(where pdftoppm:*)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 1 -l 5 \"C:/2024-MM.pdf\" - 2>&1 | head -80)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 3 -l 15 \"C:/2024-MM.pdf\" - 2>&1 | head -120)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 1 -l 8 \"C:/2024-PHB.pdf\" - 2>&1 | head -100)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 1 -l 6 \"C:/2024-DMG.pdf\" - 2>&1 | head -100)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 20 -l 32 \"C:/2024-PHB.pdf\" - 2>&1)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" -f 33 -l 50 \"C:/2024-PHB.pdf\" - 2>&1)",
+      "Bash(POPPLER=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER/pdftotext\" \"C:/2024-PHB.pdf\" - 2>&1 | grep -n \"Grapple\\\\|Actions in Combat\\\\|Unarmed Strike\\\\|Exhaustion\\\\|Conditions\\\\|Bonus Action\\\\|Death Saving\" | head -40)",
+      "Read(//mnt/c/**)",
+      "Read(//c//**)",
+      "Bash(find /mnt -name 2024-MM.pdf)",
+      "Bash(pdftoppm:*)",
+      "Bash(which pdftotext:*)",
+      "Bash(POPPLER_BIN=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER_BIN/pdftoppm.exe\" -r 120 -f 1 -l 8 /c/2024-MM.pdf /tmp/mm_page 2>&1 && ls /tmp/mm_page* 2>/dev/null)",
+      "Bash(POPPLER_BIN=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER_BIN/pdftocairo.exe\" -png -r 200 -f 7 -l 7 /c/2024-MM.pdf /tmp/mm_hires 2>&1\ncp /tmp/mm_hires-007.png /c/Users/mojpo/WebstormProjects/Initiative/mm_hires-007.png)",
+      "Bash(curl:*)",
+      "Bash(head:*)"
     ]
   }
 }

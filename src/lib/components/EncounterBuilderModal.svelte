@@ -3,14 +3,21 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES } from '$lib/enemies';
-	import { crToXp, encounterDifficulty, encounterMultiplier } from '$lib/utils';
+	import { ENEMY_TEMPLATES_2024 } from '$lib/enemies2024';
+	import {
+		crToXp,
+		encounterDifficulty,
+		encounterDifficulty2024,
+		encounterMultiplier
+	} from '$lib/utils';
 	import type { Encounter, EncounterEnemy, CustomMonster, EnemyTemplate } from '$lib/types';
 
 	interface Props {
 		onclose: () => void;
+		ruleset?: '2014' | '2024';
 	}
 
-	let { onclose }: Props = $props();
+	let { onclose, ruleset = '2014' }: Props = $props();
 
 	// ── Saved encounters ─────────────────────────────────────────────────────
 	let encounters = $state<Encounter[]>([]);
@@ -19,8 +26,9 @@
 	// ── Custom monsters (fetched once on open) ───────────────────────────────
 	let customMonsters = $state<CustomMonster[]>([]);
 
-	// Combined template list (custom first, then built-ins)
-	const allTemplates = $derived<EnemyTemplate[]>([...customMonsters, ...ENEMY_TEMPLATES]);
+	// Combined template list (custom first, then edition-appropriate built-ins)
+	const builtinTemplates = $derived(ruleset === '2024' ? ENEMY_TEMPLATES_2024 : ENEMY_TEMPLATES);
+	const allTemplates = $derived<EnemyTemplate[]>([...customMonsters, ...builtinTemplates]);
 
 	// ── Build-new-encounter form ─────────────────────────────────────────────
 	let showBuilder = $state(false);
@@ -58,11 +66,15 @@
 	const stagingEnemyCount = $derived(stagingEnemies.reduce((s, e) => s + e.quantity, 0));
 
 	const stagingDifficulty = $derived(
-		encounterDifficulty(stagingRawXp, stagingEnemyCount, partySize, partyLevel)
+		ruleset === '2024'
+			? encounterDifficulty2024(stagingRawXp, partySize, partyLevel)
+			: encounterDifficulty(stagingRawXp, stagingEnemyCount, partySize, partyLevel)
 	);
 
 	const stagingAdjustedXp = $derived(
-		Math.round(stagingRawXp * encounterMultiplier(stagingEnemyCount))
+		ruleset === '2024'
+			? stagingRawXp
+			: Math.round(stagingRawXp * encounterMultiplier(stagingEnemyCount))
 	);
 
 	// ── Template search filter ───────────────────────────────────────────────
@@ -75,10 +87,11 @@
 	// ── Difficulty badge colour ──────────────────────────────────────────────
 	function difficultyColor(d: string) {
 		if (d === 'Trivial') return 'bg-gray-700 text-gray-300';
-		if (d === 'Easy') return 'bg-green-800 text-green-200';
-		if (d === 'Medium') return 'bg-yellow-700 text-yellow-200';
-		if (d === 'Hard') return 'bg-orange-700 text-orange-200';
-		return 'bg-red-800 text-red-200';
+		if (d === 'Easy' || d === 'Low') return 'bg-green-800 text-green-200';
+		if (d === 'Medium' || d === 'Moderate') return 'bg-yellow-700 text-yellow-200';
+		if (d === 'Hard' || d === 'High') return 'bg-orange-700 text-orange-200';
+		if (d === 'Severe') return 'bg-red-700 text-red-200';
+		return 'bg-red-900 text-red-200'; // Deadly
 	}
 
 	// ── Per-encounter XP helper ──────────────────────────────────────────────
@@ -94,16 +107,15 @@
 	}
 
 	function encounterXpDisplay(enc: Encounter): number {
-		return Math.round(encounterRawXp(enc) * encounterMultiplier(encounterTotalCount(enc)));
+		const raw = encounterRawXp(enc);
+		return ruleset === '2024' ? raw : Math.round(raw * encounterMultiplier(encounterTotalCount(enc)));
 	}
 
 	function encounterDiff(enc: Encounter): string {
-		return encounterDifficulty(
-			encounterRawXp(enc),
-			encounterTotalCount(enc),
-			partySize,
-			partyLevel
-		);
+		const raw = encounterRawXp(enc);
+		return ruleset === '2024'
+			? encounterDifficulty2024(raw, partySize, partyLevel)
+			: encounterDifficulty(raw, encounterTotalCount(enc), partySize, partyLevel);
 	}
 
 	// ── Actions ──────────────────────────────────────────────────────────────
@@ -428,7 +440,7 @@
 								<!-- XP / difficulty preview -->
 								<div class="mt-2 flex items-center gap-3 text-xs text-gray-400">
 									<span
-										>Total XP: <span class="font-semibold text-amber-300"
+										>{ruleset === '2024' ? 'XP' : 'Adjusted XP'}: <span class="font-semibold text-amber-300"
 											>{stagingAdjustedXp.toLocaleString()}</span
 										></span
 									>

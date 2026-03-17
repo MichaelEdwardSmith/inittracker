@@ -2,9 +2,11 @@
      right panel shows the selected category's content. -->
 <script lang="ts">
 	let {
-		onclose
+		onclose,
+		ruleset = '2014'
 	}: {
 		onclose: () => void;
+		ruleset?: '2014' | '2024';
 	} = $props();
 
 	type Category = {
@@ -441,7 +443,7 @@
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
 		<span class="text-xl">📖</span>
 		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Quick Reference</h2>
-		<p class="ml-2 hidden text-xs text-gray-500 sm:block">D&amp;D 5e combat reference</p>
+		<p class="ml-2 hidden text-xs text-gray-500 sm:block">{ruleset === '2024' ? 'D&D 2024 combat reference' : 'D&D 5e combat reference'}</p>
 		<button
 			onclick={onclose}
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
@@ -493,12 +495,21 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-800">
-						{#each [['Attack', 'Make one attack (more with Extra Attack). Replace one attack with a grapple or shove.'], ['Dash', 'Double your movement for the turn.'], ['Disengage', "Your movement doesn't provoke opportunity attacks this turn."], ['Dodge', 'Attacks against you have disadvantage. DEX saves have advantage. Benefit lost if incapacitated or speed drops to 0.'], ['Help', 'Give an ally advantage on their next ability check or one attack roll against a creature within 5 ft of you.'], ['Hide', 'Make a Stealth check. You become hidden if you beat the DC.'], ['Ready', 'Choose an action and a trigger. React to execute the action when the trigger occurs (before your next turn).'], ['Search', 'Devote attention to finding something — Perception or Investigation check.'], ['Use an Object', 'Interact with a second object (first is free) or use a special item property.'], ['Cast a Spell', 'Cast any spell with a casting time of 1 action.'], ['Use Class Feature', 'Activate a feature that requires an action (e.g. Second Wind, Divine Smite prep).'], ['Improvise', 'Attempt any reasonable action not listed. DM sets the rules on the fly.']] as [action, desc]}
-							<tr>
-								<td class="py-2 pr-4 align-top font-semibold text-white">{action}</td>
-								<td class="py-2 text-gray-300">{desc}</td>
-							</tr>
-						{/each}
+						{#if ruleset === '2024'}
+							{#each [['Attack', 'Make one attack (more with Extra Attack). Can replace one attack with a Grapple or Shove.'], ['Dash', 'Double your movement for the turn.'], ['Disengage', "Your movement doesn't provoke opportunity attacks this turn."], ['Dodge', 'Until the start of your next turn: attacks against you have disadvantage, you have advantage on DEX saves. Lost if incapacitated or speed drops to 0.'], ['Help', 'Aid a creature within 5 ft: give advantage on their next ability check or attack roll. Or aid another creature on a skill check they can see.'], ['Hide', 'Make a Stealth check. You become hidden if the result exceeds the passive Perception of any creature that could detect you.'], ['Influence', 'Make a Charisma check (Persuasion, Deception, Intimidation, or Performance) to alter a creature\'s attitude. Replaces some social interactions that were free actions in 2014.'], ['Magic', 'Cast a spell or use a magical item. Most spells with a casting time of 1 Action use this.'], ['Ready', 'Choose an action and a trigger. React to execute the action when the trigger occurs (before your next turn).'], ['Search', 'Devote attention to finding something — Perception or Investigation check.'], ['Study', 'Make an Investigation, Arcana, History, Medicine, Nature, or Religion check to recall information about a target or situation.'], ['Utilize', 'Use a non-weapon item (replaces "Use an Object"). Does not include attacking with a weapon.'], ['Use Class Feature', 'Activate a feature that requires an action (e.g. Second Wind).'], ['Improvise', 'Attempt any reasonable action not listed. DM sets the rules on the fly.']] as [action, desc]}
+								<tr>
+									<td class="py-2 pr-4 align-top font-semibold text-white">{action}</td>
+									<td class="py-2 text-gray-300">{desc}</td>
+								</tr>
+							{/each}
+						{:else}
+							{#each [['Attack', 'Make one attack (more with Extra Attack). Replace one attack with a grapple or shove.'], ['Dash', 'Double your movement for the turn.'], ['Disengage', "Your movement doesn't provoke opportunity attacks this turn."], ['Dodge', 'Attacks against you have disadvantage. DEX saves have advantage. Benefit lost if incapacitated or speed drops to 0.'], ['Help', 'Give an ally advantage on their next ability check or one attack roll against a creature within 5 ft of you.'], ['Hide', 'Make a Stealth check. You become hidden if you beat the DC.'], ['Ready', 'Choose an action and a trigger. React to execute the action when the trigger occurs (before your next turn).'], ['Search', 'Devote attention to finding something — Perception or Investigation check.'], ['Use an Object', 'Interact with a second object (first is free) or use a special item property.'], ['Cast a Spell', 'Cast any spell with a casting time of 1 action.'], ['Use Class Feature', 'Activate a feature that requires an action (e.g. Second Wind, Divine Smite prep).'], ['Improvise', 'Attempt any reasonable action not listed. DM sets the rules on the fly.']] as [action, desc]}
+								<tr>
+									<td class="py-2 pr-4 align-top font-semibold text-white">{action}</td>
+									<td class="py-2 text-gray-300">{desc}</td>
+								</tr>
+							{/each}
+						{/if}
 					</tbody>
 				</table>
 
@@ -521,12 +532,21 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-800">
-						{#each [['Two-Weapon Fighting', 'Attack with your off-hand light weapon (no ability modifier to damage).'], ['Spell (bonus action)', "Cast any spell with a casting time of 1 bonus action. Can't cast another non-cantrip spell on the same turn."], ['Rogue — Cunning Action', 'Dash, Disengage, or Hide.'], ['Druid — Wild Shape', "Transform into a beast you've seen."], ['Monk — Flurry of Blows', 'Spend 1 ki: two unarmed strikes.'], ['Monk — Patient Defense', 'Spend 1 ki: take Dodge action as bonus.'], ['Monk — Step of the Wind', 'Spend 1 ki: Disengage or Dash; jump distance doubled.'], ['Paladin — Divine Smite', 'Expend a spell slot after hitting to add radiant damage.'], ["Warlock — Hex / Hunter's Mark", 'Cast at normal casting time; move the curse/mark as bonus action.']] as [src, desc]}
-							<tr>
-								<td class="py-2 pr-4 align-top font-semibold text-white">{src}</td>
-								<td class="py-2 text-gray-300">{desc}</td>
-							</tr>
-						{/each}
+						{#if ruleset === '2024'}
+							{#each [['Two-Weapon Fighting', 'Attack with your off-hand light weapon (no ability modifier to damage unless the Nick mastery property is used).'], ['Spell (bonus action)', 'Cast any spell with a casting time of 1 bonus action. You can also cast a leveled spell as your action on the same turn — the 2014 restriction is removed.'], ['Rogue — Cunning Action', 'Dash, Disengage, or Hide.'], ['Druid — Wild Shape', "Transform into a beast you've seen."], ['Monk — Flurry of Blows', 'Spend 1 Focus Point: two Unarmed Strikes.'], ['Monk — Patient Defense', 'Spend 1 Focus Point: take the Dodge action.'], ['Monk — Step of the Wind', 'Spend 1 Focus Point: Disengage or Dash; jump distance doubled.'], ['Paladin — Divine Smite', 'Expend a spell slot after hitting to add Radiant damage (now a bonus action, not automatic).'], ["Warlock — Hex / Hunter's Mark", 'Cast at normal casting time; move the curse/mark as bonus action.']] as [src, desc]}
+								<tr>
+									<td class="py-2 pr-4 align-top font-semibold text-white">{src}</td>
+									<td class="py-2 text-gray-300">{desc}</td>
+								</tr>
+							{/each}
+						{:else}
+							{#each [['Two-Weapon Fighting', 'Attack with your off-hand light weapon (no ability modifier to damage).'], ['Spell (bonus action)', "Cast any spell with a casting time of 1 bonus action. Can't cast another non-cantrip spell on the same turn."], ['Rogue — Cunning Action', 'Dash, Disengage, or Hide.'], ['Druid — Wild Shape', "Transform into a beast you've seen."], ['Monk — Flurry of Blows', 'Spend 1 ki: two unarmed strikes.'], ['Monk — Patient Defense', 'Spend 1 ki: take Dodge action as bonus.'], ['Monk — Step of the Wind', 'Spend 1 ki: Disengage or Dash; jump distance doubled.'], ['Paladin — Divine Smite', 'Expend a spell slot after hitting to add radiant damage.'], ["Warlock — Hex / Hunter's Mark", 'Cast at normal casting time; move the curse/mark as bonus action.']] as [src, desc]}
+								<tr>
+									<td class="py-2 pr-4 align-top font-semibold text-white">{src}</td>
+									<td class="py-2 text-gray-300">{desc}</td>
+								</tr>
+							{/each}
+						{/if}
 					</tbody>
 				</table>
 
@@ -743,32 +763,64 @@
 				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
 					Exhaustion
 				</h3>
-				<p class="mb-4 text-sm text-gray-300">
-					Effects are cumulative. A long rest removes <strong class="text-white">one level</strong> of
-					exhaustion (requires food and water).
-				</p>
-				<table class="w-full max-w-md text-sm">
-					<thead>
-						<tr class="border-b border-gray-700">
-							<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
-							<th class="pb-2 text-left font-semibold text-gray-400">Effect</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-gray-800">
-						{#each [['1', 'Disadvantage on ability checks'], ['2', 'Speed halved'], ['3', 'Disadvantage on attack rolls and saving throws'], ['4', 'Hit point maximum halved'], ['5', 'Speed reduced to 0'], ['6', 'Death']] as [lvl, effect]}
-							<tr>
-								<td class="py-2 pr-4 text-lg font-black text-amber-300">{lvl}</td>
-								<td class="py-2 text-gray-300 {lvl === '6' ? 'font-semibold text-red-400' : ''}"
-									>{effect}</td
-								>
+				{#if ruleset === '2024'}
+					<p class="mb-4 text-sm text-gray-300">
+						Each level of Exhaustion applies a cumulative <strong class="text-white">−1 penalty</strong>
+						to all d20 Tests (ability checks, attack rolls, saving throws) and to your
+						<strong class="text-white">spell save DC</strong>. A long rest removes
+						<strong class="text-white">one level</strong>.
+					</p>
+					<table class="w-full max-w-md text-sm">
+						<thead>
+							<tr class="border-b border-gray-700">
+								<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
+								<th class="pb-2 text-left font-semibold text-gray-400">Additional Effect</th>
 							</tr>
-						{/each}
-					</tbody>
-				</table>
-				<p class="mt-4 text-xs text-gray-500">
-					Common sources: forced march, swimming in armor, starvation, some spells and monster
-					abilities.
-				</p>
+						</thead>
+						<tbody class="divide-y divide-gray-800">
+							{#each [['1', '−1 to all d20 Tests and spell save DCs'], ['2', '−2 to all d20 Tests and spell save DCs'], ['3', '−3 to all d20 Tests and spell save DCs'], ['4', '−4 to all d20 Tests and spell save DCs'], ['5', '−5 to all d20 Tests and spell save DCs; Speed halved'], ['6', '−6 to all d20 Tests and spell save DCs'], ['7', '−7 to all d20 Tests and spell save DCs'], ['8', '−8 to all d20 Tests and spell save DCs'], ['9', '−9 to all d20 Tests and spell save DCs'], ['10', 'Death']] as [lvl, effect]}
+								<tr>
+									<td class="py-2 pr-4 text-lg font-black text-amber-300">{lvl}</td>
+									<td class="py-2 text-gray-300 {lvl === '10' ? 'font-semibold text-red-400' : ''}"
+										>{effect}</td
+									>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+					<p class="mt-4 text-xs text-gray-500">
+						Common sources: forced march, starvation, some spells and monster abilities. The
+						Exhausted condition in 2024 works on a single stacking scale rather than six discrete
+						tiers.
+					</p>
+				{:else}
+					<p class="mb-4 text-sm text-gray-300">
+						Effects are cumulative. A long rest removes <strong class="text-white">one level</strong> of
+						exhaustion (requires food and water).
+					</p>
+					<table class="w-full max-w-md text-sm">
+						<thead>
+							<tr class="border-b border-gray-700">
+								<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
+								<th class="pb-2 text-left font-semibold text-gray-400">Effect</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-800">
+							{#each [['1', 'Disadvantage on ability checks'], ['2', 'Speed halved'], ['3', 'Disadvantage on attack rolls and saving throws'], ['4', 'Hit point maximum halved'], ['5', 'Speed reduced to 0'], ['6', 'Death']] as [lvl, effect]}
+								<tr>
+									<td class="py-2 pr-4 text-lg font-black text-amber-300">{lvl}</td>
+									<td class="py-2 text-gray-300 {lvl === '6' ? 'font-semibold text-red-400' : ''}"
+										>{effect}</td
+									>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+					<p class="mt-4 text-xs text-gray-500">
+						Common sources: forced march, swimming in armor, starvation, some spells and monster
+						abilities.
+					</p>
+				{/if}
 
 				<!-- ── Cover ────────────────────────────────────────────── -->
 			{:else if selected === 'cover'}
@@ -981,57 +1033,99 @@
 				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
 					Encounter Difficulty
 				</h3>
-				<div class="space-y-5 text-sm">
-					<div>
-						<h4 class="mb-2 font-semibold text-gray-200">XP Thresholds per Character Level</h4>
-						<table class="w-full max-w-lg">
-							<thead>
-								<tr class="border-b border-gray-700">
-									<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
-									<th class="pb-2 text-right font-semibold text-gray-400">Easy</th>
-									<th class="pb-2 text-right font-semibold text-gray-400">Medium</th>
-									<th class="pb-2 text-right font-semibold text-gray-400">Hard</th>
-									<th class="pb-2 text-right font-semibold text-gray-400">Deadly</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-gray-800 text-gray-300">
-								{#each [[1, 25, 50, 75, 100], [2, 50, 100, 150, 200], [3, 75, 150, 225, 400], [4, 125, 250, 375, 500], [5, 250, 500, 750, 1100], [6, 300, 600, 900, 1400], [7, 350, 750, 1100, 1700], [8, 450, 900, 1400, 2100], [9, 550, 1100, 1600, 2400], [10, 600, 1200, 1900, 2800], [11, 800, 1600, 2400, 3600], [12, 1000, 2000, 3000, 4500], [13, 1100, 2200, 3400, 5100], [14, 1250, 2500, 3800, 5700], [15, 1400, 2800, 4300, 6400], [16, 1600, 3200, 4800, 7200], [17, 2000, 3900, 5900, 8800], [18, 2100, 4200, 6300, 9500], [19, 2400, 4900, 7300, 10900], [20, 2800, 5700, 8500, 12700]] as [lvl, easy, med, hard, deadly]}
-									<tr>
-										<td class="py-1 pr-4 font-bold text-amber-300">{lvl}</td>
-										<td class="py-1 text-right">{easy}</td>
-										<td class="py-1 text-right">{med}</td>
-										<td class="py-1 text-right text-orange-300">{hard}</td>
-										<td class="py-1 text-right text-red-400">{deadly}</td>
+				{#if ruleset === '2024'}
+					<div class="space-y-5 text-sm">
+						<p class="text-gray-300">
+							2024 uses an <strong class="text-white">XP Budget</strong> system. Sum the XP of all
+							monsters to get the encounter's total XP, then compare against the budget for your party
+							size and desired difficulty. No multiplier.
+						</p>
+						<div>
+							<h4 class="mb-2 font-semibold text-gray-200">XP Budget per Character (by Level)</h4>
+							<table class="w-full max-w-lg">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Low</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Moderate</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">High</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Severe</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Deadly</th>
 									</tr>
-								{/each}
-							</tbody>
-						</table>
-					</div>
-					<div>
-						<h4 class="mb-2 font-semibold text-gray-200">Monster Count Multiplier</h4>
-						<table class="w-full max-w-xs">
-							<thead>
-								<tr class="border-b border-gray-700">
-									<th class="pb-2 text-left font-semibold text-gray-400">Monsters</th>
-									<th class="pb-2 text-left font-semibold text-gray-400">Multiplier</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-gray-800 text-gray-300">
-								{#each [['1', '×1'], ['2', '×1.5'], ['3–6', '×2'], ['7–10', '×2.5'], ['11–14', '×3'], ['15+', '×4']] as [n, mult]}
-									<tr>
-										<td class="py-1.5 pr-4 text-white">{n}</td>
-										<td class="py-1.5 font-bold text-amber-300">{mult}</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-						<p class="mt-2 text-xs text-gray-500">
-							Compare total adjusted XP against the <em>party's</em> thresholds (sum each character's
-							threshold). Small parties (≤2) move one bracket up; large parties (≥6) move one bracket
-							down.
+								</thead>
+								<tbody class="divide-y divide-gray-800 text-gray-300">
+									{#each [[1, 50, 75, 100, 150, 200], [2, 100, 150, 200, 250, 350], [3, 150, 225, 400, 550, 700], [4, 250, 375, 500, 750, 1100], [5, 500, 750, 1100, 1700, 2700], [6, 600, 1000, 1400, 2100, 3200], [7, 750, 1100, 1700, 2600, 3900], [8, 1000, 1400, 2100, 3100, 4700], [9, 1300, 1600, 2400, 3700, 5400], [10, 1600, 1900, 2800, 4300, 6400], [11, 1900, 2400, 3600, 5400, 7800], [12, 2200, 3000, 4500, 6600, 9600], [13, 2600, 3400, 5100, 7800, 11200], [14, 2900, 3800, 5700, 8600, 12400], [15, 3300, 4300, 6400, 9800, 14000], [16, 3800, 4800, 7200, 10800, 15800], [17, 4500, 5900, 8800, 13200, 18800], [18, 5000, 6300, 9500, 14300, 20800], [19, 5500, 7300, 10900, 16100, 23000], [20, 6400, 8500, 12700, 19200, 27200]] as [lvl, low, mod, high, sev, dead]}
+										<tr>
+											<td class="py-1 pr-4 font-bold text-amber-300">{lvl}</td>
+											<td class="py-1 text-right">{low}</td>
+											<td class="py-1 text-right">{mod}</td>
+											<td class="py-1 text-right text-orange-300">{high}</td>
+											<td class="py-1 text-right text-red-300">{sev}</td>
+											<td class="py-1 text-right text-red-500">{dead}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						<p class="text-xs text-gray-500">
+							Multiply each column by the number of characters in the party to get the total budget.
+							Total monster XP ≥ budget = encounter meets that difficulty tier. No monster-count
+							multiplier is used in 2024.
 						</p>
 					</div>
-				</div>
+				{:else}
+					<div class="space-y-5 text-sm">
+						<div>
+							<h4 class="mb-2 font-semibold text-gray-200">XP Thresholds per Character Level</h4>
+							<table class="w-full max-w-lg">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Easy</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Medium</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Hard</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Deadly</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-800 text-gray-300">
+									{#each [[1, 25, 50, 75, 100], [2, 50, 100, 150, 200], [3, 75, 150, 225, 400], [4, 125, 250, 375, 500], [5, 250, 500, 750, 1100], [6, 300, 600, 900, 1400], [7, 350, 750, 1100, 1700], [8, 450, 900, 1400, 2100], [9, 550, 1100, 1600, 2400], [10, 600, 1200, 1900, 2800], [11, 800, 1600, 2400, 3600], [12, 1000, 2000, 3000, 4500], [13, 1100, 2200, 3400, 5100], [14, 1250, 2500, 3800, 5700], [15, 1400, 2800, 4300, 6400], [16, 1600, 3200, 4800, 7200], [17, 2000, 3900, 5900, 8800], [18, 2100, 4200, 6300, 9500], [19, 2400, 4900, 7300, 10900], [20, 2800, 5700, 8500, 12700]] as [lvl, easy, med, hard, deadly]}
+										<tr>
+											<td class="py-1 pr-4 font-bold text-amber-300">{lvl}</td>
+											<td class="py-1 text-right">{easy}</td>
+											<td class="py-1 text-right">{med}</td>
+											<td class="py-1 text-right text-orange-300">{hard}</td>
+											<td class="py-1 text-right text-red-400">{deadly}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						<div>
+							<h4 class="mb-2 font-semibold text-gray-200">Monster Count Multiplier</h4>
+							<table class="w-full max-w-xs">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="pb-2 text-left font-semibold text-gray-400">Monsters</th>
+										<th class="pb-2 text-left font-semibold text-gray-400">Multiplier</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-800 text-gray-300">
+									{#each [['1', '×1'], ['2', '×1.5'], ['3–6', '×2'], ['7–10', '×2.5'], ['11–14', '×3'], ['15+', '×4']] as [n, mult]}
+										<tr>
+											<td class="py-1.5 pr-4 text-white">{n}</td>
+											<td class="py-1.5 font-bold text-amber-300">{mult}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+							<p class="mt-2 text-xs text-gray-500">
+								Compare total adjusted XP against the <em>party's</em> thresholds (sum each character's
+								threshold). Small parties (≤2) move one bracket up; large parties (≥6) move one bracket
+								down.
+							</p>
+						</div>
+					</div>
+				{/if}
 
 				<!-- ── Magic & Casting ─────────────────────────────────── -->
 			{:else if selected === 'magic'}
@@ -1050,13 +1144,23 @@
 								></thead
 							>
 							<tbody class="divide-y divide-gray-800">
-								{#each [['Action', 'Standard. Most spells use this.'], ['Bonus Action', 'If you cast a bonus-action spell, your action that turn can only be used to cast a cantrip (2014 rules).'], ['Reaction', "On another creature's turn in response to a specific trigger defined in the spell (e.g. Shield, Counterspell)."], ['1 Minute +', 'Must use your action every turn during casting; concentration required throughout. Interruption = slot lost.'], ['Ritual (+10 min)', 'No spell slot expended. Takes 10 extra minutes. Cannot be used in combat for an instant result.']] as [time, note]}
-									<tr
-										><td class="py-2 pr-4 align-top font-semibold text-white">{time}</td><td
-											class="py-2 text-gray-300">{note}</td
-										></tr
-									>
-								{/each}
+								{#if ruleset === '2024'}
+									{#each [['Action', 'Standard. Most spells use this.'], ['Bonus Action', 'Cast any spell with a casting time of 1 bonus action. You may also cast a leveled spell as your action on the same turn — the 2014 restriction is removed in 2024.'], ['Reaction', "On another creature's turn in response to a specific trigger defined in the spell (e.g. Shield, Counterspell)."], ['1 Minute +', 'Must use your Magic action every turn during casting; concentration required throughout. Interruption = slot lost.'], ['Ritual (+10 min)', 'No spell slot expended. Takes 10 extra minutes. Cannot be used in combat for an instant result.']] as [time, note]}
+										<tr
+											><td class="py-2 pr-4 align-top font-semibold text-white">{time}</td><td
+												class="py-2 text-gray-300">{note}</td
+											></tr
+										>
+									{/each}
+								{:else}
+									{#each [['Action', 'Standard. Most spells use this.'], ['Bonus Action', 'If you cast a bonus-action spell, your action that turn can only be used to cast a cantrip (2014 rules).'], ['Reaction', "On another creature's turn in response to a specific trigger defined in the spell (e.g. Shield, Counterspell)."], ['1 Minute +', 'Must use your action every turn during casting; concentration required throughout. Interruption = slot lost.'], ['Ritual (+10 min)', 'No spell slot expended. Takes 10 extra minutes. Cannot be used in combat for an instant result.']] as [time, note]}
+										<tr
+											><td class="py-2 pr-4 align-top font-semibold text-white">{time}</td><td
+												class="py-2 text-gray-300">{note}</td
+											></tr
+										>
+									{/each}
+								{/if}
 							</tbody>
 						</table>
 					</section>

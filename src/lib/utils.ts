@@ -43,6 +43,30 @@ export const conditionDescriptions: Record<string, string> = {
 		'Attack rolls against this creature have disadvantage (DM-tracked reminder).'
 };
 
+// 2024 condition descriptions — only entries that differ from the 2014 wording are listed here.
+// All other conditions fall back to conditionDescriptions (2014).
+const conditionDescriptions2024Overrides: Partial<Record<string, string>> = {
+	Exhausted:
+		'Each level applies a cumulative −1 penalty to all d20 Tests (attack rolls, ability checks, saving throws) and to your Spell Save DC. Speed is also halved at level 5. Death at level 10. A long rest removes one level.',
+	Grappled:
+		"Speed is 0 and can't benefit from bonuses to Speed. Ends if the grappler becomes Incapacitated, or if the grappled creature escapes (Athletics or Acrobatics vs. grappler's Athletics).",
+	Incapacitated: "Can't take Actions, Bonus Actions, or Reactions. Can't concentrate.",
+	Prone:
+		'Can only crawl, or spend half Speed to stand up. Disadvantage on attack rolls. Attacks from within 5 ft. have advantage; attacks from farther away have disadvantage.'
+};
+
+/** Returns the correct condition description for the given edition. */
+export function getConditionDescription(condition: string, ruleset: '2014' | '2024' = '2014'): string {
+	if (ruleset === '2024') {
+		return (
+			conditionDescriptions2024Overrides[condition] ??
+			conditionDescriptions[condition] ??
+			'No description available.'
+		);
+	}
+	return conditionDescriptions[condition] ?? 'No description available.';
+}
+
 export const conditionColors: Record<string, string> = {
 	Blinded: 'bg-gray-600 text-gray-200',
 	Charmed: 'bg-pink-800 text-pink-200',
@@ -160,6 +184,57 @@ const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 	19: [2400, 4900, 7300, 10900],
 	20: [2800, 5700, 8500, 12700]
 };
+
+// D&D 2024 XP budget per character per level [low, moderate, high, severe, deadly]
+// Encounter difficulty = compare raw monster XP (no multiplier) to budget × party size.
+const XP_THRESHOLDS_2024: Record<number, [number, number, number, number, number]> = {
+	1: [50, 75, 100, 150, 200],
+	2: [100, 150, 200, 250, 350],
+	3: [150, 225, 400, 550, 700],
+	4: [250, 375, 500, 750, 1100],
+	5: [500, 750, 1100, 1700, 2700],
+	6: [600, 1000, 1400, 2100, 3200],
+	7: [750, 1100, 1700, 2600, 3900],
+	8: [1000, 1400, 2100, 3100, 4700],
+	9: [1300, 1600, 2400, 3700, 5400],
+	10: [1600, 1900, 2800, 4300, 6400],
+	11: [1900, 2400, 3600, 5400, 7800],
+	12: [2200, 3000, 4500, 6600, 9600],
+	13: [2600, 3400, 5100, 7800, 11200],
+	14: [2900, 3800, 5700, 8600, 12400],
+	15: [3300, 4300, 6400, 9800, 14000],
+	16: [3800, 4800, 7200, 10800, 15800],
+	17: [4500, 5900, 8800, 13200, 18800],
+	18: [5000, 6300, 9500, 14300, 20800],
+	19: [5500, 7300, 10900, 16100, 23000],
+	20: [6400, 8500, 12700, 19200, 27200]
+};
+
+export type EncounterDifficulty2024 = 'Trivial' | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Deadly';
+
+/**
+ * 2024 encounter difficulty — no enemy-count multiplier; uses XP budget thresholds.
+ * @param rawXp  Sum of XP for all enemies (no multiplier applied)
+ * @param partySize  Number of players
+ * @param partyLevel  Average party level (1–20)
+ */
+export function encounterDifficulty2024(
+	rawXp: number,
+	partySize: number,
+	partyLevel: number
+): EncounterDifficulty2024 {
+	if (partySize <= 0 || partyLevel <= 0) return 'Trivial';
+	const level = Math.max(1, Math.min(20, Math.round(partyLevel)));
+	const [low, moderate, high, severe, deadly] = XP_THRESHOLDS_2024[level].map(
+		(t) => t * partySize
+	);
+	if (rawXp < low) return 'Trivial';
+	if (rawXp < moderate) return 'Low';
+	if (rawXp < high) return 'Moderate';
+	if (rawXp < severe) return 'High';
+	if (rawXp < deadly) return 'Severe';
+	return 'Deadly';
+}
 
 /** D&D 5e encounter multiplier based on total enemy count. */
 export function encounterMultiplier(enemyCount: number): number {
