@@ -183,11 +183,18 @@
 								onclick={() => !isActive && switchSession(session)}
 								disabled={isActive || busy}
 							>
-								<span
-									class="block truncate text-sm font-medium {isActive
-										? 'text-amber-300'
-										: 'text-gray-200 group-hover:text-white'}">{session.name}</span
-								>
+								<span class="flex items-center gap-2">
+									<span
+										class="block truncate text-sm font-medium {isActive
+											? 'text-amber-300'
+											: 'text-gray-200 group-hover:text-white'}">{session.name}</span
+									>
+									<span
+										class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide {session.ruleset === '2024'
+											? 'bg-blue-900/50 text-blue-400'
+											: 'bg-amber-900/40 text-amber-500'}"
+									>{session.ruleset === '2024' ? '2024' : '5e'}</span>
+								</span>
 								<span
 									class="font-mono text-xs tracking-widest {isActive
 										? 'text-amber-500/70'
