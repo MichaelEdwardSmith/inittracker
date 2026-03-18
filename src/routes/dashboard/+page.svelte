@@ -18,9 +18,8 @@
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
-	import QuickRulesModal from '$lib/components/QuickRulesModal.svelte';
-	import GeneratorsModal from '$lib/components/GeneratorsModal.svelte';
-	import DungeonGeneratorModal from '$lib/components/DungeonGeneratorModal.svelte';
+	// QuickRulesModal, GeneratorsModal, DungeonGeneratorModal are lazy-loaded on first open
+	// to keep them out of the initial server/client bundle (~415 KB of inline data).
 	import { ENEMY_TEMPLATES } from '$lib/enemies';
 	import { combat } from '$lib/store.svelte';
 	import { theme } from '$lib/theme.svelte';
@@ -166,6 +165,32 @@
 	let showQuickRules = $state(false);
 	let showGenerators = $state(false);
 	let showDungeon = $state(false);
+
+	// Lazily-loaded heavy modal components
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let QuickRulesModalComp = $state<any>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let GeneratorsModalComp = $state<any>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let DungeonGeneratorModalComp = $state<any>(null);
+
+	async function openQuickRules() {
+		showQuickRules = true;
+		showMobileMenu = false;
+		if (!QuickRulesModalComp)
+			QuickRulesModalComp = (await import('$lib/components/QuickRulesModal.svelte')).default;
+	}
+	async function openGenerators() {
+		showGenerators = true;
+		showMobileMenu = false;
+		if (!GeneratorsModalComp)
+			GeneratorsModalComp = (await import('$lib/components/GeneratorsModal.svelte')).default;
+	}
+	async function openDungeon() {
+		showDungeon = true;
+		if (!DungeonGeneratorModalComp)
+			DungeonGeneratorModalComp = (await import('$lib/components/DungeonGeneratorModal.svelte')).default;
+	}
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -531,10 +556,7 @@
 			Mixer
 		</button>
 		<button
-			onclick={() => {
-				showQuickRules = true;
-				showMobileMenu = false;
-			}}
+			onclick={openQuickRules}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			<svg
@@ -554,10 +576,7 @@
 			Quick Reference
 		</button>
 		<button
-			onclick={() => {
-				showGenerators = true;
-				showMobileMenu = false;
-			}}
+			onclick={openGenerators}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			<svg
@@ -971,17 +990,19 @@
 	</div>
 {/if}
 
-{#if showQuickRules}
-	<QuickRulesModal
+{#if showQuickRules && QuickRulesModalComp}
+	{@const QuickRules = QuickRulesModalComp}
+	<QuickRules
 		onclose={() => (showQuickRules = false)}
 		ruleset={activeSession.ruleset}
 	/>
 {/if}
 
-{#if showGenerators}
-	<GeneratorsModal
+{#if showGenerators && GeneratorsModalComp}
+	{@const Generators = GeneratorsModalComp}
+	<Generators
 		onclose={() => (showGenerators = false)}
-		onOpenDungeon={() => { showGenerators = false; showDungeon = true; }}
+		onOpenDungeon={() => { showGenerators = false; openDungeon(); }}
 		onAddEncounter={(monsters) => {
 			combat.clearEnemies();
 			for (const m of monsters) {
@@ -1001,25 +1022,28 @@
 	/>
 {/if}
 
-<div style="display:{showDungeon ? 'block' : 'none'}">
-	<DungeonGeneratorModal
-		onclose={() => (showDungeon = false)}
-		onAddEncounter={(monsters) => {
-			for (const m of monsters) {
-				const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
-				if (template) {
-					combat.addEnemies(template, m.count);
-				} else {
-					combat.addEnemies(
-						{ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' },
-						m.count
-					);
+{#if DungeonGeneratorModalComp}
+	{@const DungeonGenerator = DungeonGeneratorModalComp}
+	<div style="display:{showDungeon ? 'block' : 'none'}">
+		<DungeonGenerator
+			onclose={() => (showDungeon = false)}
+			onAddEncounter={(monsters) => {
+				for (const m of monsters) {
+					const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
+					if (template) {
+						combat.addEnemies(template, m.count);
+					} else {
+						combat.addEnemies(
+							{ name: m.name, ac: 10, hp: 10, cr: '1', monsterType: 'unknown' },
+							m.count
+						);
+					}
 				}
-			}
-			showDungeon = false;
-		}}
-	/>
-</div>
+				showDungeon = false;
+			}}
+		/>
+	</div>
+{/if}
 
 {#if data.needsEditionSetup && !guestEditionPicked}
 	<FirstRunEditionModal
