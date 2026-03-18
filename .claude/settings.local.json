@@ -134,7 +134,9 @@
       "Bash(POPPLER_BIN=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER_BIN/pdftoppm.exe\" -r 120 -f 1 -l 8 /c/2024-MM.pdf /tmp/mm_page 2>&1 && ls /tmp/mm_page* 2>/dev/null)",
       "Bash(POPPLER_BIN=\"/c/Users/mojpo/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin\"\n\"$POPPLER_BIN/pdftocairo.exe\" -png -r 200 -f 7 -l 7 /c/2024-MM.pdf /tmp/mm_hires 2>&1\ncp /tmp/mm_hires-007.png /c/Users/mojpo/WebstormProjects/Initiative/mm_hires-007.png)",
       "Bash(curl:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(cmd.exe /c \"pnpm check 2>&1\")",
+      "Bash(cmd.exe /c \"cd C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative && pnpm check\")"
     ]
   }
 }

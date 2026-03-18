@@ -15,6 +15,7 @@
 	import ConditionTimingModal from '$lib/components/ConditionTimingModal.svelte';
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
 	import LootModal from '$lib/components/LootModal.svelte';
+	import AoEDamageModal from '$lib/components/AoEDamageModal.svelte';
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
@@ -33,6 +34,25 @@
 	let concentrationCheck = $state<{ id: string; name: string; damage: number; dc: number } | null>(
 		null
 	);
+	let concentrationQueue = $state<Array<{ id: string; name: string; damage: number; dc: number }>>([]);
+	let showAoE = $state(false);
+
+	function dequeueConcentration() {
+		if (concentrationQueue.length > 0) {
+			concentrationCheck = concentrationQueue[0];
+			concentrationQueue = concentrationQueue.slice(1);
+		} else {
+			concentrationCheck = null;
+		}
+	}
+
+	function handleAoEConcentrationChecks(
+		checks: Array<{ id: string; name: string; damage: number; dc: number }>
+	) {
+		const [first, ...rest] = checks;
+		concentrationQueue = rest;
+		concentrationCheck = first;
+	}
 	let pendingInitChange = $state<{
 		id: string;
 		name: string;
@@ -230,6 +250,13 @@
 				</button>
 				<div class="h-4 w-px bg-gray-700"></div>
 			{/if}
+			<button
+				onclick={() => (showAoE = true)}
+				title="Apply damage or healing to multiple combatants"
+				class="rounded bg-orange-900/60 px-2 py-1 text-xs text-orange-300 transition hover:bg-orange-800 hover:text-white"
+			>
+				AoE
+			</button>
 			<button
 				onclick={() => combat.resetInitiatives()}
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
@@ -871,12 +898,19 @@
 
 <ConcentrationCheckModal
 	check={concentrationCheck}
-	onsuccess={() => (concentrationCheck = null)}
+	onsuccess={dequeueConcentration}
 	onfail={(id) => {
 		combat.toggleStatus(id, 'Concentrating');
-		concentrationCheck = null;
+		dequeueConcentration();
 	}}
 />
+
+{#if showAoE}
+	<AoEDamageModal
+		onclose={() => (showAoE = false)}
+		onconcentrationchecks={handleAoEConcentrationChecks}
+	/>
+{/if}
 
 <ConditionTimingModal
 	pending={pendingCondition}
