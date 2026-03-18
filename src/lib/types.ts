@@ -52,6 +52,9 @@ export interface StorageState {
 	combatants: Combatant[];
 	currentTurnId: string | null;
 	round: number;
+	/** Present only on the sync immediately after an AoE action; tells the viewer
+	 *  which combatants were hit (in order) so it can animate them sequentially. */
+	aoeEvents?: Array<{ id: string; name: string; delta: number }>;
 }
 
 export interface EnemyTemplate {

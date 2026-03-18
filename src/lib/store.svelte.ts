@@ -67,8 +67,98 @@ function createCombatStore() {
 	let combatStartedAt = $state<string | null>(null);
 	let participantStats = $state<Map<string, ParticipantStat>>(new Map());
 
+	let suppressSync = false;
+
 	function sync() {
+		if (suppressSync) return;
 		syncToServer({ combatants, currentTurnId, round });
+	}
+
+	/** Core HP mutation — shared by adjustHp and applyAoE (no sync). */
+	function applyHpChange(id: string, delta: number) {
+		let hpBefore = 0;
+		let hpAfter = 0;
+		let combatantRef: Combatant | undefined;
+
+		combatants = combatants.map((c) => {
+			if (c.id !== id) return c;
+			combatantRef = c;
+			hpBefore = c.currentHp;
+			let updated: Combatant;
+			if (delta < 0 && c.tempHp > 0) {
+				const absorbed = Math.min(c.tempHp, -delta);
+				const spill = -delta - absorbed;
+				updated = { ...c, tempHp: c.tempHp - absorbed, currentHp: Math.max(0, c.currentHp - spill) };
+			} else {
+				updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
+			}
+			hpAfter = updated.currentHp;
+			if (hpBefore > 0 && hpAfter === 0) {
+				updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
+				if (c.type === 'player' && !updated.deathSaves) {
+					updated = { ...updated, deathSaves: { successes: 0, failures: 0, stable: false } };
+				}
+			}
+			if (c.type === 'player' && hpBefore === 0 && hpAfter > 0) {
+				updated = { ...updated, deathSaves: undefined };
+			}
+			return updated;
+		});
+
+		if (combatStartedAt !== null && combatantRef) {
+			const c = combatantRef;
+			const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
+			const actorFields = actor
+				? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
+				: {};
+			const actualDelta = hpAfter - hpBefore;
+			if (actualDelta < 0) {
+				const dmg = -actualDelta;
+				const causedDown = hpBefore > 0 && hpAfter === 0;
+				combatEvents = [
+					...combatEvents,
+					{
+						type: 'damage',
+						round,
+						...actorFields,
+						combatantId: id,
+						combatantName: c.name,
+						combatantType: c.type as 'player' | 'enemy',
+						value: dmg,
+						hpBefore,
+						hpAfter,
+						causedDown: causedDown || undefined
+					}
+				];
+				const stats = participantStats.get(id);
+				if (stats) {
+					participantStats.set(id, {
+						...stats,
+						totalDamage: stats.totalDamage + dmg,
+						wasSlain: stats.wasSlain || (causedDown && c.type === 'enemy')
+					});
+				}
+			} else if (actualDelta > 0) {
+				combatEvents = [
+					...combatEvents,
+					{
+						type: 'heal',
+						round,
+						...actorFields,
+						combatantId: id,
+						combatantName: c.name,
+						combatantType: c.type as 'player' | 'enemy',
+						value: actualDelta,
+						hpBefore,
+						hpAfter
+					}
+				];
+				const stats = participantStats.get(id);
+				if (stats) {
+					participantStats.set(id, { ...stats, totalHealing: stats.totalHealing + actualDelta });
+				}
+			}
+		}
 	}
 
 	/** Combatants currently participating in the initiative order. */
@@ -335,100 +425,21 @@ function createCombatStore() {
 		},
 
 		adjustHp(id: string, delta: number) {
-			let hpBefore = 0;
-			let hpAfter = 0;
-			let combatantRef: Combatant | undefined;
-
-			combatants = combatants.map((c) => {
-				if (c.id !== id) return c;
-				combatantRef = c;
-				hpBefore = c.currentHp;
-				let updated: Combatant;
-				if (delta < 0 && c.tempHp > 0) {
-					const absorbed = Math.min(c.tempHp, -delta);
-					const spill = -delta - absorbed;
-					updated = {
-						...c,
-						tempHp: c.tempHp - absorbed,
-						currentHp: Math.max(0, c.currentHp - spill)
-					};
-				} else {
-					updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
-				}
-				hpAfter = updated.currentHp;
-				if (hpBefore > 0 && hpAfter === 0) {
-					updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
-					if (c.type === 'player' && !updated.deathSaves) {
-						updated = { ...updated, deathSaves: { successes: 0, failures: 0, stable: false } };
-					}
-				}
-				if (c.type === 'player' && hpBefore === 0 && hpAfter > 0) {
-					updated = { ...updated, deathSaves: undefined };
-				}
-				return updated;
-			});
-
-			// Log event if in a tracked combat
-			if (combatStartedAt !== null && combatantRef) {
-				const c = combatantRef;
-				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
-				const actorFields = actor
-					? {
-							actorId: actor.id,
-							actorName: actor.name,
-							actorType: actor.type as 'player' | 'enemy'
-						}
-					: {};
-				const actualDelta = hpAfter - hpBefore;
-				if (actualDelta < 0) {
-					const dmg = -actualDelta;
-					const causedDown = hpBefore > 0 && hpAfter === 0;
-					combatEvents = [
-						...combatEvents,
-						{
-							type: 'damage',
-							round,
-							...actorFields,
-							combatantId: id,
-							combatantName: c.name,
-							combatantType: c.type as 'player' | 'enemy',
-							value: dmg,
-							hpBefore,
-							hpAfter,
-							causedDown: causedDown || undefined
-						}
-					];
-					const stats = participantStats.get(id);
-					if (stats) {
-						participantStats.set(id, {
-							...stats,
-							totalDamage: stats.totalDamage + dmg,
-							wasSlain: stats.wasSlain || (causedDown && c.type === 'enemy')
-						});
-					}
-				} else if (actualDelta > 0) {
-					combatEvents = [
-						...combatEvents,
-						{
-							type: 'heal',
-							round,
-							...actorFields,
-							combatantId: id,
-							combatantName: c.name,
-							combatantType: c.type as 'player' | 'enemy',
-							value: actualDelta,
-							hpBefore,
-							hpAfter
-						}
-					];
-					const stats = participantStats.get(id);
-					if (stats) {
-						participantStats.set(id, { ...stats, totalHealing: stats.totalHealing + actualDelta });
-					}
-				}
-			}
-
+			applyHpChange(id, delta);
 			sync();
+		},
+
+		applyAoE(targets: Array<{ id: string; delta: number }>) {
+			const aoeEvents: Array<{ id: string; name: string; delta: number }> = [];
+			suppressSync = true;
+			for (const { id, delta } of targets) {
+				const c = combatants.find((x) => x.id === id);
+				if (!c) continue;
+				aoeEvents.push({ id, name: c.name, delta });
+				applyHpChange(id, delta);
+			}
+			suppressSync = false;
+			syncToServer({ combatants, currentTurnId, round, aoeEvents });
 		},
 
 		setTempHp(id: string, value: number) {

@@ -43,15 +43,17 @@
 	function applyDamage() {
 		const val = parseInt(amount);
 		if (isNaN(val) || val <= 0) return;
+		const targets: Array<{ id: string; delta: number }> = [];
 		const checks: ConcentrationCheck[] = [];
 		for (const c of combatants) {
 			if (!isSelected(c.id)) continue;
 			const dmg = saved[c.id] ? Math.floor(val / 2) : val;
+			targets.push({ id: c.id, delta: -dmg });
 			if (c.statuses.includes('Concentrating')) {
 				checks.push({ id: c.id, name: c.name, damage: dmg, dc: Math.max(10, Math.floor(dmg / 2)) });
 			}
-			combat.adjustHp(c.id, -dmg);
 		}
+		combat.applyAoE(targets);
 		if (checks.length > 0) onconcentrationchecks?.(checks);
 		onclose();
 	}
@@ -59,11 +61,13 @@
 	function applyHeal() {
 		const val = parseInt(amount);
 		if (isNaN(val) || val <= 0) return;
+		const targets: Array<{ id: string; delta: number }> = [];
 		for (const c of combatants) {
 			if (!isSelected(c.id)) continue;
 			const heal = saved[c.id] ? Math.floor(val / 2) : val;
-			combat.adjustHp(c.id, heal);
+			targets.push({ id: c.id, delta: heal });
 		}
+		combat.applyAoE(targets);
 		onclose();
 	}
 

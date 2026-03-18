@@ -88,5 +88,15 @@ export function validateStorageState(raw: unknown): StorageState | null {
 	if (o.currentTurnId !== null && !isStr(o.currentTurnId, 36)) return null;
 	if (!isInt(o.round, 1, MAX_ROUND)) return null;
 
+	// Optional aoeEvents — array of {id, name, delta} for viewer sequential animation
+	if (o.aoeEvents !== undefined) {
+		if (!Array.isArray(o.aoeEvents) || o.aoeEvents.length > 100) return null;
+		for (const ev of o.aoeEvents) {
+			if (!ev || typeof ev !== 'object') return null;
+			if (!isStr(ev.id, 36) || !isStr(ev.name, MAX_NAME_LEN)) return null;
+			if (typeof ev.delta !== 'number' || !Number.isFinite(ev.delta)) return null;
+		}
+	}
+
 	return o as unknown as StorageState;
 }

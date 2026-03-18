@@ -354,35 +354,49 @@
 
 				// Detect changes — skip on the very first message (empty initial state)
 				if (combatState.combatants.length > 0) {
-					let hadDamage = false;
-					let hadHeal = false;
-					let hadTempHp = false;
-					let affectedId: string | null = null;
-					let addedCondition: string | null = null;
-					for (const nc of newState.combatants) {
-						const oc = combatState.combatants.find((c) => c.id === nc.id);
-						if (!oc) continue;
-						const oldEff = oc.currentHp + (oc.tempHp ?? 0);
-						const newEff = nc.currentHp + (nc.tempHp ?? 0);
-						if (newEff < oldEff) {
-							if (!hadDamage) affectedId = nc.id;
-							hadDamage = true;
-						} else if (nc.currentHp > oc.currentHp) {
-							if (!hadHeal) affectedId = nc.id;
-							hadHeal = true;
+					if (newState.aoeEvents && newState.aoeEvents.length > 0) {
+						// AoE action — animate each affected combatant in sequence
+						const INTERVAL = 1200;
+						const isDamage = newState.aoeEvents.some((ev) => ev.delta < 0);
+						const color = isDamage ? 'rgba(239, 68, 68, 1)' : 'rgba(34, 197, 94, 1)';
+						const soundType = isDamage ? 'damage' : 'heal';
+						newState.aoeEvents.forEach((ev, i) => {
+							setTimeout(() => {
+								triggerEffect(soundType, color, ev.id);
+							}, i * INTERVAL);
+						});
+					} else {
+						// Normal single-target detection
+						let hadDamage = false;
+						let hadHeal = false;
+						let hadTempHp = false;
+						let affectedId: string | null = null;
+						let addedCondition: string | null = null;
+						for (const nc of newState.combatants) {
+							const oc = combatState.combatants.find((c) => c.id === nc.id);
+							if (!oc) continue;
+							const oldEff = oc.currentHp + (oc.tempHp ?? 0);
+							const newEff = nc.currentHp + (nc.tempHp ?? 0);
+							if (newEff < oldEff) {
+								if (!hadDamage) affectedId = nc.id;
+								hadDamage = true;
+							} else if (nc.currentHp > oc.currentHp) {
+								if (!hadHeal) affectedId = nc.id;
+								hadHeal = true;
+							}
+							if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
+							if (!addedCondition) {
+								addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
+							}
 						}
-						if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
-						if (!addedCondition) {
-							addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
+						if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
+						else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
+						else if (hadTempHp) {
+							if (audioEnabled && audioCtx) playTempHpSound(audioCtx);
+						} else if (addedCondition) {
+							const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
+							triggerEffect('condition', color);
 						}
-					}
-					if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
-					else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
-					else if (hadTempHp) {
-						if (audioEnabled && audioCtx) playTempHpSound(audioCtx);
-					} else if (addedCondition) {
-						const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
-						triggerEffect('condition', color);
 					}
 				}
 

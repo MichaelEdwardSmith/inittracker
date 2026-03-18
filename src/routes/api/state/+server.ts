@@ -65,12 +65,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const state = validateStorageState(raw);
 	if (!state) return new Response('Invalid state payload', { status: 400 });
 
-	sessionStates.set(gameSessionId, state);
+	// Broadcast the full state (including aoeEvents) to connected viewers,
+	// but strip aoeEvents before caching/persisting so reconnecting viewers
+	// don't replay the animation sequence.
 	broadcastToSession(gameSessionId, state);
+	const { aoeEvents: _discarded, ...persistState } = state;
+	sessionStates.set(gameSessionId, persistState);
 
 	// Guests: skip MongoDB persistence
 	if (!isGuest) {
-		saveCombatState(gameSessionId, state).catch(() => {});
+		saveCombatState(gameSessionId, persistState).catch(() => {});
 	}
 
 	return new Response(null, { status: 204 });
