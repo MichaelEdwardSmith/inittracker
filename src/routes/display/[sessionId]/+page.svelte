@@ -181,6 +181,7 @@
 						let hadTempHp = false;
 						let affectedId: string | null = null;
 						let addedCondition: string | null = null;
+						let conditionTargetId: string | null = null;
 						for (const nc of newState.combatants) {
 							const oc = combatState.combatants.find((c) => c.id === nc.id);
 							if (!oc) continue;
@@ -196,6 +197,7 @@
 							if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
 							if (!addedCondition) {
 								addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
+								if (addedCondition) conditionTargetId = nc.id;
 							}
 						}
 						if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
@@ -204,7 +206,7 @@
 							playSound('temphp');
 						} else if (addedCondition) {
 							const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
-							triggerEffect('condition', color);
+							triggerEffect('condition', color, conditionTargetId ?? undefined);
 						}
 					}
 				}
