@@ -140,7 +140,8 @@
       "Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\lib\\\\components\\\\InitiativeTracker.svelte' | Select-Object -Index \\(235..252\\) | ForEach-Object { $_ | Format-List }\")",
       "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\audio' | Select-Object Name, Length | Format-Table -AutoSize\")",
       "Bash(powershell.exe -Command \"New-Item -ItemType Directory -Force 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio' | Out-Null; Copy-Item 'C:\\\\audio\\\\*.mp3' 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio\\\\'; Get-ChildItem 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio'\")",
-      "Bash(cmd /c \"pnpm check 2>&1\")"
+      "Bash(cmd /c \"pnpm check 2>&1\")",
+      "Bash(powershell.exe -Command \"Select-String -Path 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\lib\\\\components\\\\AudioMixer.svelte' -Pattern 'Sync|sync failed|error|Error' -CaseSensitive:$false | Select-Object LineNumber, Line\")"
     ]
   }
 }
