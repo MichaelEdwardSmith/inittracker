@@ -23,3 +23,16 @@ export function broadcastToSession(sessionId: string, state: StorageState) {
 		}
 	}
 }
+
+export function broadcastEventToSession(sessionId: string, eventName: string, data: unknown) {
+	const clients = sessionClients.get(sessionId);
+	if (!clients) return;
+	const msg = encoder.encode(`event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`);
+	for (const ctrl of clients) {
+		try {
+			ctrl.enqueue(msg);
+		} catch {
+			clients.delete(ctrl);
+		}
+	}
+}
