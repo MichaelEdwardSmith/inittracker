@@ -36,7 +36,11 @@ import adapter from '@sveltejs/adapter-node';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		server: {
+			// Allow large audio file uploads from the mixer (default is 512 KB)
+			bodyLimit: 100 * 1024 * 1024 // 100 MB
+		}
 	}
 };
 

@@ -480,17 +480,10 @@
 					body: buf
 				})
 			)
-			.then(async (res) => {
-				if (res.ok) {
-					uploadStatus[i] = 'done';
-				} else {
-					const body = await res.text().catch(() => '(unreadable)');
-					alert(`Upload failed: ${res.status} ${res.statusText}\n${body}`);
-					uploadStatus[i] = 'error';
-				}
+			.then((res) => {
+				uploadStatus[i] = res.ok ? 'done' : 'error';
 			})
-			.catch((err) => {
-				alert(`Upload error: ${err}`);
+			.catch(() => {
 				uploadStatus[i] = 'error';
 			});
 	}
