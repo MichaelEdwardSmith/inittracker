@@ -637,7 +637,7 @@
 <!-- ── Channel strip snippet (reused in both single-row and two-row layouts) ── -->
 {#snippet strip(ch: Channel, i: number)}
 	<div
-		class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg"
+		class="flex {isMobile ? 'w-[calc(50%-6px)] min-w-0' : 'w-[118px] shrink-0'} flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg"
 	>
 		<!-- Label + delete row -->
 		<div class="flex items-center gap-1">
@@ -911,54 +911,46 @@
 
 <!-- ── Master channel strip ────────────────────────────────────────────────── -->
 {#snippet masterStrip()}
-	<div
-		class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg"
-	>
-		<!-- Label (non-editable) -->
-		<div
-			class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold tracking-widest text-amber-400 uppercase"
-		>
-			Master
-		</div>
-
-		{#if isMobile}
-			<!-- Volume number input (mobile) -->
-			<div class="flex flex-col items-center gap-1.5 py-1">
-				<span class="text-[10px] font-semibold tracking-wider text-gray-500 uppercase">Vol</span>
-				<div class="flex items-center gap-1">
-					<button
-						onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
-						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>−</button
-					>
-					<input
-						type="number"
-						min="0"
-						max="100"
-						step="1"
-						value={Math.round(masterVolume * 100)}
-						oninput={(e) =>
-							setMaster(
-								Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) /
-									100
-							)}
-						class="w-12 rounded border border-gray-700 bg-gray-800 py-1 text-center font-mono text-xs text-amber-300 focus:border-amber-500 focus:outline-none"
-					/>
-					<button
-						onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
-						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>+</button
-					>
-				</div>
+	{#if isMobile}
+		<!-- Mobile: compact horizontal bar -->
+		<div class="flex w-full items-center gap-2 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-2 shadow-lg">
+			<div class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-xs font-bold tracking-widest text-amber-400 uppercase shrink-0">Master</div>
+			<div class="flex items-center gap-1 flex-1">
+				<button
+					onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
+					class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700 shrink-0"
+				>−</button>
+				<input
+					type="number"
+					min="0"
+					max="100"
+					step="1"
+					value={Math.round(masterVolume * 100)}
+					oninput={(e) => setMaster(Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) / 100)}
+					class="w-12 rounded border border-gray-700 bg-gray-800 py-1 text-center font-mono text-xs text-amber-300 focus:border-amber-500 focus:outline-none"
+				/>
+				<button
+					onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
+					class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700 shrink-0"
+				>+</button>
 			</div>
-		{:else}
+			<button
+				onclick={stopAll}
+				title="Fade out and stop all playing channels"
+				class="flex shrink-0 items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 px-2 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg>
+				Stop All
+			</button>
+		</div>
+	{:else}
+		<!-- Desktop: tall vertical card (existing layout) -->
+		<div class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg">
+			<div class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold tracking-widest text-amber-400 uppercase">Master</div>
 			<!-- Vertical fader (desktop) -->
 			<div class="flex flex-1 flex-col items-center gap-1">
 				<span class="text-[10px] font-semibold tracking-wider text-gray-500 uppercase">Vol</span>
-				<div
-					class="relative flex flex-1 items-center justify-center self-stretch overflow-hidden"
-					bind:clientHeight={masterFaderHeight}
-				>
+				<div class="relative flex flex-1 items-center justify-center self-stretch overflow-hidden" bind:clientHeight={masterFaderHeight}>
 					{#if masterFaderHeight > 0}
 						<div class="relative" style="width: 28px; height: {masterFaderHeight}px;">
 							<input
@@ -969,47 +961,31 @@
 								value={masterVolume}
 								oninput={(e) => setMaster(parseFloat((e.target as HTMLInputElement).value))}
 								class="fader absolute"
-								style="
-									width: {masterFaderHeight}px;
-									height: 28px;
-									top: {(masterFaderHeight - 28) / 2}px;
-									left: -{(masterFaderHeight - 28) / 2}px;
-									transform: rotate(-90deg);
-									transform-origin: center;
-									cursor: pointer;
-								"
+								style="width: {masterFaderHeight}px; height: 28px; top: {(masterFaderHeight - 28) / 2}px; left: -{(masterFaderHeight - 28) / 2}px; transform: rotate(-90deg); transform-origin: center; cursor: pointer;"
 							/>
 						</div>
 					{/if}
 				</div>
 				<span class="font-mono text-[10px] text-amber-400">{Math.round(masterVolume * 100)}%</span>
 			</div>
-		{/if}
-
-		<!-- Stop All -->
-		<button
-			onclick={stopAll}
-			title="Fade out and stop all playing channels"
-			class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-3 w-3"
-				viewBox="0 0 24 24"
-				fill="currentColor"
+			<!-- Stop All -->
+			<button
+				onclick={stopAll}
+				title="Fade out and stop all playing channels"
+				class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<rect x="6" y="6" width="12" height="12" rx="1.5" />
-			</svg>
-			Stop All
-		</button>
-	</div>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg>
+				Stop All
+			</button>
+		</div>
+	{/if}
 {/snippet}
 
 <!-- ── Add Channel button snippet ─────────────────────────────────────────── -->
 {#snippet addButton()}
 	<button
 		onclick={addChannel}
-		class="flex w-[118px] shrink-0 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
+		class="flex {isMobile ? 'w-[calc(50%-6px)] min-w-0 min-h-[80px]' : 'w-[118px] shrink-0'} flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1078,8 +1054,17 @@
 
 	<!-- ── Channel area ────────────────────────────────────────────────────── -->
 	<div class="flex flex-1 flex-col gap-3 overflow-hidden p-4" bind:clientWidth={containerWidth}>
-		{#if twoRows}
-			<!-- Two rows: channels split evenly, add button at end of row 2 -->
+		{#if isMobile}
+			<!-- Mobile: master bar at top, then 2-col wrapping grid -->
+			{@render masterStrip()}
+			<div class="flex flex-1 flex-wrap content-start gap-3 overflow-y-auto">
+				{#each channels as ch, i}
+					{@render strip(ch, i)}
+				{/each}
+				{@render addButton()}
+			</div>
+		{:else if twoRows}
+			<!-- Desktop two rows -->
 			<div class="flex min-h-0 flex-1 gap-3">
 				{@render masterStrip()}
 				{#each channels.slice(0, row1Count) as ch, li}
@@ -1093,7 +1078,7 @@
 				{@render addButton()}
 			</div>
 		{:else}
-			<!-- Single row -->
+			<!-- Desktop single row -->
 			<div class="flex h-full gap-3">
 				{@render masterStrip()}
 				{#each channels as ch, i}
