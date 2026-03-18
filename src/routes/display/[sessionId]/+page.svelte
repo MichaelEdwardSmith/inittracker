@@ -71,11 +71,15 @@
 	// ── Audio ──────────────────────────────────────────────────────────
 	let joined = $state(false);
 	let audioEnabled = $state(true);
-	let audioCtx: AudioContext | null = null;
+
+	const sounds: Record<string, HTMLAudioElement> = {};
 
 	function joinSession() {
-		audioCtx = new AudioContext();
-		if (audioCtx.state === 'suspended') audioCtx.resume();
+		for (const name of ['damage', 'heal', 'condition', 'battlestart', 'fanfare', 'sword', 'temphp']) {
+			const a = new Audio(`/audio/${name}.mp3`);
+			a.preload = 'auto';
+			sounds[name] = a;
+		}
 		joined = true;
 	}
 
@@ -83,204 +87,11 @@
 		audioEnabled = !audioEnabled;
 	}
 
-	function playDamageSound(ctx: AudioContext) {
-		const t = ctx.currentTime;
-		// Low-pitched thud sweep
-		const osc = ctx.createOscillator();
-		const oscGain = ctx.createGain();
-		osc.type = 'sawtooth';
-		osc.frequency.setValueAtTime(130, t);
-		osc.frequency.exponentialRampToValueAtTime(45, t + 0.18);
-		oscGain.gain.setValueAtTime(0.65, t);
-		oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-		osc.connect(oscGain);
-		oscGain.connect(ctx.destination);
-		osc.start(t);
-		osc.stop(t + 0.28);
-		// Short noise burst (impact transient)
-		const bufLen = Math.floor(ctx.sampleRate * 0.07);
-		const noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-		const nd = noiseBuf.getChannelData(0);
-		for (let i = 0; i < bufLen; i++) nd[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
-		const noise = ctx.createBufferSource();
-		noise.buffer = noiseBuf;
-		const nf = ctx.createBiquadFilter();
-		nf.type = 'bandpass';
-		nf.frequency.value = 1100;
-		nf.Q.value = 0.6;
-		const ng = ctx.createGain();
-		ng.gain.setValueAtTime(0.35, t);
-		ng.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
-		noise.connect(nf);
-		nf.connect(ng);
-		ng.connect(ctx.destination);
-		noise.start(t);
-	}
-
-	function playHealSound(ctx: AudioContext) {
-		// Ascending magical chime (C-E-G-C)
-		[523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
-			const t = ctx.currentTime + i * 0.13;
-			const osc = ctx.createOscillator();
-			const gain = ctx.createGain();
-			osc.type = 'sine';
-			osc.frequency.value = freq;
-			gain.gain.setValueAtTime(0, t);
-			gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
-			gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-			osc.connect(gain);
-			gain.connect(ctx.destination);
-			osc.start(t);
-			osc.stop(t + 0.45);
-		});
-	}
-
-	function playConditionSound(ctx: AudioContext) {
-		// Single resonant bell tone — neutral, mystical
-		const t = ctx.currentTime;
-		const osc = ctx.createOscillator();
-		const gain = ctx.createGain();
-		osc.type = 'triangle';
-		osc.frequency.value = 528;
-		gain.gain.setValueAtTime(0, t);
-		gain.gain.linearRampToValueAtTime(0.2, t + 0.02);
-		gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-		osc.connect(gain);
-		gain.connect(ctx.destination);
-		osc.start(t);
-		osc.stop(t + 0.7);
-	}
-
-	function playBattleStartSound(ctx: AudioContext) {
-		// Urgent war-horn call: D4 → A4 → D5 → A5 (faster, tense, minor feel)
-		const notes = [
-			{ freq: 293.66, start: 0.0, dur: 0.09 },
-			{ freq: 440.0, start: 0.1, dur: 0.09 },
-			{ freq: 587.33, start: 0.2, dur: 0.09 },
-			{ freq: 880.0, start: 0.3, dur: 0.55 }
-		];
-		notes.forEach(({ freq, start, dur }) => {
-			const t = ctx.currentTime + start;
-			const osc = ctx.createOscillator();
-			const filter = ctx.createBiquadFilter();
-			const gain = ctx.createGain();
-			osc.type = 'square';
-			osc.frequency.value = freq;
-			filter.type = 'lowpass';
-			filter.frequency.value = 900;
-			filter.Q.value = 1.2;
-			gain.gain.setValueAtTime(0, t);
-			gain.gain.linearRampToValueAtTime(0.28, t + 0.015);
-			gain.gain.setValueAtTime(0.28, t + dur - 0.02);
-			gain.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.07);
-			osc.connect(filter);
-			filter.connect(gain);
-			gain.connect(ctx.destination);
-			osc.start(t);
-			osc.stop(t + dur + 0.08);
-		});
-		// Kick-drum thud at the downbeat
-		const bufLen = Math.floor(ctx.sampleRate * 0.18);
-		const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-		const bd = buf.getChannelData(0);
-		for (let i = 0; i < bufLen; i++)
-			bd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
-		const drum = ctx.createBufferSource();
-		drum.buffer = buf;
-		const df = ctx.createBiquadFilter();
-		df.type = 'lowpass';
-		df.frequency.value = 180;
-		const dg = ctx.createGain();
-		dg.gain.setValueAtTime(0.8, ctx.currentTime);
-		dg.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-		drum.connect(df);
-		df.connect(dg);
-		dg.connect(ctx.destination);
-		drum.start(ctx.currentTime);
-	}
-
-	function playFanfareSound(ctx: AudioContext) {
-		// Triumphant brass fanfare: G4 → C5 → E5 → G5 (held)
-		const notes = [
-			{ freq: 392.0, start: 0.0, dur: 0.13 },
-			{ freq: 523.25, start: 0.16, dur: 0.13 },
-			{ freq: 659.25, start: 0.32, dur: 0.13 },
-			{ freq: 783.99, start: 0.48, dur: 0.7 }
-		];
-		notes.forEach(({ freq, start, dur }) => {
-			const t = ctx.currentTime + start;
-			const osc = ctx.createOscillator();
-			const filter = ctx.createBiquadFilter();
-			const gain = ctx.createGain();
-			osc.type = 'sawtooth';
-			osc.frequency.value = freq;
-			filter.type = 'lowpass';
-			filter.frequency.value = 1400;
-			filter.Q.value = 0.8;
-			gain.gain.setValueAtTime(0, t);
-			gain.gain.linearRampToValueAtTime(0.38, t + 0.025);
-			gain.gain.setValueAtTime(0.38, t + dur - 0.03);
-			gain.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.08);
-			osc.connect(filter);
-			filter.connect(gain);
-			gain.connect(ctx.destination);
-			osc.start(t);
-			osc.stop(t + dur + 0.1);
-		});
-	}
-
-	function playSwordSound(ctx: AudioContext) {
-		const t = ctx.currentTime;
-		// Whoosh: noise burst with bandpass sweeping low → high
-		const bufLen = Math.floor(ctx.sampleRate * 0.18);
-		const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-		const data = buf.getChannelData(0);
-		for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
-		const noise = ctx.createBufferSource();
-		noise.buffer = buf;
-		const sweep = ctx.createBiquadFilter();
-		sweep.type = 'bandpass';
-		sweep.frequency.setValueAtTime(250, t);
-		sweep.frequency.exponentialRampToValueAtTime(5000, t + 0.13);
-		sweep.Q.value = 1.5;
-		const whooshGain = ctx.createGain();
-		whooshGain.gain.setValueAtTime(0.55, t);
-		whooshGain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-		noise.connect(sweep);
-		sweep.connect(whooshGain);
-		whooshGain.connect(ctx.destination);
-		noise.start(t);
-		// Metallic ting: triangle wave at the peak of the whoosh
-		const osc = ctx.createOscillator();
-		const oscGain = ctx.createGain();
-		osc.type = 'triangle';
-		osc.frequency.setValueAtTime(2900, t + 0.09);
-		osc.frequency.exponentialRampToValueAtTime(2100, t + 0.38);
-		oscGain.gain.setValueAtTime(0, t + 0.09);
-		oscGain.gain.linearRampToValueAtTime(0.28, t + 0.1);
-		oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
-		osc.connect(oscGain);
-		oscGain.connect(ctx.destination);
-		osc.start(t + 0.09);
-		osc.stop(t + 0.42);
-	}
-
-	function playTempHpSound(ctx: AudioContext) {
-		// Bright shield-shimmer: C6 + G6 (a fifth apart), quick attack, short decay
-		[1046.5, 1567.98].forEach((freq, i) => {
-			const t = ctx.currentTime + i * 0.05;
-			const osc = ctx.createOscillator();
-			const gain = ctx.createGain();
-			osc.type = 'sine';
-			osc.frequency.value = freq;
-			gain.gain.setValueAtTime(0, t);
-			gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
-			gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-			osc.connect(gain);
-			gain.connect(ctx.destination);
-			osc.start(t);
-			osc.stop(t + 0.45);
-		});
+	function playSound(name: string) {
+		if (!audioEnabled) return;
+		const src = sounds[name];
+		if (!src) return;
+		(src.cloneNode(true) as HTMLAudioElement).play().catch(() => {});
 	}
 
 	function triggerEffect(
@@ -308,11 +119,9 @@
 				flashTimer = setTimeout(() => {
 					flashColor = null;
 				}, 750);
-				if (audioEnabled && audioCtx) {
-					if (soundType === 'damage') playDamageSound(audioCtx);
-					else if (soundType === 'heal') playHealSound(audioCtx);
-					else playConditionSound(audioCtx);
-				}
+				if (soundType === 'damage') playSound('damage');
+				else if (soundType === 'heal') playSound('heal');
+				else playSound('condition');
 			},
 			willPan ? 500 : 0
 		);
@@ -335,11 +144,11 @@
 				if (firstMessageReceived) {
 					// Combat begins (null → active)
 					if (combatState.currentTurnId === null && newState.currentTurnId !== null) {
-						if (audioEnabled && audioCtx) playBattleStartSound(audioCtx);
+						playSound('battlestart');
 					}
 					// Combat ends (active → null)
 					if (combatState.currentTurnId !== null && newState.currentTurnId === null) {
-						if (audioEnabled && audioCtx) playFanfareSound(audioCtx);
+						playSound('fanfare');
 					}
 					// Turn advances (one combatant → another)
 					if (
@@ -347,7 +156,7 @@
 						newState.currentTurnId !== null &&
 						combatState.currentTurnId !== newState.currentTurnId
 					) {
-						if (audioEnabled && audioCtx) playSwordSound(audioCtx);
+						playSound('sword');
 					}
 				}
 				firstMessageReceived = true;
@@ -392,7 +201,7 @@
 						if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
 						else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
 						else if (hadTempHp) {
-							if (audioEnabled && audioCtx) playTempHpSound(audioCtx);
+							playSound('temphp');
 						} else if (addedCondition) {
 							const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
 							triggerEffect('condition', color);

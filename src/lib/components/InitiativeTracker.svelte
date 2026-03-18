@@ -94,14 +94,7 @@
 	}
 	let damageInputs = $state<Record<string, string>>({});
 	let tempHpInputs = $state<Record<string, string>>({});
-	let chronicleSaved = $state(false);
 	let initiativeTimers: Record<string, ReturnType<typeof setTimeout>> = {};
-
-	function handleSaveToChronicle() {
-		combat.saveToChronicle();
-		chronicleSaved = true;
-		setTimeout(() => (chronicleSaved = false), 2000);
-	}
 
 	function handleInitiativeInput(id: string, raw: string, name: string, oldValue: number | null) {
 		clearTimeout(initiativeTimers[id]);
@@ -233,23 +226,6 @@
 
 			<!-- Utility buttons -->
 			<div class="h-4 w-px bg-gray-700"></div>
-			{#if combat.hasCombatHistory}
-				<button
-					onclick={handleSaveToChronicle}
-					title="Save a snapshot of this combat to Chronicles"
-					class="flex items-center gap-1 rounded border px-2 py-1 text-xs font-semibold transition
-					       {chronicleSaved
-						? 'border-green-700 bg-green-900/40 text-green-300'
-						: 'border-amber-800/60 bg-amber-900/20 text-amber-500 hover:border-amber-600 hover:bg-amber-900/40 hover:text-amber-300'}"
-				>
-					{#if chronicleSaved}
-						✓ Saved
-					{:else}
-						📜 Save
-					{/if}
-				</button>
-				<div class="h-4 w-px bg-gray-700"></div>
-			{/if}
 			<button
 				onclick={() => (showAoE = true)}
 				title="Apply damage or healing to multiple combatants"
