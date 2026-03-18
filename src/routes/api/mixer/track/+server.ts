@@ -41,7 +41,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	const trackId = request.headers.get('X-Track-Id');
-	const trackName = request.headers.get('X-Track-Name');
+	const rawTrackName = request.headers.get('X-Track-Name');
+	const trackName = rawTrackName ? (() => { try { return decodeURIComponent(rawTrackName); } catch { return rawTrackName; } })() : null;
 	const mimeType = request.headers.get('Content-Type') ?? 'audio/mpeg';
 
 	if (!trackId || !trackName) return new Response('Missing track headers', { status: 400 });
