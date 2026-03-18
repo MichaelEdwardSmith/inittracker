@@ -74,6 +74,52 @@
 
 	const sounds: Record<string, HTMLAudioElement> = {};
 
+	// ── Mixer track storage (plain Map — managed imperatively) ─────────
+	const viewerTracks = new Map<string, { name: string; blobUrl: string; audio: HTMLAudioElement }>();
+
+	async function downloadTrack(id: string, name: string) {
+		try {
+			const res = await fetch(`/api/mixer/track?session=${data.sessionId}&id=${id}`);
+			if (!res.ok) return;
+			const blob = await res.blob();
+			const existing = viewerTracks.get(id);
+			if (existing) {
+				existing.audio.pause();
+				URL.revokeObjectURL(existing.blobUrl);
+			}
+			const blobUrl = URL.createObjectURL(blob);
+			const audio = new Audio(blobUrl);
+			audio.loop = true;
+			viewerTracks.set(id, { name, blobUrl, audio });
+		} catch {
+			/* ignore */
+		}
+	}
+
+	function revokeTrack(id: string) {
+		const t = viewerTracks.get(id);
+		if (!t) return;
+		t.audio.pause();
+		URL.revokeObjectURL(t.blobUrl);
+		viewerTracks.delete(id);
+	}
+
+	function applyMixerState(state: {
+		masterVolume: number;
+		channels: Array<{ id: string; playing: boolean; volume: number; muted: boolean; solo: boolean }>;
+	}) {
+		const anySolo = state.channels.some((c) => c.solo);
+		for (const ch of state.channels) {
+			const t = viewerTracks.get(ch.id);
+			if (!t) continue;
+			const shouldPlay = ch.playing;
+			const effVol = ch.muted ? 0 : anySolo && !ch.solo ? 0 : state.masterVolume * ch.volume;
+			t.audio.volume = Math.max(0, Math.min(1, effVol));
+			if (shouldPlay && t.audio.paused) t.audio.play().catch(() => {});
+			else if (!shouldPlay && !t.audio.paused) t.audio.pause();
+		}
+	}
+
 	function joinSession() {
 		for (const name of ['damage', 'heal', 'condition', 'battlestart', 'fanfare', 'sword', 'temphp']) {
 			const a = new Audio(`/audio/${name}.mp3`);
@@ -81,6 +127,13 @@
 			sounds[name] = a;
 		}
 		joined = true;
+		// Download any tracks already uploaded before this viewer joined
+		fetch(`/api/mixer/tracks?session=${data.sessionId}`)
+			.then((r) => (r.ok ? r.json() : []))
+			.then(async (tracks: Array<{ id: string; name: string }>) => {
+				for (const t of tracks) await downloadTrack(t.id, t.name);
+			})
+			.catch(() => {});
 	}
 
 	function toggleAudio() {
@@ -221,6 +274,18 @@
 			connected = false;
 			// EventSource automatically retries — no manual reconnect needed.
 		};
+
+		source.addEventListener('track', (e) => {
+			const { id, name } = JSON.parse((e as MessageEvent).data);
+			downloadTrack(id, name);
+		});
+		source.addEventListener('trackRemoved', (e) => {
+			const { id } = JSON.parse((e as MessageEvent).data);
+			revokeTrack(id);
+		});
+		source.addEventListener('mixer', (e) => {
+			applyMixerState(JSON.parse((e as MessageEvent).data));
+		});
 
 		return () => source.close();
 	});

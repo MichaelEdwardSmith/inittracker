@@ -1,4 +1,4 @@
-<!-- Full-screen audio mixer overlay for the DM.
+﻿<!-- Full-screen audio mixer overlay for the DM.
      Starts with 5 channels; more can be added via the "+ Add a Channel" card.
      Automatically splits into two equal-height rows when channels overflow one row.
      Each channel has file upload, vertical fader, play/stop, solo, mute, editable label, and delete.
@@ -90,6 +90,7 @@
 		muted: boolean;
 		solo: boolean;
 		playing: boolean;
+		muteLocal: boolean; // silences DM's local audio; does not affect viewer state
 	}
 
 	// File System Access API available in Chrome/Edge — stores a tiny handle
@@ -221,6 +222,7 @@
 				channels[i].playing = true;
 			}
 			applyVol(i);
+			uploadTrack(i, file);
 			if (saveToIdb) {
 				const ok = await idbPut(channels[i].id, { handle, name: file.name });
 				channels[i].persistFailed = !ok;
@@ -264,6 +266,7 @@
 			channels[i].playing = true;
 		}
 		applyVol(i);
+		uploadTrack(i, file);
 		saveSettings();
 		idbPut(channels[i].id, { buffer: null, name: file.name, _needsBuffer: true });
 		// Read the ArrayBuffer async and then overwrite with the real entry.
@@ -321,13 +324,18 @@
 			volume: saved.volumes?.[i] ?? 0.8,
 			muted: false,
 			solo: false,
-			playing: false
+			playing: false,
+			muteLocal: false
 		}))
 	);
 
 	// ── Audio objects — parallel array to channels, managed imperatively ──────
 	// remainingTimes[i] = seconds left in clip (null = no file loaded)
 	let remainingTimes = $state<(number | null)[]>(Array(initCount).fill(null));
+	// uploadStatus[i] = server upload state for this channel's file
+	let uploadStatus = $state<('idle' | 'uploading' | 'done' | 'error')[]>(
+		Array(initCount).fill('idle')
+	);
 
 	function formatTime(s: number): string {
 		const total = Math.max(0, Math.floor(s));
@@ -433,7 +441,51 @@
 	}
 
 	function applyVol(i: number) {
-		if (audios[i]) audios[i].volume = effectiveVol(i);
+		if (audios[i]) {
+			// muteLocal silences the DM's speaker only — does not affect synced state
+			audios[i].volume = channels[i].muteLocal ? 0 : effectiveVol(i);
+		}
+	}
+
+	// ── Server sync helpers ───────────────────────────────────────────────────
+	function syncMixerState() {
+		fetch('/api/mixer/tracks', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				masterVolume,
+				channels: channels.map((c) => ({
+					id: c.id,
+					playing: c.playing,
+					volume: c.volume,
+					muted: c.muted,
+					solo: c.solo
+				}))
+			})
+		}).catch(() => {});
+	}
+
+	function uploadTrack(i: number, file: File) {
+		uploadStatus[i] = 'uploading';
+		file
+			.arrayBuffer()
+			.then((buf) =>
+				fetch('/api/mixer/track', {
+					method: 'POST',
+					headers: {
+						'X-Track-Id': channels[i].id,
+						'X-Track-Name': file.name,
+						'Content-Type': file.type || 'audio/mpeg'
+					},
+					body: buf
+				})
+			)
+			.then((res) => {
+				uploadStatus[i] = res.ok ? 'done' : 'error';
+			})
+			.catch(() => {
+				uploadStatus[i] = 'error';
+			});
 	}
 
 	function applyAllVols() {
@@ -454,8 +506,9 @@
 			if (step >= steps) {
 				clearInterval(timer);
 				a.pause();
-				a.volume = effectiveVol(i);
+				a.volume = channels[i].muteLocal ? 0 : effectiveVol(i);
 				channels[i].playing = false;
+				syncMixerState();
 			}
 		}, stepMs);
 	}
@@ -466,32 +519,38 @@
 		if (!ch.fileName) return;
 		if (ch.playing) {
 			fadeOutAndStop(i);
+			// syncMixerState() is called inside fadeOutAndStop after playing = false
 		} else {
 			applyVol(i);
 			a.play().catch(() => {});
 			channels[i].playing = true;
+			syncMixerState();
 		}
 	}
 
 	function toggleMute(i: number) {
 		channels[i].muted = !channels[i].muted;
 		applyAllVols();
+		syncMixerState();
 	}
 
 	function toggleSolo(i: number) {
 		channels[i].solo = !channels[i].solo;
 		applyAllVols();
+		syncMixerState();
 	}
 
 	function setChannelVol(i: number, v: number) {
 		channels[i].volume = v;
 		applyVol(i);
 		saveSettings();
+		syncMixerState();
 	}
 
 	function stopAll() {
 		channels.forEach((ch, i) => {
 			if (ch.playing) fadeOutAndStop(i);
+			// syncMixerState() is called inside fadeOutAndStop for each channel
 		});
 	}
 
@@ -499,6 +558,7 @@
 		masterVolume = v;
 		applyAllVols();
 		saveSettings();
+		syncMixerState();
 	}
 
 	function renameChannel(i: number, name: string) {
@@ -518,10 +578,12 @@
 			volume: 0.8,
 			muted: false,
 			solo: false,
-			playing: false
+			playing: false,
+			muteLocal: false
 		});
 		faderHeights.push(0);
 		remainingTimes.push(null);
+		uploadStatus.push('idle');
 		if (browser) {
 			const a = new Audio();
 			a.loop = true;
@@ -544,7 +606,11 @@
 		channels.splice(i, 1);
 		faderHeights.splice(i, 1);
 		remainingTimes.splice(i, 1);
+		uploadStatus.splice(i, 1);
 		idbDelete(channelId);
+		fetch(`/api/mixer/track?id=${encodeURIComponent(channelId)}`, { method: 'DELETE' }).catch(
+			() => {}
+		);
 		saveSettings();
 	}
 
@@ -668,6 +734,24 @@
 					⚠ won't persist
 				</div>
 			{/if}
+		{/if}
+
+		<!-- Upload status indicator -->
+		{#if uploadStatus[i] === 'uploading'}
+			<div class="flex items-center justify-center gap-1">
+				<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400"></span>
+				<span class="text-[9px] text-blue-400">uploading…</span>
+			</div>
+		{:else if uploadStatus[i] === 'done'}
+			<div class="flex items-center justify-center gap-1">
+				<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+				<span class="text-[9px] text-green-500">synced</span>
+			</div>
+		{:else if uploadStatus[i] === 'error'}
+			<div class="flex items-center justify-center gap-1">
+				<span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+				<span class="text-[9px] text-red-400">sync failed</span>
+			</div>
 		{/if}
 
 		<!-- Time remaining -->
@@ -799,6 +883,24 @@
 				>M</button
 			>
 		</div>
+
+		<!-- Mute to DM (local only) -->
+		<button
+			onclick={() => { channels[i].muteLocal = !channels[i].muteLocal; applyVol(i); }}
+			title={ch.muteLocal ? 'DM audio muted (viewers still hear it)' : 'Mute DM speaker only'}
+			class="w-full rounded border py-1 text-[10px] font-semibold tracking-wide transition
+				{ch.muteLocal
+				? 'border-orange-600/70 bg-orange-900/30 text-orange-400'
+				: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-orange-700 hover:text-orange-400'}"
+		>
+			{#if ch.muteLocal}
+				<svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+				DM muted
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-4.5-4.5M12 18l4.5-4.5" /></svg>
+				Mute DM
+			{/if}
+		</button>
 
 		<!-- Channel number -->
 		<div class="text-center text-[10px] font-semibold tracking-widest text-gray-600 uppercase">
