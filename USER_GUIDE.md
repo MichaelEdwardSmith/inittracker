@@ -10,6 +10,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 2. [Getting Started (Players)](#2-getting-started-players)
 3. [The DM Dashboard](#3-the-dm-dashboard)
 4. [Managing Your Party (Players)](#4-managing-your-party-players)
+   - [Importing from D&D Beyond](#importing-from-dd-beyond)
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
@@ -101,13 +102,38 @@ The header runs across the top of every screen. From left to right:
 
 ### Adding a Player
 
-In the left sidebar, fill in:
+The Player Panel offers two ways to add a player: **Manual** entry or **D&D Beyond** import. Click the tab at the top of the add-player form to switch between them.
+
+**Manual:**
+
+Fill in:
 
 - **Name**
 - **AC** (Armor Class, default 10, range 1–30)
 - **Max HP** (default 10)
 
 Click **Add Player**. The player appears in the party list and is immediately available to add to the initiative order.
+
+### Importing from D&D Beyond
+
+If your players have characters on D&D Beyond, you can import them directly instead of entering stats manually.
+
+> **Requirement:** The character sheet must be set to **Public** on D&D Beyond (Character Settings → Privacy → Public).
+
+1. Click the **D&D Beyond** tab at the top of the add-player form
+2. Paste a character URL (e.g. `https://www.dndbeyond.com/characters/39615915`) or just the numeric character ID
+3. Click **Fetch** — the tracker contacts D&D Beyond and parses the character sheet
+4. A preview card appears showing the imported values:
+   - **Name**
+   - **Max HP** — calculated from hit dice, CON modifier, and any bonuses
+   - **AC** — derived from equipped armor, shield, class features, feats, and magic items
+   - **DEX mod** — includes 2024 initiative proficiency if the character uses 2024 rules
+   - **Passive Perception** — includes proficiency or expertise if applicable
+5. Click **Add Player** on the preview card to add them to the roster
+
+The character's **D&D Beyond portrait** is imported automatically and set as their avatar.
+
+> **Tip:** If Fetch returns an error, check that the character's privacy is set to Public in D&D Beyond's Character Settings.
 
 ### Player Avatars
 
