@@ -305,6 +305,39 @@
 		else document.exitFullscreen();
 	}
 
+	// Clock + battery
+	let currentTime = $state('');
+	let batteryLevel = $state<number | null>(null);
+	let batteryCharging = $state(false);
+	let isTouchDevice = $state(false);
+
+	$effect(() => {
+		function formatTime() {
+			return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		}
+		currentTime = formatTime();
+		const id = setInterval(() => {
+			currentTime = formatTime();
+		}, 10000);
+		return () => clearInterval(id);
+	});
+
+	$effect(() => {
+		isTouchDevice = navigator.maxTouchPoints > 0;
+		if (!isTouchDevice || !('getBattery' in navigator)) return;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(navigator as any).getBattery().then((battery: any) => {
+			batteryLevel = Math.round(battery.level * 100);
+			batteryCharging = battery.charging;
+			battery.addEventListener('levelchange', () => {
+				batteryLevel = Math.round(battery.level * 100);
+			});
+			battery.addEventListener('chargingchange', () => {
+				batteryCharging = battery.charging;
+			});
+		});
+	});
+
 	const sorted = $derived(sortCombatants(combatState.combatants));
 	const players = $derived(sorted.filter((c) => c.type === 'player'));
 	const currentIndex = $derived(sorted.findIndex((c) => c.id === combatState.currentTurnId));
@@ -497,6 +530,43 @@
 				<div class="flex items-center gap-2">
 					<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
 					<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
+				</div>
+			{/if}
+			<!-- Time + battery -->
+			{#if currentTime}
+				<div class="hidden items-center gap-1.5 text-xs text-gray-500 sm:flex">
+					<span class="font-mono tabular-nums">{currentTime}</span>
+					{#if isTouchDevice && batteryLevel !== null}
+						<span
+							class="flex items-center gap-0.5 {batteryLevel <= 20
+								? 'text-red-400'
+								: batteryCharging
+									? 'text-green-400'
+									: ''}"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+							>
+								<rect x="2" y="7" width="17" height="10" rx="1.5" />
+								<path d="M19 10v4" stroke-width="2.5" stroke-linecap="round" />
+								<rect
+									x="3.5"
+									y="8.5"
+									width={Math.round((batteryLevel / 100) * 14)}
+									height="7"
+									rx="0.75"
+									fill="currentColor"
+									stroke="none"
+								/>
+							</svg>
+							<span>{batteryLevel}%</span>
+						</span>
+					{/if}
 				</div>
 			{/if}
 			<!-- Desktop-only right buttons -->
