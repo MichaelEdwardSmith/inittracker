@@ -142,7 +142,9 @@
       "Bash(powershell.exe -Command \"New-Item -ItemType Directory -Force 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio' | Out-Null; Copy-Item 'C:\\\\audio\\\\*.mp3' 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio\\\\'; Get-ChildItem 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\static\\\\audio'\")",
       "Bash(cmd /c \"pnpm check 2>&1\")",
       "Bash(powershell.exe -Command \"Select-String -Path 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\lib\\\\components\\\\AudioMixer.svelte' -Pattern 'Sync|sync failed|error|Error' -CaseSensitive:$false | Select-Object LineNumber, Line\")",
-      "Read(//etc/nginx/**)"
+      "Read(//etc/nginx/**)",
+      "Bash(npm run:*)",
+      "Bash(cmd.exe /c \"pnpm check\")"
     ]
   }
 }
