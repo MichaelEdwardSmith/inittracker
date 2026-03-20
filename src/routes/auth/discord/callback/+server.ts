@@ -12,13 +12,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	const storedState = cookies.get('discord_oauth_state');
 	const codeVerifier = cookies.get('discord_oauth_verifier');
 
-	console.log('[Discord CB] code present:', !!code, '| state:', state, '| storedState:', storedState, '| verifier present:', !!codeVerifier);
-
 	cookies.delete('discord_oauth_state', { path: '/' });
 	cookies.delete('discord_oauth_verifier', { path: '/' });
 
 	if (!code || !state || state !== storedState || !codeVerifier) {
-		console.log('[Discord CB] state validation failed');
 		redirect(303, '/login?oauth_error=invalid_state');
 	}
 
@@ -27,12 +24,9 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	const errorRedirect =
 		flowType === 'player' ? '/player/login?oauth_error=' : '/login?oauth_error=';
 
-	console.log('[Discord CB] flowType:', flowType);
-
 	let tokens;
 	try {
 		tokens = await discord.validateAuthorizationCode(code, codeVerifier);
-		console.log('[Discord CB] token exchange OK');
 	} catch (err) {
 		console.error('[Discord CB] token_exchange error:', err);
 		redirect(303, errorRedirect + 'token_exchange');
@@ -51,7 +45,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			headers: { Authorization: `Bearer ${tokens.accessToken()}` }
 		});
 		discordUser = await res.json();
-		console.log('[Discord CB] Discord user id:', discordUser.id, '| username:', discordUser.username);
 	} catch (err) {
 		console.error('[Discord CB] profile_fetch error:', err);
 		redirect(303, errorRedirect + 'profile_fetch');
@@ -72,11 +65,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			avatarUrl
 		});
 
-		console.log('[Discord CB] player sessionId set, redirecting to /join');
 		cookies.set('player_auth', sessionId, {
 			path: '/',
 			httpOnly: true,
-			sameSite: 'strict',
+			sameSite: 'lax',
 			maxAge: 60 * 60 * 24 * 30,
 			secure: false
 		});
@@ -93,11 +85,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			lastName: nameParts.slice(1).join(' ') ?? ''
 		});
 
-		console.log('[Discord CB] DM sessionId set, redirecting to /dashboard');
 		cookies.set('dm_auth', sessionId, {
 			path: '/',
 			httpOnly: true,
-			sameSite: 'strict',
+			sameSite: 'lax',
 			maxAge: 60 * 60 * 24 * 30,
 			secure: false
 		});

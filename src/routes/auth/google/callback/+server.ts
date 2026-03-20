@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	cookies.set('dm_auth', sessionId, {
 		path: '/',
 		httpOnly: true,
-		sameSite: 'strict',
+		sameSite: 'lax',
 		maxAge: 60 * 60 * 24 * 30,
 		secure: false
 	});
