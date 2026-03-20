@@ -155,7 +155,7 @@ export async function loginDM(
 // OAuth — find-or-create a DM account via a third-party provider.
 // ---------------------------------------------------------------------------
 export interface OAuthProfile {
-	provider: 'google' | 'facebook';
+	provider: 'google' | 'facebook' | 'discord';
 	providerId: string; // stable user ID from the provider
 	email: string | null;
 	firstName: string;

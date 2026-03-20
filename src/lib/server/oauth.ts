@@ -2,13 +2,16 @@
 // Env vars required:
 //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 //   FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET
+//   DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
 //   OAUTH_REDIRECT_BASE  (e.g. https://inittracker.com or http://localhost:5173)
-import { Google, Facebook } from 'arctic';
+import { Google, Facebook, Discord } from 'arctic';
 import {
 	GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET,
 	FACEBOOK_CLIENT_ID,
 	FACEBOOK_CLIENT_SECRET,
+	DISCORD_CLIENT_ID,
+	DISCORD_CLIENT_SECRET,
 	OAUTH_REDIRECT_BASE
 } from '$env/static/private';
 
@@ -33,4 +36,20 @@ export const facebook = new Facebook(
 	FACEBOOK_CLIENT_ID,
 	FACEBOOK_CLIENT_SECRET,
 	`${base}/auth/facebook/callback`
+);
+
+// Discord OAuth for DM accounts.
+// Add https://yourdomain.com/auth/discord/callback to your Discord app's redirect URIs.
+export const discord = new Discord(
+	DISCORD_CLIENT_ID,
+	DISCORD_CLIENT_SECRET,
+	`${base}/auth/discord/callback`
+);
+
+// Separate Discord instance for player accounts — different callback URL.
+// Add https://yourdomain.com/auth/player/discord/callback to your Discord app's redirect URIs.
+export const discordPlayer = new Discord(
+	DISCORD_CLIENT_ID,
+	DISCORD_CLIENT_SECRET,
+	`${base}/auth/player/discord/callback`
 );
