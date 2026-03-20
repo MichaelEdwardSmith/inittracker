@@ -6,14 +6,9 @@
 //   • Any other Accept (no query param)        → returns a JSON snapshot for DM page refresh.
 import type { RequestHandler } from './$types';
 import type { StorageState } from '$lib/types';
-import {
-	saveCombatState,
-	getCombatState,
-	getDMByGameSessionId,
-	getActiveGameSessionPublicId
-} from '$lib/server/dmModel';
+import { saveCombatState, getCombatState, getDMByGameSessionId } from '$lib/server/dmModel';
 import { isValidSessionId, validateStorageState } from '$lib/server/validate';
-import { authToGameSession } from '$lib/server/sessionCache';
+import { resolveGameSessionId } from '$lib/server/sessionCache';
 
 import { sessionStates, sessionClients, broadcastToSession } from '$lib/server/sseState';
 
@@ -24,18 +19,6 @@ function getClients(sessionId: string): Set<ReadableStreamDefaultController<Uint
 		sessionClients.set(sessionId, new Set());
 	}
 	return sessionClients.get(sessionId)!;
-}
-
-/** Resolves the active game session's public ID for a DM auth sessionId.
- *  Uses the shared in-memory cache; falls back to DB on cache miss. */
-async function resolveGameSessionId(authSessionId: string): Promise<string | null> {
-	let gameSessionId = authToGameSession.get(authSessionId) ?? null;
-	if (!gameSessionId) {
-		// Cache miss (e.g. server restart) — fetch from DB and repopulate
-		gameSessionId = await getActiveGameSessionPublicId(authSessionId);
-		if (gameSessionId) authToGameSession.set(authSessionId, gameSessionId);
-	}
-	return gameSessionId;
 }
 
 // ---------------------------------------------------------------------------

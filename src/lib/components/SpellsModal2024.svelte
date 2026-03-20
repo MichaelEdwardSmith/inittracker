@@ -37,9 +37,7 @@
 				allSpells = data.spells;
 				loading = false;
 				if (initialSpell) {
-					const match = allSpells.find(
-						(s) => s.name.toLowerCase() === initialSpell.toLowerCase()
-					);
+					const match = allSpells.find((s) => s.name.toLowerCase() === initialSpell.toLowerCase());
 					if (match) selectedSpell = match;
 				}
 			})
@@ -163,11 +161,15 @@
 			<div class="flex items-center gap-2">
 				<h3 class="text-base font-black tracking-wide text-violet-300">Spell Reference</h3>
 				<span
-					class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-300 ring-1 ring-blue-500/30 uppercase"
+					class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-300 uppercase ring-1 ring-blue-500/30"
 					>2024</span
 				>
 			</div>
-			<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
+			<button
+				onclick={onclose}
+				class="text-gray-500 transition hover:text-white"
+				aria-label="Close"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-5 w-5"
@@ -283,8 +285,7 @@
 						<span>·</span>
 						<span>{capitalize(spell.school)}</span>
 						{#if spell.concentration}
-							<span
-								class="rounded bg-sky-900/50 px-1.5 py-0.5 text-xs font-semibold text-sky-300"
+							<span class="rounded bg-sky-900/50 px-1.5 py-0.5 text-xs font-semibold text-sky-300"
 								>Concentration</span
 							>
 						{/if}

@@ -34,7 +34,9 @@
 	let concentrationCheck = $state<{ id: string; name: string; damage: number; dc: number } | null>(
 		null
 	);
-	let concentrationQueue = $state<Array<{ id: string; name: string; damage: number; dc: number }>>([]);
+	let concentrationQueue = $state<Array<{ id: string; name: string; damage: number; dc: number }>>(
+		[]
+	);
 	let showAoE = $state(false);
 
 	function dequeueConcentration() {
@@ -546,13 +548,31 @@
 								</div>
 							</div>
 							<!-- AC -->
-							<div class="relative flex items-center justify-center" style="width:48px;height:54px;">
-								<svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 w-full h-full">
-									<path d="M24 2 L44 10 L44 28 C44 40 34 50 24 52 C14 50 4 40 4 28 L4 10 Z" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+							<div
+								class="relative flex items-center justify-center"
+								style="width:48px;height:54px;"
+							>
+								<svg
+									viewBox="0 0 48 54"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+									class="absolute inset-0 h-full w-full"
+								>
+									<path
+										d="M24 2 L44 10 L44 28 C44 40 34 50 24 52 C14 50 4 40 4 28 L4 10 Z"
+										fill="#1e293b"
+										stroke="#475569"
+										stroke-width="2"
+									/>
 								</svg>
-								<div class="relative flex flex-col items-center leading-none" style="margin-top:2px;">
-									<span class="text-[9px] font-bold tracking-widest text-gray-400 uppercase">AC</span>
-									<span class="text-lg font-bold text-gray-100 leading-none">{c.ac}</span>
+								<div
+									class="relative flex flex-col items-center leading-none"
+									style="margin-top:2px;"
+								>
+									<span class="text-[9px] font-bold tracking-widest text-gray-400 uppercase"
+										>AC</span
+									>
+									<span class="text-lg leading-none font-bold text-gray-100">{c.ac}</span>
 								</div>
 							</div>
 						</div>

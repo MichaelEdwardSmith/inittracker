@@ -20,7 +20,9 @@
 	<title>Join Session — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 py-10 text-white">
+<div
+	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 py-10 text-white"
+>
 	<div
 		class="pointer-events-none absolute inset-0"
 		style="background: radial-gradient(ellipse 60% 50% at 50% 45%, rgba(59,130,246,0.06) 0%, transparent 70%);"
@@ -38,7 +40,9 @@
 
 		<!-- Logged-in player greeting -->
 		{#if data.player}
-			<div class="mb-4 flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-900/80 px-4 py-3">
+			<div
+				class="mb-4 flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-900/80 px-4 py-3"
+			>
 				{#if data.player.avatarUrl}
 					<img
 						src={data.player.avatarUrl}
@@ -63,7 +67,9 @@
 			<!-- Saved sessions list -->
 			{#if data.sessions.length > 0}
 				<div class="mb-4 rounded-xl border border-gray-800 bg-gray-900/80 shadow-2xl backdrop-blur">
-					<p class="border-b border-gray-800 px-4 py-3 text-xs font-bold tracking-widest text-gray-500 uppercase">
+					<p
+						class="border-b border-gray-800 px-4 py-3 text-xs font-bold tracking-widest text-gray-500 uppercase"
+					>
 						Your Sessions
 					</p>
 					<div class="divide-y divide-gray-800/60">
@@ -74,7 +80,7 @@
 									type="submit"
 									class="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-gray-800/60 active:bg-gray-800"
 								>
-									<div class="flex-1 min-w-0">
+									<div class="min-w-0 flex-1">
 										<p class="truncate text-sm font-semibold text-white">{session.sessionName}</p>
 										<p class="mt-0.5 font-mono text-xs tracking-widest text-gray-500">
 											{session.sessionId}
@@ -102,7 +108,14 @@
 								onclick={() => (newSessionOpen = true)}
 								class="flex w-full items-center justify-center gap-2 text-xs text-gray-500 transition hover:text-gray-300"
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 								</svg>
 								Join a different session
@@ -168,7 +181,6 @@
 					</form>
 				</div>
 			{/if}
-
 		{:else}
 			<!-- Guest flow — plain session ID entry + sign-in options -->
 			<div class="rounded-xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl backdrop-blur">
@@ -248,7 +260,8 @@
 						Have an email account?
 						<a href="/player/login" class="text-gray-400 transition hover:text-white">Sign in</a>
 						·
-						<a href="/player/register" class="text-gray-400 transition hover:text-white">Register</a>
+						<a href="/player/register" class="text-gray-400 transition hover:text-white">Register</a
+						>
 					</p>
 				</div>
 			</div>

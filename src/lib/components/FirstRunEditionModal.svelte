@@ -51,9 +51,7 @@
 	aria-modal="true"
 	aria-labelledby="edition-modal-title"
 >
-	<div
-		class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
-	>
+	<div class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<!-- Header -->
 		<div class="border-b border-gray-700 px-6 py-5 text-center">
 			<div class="mb-2 text-4xl">⚔️</div>
@@ -90,8 +88,17 @@
 				</ul>
 				{#if selected === '2014'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-amber-400">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-							<path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
+								clip-rule="evenodd"
+							/>
 						</svg>
 						Selected
 					</div>
@@ -117,8 +124,17 @@
 				</ul>
 				{#if selected === '2024'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-blue-400">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-							<path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
+								clip-rule="evenodd"
+							/>
 						</svg>
 						Selected
 					</div>
@@ -131,8 +147,8 @@
 			<div
 				class="mb-4 rounded-lg border border-orange-800/40 bg-orange-950/20 px-4 py-2.5 text-xs text-orange-200"
 			>
-				<strong class="text-white">This choice is permanent.</strong> It cannot be changed after
-				confirming. You can always create a new session with a different edition.
+				<strong class="text-white">This choice is permanent.</strong> It cannot be changed after confirming.
+				You can always create a new session with a different edition.
 			</div>
 
 			{#if error}
@@ -151,7 +167,11 @@
 						? 'bg-amber-600 text-gray-950 hover:bg-amber-500'
 						: 'bg-gray-700 text-gray-400'}"
 			>
-				{saving ? 'Saving…' : selected ? `Confirm — ${selected === '2024' ? 'D&D 2024' : 'D&D 5e (2014)'}` : 'Select an Edition'}
+				{saving
+					? 'Saving…'
+					: selected
+						? `Confirm — ${selected === '2024' ? 'D&D 2024' : 'D&D 5e (2014)'}`
+						: 'Select an Edition'}
 			</button>
 		</div>
 	</div>

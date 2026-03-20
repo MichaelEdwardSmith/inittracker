@@ -238,7 +238,11 @@
 					<div class="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-gray-400">
 						<span>Max HP: <span class="text-white">{ddbPreview.maxHp}</span></span>
 						<span>AC: <span class="text-white">{ddbPreview.ac}</span></span>
-						<span>DEX: <span class="text-white">{ddbPreview.dexMod >= 0 ? '+' : ''}{ddbPreview.dexMod}</span></span>
+						<span
+							>DEX: <span class="text-white"
+								>{ddbPreview.dexMod >= 0 ? '+' : ''}{ddbPreview.dexMod}</span
+							></span
+						>
 						<span>Passive: <span class="text-white">{ddbPreview.passivePerception}</span></span>
 					</div>
 				</div>
@@ -255,66 +259,75 @@
 
 	<!-- Manual add form -->
 	{#if activeTab === 'manual'}
-	<form
-		onsubmit={(e) => {
-			e.preventDefault();
-			addPlayer();
-		}}
-		class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3"
-	>
-		<input
-			bind:value={name}
-			placeholder="Player name"
-			class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
-		/>
-		<div class="flex gap-2">
-			<label class="flex flex-1 flex-col gap-1">
-				<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class">AC</span>
-				<input
-					type="number"
-					bind:value={ac}
-					min="1"
-					max="30"
-					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-				/>
-			</label>
-			<label class="flex flex-1 flex-col gap-1">
-				<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP">HP</span>
-				<input
-					type="number"
-					bind:value={hp}
-					min="1"
-					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-				/>
-			</label>
-			<label class="flex flex-1 flex-col gap-1">
-				<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier">DEX</span>
-				<input
-					type="number"
-					bind:value={dexMod}
-					min="-10"
-					max="10"
-					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-				/>
-			</label>
-			<label class="flex flex-1 flex-col gap-1">
-				<span class="cursor-help text-xs text-gray-400" title="This is your player's Passive Perception">Passive</span>
-				<input
-					type="number"
-					bind:value={passivePerception}
-					min="1"
-					max="30"
-					class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-				/>
-			</label>
-		</div>
-		<button
-			type="submit"
-			class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				addPlayer();
+			}}
+			class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3"
 		>
-			+ Add Player
-		</button>
-	</form>
+			<input
+				bind:value={name}
+				placeholder="Player name"
+				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+			/>
+			<div class="flex gap-2">
+				<label class="flex flex-1 flex-col gap-1">
+					<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class"
+						>AC</span
+					>
+					<input
+						type="number"
+						bind:value={ac}
+						min="1"
+						max="30"
+						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+					/>
+				</label>
+				<label class="flex flex-1 flex-col gap-1">
+					<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP"
+						>HP</span
+					>
+					<input
+						type="number"
+						bind:value={hp}
+						min="1"
+						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+					/>
+				</label>
+				<label class="flex flex-1 flex-col gap-1">
+					<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier"
+						>DEX</span
+					>
+					<input
+						type="number"
+						bind:value={dexMod}
+						min="-10"
+						max="10"
+						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+					/>
+				</label>
+				<label class="flex flex-1 flex-col gap-1">
+					<span
+						class="cursor-help text-xs text-gray-400"
+						title="This is your player's Passive Perception">Passive</span
+					>
+					<input
+						type="number"
+						bind:value={passivePerception}
+						min="1"
+						max="30"
+						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+					/>
+				</label>
+			</div>
+			<button
+				type="submit"
+				class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
+			>
+				+ Add Player
+			</button>
+		</form>
 	{/if}
 
 	<!-- Player list -->
@@ -328,7 +341,10 @@
 					/>
 					<div class="flex gap-2">
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class">AC</span>
+							<span
+								class="cursor-help text-xs text-gray-400"
+								title="This is your player's Armor Class">AC</span
+							>
 							<input
 								type="number"
 								bind:value={editAc}
@@ -338,7 +354,9 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP">HP</span>
+							<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP"
+								>HP</span
+							>
 							<input
 								type="number"
 								bind:value={editHp}
@@ -347,7 +365,10 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier">DEX</span>
+							<span
+								class="cursor-help text-xs text-gray-400"
+								title="This is your player's DEX Modifier">DEX</span
+							>
 							<input
 								type="number"
 								bind:value={editDexMod}
@@ -357,7 +378,10 @@
 							/>
 						</label>
 						<label class="flex flex-1 flex-col gap-1">
-							<span class="cursor-help text-xs text-gray-400" title="This is your player's Passive Perception">Passive</span>
+							<span
+								class="cursor-help text-xs text-gray-400"
+								title="This is your player's Passive Perception">Passive</span
+							>
 							<input
 								type="number"
 								bind:value={editPassivePerception}
@@ -439,8 +463,19 @@
 						</div>
 						{#if presences[player.id]}
 							<div class="mt-0.5 flex items-center gap-1 text-xs text-blue-400">
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3 w-3 shrink-0"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									/>
 								</svg>
 								{presences[player.id]}
 							</div>

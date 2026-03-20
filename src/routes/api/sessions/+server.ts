@@ -15,6 +15,7 @@ import {
 	setSessionRuleset
 } from '$lib/server/dmModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
+import { sessionStates, sessionClients, guestHistory } from '$lib/server/sseState';
 
 // ---------------------------------------------------------------------------
 // GET /api/sessions — list all game sessions for the authenticated DM
@@ -70,10 +71,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 					status: result.error === 'Cannot delete the last session' ? 400 : 404
 				});
 			}
-			// If the deleted session was the cached active one, clear the cache entry
-			// so the next request re-resolves from DB.
+			// Clear auth→session cache so next request re-resolves from DB.
 			authToGameSession.delete(authSessionId);
 			authToRuleset.delete(authSessionId);
+			// Clean up in-memory SSE state for the deleted session.
+			if (result.deletedPublicId) {
+				sessionStates.delete(result.deletedPublicId);
+				sessionClients.delete(result.deletedPublicId);
+				guestHistory.delete(result.deletedPublicId);
+			}
 			return new Response(null, { status: 200 });
 		}
 

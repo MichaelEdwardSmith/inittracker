@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		setPresence(sessionId, characterId, player.displayName);
 	} else {
 		// characterId: null means the player cleared their selection
-		for (const [cid, name] of (Object.entries(getPresence(sessionId)) as [string, string][])) {
+		for (const [cid, name] of Object.entries(getPresence(sessionId)) as [string, string][]) {
 			if (name === player.displayName) clearPresence(sessionId, cid);
 		}
 	}

@@ -88,7 +88,11 @@ function createCombatStore() {
 			if (delta < 0 && c.tempHp > 0) {
 				const absorbed = Math.min(c.tempHp, -delta);
 				const spill = -delta - absorbed;
-				updated = { ...c, tempHp: c.tempHp - absorbed, currentHp: Math.max(0, c.currentHp - spill) };
+				updated = {
+					...c,
+					tempHp: c.tempHp - absorbed,
+					currentHp: Math.max(0, c.currentHp - spill)
+				};
 			} else {
 				updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
 			}
@@ -408,9 +412,10 @@ function createCombatStore() {
 
 		/** Apply multiple updates in a single sync. */
 		batchUpdate(updates: Array<{ id: string; changes: Partial<Combatant> }>) {
+			const updateMap = new Map(updates.map((u) => [u.id, u.changes]));
 			combatants = combatants.map((c) => {
-				const u = updates.find((upd) => upd.id === c.id);
-				return u ? { ...c, ...u.changes } : c;
+				const changes = updateMap.get(c.id);
+				return changes ? { ...c, ...changes } : c;
 			});
 			sync();
 		},

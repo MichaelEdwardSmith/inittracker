@@ -34,10 +34,9 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		picture?: string;
 	};
 
-	const displayName =
-		claims.given_name
-			? `${claims.given_name}${claims.family_name ? ' ' + claims.family_name : ''}`
-			: (claims.name ?? 'Player');
+	const displayName = claims.given_name
+		? `${claims.given_name}${claims.family_name ? ' ' + claims.family_name : ''}`
+		: (claims.name ?? 'Player');
 
 	const { sessionId } = await findOrCreatePlayerByOAuth({
 		providerId: claims.sub,

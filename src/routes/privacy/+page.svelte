@@ -6,19 +6,21 @@
 	<div class="mx-auto max-w-3xl px-6 py-16">
 		<!-- Header -->
 		<div class="mb-12">
-			<a href="/" class="mb-8 inline-block text-sm text-gray-500 transition hover:text-gray-400">← Back to home</a>
+			<a href="/" class="mb-8 inline-block text-sm text-gray-500 transition hover:text-gray-400"
+				>← Back to home</a
+			>
 			<h1 class="text-3xl font-black tracking-wide text-amber-400">Privacy Policy</h1>
 			<p class="mt-2 text-sm text-gray-500">Last updated: March 14, 2026</p>
 		</div>
 
 		<div class="space-y-10 text-gray-300">
-
 			<section>
 				<h2 class="mb-3 text-lg font-bold text-white">Overview</h2>
 				<p class="text-sm leading-relaxed">
 					Initiative Tracker ("we", "us", or "our") is a web application designed to help Dungeon
-					Masters run D&amp;D 5e combat encounters. This policy explains what information we collect,
-					how we use it, and your rights regarding that information. We do not sell your data to anyone.
+					Masters run D&amp;D 5e combat encounters. This policy explains what information we
+					collect, how we use it, and your rights regarding that information. We do not sell your
+					data to anyone.
 				</p>
 			</section>
 
@@ -26,24 +28,23 @@
 				<h2 class="mb-3 text-lg font-bold text-white">Information We Collect</h2>
 				<ul class="space-y-3 text-sm leading-relaxed">
 					<li>
-						<span class="font-semibold text-gray-200">Account information.</span> When you register,
-						we store your first name, last name, email address, and a hashed (bcrypt) version of your
-						password. We never store your password in plain text.
+						<span class="font-semibold text-gray-200">Account information.</span> When you register, we
+						store your first name, last name, email address, and a hashed (bcrypt) version of your password.
+						We never store your password in plain text.
 					</li>
 					<li>
-						<span class="font-semibold text-gray-200">OAuth sign-in.</span> If you sign in with
-						Google or Facebook, we receive your name, email address, and a unique identifier from that
-						provider. We do not receive or store your social media password.
+						<span class="font-semibold text-gray-200">OAuth sign-in.</span> If you sign in with Google
+						or Facebook, we receive your name, email address, and a unique identifier from that provider.
+						We do not receive or store your social media password.
 					</li>
 					<li>
-						<span class="font-semibold text-gray-200">Combat and session data.</span> We store the
-						combat state, combat history, session notes, and custom monsters you create within the
-						app. This data is associated with your account and is used solely to provide the service.
+						<span class="font-semibold text-gray-200">Combat and session data.</span> We store the combat
+						state, combat history, session notes, and custom monsters you create within the app. This
+						data is associated with your account and is used solely to provide the service.
 					</li>
 					<li>
-						<span class="font-semibold text-gray-200">Player messages.</span> Messages sent from
-						players to the DM during a session are stored temporarily and associated with your game
-						session.
+						<span class="font-semibold text-gray-200">Player messages.</span> Messages sent from players
+						to the DM during a session are stored temporarily and associated with your game session.
 					</li>
 				</ul>
 			</section>
@@ -52,9 +53,9 @@
 				<h2 class="mb-3 text-lg font-bold text-white">Cookies</h2>
 				<ul class="space-y-3 text-sm leading-relaxed">
 					<li>
-						<span class="font-semibold text-gray-200">dm_auth.</span> A session cookie set when you
-						log in. It holds a random identifier (not your password) used to authenticate your
-						requests. It expires after 30 days.
+						<span class="font-semibold text-gray-200">dm_auth.</span> A session cookie set when you log
+						in. It holds a random identifier (not your password) used to authenticate your requests. It
+						expires after 30 days.
 					</li>
 					<li>
 						<span class="font-semibold text-gray-200">dm_guest.</span> A temporary session cookie set
@@ -62,8 +63,8 @@
 					</li>
 					<li>
 						<span class="font-semibold text-gray-200">oauth_state / oauth_code_verifier.</span>
-						Short-lived cookies (10 minutes) used during the OAuth sign-in flow to prevent
-						cross-site request forgery. They are deleted immediately after sign-in completes.
+						Short-lived cookies (10 minutes) used during the OAuth sign-in flow to prevent cross-site
+						request forgery. They are deleted immediately after sign-in completes.
 					</li>
 				</ul>
 				<p class="mt-3 text-sm leading-relaxed">
@@ -73,7 +74,7 @@
 
 			<section>
 				<h2 class="mb-3 text-lg font-bold text-white">How We Use Your Information</h2>
-				<ul class="space-y-2 text-sm leading-relaxed list-disc list-inside">
+				<ul class="list-inside list-disc space-y-2 text-sm leading-relaxed">
 					<li>To create and manage your account.</li>
 					<li>To save and restore your combat sessions and history.</li>
 					<li>To authenticate your identity on each visit.</li>
@@ -90,15 +91,15 @@
 				<p class="text-sm leading-relaxed">
 					We do not sell, rent, or share your personal information with third parties, except:
 				</p>
-				<ul class="mt-3 space-y-2 text-sm leading-relaxed list-disc list-inside">
+				<ul class="mt-3 list-inside list-disc space-y-2 text-sm leading-relaxed">
 					<li>
-						<span class="font-semibold text-gray-200">Google / Facebook</span> — only during the
-						OAuth sign-in flow, as required to authenticate you. Their use of your data is governed
-						by their own privacy policies.
+						<span class="font-semibold text-gray-200">Google / Facebook</span> — only during the OAuth
+						sign-in flow, as required to authenticate you. Their use of your data is governed by their
+						own privacy policies.
 					</li>
 					<li>
-						<span class="font-semibold text-gray-200">Legal obligations</span> — if required by law
-						or to protect the rights and safety of our users.
+						<span class="font-semibold text-gray-200">Legal obligations</span> — if required by law or
+						to protect the rights and safety of our users.
 					</li>
 				</ul>
 			</section>
@@ -106,18 +107,18 @@
 			<section>
 				<h2 class="mb-3 text-lg font-bold text-white">Data Retention</h2>
 				<p class="text-sm leading-relaxed">
-					Your account and associated data are retained for as long as your account is active. If you
-					wish to delete your account and all associated data, contact us at the email below and we
-					will process the request within 30 days.
+					Your account and associated data are retained for as long as your account is active. If
+					you wish to delete your account and all associated data, contact us at the email below and
+					we will process the request within 30 days.
 				</p>
 			</section>
 
 			<section>
 				<h2 class="mb-3 text-lg font-bold text-white">Security</h2>
 				<p class="text-sm leading-relaxed">
-					Passwords are hashed with bcrypt before storage. Authentication tokens are random,
-					opaque identifiers with no user-readable information. We use HttpOnly cookies to
-					prevent client-side script access to session tokens.
+					Passwords are hashed with bcrypt before storage. Authentication tokens are random, opaque
+					identifiers with no user-readable information. We use HttpOnly cookies to prevent
+					client-side script access to session tokens.
 				</p>
 			</section>
 
@@ -143,12 +144,14 @@
 				<h2 class="mb-3 text-lg font-bold text-white">Contact</h2>
 				<p class="text-sm leading-relaxed">
 					Questions about this policy or requests to delete your data:
-					<a href="mailto:dm@inittracker.com" class="text-amber-500 transition hover:text-amber-400">
+					<a
+						href="mailto:dm@inittracker.com"
+						class="text-amber-500 transition hover:text-amber-400"
+					>
 						dm@inittracker.com
 					</a>
 				</p>
 			</section>
-
 		</div>
 	</div>
 </div>

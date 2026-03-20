@@ -189,7 +189,8 @@
 	async function openDungeon() {
 		showDungeon = true;
 		if (!DungeonGeneratorModalComp)
-			DungeonGeneratorModalComp = (await import('$lib/components/DungeonGeneratorModal.svelte')).default;
+			DungeonGeneratorModalComp = (await import('$lib/components/DungeonGeneratorModal.svelte'))
+				.default;
 	}
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
@@ -203,7 +204,9 @@
 		try {
 			const res = await fetch(`/api/player-presence?session=${activeSession.sessionId}`);
 			if (res.ok) presences = await res.json();
-		} catch { /* silent */ }
+		} catch {
+			/* silent */
+		}
 	}
 
 	$effect(() => {
@@ -316,9 +319,12 @@
 			duration: 3.5 + Math.random() * 1.5
 		};
 		floatingEmojis = [...floatingEmojis, item];
-		setTimeout(() => {
-			floatingEmojis = floatingEmojis.filter((e) => e.id !== item.id);
-		}, (item.duration + 0.5) * 1000);
+		setTimeout(
+			() => {
+				floatingEmojis = floatingEmojis.filter((e) => e.id !== item.id);
+			},
+			(item.duration + 0.5) * 1000
+		);
 	}
 
 	$effect(() => {
@@ -334,7 +340,9 @@
 						spawnFloatingEmoji(reaction.emoji, reaction.from);
 					}
 				}
-			} catch { /* ignore */ }
+			} catch {
+				/* ignore */
+			}
 		}, 2500);
 		return () => clearInterval(interval);
 	});
@@ -1153,17 +1161,17 @@
 
 {#if showQuickRules && QuickRulesModalComp}
 	{@const QuickRules = QuickRulesModalComp}
-	<QuickRules
-		onclose={() => (showQuickRules = false)}
-		ruleset={activeSession.ruleset}
-	/>
+	<QuickRules onclose={() => (showQuickRules = false)} ruleset={activeSession.ruleset} />
 {/if}
 
 {#if showGenerators && GeneratorsModalComp}
 	{@const Generators = GeneratorsModalComp}
 	<Generators
 		onclose={() => (showGenerators = false)}
-		onOpenDungeon={() => { showGenerators = false; openDungeon(); }}
+		onOpenDungeon={() => {
+			showGenerators = false;
+			openDungeon();
+		}}
 		onAddEncounter={(monsters) => {
 			combat.clearEnemies();
 			for (const m of monsters) {
@@ -1190,7 +1198,9 @@
 			onclose={() => (showDungeon = false)}
 			onAddEncounter={(monsters) => {
 				for (const m of monsters) {
-					const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
+					const template = ENEMY_TEMPLATES.find(
+						(t) => t.name.toLowerCase() === m.name.toLowerCase()
+					);
 					if (template) {
 						combat.addEnemies(template, m.count);
 					} else {
@@ -1223,13 +1233,34 @@
 		transform-origin: center bottom;
 	}
 	@keyframes float-up {
-		0%   { transform: translateY(0)     translateX(0px)   scale(0.4); opacity: 0; }
-		8%   { transform: translateY(-6vh)  translateX(12px)  scale(1.2); opacity: 1; }
-		25%  { transform: translateY(-25vh) translateX(-18px) scale(1);   opacity: 1; }
-		50%  { transform: translateY(-50vh) translateX(22px)  scale(1);   opacity: 1; }
-		70%  { transform: translateY(-70vh) translateX(-14px) scale(1);   opacity: 0.8; }
-		88%  { transform: translateY(-84vh) translateX(10px)  scale(0.9); opacity: 0.3; }
-		100% { transform: translateY(-95vh) translateX(0px)   scale(0.7); opacity: 0; }
+		0% {
+			transform: translateY(0) translateX(0px) scale(0.4);
+			opacity: 0;
+		}
+		8% {
+			transform: translateY(-6vh) translateX(12px) scale(1.2);
+			opacity: 1;
+		}
+		25% {
+			transform: translateY(-25vh) translateX(-18px) scale(1);
+			opacity: 1;
+		}
+		50% {
+			transform: translateY(-50vh) translateX(22px) scale(1);
+			opacity: 1;
+		}
+		70% {
+			transform: translateY(-70vh) translateX(-14px) scale(1);
+			opacity: 0.8;
+		}
+		88% {
+			transform: translateY(-84vh) translateX(10px) scale(0.9);
+			opacity: 0.3;
+		}
+		100% {
+			transform: translateY(-95vh) translateX(0px) scale(0.7);
+			opacity: 0;
+		}
 	}
 
 	.bg-orb {
@@ -1238,49 +1269,87 @@
 		filter: blur(90px);
 	}
 	.orb-1 {
-		width: min(65vw, 700px); height: min(65vw, 700px);
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
 		background: rgba(88, 28, 135, 0.45);
-		top: -15%; left: -12%;
+		top: -15%;
+		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
-		width: min(55vw, 620px); height: min(55vw, 620px);
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
 		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%; right: -10%;
+		bottom: -18%;
+		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
-		width: min(45vw, 520px); height: min(45vw, 520px);
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
 		background: rgba(120, 53, 15, 0.35);
-		top: 35%; left: 42%;
+		top: 35%;
+		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
-		width: min(38vw, 440px); height: min(38vw, 440px);
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
 		background: rgba(49, 46, 129, 0.4);
-		top: 15%; right: 18%;
+		top: 15%;
+		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 </style>

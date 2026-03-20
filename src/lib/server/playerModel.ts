@@ -56,7 +56,10 @@ export async function findOrCreatePlayerByOAuth(profile: {
 	if (player) {
 		// Keep avatar fresh from Google
 		if (profile.avatarUrl && profile.avatarUrl !== player.avatarUrl) {
-			await c.updateOne({ sessionId: player.sessionId }, { $set: { avatarUrl: profile.avatarUrl } });
+			await c.updateOne(
+				{ sessionId: player.sessionId },
+				{ $set: { avatarUrl: profile.avatarUrl } }
+			);
 		}
 		return { sessionId: player.sessionId };
 	}
@@ -140,7 +143,12 @@ export async function recordPlayerSession(
 	if (existing) {
 		await c.updateOne(
 			{ sessionId: playerSessionId, 'joinedSessions.sessionId': gameSessionId },
-			{ $set: { 'joinedSessions.$.sessionName': sessionName, 'joinedSessions.$.lastSeen': new Date() } }
+			{
+				$set: {
+					'joinedSessions.$.sessionName': sessionName,
+					'joinedSessions.$.lastSeen': new Date()
+				}
+			}
 		);
 	} else {
 		await c.updateOne(
@@ -181,10 +189,7 @@ export async function createPlayerNote(
 ): Promise<NoteEntry> {
 	const c = await col();
 	const note: NoteEntry = { id: randomUUID(), date: new Date().toISOString(), content };
-	await c.updateOne(
-		{ sessionId: playerSessionId },
-		{ $push: { notes: note } as never }
-	);
+	await c.updateOne({ sessionId: playerSessionId }, { $push: { notes: note } as never });
 	return note;
 }
 
@@ -204,10 +209,7 @@ export async function updatePlayerNote(
 }
 
 /** Deletes a note by id. */
-export async function deletePlayerNote(
-	playerSessionId: string,
-	noteId: string
-): Promise<void> {
+export async function deletePlayerNote(playerSessionId: string, noteId: string): Promise<void> {
 	const c = await col();
 	const player = await c.findOne({ sessionId: playerSessionId });
 	if (!player) return;

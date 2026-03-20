@@ -129,7 +129,12 @@
 				viewBox="0 0 24 24"
 				stroke="currentColor"
 			>
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M6 18L18 6M6 6l12 12"
+				/>
 			</svg>
 		</a>
 	</header>
@@ -242,7 +247,9 @@
 					<!-- 2014 card -->
 					<div class="rounded-lg border border-amber-800/50 bg-amber-950/20 p-4">
 						<p class="mb-1 text-sm font-black tracking-wide text-amber-400">D&D 5e (2014)</p>
-						<p class="mb-3 text-xs text-gray-400 italic">Player's Handbook · Monster Manual · DMG</p>
+						<p class="mb-3 text-xs text-gray-400 italic">
+							Player's Handbook · Monster Manual · DMG
+						</p>
 						<ul class="space-y-1 text-xs text-gray-300">
 							<li>• Original 2014 Monster Manual bestiary</li>
 							<li>• Classic spell list (PHB / XGE / TCE)</li>
@@ -356,7 +363,8 @@
 					Adding a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					The Player Panel has two tabs: <strong class="font-semibold text-white">Manual</strong> and
+					The Player Panel has two tabs: <strong class="font-semibold text-white">Manual</strong>
+					and
 					<strong class="font-semibold text-white">D&amp;D Beyond</strong>. Click a tab to switch
 					between them.
 				</p>
@@ -374,13 +382,12 @@
 				<p class="mb-3 text-sm leading-relaxed">
 					If your players have characters on D&amp;D Beyond, you can import them directly instead of
 					entering stats by hand. The character sheet must be set to
-					<strong class="font-semibold text-white">Public</strong> in D&amp;D Beyond's Character
-					Settings.
+					<strong class="font-semibold text-white">Public</strong> in D&amp;D Beyond's Character Settings.
 				</p>
 				<ol class="mb-4 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
 					<li>
-						Click the <strong class="font-semibold text-white">D&amp;D Beyond</strong> tab in the
-						Player Panel
+						Click the <strong class="font-semibold text-white">D&amp;D Beyond</strong> tab in the Player
+						Panel
 					</li>
 					<li>
 						Paste a character URL (e.g.
@@ -389,12 +396,12 @@
 						>) or just the numeric character ID
 					</li>
 					<li>
-						Click <strong class="font-semibold text-white">Fetch</strong> — the tracker contacts
-						D&amp;D Beyond and parses the sheet
+						Click <strong class="font-semibold text-white">Fetch</strong> — the tracker contacts D&amp;D
+						Beyond and parses the sheet
 					</li>
 					<li>
-						A preview card appears with the imported values: <strong class="font-semibold text-white"
-							>Name</strong
+						A preview card appears with the imported values: <strong
+							class="font-semibold text-white">Name</strong
 						>, <strong class="font-semibold text-white">Max HP</strong>,
 						<strong class="font-semibold text-white">AC</strong>,
 						<strong class="font-semibold text-white">DEX modifier</strong>, and
@@ -407,8 +414,8 @@
 				</ol>
 				<p class="mb-4 text-sm leading-relaxed">
 					The character's D&amp;D Beyond portrait is imported automatically and set as their avatar.
-					Both 2014 and 2024 ruleset characters are supported — 2024 initiative proficiency is applied
-					to the DEX modifier automatically.
+					Both 2014 and 2024 ruleset characters are supported — 2024 initiative proficiency is
+					applied to the DEX modifier automatically.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1259,8 +1266,8 @@
 					calculated from each <strong class="font-semibold text-white"
 						>slain enemy's Challenge Rating</strong
 					>
-					using the standard D&amp;D 5e XP-by-CR table. Expand a record to see the full breakdown —
-					each slain enemy listed with its CR and XP value, a total, and an
+					using the standard D&amp;D 5e XP-by-CR table. Expand a record to see the full breakdown — each
+					slain enemy listed with its CR and XP value, a total, and an
 					<strong class="font-semibold text-white">even split per player</strong> if your party is listed.
 				</p>
 
@@ -2140,9 +2147,9 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">🗺 Dungeon</strong> button in the DM
 					header to open the Random Dungeon Generator. Configure your options and click
-					<strong class="font-semibold text-white">Generate Dungeon</strong> to produce a complete
-					tile-based dungeon map with level-appropriate encounters, trapped doors, loot, and optional
-					multi-floor stairs.
+					<strong class="font-semibold text-white">Generate Dungeon</strong> to produce a complete tile-based
+					dungeon map with level-appropriate encounters, trapped doors, loot, and optional multi-floor
+					stairs.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -2157,18 +2164,12 @@
 							'Dungeon Size',
 							'Small, Medium, or Large — controls the overall grid size and room count'
 						],
-						[
-							'Difficulty',
-							'Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier'
-						],
+						['Difficulty', 'Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier'],
 						[
 							'Include Boss',
 							'Toggle on to guarantee a boss room with a harder encounter at the end'
 						],
-						[
-							'Floors',
-							'1–5 floors; each floor is generated independently and connected by stairs'
-						]
+						['Floors', '1–5 floors; each floor is generated independently and connected by stairs']
 					]
 				)}
 
@@ -2179,9 +2180,9 @@
 					</h3>
 					<p class="mb-3 text-sm leading-relaxed">
 						The map is a tile-based top-down grid. Use the
-						<strong class="font-semibold text-white">− / +</strong> zoom controls in the top-right
-						corner to scale the view. On smaller screens the map scrolls both horizontally and
-						vertically. A north-pointing compass appears in the top-left corner.
+						<strong class="font-semibold text-white">− / +</strong> zoom controls in the top-right corner
+						to scale the view. On smaller screens the map scrolls both horizontally and vertically. A
+						north-pointing compass appears in the top-left corner.
 					</p>
 					{@render dataTable(
 						['Visual', 'Meaning'],
@@ -2197,8 +2198,8 @@
 					)}
 					<p class="mt-3 text-sm leading-relaxed">
 						<strong class="font-semibold text-white">Room labels</strong> appear inside each room:
-						the entrance is marked <em>Entrance</em>, the boss room is marked <em>Boss</em>, and
-						all other rooms receive a themed name (e.g. <em>Crypt of Shadows</em>,
+						the entrance is marked <em>Entrance</em>, the boss room is marked <em>Boss</em>, and all
+						other rooms receive a themed name (e.g. <em>Crypt of Shadows</em>,
 						<em>Guard Post</em>).
 					</p>
 				</section>
@@ -2224,10 +2225,10 @@
 					</h3>
 					<p class="mb-3 text-sm leading-relaxed">
 						Approximately <strong class="font-semibold text-white">25% of doors</strong> are
-						randomly trapped. They are drawn with a <strong class="font-semibold text-white"
-							>red frame</strong
-						> and a white <strong class="font-semibold text-white">!</strong> in the center. Click a
-						trapped door to open the Trap modal:
+						randomly trapped. They are drawn with a
+						<strong class="font-semibold text-white">red frame</strong>
+						and a white <strong class="font-semibold text-white">!</strong> in the center. Click a trapped
+						door to open the Trap modal:
 					</p>
 					{@render dataTable(
 						['Field', 'Description'],
@@ -2242,19 +2243,17 @@
 
 				<!-- Loot -->
 				<section id="dungeon-loot">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Loot
-					</h3>
+					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Loot</h3>
 					<p class="mb-3 text-sm leading-relaxed">
 						<strong class="font-semibold text-white">25% of non-entrance rooms</strong> contain a
 						<strong class="font-semibold text-white">💰 moneybag icon</strong> in the room's bottom-right
-						inner corner. Click it to open the Loot modal showing a level-appropriate coin total and
-						0–2 items from the appropriate tier:
+						inner corner. Click it to open the Loot modal showing a level-appropriate coin total and 0–2
+						items from the appropriate tier:
 					</p>
 					{@render dataTable(
 						['Party Level', 'Loot Tier', 'Example Items'],
 						[
-							['1–4', 'Common', 'Healing Potion, Thieves\' Tools, Torch Bundle'],
+							['1–4', 'Common', "Healing Potion, Thieves' Tools, Torch Bundle"],
 							['5–10', 'Uncommon', 'Bag of Holding, Cloak of Protection, Sending Stones'],
 							['11–16', 'Rare', 'Ring of Evasion, Staff of Fire, Carpet of Flying'],
 							['17–20', 'Very Rare', 'Cloak of Invisibility, Manual of Bodily Health']
@@ -2268,9 +2267,9 @@
 						Multiple Floors
 					</h3>
 					<p class="mb-3 text-sm leading-relaxed">
-						When <strong class="font-semibold text-white">Floors</strong> is set to 2 or more, each
-						floor is generated independently and linked by staircases. Stair icons are placed in the
-						corner of their room:
+						When <strong class="font-semibold text-white">Floors</strong> is set to 2 or more, each floor
+						is generated independently and linked by staircases. Stair icons are placed in the corner
+						of their room:
 					</p>
 					{@render dataTable(
 						['Icon', 'Meaning'],
@@ -2288,9 +2287,9 @@
 						corner next to the zoom controls — select any floor directly from the list.
 					</p>
 					<p class="mt-3 text-sm leading-relaxed">
-						<strong class="font-semibold text-white">Floor 1</strong> is the ground floor (entry
-						level). Higher numbers go deeper underground — Floor 2 is one level below Floor 1,
-						Floor 3 is one level below Floor 2, and so on.
+						<strong class="font-semibold text-white">Floor 1</strong> is the ground floor (entry level).
+						Higher numbers go deeper underground — Floor 2 is one level below Floor 1, Floor 3 is one
+						level below Floor 2, and so on.
 					</p>
 				</section>
 			</section>
@@ -2305,49 +2304,87 @@
 		filter: blur(90px);
 	}
 	.orb-1 {
-		width: min(65vw, 700px); height: min(65vw, 700px);
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
 		background: rgba(88, 28, 135, 0.45);
-		top: -15%; left: -12%;
+		top: -15%;
+		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
-		width: min(55vw, 620px); height: min(55vw, 620px);
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
 		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%; right: -10%;
+		bottom: -18%;
+		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
-		width: min(45vw, 520px); height: min(45vw, 520px);
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
 		background: rgba(120, 53, 15, 0.35);
-		top: 35%; left: 42%;
+		top: 35%;
+		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
-		width: min(38vw, 440px); height: min(38vw, 440px);
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
 		background: rgba(49, 46, 129, 0.4);
-		top: 15%; right: 18%;
+		top: 15%;
+		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 </style>

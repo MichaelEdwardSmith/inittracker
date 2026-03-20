@@ -69,19 +69,32 @@
 			<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">
 				Player Messages
 				{#if messages.length > 0}
-					<span class="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-xs font-semibold text-gray-400"
+					<span
+						class="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-xs font-semibold text-gray-400"
 						>{messages.length}</span
 					>
 				{/if}
 			</h2>
 			<div class="flex items-center gap-2">
 				<button
-					onclick={() => { showCompose = !showCompose; replyOpenId = null; }}
+					onclick={() => {
+						showCompose = !showCompose;
+						replyOpenId = null;
+					}}
 					title="Send a message to a player"
 					class="flex items-center gap-1.5 rounded px-2 py-1 text-xs transition
-						{showCompose ? 'bg-blue-900/50 text-blue-300' : 'text-gray-500 hover:bg-gray-800 hover:text-blue-300'}"
+						{showCompose
+						? 'bg-blue-900/50 text-blue-300'
+						: 'text-gray-500 hover:bg-gray-800 hover:text-blue-300'}"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3.5 w-3.5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 					</svg>
 					New Message
@@ -90,11 +103,27 @@
 					<button
 						onclick={onclear}
 						class="rounded px-2 py-1 text-xs text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
-					>Clear all</button>
+						>Clear all</button
+					>
 				{/if}
-				<button onclick={onclose} aria-label="Close" class="text-gray-600 transition hover:text-gray-300">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				<button
+					onclick={onclose}
+					aria-label="Close"
+					class="text-gray-600 transition hover:text-gray-300"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -125,21 +154,47 @@
 				></textarea>
 				<div class="mt-2 flex justify-end gap-2">
 					<button
-						onclick={() => { showCompose = false; composeText = ''; }}
+						onclick={() => {
+							showCompose = false;
+							composeText = '';
+						}}
 						class="rounded px-3 py-1.5 text-xs text-gray-500 transition hover:text-gray-300"
-					>Cancel</button>
+						>Cancel</button
+					>
 					<button
 						onclick={sendCompose}
 						disabled={composeSending || !composeText.trim()}
 						class="flex items-center gap-1.5 rounded-lg bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-40"
 					>
 						{#if composeSending}
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5 animate-spin"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+								/>
 							</svg>
 						{:else}
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+								/>
 							</svg>
 						{/if}
 						Send
@@ -152,8 +207,19 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if messages.length === 0}
 				<div class="flex flex-col items-center justify-center gap-2 py-16 text-center">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-10 w-10 text-gray-700"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="1.5"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/>
 					</svg>
 					<p class="text-sm text-gray-600">No messages yet</p>
 				</div>
@@ -166,12 +232,13 @@
 								<div class="flex items-center gap-2">
 									<span class="text-xs text-gray-600">{formatTime(msg.timestamp)}</span>
 									<button
-										onclick={() => replyOpenId === msg.id ? replyOpenId = null : openReply(msg.id, msg.from)}
+										onclick={() =>
+											replyOpenId === msg.id ? (replyOpenId = null) : openReply(msg.id, msg.from)}
 										class="rounded px-2 py-0.5 text-xs transition
 											{replyOpenId === msg.id
-												? 'bg-blue-900/50 text-blue-300'
-												: 'text-gray-600 hover:bg-gray-800 hover:text-blue-300'}"
-									>Reply</button>
+											? 'bg-blue-900/50 text-blue-300'
+											: 'text-gray-600 hover:bg-gray-800 hover:text-blue-300'}">Reply</button
+									>
 								</div>
 							</div>
 							<p class="mt-1 text-sm leading-relaxed text-gray-300">{msg.text}</p>
@@ -190,17 +257,32 @@
 									></textarea>
 									<div class="mt-2 flex justify-end gap-2">
 										<button
-											onclick={() => { replyOpenId = null; replyText = ''; }}
+											onclick={() => {
+												replyOpenId = null;
+												replyText = '';
+											}}
 											class="rounded px-2 py-1 text-xs text-gray-500 transition hover:text-gray-300"
-										>Cancel</button>
+											>Cancel</button
+										>
 										<button
 											onclick={() => sendReply(msg.from)}
 											disabled={replySending || !replyText.trim()}
 											class="flex items-center gap-1.5 rounded bg-blue-700 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-40"
 										>
 											{#if replySending}
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-3 w-3 animate-spin"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+													/>
 												</svg>
 											{:else}
 												Send

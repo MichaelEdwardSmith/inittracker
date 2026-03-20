@@ -114,9 +114,15 @@
 		{:else}
 			<div class="flex flex-col gap-5 px-5 py-5">
 				{#if preselectedId}
-					<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-2.5">
-						<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Rolling for</span>
-						<span class="ml-auto text-sm font-semibold text-white">{initSelectedPlayer?.name ?? ''}</span>
+					<div
+						class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-2.5"
+					>
+						<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
+							>Rolling for</span
+						>
+						<span class="ml-auto text-sm font-semibold text-white"
+							>{initSelectedPlayer?.name ?? ''}</span
+						>
 					</div>
 				{:else}
 					<div class="flex flex-col gap-1.5">

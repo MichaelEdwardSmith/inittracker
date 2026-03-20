@@ -1,1 +1,2522 @@
-[{"name":"Aarakocra Aeromancer","ac":16,"hp":66,"cr":"4","monsterType":"Elemental","dexMod":3},{"name":"Aarakocra Skirmisher","ac":12,"hp":11,"cr":"1/4","monsterType":"Elemental","dexMod":2},{"name":"Aberrant Cultist","ac":14,"hp":137,"cr":"8","monsterType":"or Small Humanoid","dexMod":4},{"name":"Aboleth","ac":17,"hp":150,"cr":"10","monsterType":"Aberration","dexMod":-1},{"name":"Abominable Yeti","ac":15,"hp":137,"cr":"9","monsterType":"Monstrosity","dexMod":0},{"name":"Adult Black Dragon","ac":19,"hp":195,"cr":"14","monsterType":"Dragon (Chromatic)","dexMod":2},{"name":"Adult Blue Dragon","ac":19,"hp":212,"cr":"16","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Adult Brass Dragon","ac":18,"hp":172,"cr":"13","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Adult Bronze Dragon","ac":18,"hp":212,"cr":"15","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Adult Copper Dragon","ac":18,"hp":184,"cr":"14","monsterType":"Dragon (Metallic)","dexMod":1},{"name":"Adult Gold Dragon","ac":19,"hp":243,"cr":"17","monsterType":"Dragon (Metallic)","dexMod":2},{"name":"Adult Green Dragon","ac":19,"hp":207,"cr":"15","monsterType":"Dragon (Chromatic)","dexMod":1},{"name":"Adult Red Dragon","ac":19,"hp":256,"cr":"17","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Adult Silver Dragon","ac":19,"hp":216,"cr":"16","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Adult White Dragon","ac":18,"hp":200,"cr":"13","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Air Elemental","ac":15,"hp":90,"cr":"5","monsterType":"Elemental","dexMod":5},{"name":"Allosaurus","ac":13,"hp":51,"cr":"2","monsterType":"Beast (Dinosaur)","dexMod":1},{"name":"Ancient Black Dragon","ac":22,"hp":367,"cr":"21","monsterType":"Dragon (Chromatic)","dexMod":2},{"name":"Ancient Blue Dragon","ac":22,"hp":481,"cr":"23","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Ancient Brass Dragon","ac":20,"hp":332,"cr":"20","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Ancient Bronze Dragon","ac":22,"hp":444,"cr":"22","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Ancient Copper Dragon","ac":21,"hp":367,"cr":"21","monsterType":"Dragon (Metallic)","dexMod":1},{"name":"Ancient Gold Dragon","ac":22,"hp":546,"cr":"24","monsterType":"Dragon (Metallic)","dexMod":2},{"name":"Ancient Green Dragon","ac":21,"hp":402,"cr":"22","monsterType":"Dragon (Chromatic)","dexMod":1},{"name":"Ancient Red Dragon","ac":22,"hp":507,"cr":"24","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Ancient Silver Dragon","ac":22,"hp":468,"cr":"23","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Ancient White Dragon","ac":20,"hp":333,"cr":"20","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Animal Lord","ac":19,"hp":323,"cr":"20","monsterType":"Celestial","dexMod":7},{"name":"Animated Armor","ac":18,"hp":33,"cr":"1","monsterType":"Construct","dexMod":0},{"name":"Animated Broom","ac":15,"hp":14,"cr":"1/4","monsterType":"Construct","dexMod":3},{"name":"Animated Flying Sword","ac":17,"hp":14,"cr":"1/4","monsterType":"Construct","dexMod":2},{"name":"Animated Rug of Smothering","ac":12,"hp":27,"cr":"2","monsterType":"Construct","dexMod":2},{"name":"Ankheg","ac":14,"hp":45,"cr":"2","monsterType":"Monstrosity","dexMod":0},{"name":"Ankylosaurus","ac":15,"hp":68,"cr":"3","monsterType":"Beast (Dinosaur)","dexMod":0},{"name":"Ape","ac":12,"hp":19,"cr":"1/2","monsterType":"Beast","dexMod":2},{"name":"Arcanaloth","ac":18,"hp":175,"cr":"12","monsterType":"Fiend (Yugoloth)","dexMod":1},{"name":"Arch-hag","ac":20,"hp":333,"cr":"21","monsterType":"Fey","dexMod":2},{"name":"Archelon","ac":17,"hp":90,"cr":"4","monsterType":"Beast (Dinosaur)","dexMod":3},{"name":"Archmage","ac":17,"hp":170,"cr":"12","monsterType":"or Small Humanoid (Wizard)","dexMod":2},{"name":"Archpriest","ac":16,"hp":240,"cr":"12","monsterType":"or Small Humanoid (Cleric)","dexMod":1},{"name":"Assassin","ac":16,"hp":97,"cr":"8","monsterType":"or Small Humanoid","dexMod":4},{"name":"Awakened Shrub","ac":9,"hp":10,"cr":"0","monsterType":"Plant","dexMod":-1},{"name":"Awakened Tree","ac":13,"hp":59,"cr":"2","monsterType":"Plant","dexMod":-2},{"name":"Axe Beak","ac":11,"hp":19,"cr":"1/4","monsterType":"Monstrosity","dexMod":1},{"name":"Azer Pyromancer","ac":18,"hp":97,"cr":"6","monsterType":"Elemental","dexMod":2},{"name":"Azer Sentinel","ac":17,"hp":39,"cr":"2","monsterType":"Elemental","dexMod":1},{"name":"Baboon","ac":12,"hp":3,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Badger","ac":11,"hp":5,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Balor","ac":19,"hp":287,"cr":"19","monsterType":"Fiend (Demon)","dexMod":2},{"name":"Bandit","ac":12,"hp":11,"cr":"1/8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Bandit Captain","ac":15,"hp":52,"cr":"2","monsterType":"or Small Humanoid","dexMod":3},{"name":"Bandit Crime Lord","ac":17,"hp":169,"cr":"11","monsterType":"or Small Humanoid","dexMod":5},{"name":"Bandit Deceiver","ac":16,"hp":130,"cr":"7","monsterType":"or Small Humanoid","dexMod":3},{"name":"Banshee","ac":12,"hp":54,"cr":"4","monsterType":"Undead","dexMod":2},{"name":"Barbed Devil","ac":15,"hp":110,"cr":"5","monsterType":"Fiend (Devil)","dexMod":3},{"name":"Barlgura","ac":15,"hp":85,"cr":"5","monsterType":"Fiend (Demon)","dexMod":2},{"name":"Basilisk","ac":15,"hp":52,"cr":"3","monsterType":"Monstrosity","dexMod":-1},{"name":"Bat","ac":12,"hp":1,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Bearded Devil","ac":13,"hp":58,"cr":"3","monsterType":"Fiend (Devil)","dexMod":2},{"name":"Behir","ac":17,"hp":168,"cr":"11","monsterType":"Monstrosity","dexMod":3},{"name":"Beholder","ac":18,"hp":190,"cr":"13","monsterType":"Aberration","dexMod":2},{"name":"Beholder Zombie","ac":15,"hp":93,"cr":"5","monsterType":"Undead","dexMod":-1},{"name":"Berserker","ac":13,"hp":67,"cr":"2","monsterType":"or Small Humanoid","dexMod":1},{"name":"Berserker Commander","ac":16,"hp":136,"cr":"8","monsterType":"or Small Humanoid","dexMod":2},{"name":"Black Bear","ac":11,"hp":19,"cr":"1/2","monsterType":"Beast","dexMod":1},{"name":"Black Dragon Wyrmling","ac":17,"hp":33,"cr":"2","monsterType":"Dragon (Chromatic)","dexMod":2},{"name":"Black Pudding","ac":7,"hp":68,"cr":"4","monsterType":"Ooze","dexMod":-3},{"name":"Blink Dog","ac":13,"hp":16,"cr":"1/4","monsterType":"Fey","dexMod":3},{"name":"Blob of Annihilation","ac":18,"hp":448,"cr":"23","monsterType":"Ooze (Titan)","dexMod":2},{"name":"Blood Hawk","ac":12,"hp":7,"cr":"1/8","monsterType":"Beast","dexMod":2},{"name":"Blue Dragon Wyrmling","ac":17,"hp":65,"cr":"3","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Blue Slaad","ac":15,"hp":133,"cr":"7","monsterType":"Aberration","dexMod":2},{"name":"Boar","ac":11,"hp":13,"cr":"1/4","monsterType":"Beast","dexMod":0},{"name":"Bone Devil","ac":16,"hp":161,"cr":"9","monsterType":"Fiend (Devil)","dexMod":3},{"name":"Bone Naga","ac":15,"hp":65,"cr":"4","monsterType":"Undead","dexMod":3},{"name":"Brass Dragon Wyrmling","ac":15,"hp":22,"cr":"1","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Brazen Gorgon","ac":19,"hp":161,"cr":"9","monsterType":"Construct","dexMod":2},{"name":"Bronze Dragon Wyrmling","ac":15,"hp":39,"cr":"2","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Brown Bear","ac":11,"hp":22,"cr":"1","monsterType":"Beast","dexMod":1},{"name":"Bugbear Stalker","ac":15,"hp":65,"cr":"3","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Bugbear Warrior","ac":14,"hp":33,"cr":"1","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Bulette","ac":17,"hp":94,"cr":"5","monsterType":"Monstrosity","dexMod":0},{"name":"Bulette Pup","ac":16,"hp":45,"cr":"2","monsterType":"Monstrosity","dexMod":-1},{"name":"Bullywug Bog Sage","ac":16,"hp":52,"cr":"4","monsterType":"Fey","dexMod":3},{"name":"Bullywug Warrior","ac":15,"hp":11,"cr":"1/4","monsterType":"Fey","dexMod":2},{"name":"Cambion","ac":19,"hp":105,"cr":"5","monsterType":"Fiend","dexMod":4},{"name":"Camel","ac":10,"hp":17,"cr":"1/8","monsterType":"Beast","dexMod":0},{"name":"Carrion Crawler","ac":13,"hp":51,"cr":"2","monsterType":"Monstrosity","dexMod":1},{"name":"Cat","ac":12,"hp":2,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Centaur Trooper","ac":16,"hp":45,"cr":"2","monsterType":"Fey","dexMod":2},{"name":"Centaur Warden","ac":16,"hp":105,"cr":"7","monsterType":"Fey","dexMod":2},{"name":"Chain Devil","ac":15,"hp":85,"cr":"8","monsterType":"Fiend (Devil)","dexMod":2},{"name":"Chasme","ac":15,"hp":78,"cr":"6","monsterType":"Fiend (Demon)","dexMod":2},{"name":"Chimera","ac":14,"hp":114,"cr":"6","monsterType":"Monstrosity","dexMod":0},{"name":"Chuul","ac":16,"hp":76,"cr":"4","monsterType":"Aberration","dexMod":0},{"name":"Clay Golem","ac":14,"hp":123,"cr":"9","monsterType":"Construct","dexMod":-1},{"name":"Cloaker","ac":14,"hp":91,"cr":"8","monsterType":"Aberration","dexMod":2},{"name":"Cloud Giant","ac":14,"hp":200,"cr":"9","monsterType":"Giant","dexMod":0},{"name":"Cockatrice","ac":11,"hp":22,"cr":"1/2","monsterType":"Monstrosity","dexMod":1},{"name":"Cockatrice Regent","ac":15,"hp":136,"cr":"8","monsterType":"Monstrosity","dexMod":2},{"name":"Colossus","ac":23,"hp":553,"cr":"25","monsterType":"Construct (Titan)","dexMod":0},{"name":"Commoner","ac":10,"hp":4,"cr":"0","monsterType":"or Small Humanoid","dexMod":0},{"name":"Constrictor Snake","ac":13,"hp":13,"cr":"1/4","monsterType":"Beast","dexMod":2},{"name":"Copper Dragon Wyrmling","ac":16,"hp":22,"cr":"1","monsterType":"Dragon (Metallic)","dexMod":1},{"name":"Couatl","ac":19,"hp":60,"cr":"4","monsterType":"Celestial","dexMod":5},{"name":"Crab","ac":11,"hp":3,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Crawling Claw","ac":12,"hp":2,"cr":"0","monsterType":"Undead","dexMod":2},{"name":"Crocodile","ac":12,"hp":13,"cr":"1/2","monsterType":"Beast","dexMod":0},{"name":"Cultist","ac":12,"hp":9,"cr":"1/8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Cultist Fanatic","ac":13,"hp":44,"cr":"2","monsterType":"or Small Humanoid","dexMod":2},{"name":"Cultist Hierophant","ac":16,"hp":144,"cr":"10","monsterType":"or Small Humanoid","dexMod":4},{"name":"Cyclops Oracle","ac":16,"hp":207,"cr":"10","monsterType":"Giant","dexMod":0},{"name":"Cyclops Sentry","ac":14,"hp":138,"cr":"6","monsterType":"Giant","dexMod":0},{"name":"Dao","ac":18,"hp":200,"cr":"11","monsterType":"Elemental (Genie)","dexMod":1},{"name":"Darkmantle","ac":11,"hp":22,"cr":"1/2","monsterType":"Aberration","dexMod":1},{"name":"Death Cultist","ac":17,"hp":127,"cr":"8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Death Dog","ac":12,"hp":39,"cr":"1","monsterType":"Monstrosity","dexMod":2},{"name":"Death Knight","ac":20,"hp":199,"cr":"17","monsterType":"or Small Undead","dexMod":0},{"name":"Death Knight Aspirant","ac":20,"hp":178,"cr":"11","monsterType":"or Small Undead","dexMod":0},{"name":"Death Slaad","ac":18,"hp":178,"cr":"10","monsterType":"Aberration","dexMod":2},{"name":"Death Tyrant","ac":19,"hp":195,"cr":"14","monsterType":"Undead (Beholder)","dexMod":2},{"name":"Deer","ac":13,"hp":4,"cr":"0","monsterType":"Beast","dexMod":3},{"name":"Demilich","ac":20,"hp":180,"cr":"18","monsterType":"Undead","dexMod":5},{"name":"Deva","ac":17,"hp":229,"cr":"10","monsterType":"Celestial (Angel)","dexMod":4},{"name":"Dire Wolf","ac":14,"hp":22,"cr":"1","monsterType":"Beast","dexMod":2},{"name":"Dire Worg","ac":16,"hp":147,"cr":"10","monsterType":"Fey","dexMod":2},{"name":"Displacer Beast","ac":13,"hp":76,"cr":"3","monsterType":"Monstrosity","dexMod":2},{"name":"Djinni","ac":17,"hp":218,"cr":"11","monsterType":"Elemental (Genie)","dexMod":2},{"name":"Doppelganger","ac":14,"hp":52,"cr":"3","monsterType":"Monstrosity","dexMod":4},{"name":"Dracolich","ac":20,"hp":225,"cr":"17","monsterType":"or Gargantuan Undead","dexMod":0},{"name":"Draft Horse","ac":10,"hp":15,"cr":"1/4","monsterType":"Beast","dexMod":0},{"name":"Dragon Turtle","ac":20,"hp":356,"cr":"17","monsterType":"Dragon","dexMod":0},{"name":"Dretch","ac":11,"hp":18,"cr":"1/4","monsterType":"Fiend (Demon)","dexMod":0},{"name":"Drider","ac":19,"hp":123,"cr":"6","monsterType":"Monstrosity","dexMod":4},{"name":"Druid","ac":13,"hp":44,"cr":"2","monsterType":"or Small Humanoid","dexMod":1},{"name":"Dryad","ac":16,"hp":22,"cr":"1","monsterType":"Fey","dexMod":1},{"name":"Dust Mephit","ac":12,"hp":17,"cr":"1/2","monsterType":"Elemental","dexMod":2},{"name":"Eagle","ac":12,"hp":4,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Earth Elemental","ac":17,"hp":147,"cr":"5","monsterType":"Elemental","dexMod":-1},{"name":"Efreeti","ac":17,"hp":212,"cr":"11","monsterType":"Elemental (Genie)","dexMod":1},{"name":"Elemental Cataclysm","ac":20,"hp":370,"cr":"22","monsterType":"Elemental (Titan)","dexMod":4},{"name":"Elemental Cultist","ac":16,"hp":135,"cr":"8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Elephant","ac":12,"hp":76,"cr":"4","monsterType":"Beast","dexMod":0},{"name":"Elk","ac":10,"hp":11,"cr":"1/4","monsterType":"Beast","dexMod":0},{"name":"Empyrean","ac":22,"hp":346,"cr":"23","monsterType":"Celestial or Fiend (Titan)","dexMod":5},{"name":"Empyrean Iota","ac":13,"hp":22,"cr":"1","monsterType":"Celestial or Fiend (Titan)","dexMod":2},{"name":"Erinyes","ac":18,"hp":178,"cr":"12","monsterType":"Fiend (Devil)","dexMod":3},{"name":"Ettercap","ac":13,"hp":44,"cr":"2","monsterType":"Monstrosity","dexMod":2},{"name":"Ettin","ac":12,"hp":85,"cr":"4","monsterType":"Giant","dexMod":-1},{"name":"Faerie Dragon Adult","ac":15,"hp":35,"cr":"2","monsterType":"Dragon","dexMod":5},{"name":"Faerie Dragon Youth","ac":13,"hp":21,"cr":"1","monsterType":"Dragon","dexMod":3},{"name":"Fiend Cultist","ac":16,"hp":127,"cr":"8","monsterType":"or Small Humanoid","dexMod":2},{"name":"Fire Elemental","ac":13,"hp":93,"cr":"5","monsterType":"Elemental","dexMod":3},{"name":"Fire Giant","ac":18,"hp":162,"cr":"9","monsterType":"Giant","dexMod":-1},{"name":"Flameskull","ac":13,"hp":40,"cr":"4","monsterType":"Undead","dexMod":3},{"name":"Flaming Skeleton","ac":15,"hp":65,"cr":"3","monsterType":"Undead","dexMod":2},{"name":"Flesh Golem","ac":9,"hp":127,"cr":"5","monsterType":"Construct","dexMod":-1},{"name":"Flumph","ac":12,"hp":7,"cr":"1/8","monsterType":"Aberration","dexMod":2},{"name":"Flying Snake","ac":14,"hp":5,"cr":"1/8","monsterType":"Monstrosity","dexMod":2},{"name":"Fomorian","ac":14,"hp":172,"cr":"8","monsterType":"Giant","dexMod":0},{"name":"Frog","ac":11,"hp":1,"cr":"0","monsterType":"Beast","dexMod":1},{"name":"Frost Giant","ac":15,"hp":149,"cr":"8","monsterType":"Giant","dexMod":-1},{"name":"Galeb Duhr","ac":16,"hp":123,"cr":"6","monsterType":"Elemental","dexMod":2},{"name":"Gargoyle","ac":15,"hp":67,"cr":"2","monsterType":"Elemental","dexMod":0},{"name":"Gas Spore Fungus","ac":8,"hp":13,"cr":"1/2","monsterType":"Plant","dexMod":-5},{"name":"Gelatinous Cube","ac":6,"hp":63,"cr":"2","monsterType":"Ooze","dexMod":-4},{"name":"Ghast","ac":13,"hp":36,"cr":"2","monsterType":"Undead","dexMod":3},{"name":"Ghast Gravecaller","ac":16,"hp":97,"cr":"6","monsterType":"Undead","dexMod":3},{"name":"Ghost","ac":11,"hp":45,"cr":"4","monsterType":"Undead","dexMod":1},{"name":"Ghoul","ac":12,"hp":22,"cr":"1","monsterType":"Undead","dexMod":2},{"name":"Giant Ape","ac":12,"hp":168,"cr":"7","monsterType":"Beast","dexMod":2},{"name":"Giant Axe Beak","ac":15,"hp":84,"cr":"5","monsterType":"Monstrosity","dexMod":2},{"name":"Giant Badger","ac":13,"hp":15,"cr":"1/4","monsterType":"Beast","dexMod":0},{"name":"Giant Bat","ac":13,"hp":22,"cr":"1/4","monsterType":"Beast","dexMod":3},{"name":"Giant Boar","ac":13,"hp":42,"cr":"2","monsterType":"Beast","dexMod":0},{"name":"Giant Centipede","ac":14,"hp":9,"cr":"1/4","monsterType":"Beast","dexMod":2},{"name":"Giant Constrictor Snake","ac":12,"hp":60,"cr":"2","monsterType":"Beast","dexMod":2},{"name":"Giant Crab","ac":15,"hp":13,"cr":"1/8","monsterType":"Beast","dexMod":1},{"name":"Giant Crocodile","ac":14,"hp":85,"cr":"5","monsterType":"Beast","dexMod":-1},{"name":"Giant Eagle","ac":13,"hp":26,"cr":"1","monsterType":"Celestial","dexMod":3},{"name":"Giant Elk","ac":14,"hp":42,"cr":"2","monsterType":"Celestial","dexMod":4},{"name":"Giant Fire Beetle","ac":13,"hp":4,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Giant Frog","ac":11,"hp":18,"cr":"1/4","monsterType":"Beast","dexMod":1},{"name":"Giant Goat","ac":11,"hp":19,"cr":"1/2","monsterType":"Beast","dexMod":1},{"name":"Giant Hyena","ac":12,"hp":45,"cr":"1","monsterType":"Beast","dexMod":2},{"name":"Giant Lizard","ac":12,"hp":19,"cr":"1/4","monsterType":"Beast","dexMod":1},{"name":"Giant Octopus","ac":11,"hp":45,"cr":"1","monsterType":"Beast","dexMod":1},{"name":"Giant Owl","ac":12,"hp":19,"cr":"1/4","monsterType":"Celestial","dexMod":2},{"name":"Giant Rat","ac":13,"hp":7,"cr":"1/8","monsterType":"Beast","dexMod":3},{"name":"Giant Scorpion","ac":15,"hp":52,"cr":"3","monsterType":"Beast","dexMod":1},{"name":"Giant Seahorse","ac":14,"hp":16,"cr":"1/2","monsterType":"Beast","dexMod":1},{"name":"Giant Shark","ac":13,"hp":92,"cr":"5","monsterType":"Beast","dexMod":0},{"name":"Giant Spider","ac":14,"hp":26,"cr":"1","monsterType":"Beast","dexMod":3},{"name":"Giant Squid","ac":12,"hp":120,"cr":"6","monsterType":"Beast","dexMod":2},{"name":"Giant Toad","ac":11,"hp":39,"cr":"1","monsterType":"Beast","dexMod":1},{"name":"Giant Venomous Snake","ac":14,"hp":11,"cr":"1/4","monsterType":"Beast","dexMod":4},{"name":"Giant Vulture","ac":10,"hp":25,"cr":"1","monsterType":"Monstrosity","dexMod":0},{"name":"Giant Wasp","ac":13,"hp":22,"cr":"1/2","monsterType":"Beast","dexMod":2},{"name":"Giant Weasel","ac":13,"hp":9,"cr":"1/8","monsterType":"Beast","dexMod":3},{"name":"Giant Wolf Spider","ac":13,"hp":11,"cr":"1/4","monsterType":"Beast","dexMod":3},{"name":"Gibbering Mouther","ac":9,"hp":52,"cr":"2","monsterType":"Aberration","dexMod":-1},{"name":"Githyanki Dracomancer","ac":18,"hp":255,"cr":"16","monsterType":"Aberration (Gith)","dexMod":3},{"name":"Githyanki Knight","ac":18,"hp":117,"cr":"8","monsterType":"Aberration (Gith)","dexMod":2},{"name":"Githyanki Warrior","ac":17,"hp":49,"cr":"3","monsterType":"Aberration (Gith)","dexMod":2},{"name":"Githzerai Monk","ac":14,"hp":38,"cr":"2","monsterType":"Aberration (Gith)","dexMod":2},{"name":"Githzerai Psion","ac":18,"hp":169,"cr":"12","monsterType":"Aberration (Gith)","dexMod":4},{"name":"Githzerai Zerth","ac":17,"hp":84,"cr":"6","monsterType":"Aberration (Gith)","dexMod":4},{"name":"Glabrezu","ac":17,"hp":189,"cr":"9","monsterType":"Fiend (Demon)","dexMod":2},{"name":"Gladiator","ac":16,"hp":112,"cr":"5","monsterType":"or Small Humanoid","dexMod":2},{"name":"Gnoll Demoniac","ac":16,"hp":135,"cr":"8","monsterType":"Fiend","dexMod":1},{"name":"Gnoll Fang of Yeenoghu","ac":14,"hp":71,"cr":"4","monsterType":"Fiend","dexMod":2},{"name":"Gnoll Pack Lord","ac":15,"hp":49,"cr":"2","monsterType":"Fiend","dexMod":2},{"name":"Gnoll Warrior","ac":15,"hp":27,"cr":"1/2","monsterType":"Fiend","dexMod":1},{"name":"Goat","ac":10,"hp":4,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Goblin Boss","ac":17,"hp":21,"cr":"1","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Goblin Hexer","ac":13,"hp":45,"cr":"3","monsterType":"Fey (Goblinoid)","dexMod":3},{"name":"Goblin Minion","ac":12,"hp":7,"cr":"1/8","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Goblin Warrior","ac":15,"hp":10,"cr":"1/4","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Gold Dragon Wyrmling","ac":17,"hp":60,"cr":"3","monsterType":"Dragon (Metallic)","dexMod":2},{"name":"Gorgon","ac":19,"hp":114,"cr":"5","monsterType":"Construct","dexMod":0},{"name":"Goristro","ac":19,"hp":310,"cr":"17","monsterType":"Fiend (Demon)","dexMod":0},{"name":"Graveyard Revenant","ac":14,"hp":161,"cr":"7","monsterType":"Undead","dexMod":2},{"name":"Gray Ooze","ac":9,"hp":22,"cr":"1/2","monsterType":"Ooze","dexMod":-2},{"name":"Gray Slaad","ac":18,"hp":150,"cr":"9","monsterType":"Aberration","dexMod":3},{"name":"Green Dragon Wyrmling","ac":17,"hp":38,"cr":"2","monsterType":"Dragon (Chromatic)","dexMod":1},{"name":"Green Hag","ac":17,"hp":82,"cr":"3","monsterType":"Fey","dexMod":1},{"name":"Green Slaad","ac":16,"hp":144,"cr":"8","monsterType":"Aberration","dexMod":2},{"name":"Grell","ac":12,"hp":55,"cr":"3","monsterType":"Aberration","dexMod":2},{"name":"Grick","ac":14,"hp":54,"cr":"2","monsterType":"Aberration","dexMod":2},{"name":"Grick Ancient","ac":18,"hp":135,"cr":"7","monsterType":"Aberration","dexMod":3},{"name":"Griffon","ac":12,"hp":59,"cr":"2","monsterType":"Monstrosity","dexMod":2},{"name":"Grimlock","ac":11,"hp":11,"cr":"1/4","monsterType":"Aberration","dexMod":1},{"name":"Guard","ac":16,"hp":11,"cr":"1/8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Guard Captain","ac":18,"hp":75,"cr":"4","monsterType":"or Small Humanoid","dexMod":2},{"name":"Guardian Naga","ac":18,"hp":136,"cr":"10","monsterType":"Celestial","dexMod":4},{"name":"Gulthias Blight","ac":20,"hp":264,"cr":"16","monsterType":"Plant","dexMod":0},{"name":"Half-Dragon","ac":18,"hp":105,"cr":"5","monsterType":"Dragon","dexMod":2},{"name":"Harpy","ac":11,"hp":38,"cr":"1","monsterType":"Monstrosity","dexMod":1},{"name":"Haunting Revenant","ac":20,"hp":203,"cr":"10","monsterType":"Undead","dexMod":1},{"name":"Hawk","ac":13,"hp":1,"cr":"0","monsterType":"Beast","dexMod":3},{"name":"Hell Hound","ac":15,"hp":58,"cr":"3","monsterType":"Fiend","dexMod":1},{"name":"Helmed Horror","ac":20,"hp":67,"cr":"4","monsterType":"Construct","dexMod":1},{"name":"Hezrou","ac":18,"hp":157,"cr":"8","monsterType":"Fiend (Demon)","dexMod":3},{"name":"Hill Giant","ac":13,"hp":105,"cr":"5","monsterType":"Giant","dexMod":-1},{"name":"Hippogriff","ac":11,"hp":26,"cr":"1","monsterType":"Monstrosity","dexMod":1},{"name":"Hippopotamus","ac":14,"hp":82,"cr":"4","monsterType":"Beast","dexMod":-2},{"name":"Hobgoblin Captain","ac":17,"hp":58,"cr":"3","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Hobgoblin Warlord","ac":20,"hp":112,"cr":"6","monsterType":"Fey (Goblinoid)","dexMod":2},{"name":"Hobgoblin Warrior","ac":18,"hp":11,"cr":"1/2","monsterType":"Fey (Goblinoid)","dexMod":1},{"name":"Homunculus","ac":13,"hp":4,"cr":"0","monsterType":"Construct","dexMod":2},{"name":"Hook Horror","ac":15,"hp":75,"cr":"3","monsterType":"Monstrosity","dexMod":0},{"name":"Horned Devil","ac":18,"hp":199,"cr":"11","monsterType":"Fiend (Devil)","dexMod":3},{"name":"Hunter Shark","ac":12,"hp":45,"cr":"2","monsterType":"Beast","dexMod":2},{"name":"Hydra","ac":15,"hp":184,"cr":"8","monsterType":"Monstrosity","dexMod":1},{"name":"Hyena","ac":11,"hp":5,"cr":"0","monsterType":"Beast","dexMod":1},{"name":"Ice Devil","ac":18,"hp":228,"cr":"14","monsterType":"Fiend (Devil)","dexMod":2},{"name":"Ice Mephit","ac":11,"hp":21,"cr":"1/2","monsterType":"Elemental","dexMod":1},{"name":"Imp","ac":13,"hp":21,"cr":"1","monsterType":"Fiend (Devil)","dexMod":3},{"name":"Incubus","ac":15,"hp":66,"cr":"4","monsterType":"Fiend","dexMod":3},{"name":"Intellect Devourer","ac":12,"hp":28,"cr":"2","monsterType":"Aberration","dexMod":2},{"name":"Invisible Stalker","ac":14,"hp":97,"cr":"6","monsterType":"Elemental","dexMod":4},{"name":"Iron Golem","ac":20,"hp":252,"cr":"16","monsterType":"Construct","dexMod":-1},{"name":"Jackal","ac":12,"hp":3,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Jackalwere","ac":12,"hp":18,"cr":"1/2","monsterType":"Fiend","dexMod":2},{"name":"Juvenile Shadow Dragon","ac":15,"hp":45,"cr":"4","monsterType":"Dragon","dexMod":2},{"name":"Kenku","ac":13,"hp":13,"cr":"1/4","monsterType":"Monstrosity","dexMod":3},{"name":"Killer Whale","ac":12,"hp":90,"cr":"3","monsterType":"Beast","dexMod":2},{"name":"Knight","ac":18,"hp":52,"cr":"3","monsterType":"or Small Humanoid","dexMod":0},{"name":"Kobold Warrior","ac":14,"hp":7,"cr":"1/8","monsterType":"Dragon","dexMod":2},{"name":"Kraken","ac":18,"hp":481,"cr":"23","monsterType":"Monstrosity (Titan)","dexMod":0},{"name":"Kuo-toa","ac":13,"hp":18,"cr":"1/4","monsterType":"Aberration","dexMod":0},{"name":"Kuo-toa Archpriest","ac":13,"hp":105,"cr":"6","monsterType":"Aberration","dexMod":2},{"name":"Kuo-toa Monitor","ac":13,"hp":65,"cr":"3","monsterType":"Aberration","dexMod":0},{"name":"Kuo-toa Whip","ac":11,"hp":45,"cr":"1","monsterType":"Aberration","dexMod":0},{"name":"Lacedon Ghoul","ac":12,"hp":22,"cr":"1","monsterType":"Undead","dexMod":2},{"name":"Lamia","ac":13,"hp":97,"cr":"4","monsterType":"Fiend","dexMod":1},{"name":"Larva","ac":9,"hp":9,"cr":"0","monsterType":"Fiend","dexMod":-1},{"name":"Lemure","ac":9,"hp":9,"cr":"0","monsterType":"Fiend (Devil)","dexMod":-3},{"name":"Lich","ac":20,"hp":315,"cr":"21","monsterType":"Undead (Wizard)","dexMod":3},{"name":"Lion","ac":12,"hp":22,"cr":"1","monsterType":"Beast","dexMod":2},{"name":"Lizard","ac":10,"hp":2,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Lizardfolk Geomancer","ac":13,"hp":33,"cr":"2","monsterType":"Elemental","dexMod":0},{"name":"Lizardfolk Sovereign","ac":15,"hp":78,"cr":"4","monsterType":"Elemental","dexMod":1},{"name":"Mage","ac":15,"hp":81,"cr":"6","monsterType":"or Small Humanoid (Wizard)","dexMod":2},{"name":"Mage Apprentice","ac":15,"hp":49,"cr":"2","monsterType":"or Small Humanoid (Wizard)","dexMod":2},{"name":"Magma Mephit","ac":11,"hp":18,"cr":"1/2","monsterType":"Elemental","dexMod":1},{"name":"Magmin","ac":14,"hp":13,"cr":"1/2","monsterType":"Elemental","dexMod":2},{"name":"Mammoth","ac":13,"hp":126,"cr":"6","monsterType":"Beast","dexMod":-1},{"name":"Manes","ac":9,"hp":9,"cr":"1/8","monsterType":"Fiend (Demon)","dexMod":-1},{"name":"Manes Vaporspawn","ac":13,"hp":19,"cr":"1","monsterType":"Fiend (Demon)","dexMod":1},{"name":"Manticore","ac":14,"hp":68,"cr":"3","monsterType":"Monstrosity","dexMod":3},{"name":"Marid","ac":17,"hp":229,"cr":"11","monsterType":"Elemental (Genie)","dexMod":1},{"name":"Marilith","ac":16,"hp":220,"cr":"16","monsterType":"Fiend (Demon)","dexMod":5},{"name":"Mastiff","ac":12,"hp":5,"cr":"1/8","monsterType":"Beast","dexMod":2},{"name":"Medusa","ac":15,"hp":127,"cr":"6","monsterType":"Monstrosity","dexMod":3},{"name":"Merfolk Skirmisher","ac":11,"hp":11,"cr":"1/8","monsterType":"Elemental","dexMod":1},{"name":"Merfolk Wavebender","ac":14,"hp":97,"cr":"6","monsterType":"Elemental","dexMod":4},{"name":"Merrow","ac":13,"hp":45,"cr":"2","monsterType":"Monstrosity","dexMod":2},{"name":"Mezzoloth","ac":18,"hp":75,"cr":"5","monsterType":"Fiend (Yugoloth)","dexMod":0},{"name":"Mimic","ac":12,"hp":58,"cr":"2","monsterType":"Monstrosity","dexMod":1},{"name":"Mind Flayer","ac":15,"hp":99,"cr":"7","monsterType":"Aberration","dexMod":1},{"name":"Mind Flayer Arcanist","ac":16,"hp":143,"cr":"11","monsterType":"Aberration","dexMod":2},{"name":"Minotaur of Baphomet","ac":14,"hp":85,"cr":"3","monsterType":"Monstrosity","dexMod":0},{"name":"Minotaur Skeleton","ac":12,"hp":45,"cr":"2","monsterType":"Undead","dexMod":0},{"name":"Mud Mephit","ac":11,"hp":13,"cr":"1/4","monsterType":"Elemental","dexMod":1},{"name":"Mule","ac":10,"hp":11,"cr":"1/8","monsterType":"Beast","dexMod":0},{"name":"Mummy","ac":11,"hp":58,"cr":"3","monsterType":"or Small Undead","dexMod":-1},{"name":"Mummy Lord","ac":17,"hp":187,"cr":"15","monsterType":"or Small Undead (Cleric)","dexMod":0},{"name":"Myconid Adult","ac":12,"hp":16,"cr":"1/2","monsterType":"Plant","dexMod":0},{"name":"Myconid Sovereign","ac":13,"hp":45,"cr":"2","monsterType":"Plant","dexMod":0},{"name":"Myconid Spore Servant","ac":13,"hp":37,"cr":"1","monsterType":"or Small Plant","dexMod":1},{"name":"Myconid Sprout","ac":10,"hp":3,"cr":"0","monsterType":"Plant","dexMod":0},{"name":"Nalfeshnee","ac":18,"hp":184,"cr":"13","monsterType":"Fiend (Demon)","dexMod":0},{"name":"Needle Blight","ac":12,"hp":16,"cr":"1/4","monsterType":"Plant","dexMod":1},{"name":"Night Hag","ac":17,"hp":112,"cr":"5","monsterType":"Fiend","dexMod":2},{"name":"Nightmare","ac":13,"hp":68,"cr":"3","monsterType":"Fiend","dexMod":2},{"name":"Noble","ac":15,"hp":9,"cr":"1/8","monsterType":"or Small Humanoid","dexMod":1},{"name":"Noble Prodigy","ac":16,"hp":148,"cr":"10","monsterType":"or Small Humanoid","dexMod":3},{"name":"Nothic","ac":15,"hp":45,"cr":"2","monsterType":"Aberration","dexMod":3},{"name":"Nycaloth","ac":18,"hp":152,"cr":"9","monsterType":"Fiend (Yugoloth)","dexMod":0},{"name":"Ochre Jelly","ac":8,"hp":52,"cr":"2","monsterType":"Ooze","dexMod":-2},{"name":"Octopus","ac":12,"hp":3,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Ogre","ac":11,"hp":68,"cr":"2","monsterType":"Giant","dexMod":-1},{"name":"Ogre Zombie","ac":8,"hp":85,"cr":"2","monsterType":"Undead","dexMod":-2},{"name":"Ogrillon Ogre","ac":12,"hp":52,"cr":"1","monsterType":"Giant","dexMod":0},{"name":"Oni","ac":17,"hp":119,"cr":"7","monsterType":"Fiend","dexMod":0},{"name":"Otyugh","ac":14,"hp":104,"cr":"5","monsterType":"Aberration","dexMod":0},{"name":"Owl","ac":11,"hp":1,"cr":"0","monsterType":"Beast","dexMod":1},{"name":"Owlbear","ac":13,"hp":59,"cr":"3","monsterType":"Monstrosity","dexMod":1},{"name":"Panther","ac":13,"hp":13,"cr":"1/4","monsterType":"Beast","dexMod":3},{"name":"Pegasus","ac":12,"hp":59,"cr":"2","monsterType":"Celestial","dexMod":2},{"name":"Performer","ac":13,"hp":27,"cr":"1/2","monsterType":"or Small Humanoid","dexMod":3},{"name":"Performer Legend","ac":20,"hp":162,"cr":"10","monsterType":"or Small Humanoid","dexMod":5},{"name":"Performer Maestro","ac":18,"hp":110,"cr":"6","monsterType":"or Small Humanoid","dexMod":4},{"name":"Peryton","ac":13,"hp":33,"cr":"2","monsterType":"Monstrosity","dexMod":1},{"name":"Phase Spider","ac":14,"hp":45,"cr":"3","monsterType":"Monstrosity","dexMod":3},{"name":"Piercer","ac":15,"hp":22,"cr":"1/2","monsterType":"Aberration","dexMod":1},{"name":"Piranha","ac":13,"hp":1,"cr":"0","monsterType":"Beast","dexMod":3},{"name":"Pirate","ac":14,"hp":33,"cr":"1","monsterType":"or Small Humanoid","dexMod":3},{"name":"Pirate Admiral","ac":20,"hp":182,"cr":"12","monsterType":"or Small Humanoid","dexMod":6},{"name":"Pirate Captain","ac":17,"hp":84,"cr":"6","monsterType":"or Small Humanoid","dexMod":4},{"name":"Pit Fiend","ac":21,"hp":337,"cr":"20","monsterType":"Fiend (Devil)","dexMod":2},{"name":"Pixie","ac":15,"hp":9,"cr":"1/4","monsterType":"Fey","dexMod":5},{"name":"Pixie Wonderbringer","ac":15,"hp":60,"cr":"5","monsterType":"Fey","dexMod":5},{"name":"Planetar","ac":19,"hp":262,"cr":"16","monsterType":"Celestial (Angel)","dexMod":5},{"name":"Plesiosaurus","ac":13,"hp":68,"cr":"2","monsterType":"Beast (Dinosaur)","dexMod":2},{"name":"Polar Bear","ac":12,"hp":42,"cr":"2","monsterType":"Beast","dexMod":2},{"name":"Poltergeist","ac":12,"hp":22,"cr":"2","monsterType":"or Small Undead","dexMod":2},{"name":"Pony","ac":10,"hp":11,"cr":"1/8","monsterType":"Beast","dexMod":0},{"name":"Priest","ac":13,"hp":38,"cr":"2","monsterType":"or Small Humanoid (Cleric)","dexMod":0},{"name":"Priest Acolyte","ac":13,"hp":11,"cr":"1/4","monsterType":"or Small Humanoid (Cleric)","dexMod":0},{"name":"Primeval Owlbear","ac":16,"hp":126,"cr":"7","monsterType":"Monstrosity","dexMod":2},{"name":"Pseudodragon","ac":14,"hp":10,"cr":"1/4","monsterType":"Dragon","dexMod":2},{"name":"Psychic Gray Ooze","ac":9,"hp":37,"cr":"1","monsterType":"Ooze","dexMod":-1},{"name":"Pteranodon","ac":13,"hp":13,"cr":"1/4","monsterType":"Beast (Dinosaur)","dexMod":2},{"name":"Purple Worm","ac":18,"hp":247,"cr":"15","monsterType":"Monstrosity","dexMod":-2},{"name":"Quaggoth","ac":13,"hp":45,"cr":"2","monsterType":"Monstrosity","dexMod":1},{"name":"Quaggoth Thonot","ac":15,"hp":67,"cr":"3","monsterType":"Monstrosity","dexMod":1},{"name":"Quasit","ac":13,"hp":25,"cr":"1","monsterType":"Fiend (Demon)","dexMod":3},{"name":"Questing Knight","ac":18,"hp":202,"cr":"12","monsterType":"or Small Humanoid","dexMod":3},{"name":"Rakshasa","ac":17,"hp":221,"cr":"13","monsterType":"Fiend","dexMod":3},{"name":"Rat","ac":10,"hp":1,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Raven","ac":12,"hp":2,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Red Dragon Wyrmling","ac":17,"hp":75,"cr":"4","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Red Slaad","ac":14,"hp":93,"cr":"5","monsterType":"Aberration","dexMod":1},{"name":"Reef Shark","ac":12,"hp":22,"cr":"1/2","monsterType":"Beast","dexMod":2},{"name":"Remorhaz","ac":17,"hp":195,"cr":"11","monsterType":"Monstrosity","dexMod":1},{"name":"Revenant","ac":13,"hp":127,"cr":"5","monsterType":"Undead","dexMod":2},{"name":"Rhinoceros","ac":13,"hp":45,"cr":"2","monsterType":"Beast","dexMod":-1},{"name":"Riding Horse","ac":11,"hp":13,"cr":"1/4","monsterType":"Beast","dexMod":1},{"name":"Roc","ac":15,"hp":248,"cr":"11","monsterType":"Monstrosity","dexMod":0},{"name":"Roper","ac":20,"hp":93,"cr":"5","monsterType":"Aberration","dexMod":-1},{"name":"Rust Monster","ac":14,"hp":33,"cr":"1/2","monsterType":"Monstrosity","dexMod":1},{"name":"Saber-Toothed Tiger","ac":13,"hp":52,"cr":"2","monsterType":"Beast","dexMod":3},{"name":"Sahuagin Baron","ac":16,"hp":76,"cr":"5","monsterType":"Fiend","dexMod":2},{"name":"Sahuagin Priest","ac":12,"hp":38,"cr":"2","monsterType":"Fiend","dexMod":0},{"name":"Sahuagin Warrior","ac":12,"hp":22,"cr":"1/2","monsterType":"Fiend","dexMod":0},{"name":"Salamander","ac":15,"hp":90,"cr":"5","monsterType":"Elemental","dexMod":2},{"name":"Salamander Fire Snake","ac":14,"hp":27,"cr":"1","monsterType":"Elemental","dexMod":2},{"name":"Salamander Inferno Master","ac":18,"hp":256,"cr":"15","monsterType":"Elemental","dexMod":3},{"name":"Satyr","ac":13,"hp":31,"cr":"1/2","monsterType":"Fey","dexMod":3},{"name":"Satyr Revelmaster","ac":17,"hp":82,"cr":"6","monsterType":"Fey","dexMod":4},{"name":"Scarecrow","ac":11,"hp":27,"cr":"1","monsterType":"Construct","dexMod":1},{"name":"Scorpion","ac":11,"hp":1,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Scout","ac":13,"hp":16,"cr":"1/2","monsterType":"or Small Humanoid","dexMod":2},{"name":"Scout Captain","ac":15,"hp":66,"cr":"3","monsterType":"or Small Humanoid","dexMod":3},{"name":"Sea Hag","ac":14,"hp":52,"cr":"2","monsterType":"Fey","dexMod":1},{"name":"Seahorse","ac":12,"hp":1,"cr":"0","monsterType":"Beast","dexMod":1},{"name":"Shadow","ac":12,"hp":27,"cr":"1/2","monsterType":"Undead","dexMod":2},{"name":"Shadow Dragon","ac":16,"hp":189,"cr":"13","monsterType":"Dragon","dexMod":4},{"name":"Shambling Mound","ac":15,"hp":110,"cr":"5","monsterType":"Plant","dexMod":-1},{"name":"Shield Guardian","ac":17,"hp":142,"cr":"7","monsterType":"Construct","dexMod":-1},{"name":"Shrieker Fungus","ac":5,"hp":13,"cr":"0","monsterType":"Plant","dexMod":-5},{"name":"Silver Dragon Wyrmling","ac":17,"hp":45,"cr":"2","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Skeleton","ac":14,"hp":13,"cr":"1/4","monsterType":"Undead","dexMod":3},{"name":"Slaad Tadpole","ac":12,"hp":7,"cr":"1/8","monsterType":"Aberration","dexMod":2},{"name":"Smoke Mephit","ac":12,"hp":13,"cr":"1/4","monsterType":"Elemental","dexMod":2},{"name":"Solar","ac":21,"hp":297,"cr":"21","monsterType":"Celestial (Angel)","dexMod":6},{"name":"Spectator","ac":14,"hp":45,"cr":"3","monsterType":"Aberration (Beholder)","dexMod":2},{"name":"Specter","ac":12,"hp":22,"cr":"1","monsterType":"Undead","dexMod":2},{"name":"Sphinx of Lore","ac":17,"hp":170,"cr":"11","monsterType":"Celestial","dexMod":2},{"name":"Sphinx of Secrets","ac":16,"hp":136,"cr":"8","monsterType":"Celestial","dexMod":2},{"name":"Sphinx of Valor","ac":17,"hp":199,"cr":"17","monsterType":"Celestial","dexMod":0},{"name":"Sphinx of Wonder","ac":13,"hp":24,"cr":"1","monsterType":"Celestial","dexMod":3},{"name":"Spider","ac":12,"hp":1,"cr":"0","monsterType":"Beast","dexMod":2},{"name":"Spined Devil","ac":13,"hp":45,"cr":"2","monsterType":"Fiend (Devil)","dexMod":2},{"name":"Spirit Naga","ac":17,"hp":135,"cr":"8","monsterType":"Fiend","dexMod":3},{"name":"Sprite","ac":15,"hp":10,"cr":"1/4","monsterType":"Fey","dexMod":4},{"name":"Spy","ac":12,"hp":27,"cr":"1","monsterType":"or Small Humanoid","dexMod":2},{"name":"Spy Master","ac":19,"hp":137,"cr":"10","monsterType":"or Small Humanoid","dexMod":5},{"name":"Steam Mephit","ac":10,"hp":17,"cr":"1/4","monsterType":"Elemental","dexMod":0},{"name":"Stirge","ac":13,"hp":5,"cr":"1/8","monsterType":"Monstrosity","dexMod":3},{"name":"Stone Giant","ac":17,"hp":126,"cr":"7","monsterType":"Giant","dexMod":2},{"name":"Stone Golem","ac":18,"hp":220,"cr":"10","monsterType":"Construct","dexMod":-1},{"name":"Storm Giant","ac":16,"hp":230,"cr":"13","monsterType":"Giant","dexMod":2},{"name":"Succubus","ac":15,"hp":71,"cr":"4","monsterType":"Fiend","dexMod":3},{"name":"Swarm of Bats","ac":12,"hp":11,"cr":"1/4","monsterType":"Swarm of Tiny Beasts","dexMod":2},{"name":"Swarm of Crawling Claws","ac":12,"hp":49,"cr":"3","monsterType":"Swarm of Tiny Undead","dexMod":2},{"name":"Swarm of Dretches","ac":12,"hp":45,"cr":"4","monsterType":"swarm of Small Fiends (Demon)","dexMod":0},{"name":"Swarm of Insects","ac":11,"hp":19,"cr":"1/2","monsterType":"Swarm of Tiny Beasts","dexMod":1},{"name":"Swarm of Larvae","ac":13,"hp":22,"cr":"1","monsterType":"swarm of Medium Fiends","dexMod":0},{"name":"Swarm of Lemures","ac":12,"hp":45,"cr":"3","monsterType":"swarm of Medium Fiends (Devil)","dexMod":-2},{"name":"Swarm of Piranhas","ac":13,"hp":28,"cr":"1","monsterType":"Swarm of Tiny Beasts","dexMod":3},{"name":"Swarm of Rats","ac":10,"hp":14,"cr":"1/4","monsterType":"Swarm of Tiny Beasts","dexMod":0},{"name":"Swarm of Ravens","ac":12,"hp":11,"cr":"1/4","monsterType":"Swarm of Tiny Beasts","dexMod":2},{"name":"Swarm of Stirges","ac":14,"hp":36,"cr":"2","monsterType":"swarm of Tiny Monstrosities","dexMod":3},{"name":"Swarm of Venomous Snakes","ac":14,"hp":36,"cr":"2","monsterType":"Swarm of Tiny Beasts","dexMod":4},{"name":"Tarrasque","ac":25,"hp":697,"cr":"30","monsterType":"Monstrosity (Titan)","dexMod":0},{"name":"Thri-kreen Marauder","ac":15,"hp":33,"cr":"1","monsterType":"Monstrosity","dexMod":2},{"name":"Thri-kreen Psion","ac":16,"hp":149,"cr":"8","monsterType":"Monstrosity","dexMod":2},{"name":"Tiger","ac":13,"hp":30,"cr":"1","monsterType":"Beast","dexMod":3},{"name":"Tough","ac":12,"hp":32,"cr":"1/2","monsterType":"or Small Humanoid","dexMod":1},{"name":"Tough Boss","ac":16,"hp":82,"cr":"4","monsterType":"or Small Humanoid","dexMod":2},{"name":"Treant","ac":16,"hp":138,"cr":"9","monsterType":"Plant","dexMod":-1},{"name":"Tree Blight","ac":15,"hp":115,"cr":"7","monsterType":"Plant","dexMod":0},{"name":"Triceratops","ac":14,"hp":114,"cr":"5","monsterType":"Beast (Dinosaur)","dexMod":-1},{"name":"Troglodyte","ac":11,"hp":13,"cr":"1/4","monsterType":"Monstrosity","dexMod":0},{"name":"Troll","ac":15,"hp":94,"cr":"5","monsterType":"Giant","dexMod":1},{"name":"Troll Limb","ac":13,"hp":14,"cr":"1/2","monsterType":"Giant","dexMod":1},{"name":"Twig Blight","ac":14,"hp":7,"cr":"1/8","monsterType":"Plant","dexMod":2},{"name":"Tyrannosaurus Rex","ac":13,"hp":136,"cr":"8","monsterType":"Beast (Dinosaur)","dexMod":0},{"name":"Ultroloth","ac":19,"hp":221,"cr":"13","monsterType":"Fiend (Yugoloth)","dexMod":3},{"name":"Umber Hulk","ac":18,"hp":93,"cr":"5","monsterType":"Monstrosity","dexMod":1},{"name":"Unicorn","ac":12,"hp":97,"cr":"5","monsterType":"Celestial","dexMod":2},{"name":"Vampire","ac":16,"hp":195,"cr":"13","monsterType":"or Small Undead","dexMod":4},{"name":"Vampire Familiar","ac":15,"hp":65,"cr":"3","monsterType":"or Small Humanoid","dexMod":3},{"name":"Vampire Nightbringer","ac":16,"hp":142,"cr":"8","monsterType":"or Small Undead","dexMod":4},{"name":"Vampire Spawn","ac":16,"hp":90,"cr":"5","monsterType":"or Small Undead","dexMod":3},{"name":"Vampire Umbral Lord","ac":16,"hp":187,"cr":"15","monsterType":"or Small Undead","dexMod":4},{"name":"Venomous Snake","ac":12,"hp":5,"cr":"1/8","monsterType":"Beast","dexMod":2},{"name":"Vine Blight","ac":12,"hp":19,"cr":"1/2","monsterType":"Plant","dexMod":-1},{"name":"Violet Fungus","ac":5,"hp":18,"cr":"1/4","monsterType":"Plant","dexMod":-5},{"name":"Violet Fungus Necrohulk","ac":17,"hp":123,"cr":"7","monsterType":"Plant","dexMod":1},{"name":"Vrock","ac":15,"hp":152,"cr":"6","monsterType":"Fiend (Demon)","dexMod":2},{"name":"Vulture","ac":10,"hp":5,"cr":"0","monsterType":"Beast","dexMod":0},{"name":"Warhorse","ac":11,"hp":19,"cr":"1/2","monsterType":"Beast","dexMod":1},{"name":"Warhorse Skeleton","ac":13,"hp":22,"cr":"1/2","monsterType":"Undead","dexMod":1},{"name":"Warrior Commander","ac":18,"hp":161,"cr":"10","monsterType":"or Small Humanoid","dexMod":5},{"name":"Warrior Infantry","ac":13,"hp":9,"cr":"1/8","monsterType":"or Small Humanoid","dexMod":0},{"name":"Warrior Veteran","ac":17,"hp":65,"cr":"3","monsterType":"or Small Humanoid","dexMod":1},{"name":"Water Elemental","ac":14,"hp":114,"cr":"5","monsterType":"Elemental","dexMod":2},{"name":"Water Weird","ac":13,"hp":65,"cr":"3","monsterType":"Elemental","dexMod":3},{"name":"Weasel","ac":13,"hp":1,"cr":"0","monsterType":"Beast","dexMod":3},{"name":"Werebear","ac":15,"hp":135,"cr":"5","monsterType":"or Small Monstrosity (Lycanthrope)","dexMod":0},{"name":"Wereboar","ac":15,"hp":97,"cr":"4","monsterType":"or Small Monstrosity (Lycanthrope)","dexMod":0},{"name":"Wererat","ac":13,"hp":60,"cr":"2","monsterType":"or Small Monstrosity (Lycanthrope)","dexMod":3},{"name":"Weretiger","ac":12,"hp":120,"cr":"4","monsterType":"or Small Monstrosity (Lycanthrope)","dexMod":2},{"name":"Werewolf","ac":15,"hp":71,"cr":"3","monsterType":"or Small Monstrosity (Lycanthrope)","dexMod":2},{"name":"White Dragon Wyrmling","ac":16,"hp":32,"cr":"2","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Wight","ac":14,"hp":82,"cr":"3","monsterType":"Undead","dexMod":2},{"name":"Will-o'-Wisp","ac":19,"hp":27,"cr":"2","monsterType":"Undead","dexMod":9},{"name":"Winged Kobold","ac":15,"hp":10,"cr":"1/4","monsterType":"Dragon","dexMod":3},{"name":"Winter Wolf","ac":13,"hp":75,"cr":"3","monsterType":"Monstrosity","dexMod":1},{"name":"Wolf","ac":12,"hp":11,"cr":"1/4","monsterType":"Beast","dexMod":2},{"name":"Worg","ac":13,"hp":26,"cr":"1/2","monsterType":"Fey","dexMod":1},{"name":"Wraith","ac":13,"hp":67,"cr":"5","monsterType":"or Small Undead","dexMod":3},{"name":"Wyvern","ac":14,"hp":127,"cr":"6","monsterType":"Dragon","dexMod":0},{"name":"Xorn","ac":19,"hp":84,"cr":"5","monsterType":"Elemental","dexMod":0},{"name":"Yeti","ac":12,"hp":51,"cr":"3","monsterType":"Monstrosity","dexMod":1},{"name":"Yochlol","ac":15,"hp":153,"cr":"10","monsterType":"Fiend (Demon)","dexMod":4},{"name":"Young Black Dragon","ac":18,"hp":127,"cr":"7","monsterType":"Dragon (Chromatic)","dexMod":2},{"name":"Young Blue Dragon","ac":18,"hp":152,"cr":"9","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Young Brass Dragon","ac":17,"hp":110,"cr":"6","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Young Bronze Dragon","ac":17,"hp":142,"cr":"8","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Young Copper Dragon","ac":17,"hp":119,"cr":"7","monsterType":"Dragon (Metallic)","dexMod":1},{"name":"Young Gold Dragon","ac":18,"hp":178,"cr":"10","monsterType":"Dragon (Metallic)","dexMod":2},{"name":"Young Green Dragon","ac":18,"hp":136,"cr":"8","monsterType":"Dragon (Chromatic)","dexMod":1},{"name":"Young Red Dragon","ac":18,"hp":178,"cr":"10","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Young Remorhaz","ac":14,"hp":93,"cr":"5","monsterType":"Monstrosity","dexMod":1},{"name":"Young Silver Dragon","ac":18,"hp":168,"cr":"9","monsterType":"Dragon (Metallic)","dexMod":0},{"name":"Young White Dragon","ac":17,"hp":123,"cr":"6","monsterType":"Dragon (Chromatic)","dexMod":0},{"name":"Yuan-ti Abomination","ac":15,"hp":127,"cr":"7","monsterType":"Monstrosity","dexMod":3},{"name":"Yuan-ti Infiltrator","ac":11,"hp":40,"cr":"1","monsterType":"Monstrosity","dexMod":1},{"name":"Yuan-ti Malison (Type 1)","ac":12,"hp":66,"cr":"3","monsterType":"Monstrosity","dexMod":2},{"name":"Yuan-ti Malison (Type 2)","ac":12,"hp":66,"cr":"3","monsterType":"Monstrosity","dexMod":2},{"name":"Yuan-ti Malison (Type 3)","ac":12,"hp":66,"cr":"3","monsterType":"Monstrosity","dexMod":2},{"name":"Zombie","ac":8,"hp":15,"cr":"1/4","monsterType":"Undead","dexMod":-2}]
+[
+	{
+		"name": "Aarakocra Aeromancer",
+		"ac": 16,
+		"hp": 66,
+		"cr": "4",
+		"monsterType": "Elemental",
+		"dexMod": 3
+	},
+	{
+		"name": "Aarakocra Skirmisher",
+		"ac": 12,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{
+		"name": "Aberrant Cultist",
+		"ac": 14,
+		"hp": 137,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 4
+	},
+	{ "name": "Aboleth", "ac": 17, "hp": 150, "cr": "10", "monsterType": "Aberration", "dexMod": -1 },
+	{
+		"name": "Abominable Yeti",
+		"ac": 15,
+		"hp": 137,
+		"cr": "9",
+		"monsterType": "Monstrosity",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult Black Dragon",
+		"ac": 19,
+		"hp": 195,
+		"cr": "14",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Adult Blue Dragon",
+		"ac": 19,
+		"hp": 212,
+		"cr": "16",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult Brass Dragon",
+		"ac": 18,
+		"hp": 172,
+		"cr": "13",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult Bronze Dragon",
+		"ac": 18,
+		"hp": 212,
+		"cr": "15",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult Copper Dragon",
+		"ac": 18,
+		"hp": 184,
+		"cr": "14",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Adult Gold Dragon",
+		"ac": 19,
+		"hp": 243,
+		"cr": "17",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Adult Green Dragon",
+		"ac": 19,
+		"hp": 207,
+		"cr": "15",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Adult Red Dragon",
+		"ac": 19,
+		"hp": 256,
+		"cr": "17",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult Silver Dragon",
+		"ac": 19,
+		"hp": 216,
+		"cr": "16",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Adult White Dragon",
+		"ac": 18,
+		"hp": 200,
+		"cr": "13",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Air Elemental",
+		"ac": 15,
+		"hp": 90,
+		"cr": "5",
+		"monsterType": "Elemental",
+		"dexMod": 5
+	},
+	{
+		"name": "Allosaurus",
+		"ac": 13,
+		"hp": 51,
+		"cr": "2",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 1
+	},
+	{
+		"name": "Ancient Black Dragon",
+		"ac": 22,
+		"hp": 367,
+		"cr": "21",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Ancient Blue Dragon",
+		"ac": 22,
+		"hp": 481,
+		"cr": "23",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ancient Brass Dragon",
+		"ac": 20,
+		"hp": 332,
+		"cr": "20",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ancient Bronze Dragon",
+		"ac": 22,
+		"hp": 444,
+		"cr": "22",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ancient Copper Dragon",
+		"ac": 21,
+		"hp": 367,
+		"cr": "21",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Ancient Gold Dragon",
+		"ac": 22,
+		"hp": 546,
+		"cr": "24",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Ancient Green Dragon",
+		"ac": 21,
+		"hp": 402,
+		"cr": "22",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Ancient Red Dragon",
+		"ac": 22,
+		"hp": 507,
+		"cr": "24",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ancient Silver Dragon",
+		"ac": 22,
+		"hp": 468,
+		"cr": "23",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ancient White Dragon",
+		"ac": 20,
+		"hp": 333,
+		"cr": "20",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Animal Lord",
+		"ac": 19,
+		"hp": 323,
+		"cr": "20",
+		"monsterType": "Celestial",
+		"dexMod": 7
+	},
+	{
+		"name": "Animated Armor",
+		"ac": 18,
+		"hp": 33,
+		"cr": "1",
+		"monsterType": "Construct",
+		"dexMod": 0
+	},
+	{
+		"name": "Animated Broom",
+		"ac": 15,
+		"hp": 14,
+		"cr": "1/4",
+		"monsterType": "Construct",
+		"dexMod": 3
+	},
+	{
+		"name": "Animated Flying Sword",
+		"ac": 17,
+		"hp": 14,
+		"cr": "1/4",
+		"monsterType": "Construct",
+		"dexMod": 2
+	},
+	{
+		"name": "Animated Rug of Smothering",
+		"ac": 12,
+		"hp": 27,
+		"cr": "2",
+		"monsterType": "Construct",
+		"dexMod": 2
+	},
+	{ "name": "Ankheg", "ac": 14, "hp": 45, "cr": "2", "monsterType": "Monstrosity", "dexMod": 0 },
+	{
+		"name": "Ankylosaurus",
+		"ac": 15,
+		"hp": 68,
+		"cr": "3",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 0
+	},
+	{ "name": "Ape", "ac": 12, "hp": 19, "cr": "1/2", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Arcanaloth",
+		"ac": 18,
+		"hp": 175,
+		"cr": "12",
+		"monsterType": "Fiend (Yugoloth)",
+		"dexMod": 1
+	},
+	{ "name": "Arch-hag", "ac": 20, "hp": 333, "cr": "21", "monsterType": "Fey", "dexMod": 2 },
+	{
+		"name": "Archelon",
+		"ac": 17,
+		"hp": 90,
+		"cr": "4",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 3
+	},
+	{
+		"name": "Archmage",
+		"ac": 17,
+		"hp": 170,
+		"cr": "12",
+		"monsterType": "or Small Humanoid (Wizard)",
+		"dexMod": 2
+	},
+	{
+		"name": "Archpriest",
+		"ac": 16,
+		"hp": 240,
+		"cr": "12",
+		"monsterType": "or Small Humanoid (Cleric)",
+		"dexMod": 1
+	},
+	{
+		"name": "Assassin",
+		"ac": 16,
+		"hp": 97,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 4
+	},
+	{ "name": "Awakened Shrub", "ac": 9, "hp": 10, "cr": "0", "monsterType": "Plant", "dexMod": -1 },
+	{ "name": "Awakened Tree", "ac": 13, "hp": 59, "cr": "2", "monsterType": "Plant", "dexMod": -2 },
+	{
+		"name": "Axe Beak",
+		"ac": 11,
+		"hp": 19,
+		"cr": "1/4",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{
+		"name": "Azer Pyromancer",
+		"ac": 18,
+		"hp": 97,
+		"cr": "6",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{
+		"name": "Azer Sentinel",
+		"ac": 17,
+		"hp": 39,
+		"cr": "2",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{ "name": "Baboon", "ac": 12, "hp": 3, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Badger", "ac": 11, "hp": 5, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Balor", "ac": 19, "hp": 287, "cr": "19", "monsterType": "Fiend (Demon)", "dexMod": 2 },
+	{
+		"name": "Bandit",
+		"ac": 12,
+		"hp": 11,
+		"cr": "1/8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Bandit Captain",
+		"ac": 15,
+		"hp": 52,
+		"cr": "2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{
+		"name": "Bandit Crime Lord",
+		"ac": 17,
+		"hp": 169,
+		"cr": "11",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 5
+	},
+	{
+		"name": "Bandit Deceiver",
+		"ac": 16,
+		"hp": 130,
+		"cr": "7",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{ "name": "Banshee", "ac": 12, "hp": 54, "cr": "4", "monsterType": "Undead", "dexMod": 2 },
+	{
+		"name": "Barbed Devil",
+		"ac": 15,
+		"hp": 110,
+		"cr": "5",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 3
+	},
+	{
+		"name": "Barlgura",
+		"ac": 15,
+		"hp": 85,
+		"cr": "5",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 2
+	},
+	{ "name": "Basilisk", "ac": 15, "hp": 52, "cr": "3", "monsterType": "Monstrosity", "dexMod": -1 },
+	{ "name": "Bat", "ac": 12, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Bearded Devil",
+		"ac": 13,
+		"hp": 58,
+		"cr": "3",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 2
+	},
+	{ "name": "Behir", "ac": 17, "hp": 168, "cr": "11", "monsterType": "Monstrosity", "dexMod": 3 },
+	{ "name": "Beholder", "ac": 18, "hp": 190, "cr": "13", "monsterType": "Aberration", "dexMod": 2 },
+	{
+		"name": "Beholder Zombie",
+		"ac": 15,
+		"hp": 93,
+		"cr": "5",
+		"monsterType": "Undead",
+		"dexMod": -1
+	},
+	{
+		"name": "Berserker",
+		"ac": 13,
+		"hp": 67,
+		"cr": "2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Berserker Commander",
+		"ac": 16,
+		"hp": 136,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{ "name": "Black Bear", "ac": 11, "hp": 19, "cr": "1/2", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Black Dragon Wyrmling",
+		"ac": 17,
+		"hp": 33,
+		"cr": "2",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 2
+	},
+	{ "name": "Black Pudding", "ac": 7, "hp": 68, "cr": "4", "monsterType": "Ooze", "dexMod": -3 },
+	{ "name": "Blink Dog", "ac": 13, "hp": 16, "cr": "1/4", "monsterType": "Fey", "dexMod": 3 },
+	{
+		"name": "Blob of Annihilation",
+		"ac": 18,
+		"hp": 448,
+		"cr": "23",
+		"monsterType": "Ooze (Titan)",
+		"dexMod": 2
+	},
+	{ "name": "Blood Hawk", "ac": 12, "hp": 7, "cr": "1/8", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Blue Dragon Wyrmling",
+		"ac": 17,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Blue Slaad",
+		"ac": 15,
+		"hp": 133,
+		"cr": "7",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{ "name": "Boar", "ac": 11, "hp": 13, "cr": "1/4", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Bone Devil",
+		"ac": 16,
+		"hp": 161,
+		"cr": "9",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 3
+	},
+	{ "name": "Bone Naga", "ac": 15, "hp": 65, "cr": "4", "monsterType": "Undead", "dexMod": 3 },
+	{
+		"name": "Brass Dragon Wyrmling",
+		"ac": 15,
+		"hp": 22,
+		"cr": "1",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Brazen Gorgon",
+		"ac": 19,
+		"hp": 161,
+		"cr": "9",
+		"monsterType": "Construct",
+		"dexMod": 2
+	},
+	{
+		"name": "Bronze Dragon Wyrmling",
+		"ac": 15,
+		"hp": 39,
+		"cr": "2",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{ "name": "Brown Bear", "ac": 11, "hp": 22, "cr": "1", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Bugbear Stalker",
+		"ac": 15,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Bugbear Warrior",
+		"ac": 14,
+		"hp": 33,
+		"cr": "1",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{ "name": "Bulette", "ac": 17, "hp": 94, "cr": "5", "monsterType": "Monstrosity", "dexMod": 0 },
+	{
+		"name": "Bulette Pup",
+		"ac": 16,
+		"hp": 45,
+		"cr": "2",
+		"monsterType": "Monstrosity",
+		"dexMod": -1
+	},
+	{ "name": "Bullywug Bog Sage", "ac": 16, "hp": 52, "cr": "4", "monsterType": "Fey", "dexMod": 3 },
+	{
+		"name": "Bullywug Warrior",
+		"ac": 15,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Fey",
+		"dexMod": 2
+	},
+	{ "name": "Cambion", "ac": 19, "hp": 105, "cr": "5", "monsterType": "Fiend", "dexMod": 4 },
+	{ "name": "Camel", "ac": 10, "hp": 17, "cr": "1/8", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Carrion Crawler",
+		"ac": 13,
+		"hp": 51,
+		"cr": "2",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Cat", "ac": 12, "hp": 2, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Centaur Trooper", "ac": 16, "hp": 45, "cr": "2", "monsterType": "Fey", "dexMod": 2 },
+	{ "name": "Centaur Warden", "ac": 16, "hp": 105, "cr": "7", "monsterType": "Fey", "dexMod": 2 },
+	{
+		"name": "Chain Devil",
+		"ac": 15,
+		"hp": 85,
+		"cr": "8",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 2
+	},
+	{ "name": "Chasme", "ac": 15, "hp": 78, "cr": "6", "monsterType": "Fiend (Demon)", "dexMod": 2 },
+	{ "name": "Chimera", "ac": 14, "hp": 114, "cr": "6", "monsterType": "Monstrosity", "dexMod": 0 },
+	{ "name": "Chuul", "ac": 16, "hp": 76, "cr": "4", "monsterType": "Aberration", "dexMod": 0 },
+	{
+		"name": "Clay Golem",
+		"ac": 14,
+		"hp": 123,
+		"cr": "9",
+		"monsterType": "Construct",
+		"dexMod": -1
+	},
+	{ "name": "Cloaker", "ac": 14, "hp": 91, "cr": "8", "monsterType": "Aberration", "dexMod": 2 },
+	{ "name": "Cloud Giant", "ac": 14, "hp": 200, "cr": "9", "monsterType": "Giant", "dexMod": 0 },
+	{
+		"name": "Cockatrice",
+		"ac": 11,
+		"hp": 22,
+		"cr": "1/2",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{
+		"name": "Cockatrice Regent",
+		"ac": 15,
+		"hp": 136,
+		"cr": "8",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{
+		"name": "Colossus",
+		"ac": 23,
+		"hp": 553,
+		"cr": "25",
+		"monsterType": "Construct (Titan)",
+		"dexMod": 0
+	},
+	{
+		"name": "Commoner",
+		"ac": 10,
+		"hp": 4,
+		"cr": "0",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 0
+	},
+	{
+		"name": "Constrictor Snake",
+		"ac": 13,
+		"hp": 13,
+		"cr": "1/4",
+		"monsterType": "Beast",
+		"dexMod": 2
+	},
+	{
+		"name": "Copper Dragon Wyrmling",
+		"ac": 16,
+		"hp": 22,
+		"cr": "1",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 1
+	},
+	{ "name": "Couatl", "ac": 19, "hp": 60, "cr": "4", "monsterType": "Celestial", "dexMod": 5 },
+	{ "name": "Crab", "ac": 11, "hp": 3, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Crawling Claw", "ac": 12, "hp": 2, "cr": "0", "monsterType": "Undead", "dexMod": 2 },
+	{ "name": "Crocodile", "ac": 12, "hp": 13, "cr": "1/2", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Cultist",
+		"ac": 12,
+		"hp": 9,
+		"cr": "1/8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Cultist Fanatic",
+		"ac": 13,
+		"hp": 44,
+		"cr": "2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{
+		"name": "Cultist Hierophant",
+		"ac": 16,
+		"hp": 144,
+		"cr": "10",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 4
+	},
+	{
+		"name": "Cyclops Oracle",
+		"ac": 16,
+		"hp": 207,
+		"cr": "10",
+		"monsterType": "Giant",
+		"dexMod": 0
+	},
+	{ "name": "Cyclops Sentry", "ac": 14, "hp": 138, "cr": "6", "monsterType": "Giant", "dexMod": 0 },
+	{
+		"name": "Dao",
+		"ac": 18,
+		"hp": 200,
+		"cr": "11",
+		"monsterType": "Elemental (Genie)",
+		"dexMod": 1
+	},
+	{
+		"name": "Darkmantle",
+		"ac": 11,
+		"hp": 22,
+		"cr": "1/2",
+		"monsterType": "Aberration",
+		"dexMod": 1
+	},
+	{
+		"name": "Death Cultist",
+		"ac": 17,
+		"hp": 127,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{ "name": "Death Dog", "ac": 12, "hp": 39, "cr": "1", "monsterType": "Monstrosity", "dexMod": 2 },
+	{
+		"name": "Death Knight",
+		"ac": 20,
+		"hp": 199,
+		"cr": "17",
+		"monsterType": "or Small Undead",
+		"dexMod": 0
+	},
+	{
+		"name": "Death Knight Aspirant",
+		"ac": 20,
+		"hp": 178,
+		"cr": "11",
+		"monsterType": "or Small Undead",
+		"dexMod": 0
+	},
+	{
+		"name": "Death Slaad",
+		"ac": 18,
+		"hp": 178,
+		"cr": "10",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{
+		"name": "Death Tyrant",
+		"ac": 19,
+		"hp": 195,
+		"cr": "14",
+		"monsterType": "Undead (Beholder)",
+		"dexMod": 2
+	},
+	{ "name": "Deer", "ac": 13, "hp": 4, "cr": "0", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Demilich", "ac": 20, "hp": 180, "cr": "18", "monsterType": "Undead", "dexMod": 5 },
+	{
+		"name": "Deva",
+		"ac": 17,
+		"hp": 229,
+		"cr": "10",
+		"monsterType": "Celestial (Angel)",
+		"dexMod": 4
+	},
+	{ "name": "Dire Wolf", "ac": 14, "hp": 22, "cr": "1", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Dire Worg", "ac": 16, "hp": 147, "cr": "10", "monsterType": "Fey", "dexMod": 2 },
+	{
+		"name": "Displacer Beast",
+		"ac": 13,
+		"hp": 76,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{
+		"name": "Djinni",
+		"ac": 17,
+		"hp": 218,
+		"cr": "11",
+		"monsterType": "Elemental (Genie)",
+		"dexMod": 2
+	},
+	{
+		"name": "Doppelganger",
+		"ac": 14,
+		"hp": 52,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 4
+	},
+	{
+		"name": "Dracolich",
+		"ac": 20,
+		"hp": 225,
+		"cr": "17",
+		"monsterType": "or Gargantuan Undead",
+		"dexMod": 0
+	},
+	{ "name": "Draft Horse", "ac": 10, "hp": 15, "cr": "1/4", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Dragon Turtle",
+		"ac": 20,
+		"hp": 356,
+		"cr": "17",
+		"monsterType": "Dragon",
+		"dexMod": 0
+	},
+	{
+		"name": "Dretch",
+		"ac": 11,
+		"hp": 18,
+		"cr": "1/4",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 0
+	},
+	{ "name": "Drider", "ac": 19, "hp": 123, "cr": "6", "monsterType": "Monstrosity", "dexMod": 4 },
+	{
+		"name": "Druid",
+		"ac": 13,
+		"hp": 44,
+		"cr": "2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{ "name": "Dryad", "ac": 16, "hp": 22, "cr": "1", "monsterType": "Fey", "dexMod": 1 },
+	{
+		"name": "Dust Mephit",
+		"ac": 12,
+		"hp": 17,
+		"cr": "1/2",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{ "name": "Eagle", "ac": 12, "hp": 4, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Earth Elemental",
+		"ac": 17,
+		"hp": 147,
+		"cr": "5",
+		"monsterType": "Elemental",
+		"dexMod": -1
+	},
+	{
+		"name": "Efreeti",
+		"ac": 17,
+		"hp": 212,
+		"cr": "11",
+		"monsterType": "Elemental (Genie)",
+		"dexMod": 1
+	},
+	{
+		"name": "Elemental Cataclysm",
+		"ac": 20,
+		"hp": 370,
+		"cr": "22",
+		"monsterType": "Elemental (Titan)",
+		"dexMod": 4
+	},
+	{
+		"name": "Elemental Cultist",
+		"ac": 16,
+		"hp": 135,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{ "name": "Elephant", "ac": 12, "hp": 76, "cr": "4", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Elk", "ac": 10, "hp": 11, "cr": "1/4", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Empyrean",
+		"ac": 22,
+		"hp": 346,
+		"cr": "23",
+		"monsterType": "Celestial or Fiend (Titan)",
+		"dexMod": 5
+	},
+	{
+		"name": "Empyrean Iota",
+		"ac": 13,
+		"hp": 22,
+		"cr": "1",
+		"monsterType": "Celestial or Fiend (Titan)",
+		"dexMod": 2
+	},
+	{
+		"name": "Erinyes",
+		"ac": 18,
+		"hp": 178,
+		"cr": "12",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 3
+	},
+	{ "name": "Ettercap", "ac": 13, "hp": 44, "cr": "2", "monsterType": "Monstrosity", "dexMod": 2 },
+	{ "name": "Ettin", "ac": 12, "hp": 85, "cr": "4", "monsterType": "Giant", "dexMod": -1 },
+	{
+		"name": "Faerie Dragon Adult",
+		"ac": 15,
+		"hp": 35,
+		"cr": "2",
+		"monsterType": "Dragon",
+		"dexMod": 5
+	},
+	{
+		"name": "Faerie Dragon Youth",
+		"ac": 13,
+		"hp": 21,
+		"cr": "1",
+		"monsterType": "Dragon",
+		"dexMod": 3
+	},
+	{
+		"name": "Fiend Cultist",
+		"ac": 16,
+		"hp": 127,
+		"cr": "8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{
+		"name": "Fire Elemental",
+		"ac": 13,
+		"hp": 93,
+		"cr": "5",
+		"monsterType": "Elemental",
+		"dexMod": 3
+	},
+	{ "name": "Fire Giant", "ac": 18, "hp": 162, "cr": "9", "monsterType": "Giant", "dexMod": -1 },
+	{ "name": "Flameskull", "ac": 13, "hp": 40, "cr": "4", "monsterType": "Undead", "dexMod": 3 },
+	{
+		"name": "Flaming Skeleton",
+		"ac": 15,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "Undead",
+		"dexMod": 2
+	},
+	{
+		"name": "Flesh Golem",
+		"ac": 9,
+		"hp": 127,
+		"cr": "5",
+		"monsterType": "Construct",
+		"dexMod": -1
+	},
+	{ "name": "Flumph", "ac": 12, "hp": 7, "cr": "1/8", "monsterType": "Aberration", "dexMod": 2 },
+	{
+		"name": "Flying Snake",
+		"ac": 14,
+		"hp": 5,
+		"cr": "1/8",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{ "name": "Fomorian", "ac": 14, "hp": 172, "cr": "8", "monsterType": "Giant", "dexMod": 0 },
+	{ "name": "Frog", "ac": 11, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Frost Giant", "ac": 15, "hp": 149, "cr": "8", "monsterType": "Giant", "dexMod": -1 },
+	{ "name": "Galeb Duhr", "ac": 16, "hp": 123, "cr": "6", "monsterType": "Elemental", "dexMod": 2 },
+	{ "name": "Gargoyle", "ac": 15, "hp": 67, "cr": "2", "monsterType": "Elemental", "dexMod": 0 },
+	{
+		"name": "Gas Spore Fungus",
+		"ac": 8,
+		"hp": 13,
+		"cr": "1/2",
+		"monsterType": "Plant",
+		"dexMod": -5
+	},
+	{ "name": "Gelatinous Cube", "ac": 6, "hp": 63, "cr": "2", "monsterType": "Ooze", "dexMod": -4 },
+	{ "name": "Ghast", "ac": 13, "hp": 36, "cr": "2", "monsterType": "Undead", "dexMod": 3 },
+	{
+		"name": "Ghast Gravecaller",
+		"ac": 16,
+		"hp": 97,
+		"cr": "6",
+		"monsterType": "Undead",
+		"dexMod": 3
+	},
+	{ "name": "Ghost", "ac": 11, "hp": 45, "cr": "4", "monsterType": "Undead", "dexMod": 1 },
+	{ "name": "Ghoul", "ac": 12, "hp": 22, "cr": "1", "monsterType": "Undead", "dexMod": 2 },
+	{ "name": "Giant Ape", "ac": 12, "hp": 168, "cr": "7", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Giant Axe Beak",
+		"ac": 15,
+		"hp": 84,
+		"cr": "5",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{ "name": "Giant Badger", "ac": 13, "hp": 15, "cr": "1/4", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Giant Bat", "ac": 13, "hp": 22, "cr": "1/4", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Giant Boar", "ac": 13, "hp": 42, "cr": "2", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Giant Centipede",
+		"ac": 14,
+		"hp": 9,
+		"cr": "1/4",
+		"monsterType": "Beast",
+		"dexMod": 2
+	},
+	{
+		"name": "Giant Constrictor Snake",
+		"ac": 12,
+		"hp": 60,
+		"cr": "2",
+		"monsterType": "Beast",
+		"dexMod": 2
+	},
+	{ "name": "Giant Crab", "ac": 15, "hp": 13, "cr": "1/8", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Giant Crocodile",
+		"ac": 14,
+		"hp": 85,
+		"cr": "5",
+		"monsterType": "Beast",
+		"dexMod": -1
+	},
+	{ "name": "Giant Eagle", "ac": 13, "hp": 26, "cr": "1", "monsterType": "Celestial", "dexMod": 3 },
+	{ "name": "Giant Elk", "ac": 14, "hp": 42, "cr": "2", "monsterType": "Celestial", "dexMod": 4 },
+	{
+		"name": "Giant Fire Beetle",
+		"ac": 13,
+		"hp": 4,
+		"cr": "0",
+		"monsterType": "Beast",
+		"dexMod": 0
+	},
+	{ "name": "Giant Frog", "ac": 11, "hp": 18, "cr": "1/4", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Giant Goat", "ac": 11, "hp": 19, "cr": "1/2", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Giant Hyena", "ac": 12, "hp": 45, "cr": "1", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Giant Lizard", "ac": 12, "hp": 19, "cr": "1/4", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Giant Octopus", "ac": 11, "hp": 45, "cr": "1", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Giant Owl", "ac": 12, "hp": 19, "cr": "1/4", "monsterType": "Celestial", "dexMod": 2 },
+	{ "name": "Giant Rat", "ac": 13, "hp": 7, "cr": "1/8", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Giant Scorpion", "ac": 15, "hp": 52, "cr": "3", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Giant Seahorse",
+		"ac": 14,
+		"hp": 16,
+		"cr": "1/2",
+		"monsterType": "Beast",
+		"dexMod": 1
+	},
+	{ "name": "Giant Shark", "ac": 13, "hp": 92, "cr": "5", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Giant Spider", "ac": 14, "hp": 26, "cr": "1", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Giant Squid", "ac": 12, "hp": 120, "cr": "6", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Giant Toad", "ac": 11, "hp": 39, "cr": "1", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Giant Venomous Snake",
+		"ac": 14,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Beast",
+		"dexMod": 4
+	},
+	{
+		"name": "Giant Vulture",
+		"ac": 10,
+		"hp": 25,
+		"cr": "1",
+		"monsterType": "Monstrosity",
+		"dexMod": 0
+	},
+	{ "name": "Giant Wasp", "ac": 13, "hp": 22, "cr": "1/2", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Giant Weasel", "ac": 13, "hp": 9, "cr": "1/8", "monsterType": "Beast", "dexMod": 3 },
+	{
+		"name": "Giant Wolf Spider",
+		"ac": 13,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Beast",
+		"dexMod": 3
+	},
+	{
+		"name": "Gibbering Mouther",
+		"ac": 9,
+		"hp": 52,
+		"cr": "2",
+		"monsterType": "Aberration",
+		"dexMod": -1
+	},
+	{
+		"name": "Githyanki Dracomancer",
+		"ac": 18,
+		"hp": 255,
+		"cr": "16",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 3
+	},
+	{
+		"name": "Githyanki Knight",
+		"ac": 18,
+		"hp": 117,
+		"cr": "8",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 2
+	},
+	{
+		"name": "Githyanki Warrior",
+		"ac": 17,
+		"hp": 49,
+		"cr": "3",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 2
+	},
+	{
+		"name": "Githzerai Monk",
+		"ac": 14,
+		"hp": 38,
+		"cr": "2",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 2
+	},
+	{
+		"name": "Githzerai Psion",
+		"ac": 18,
+		"hp": 169,
+		"cr": "12",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 4
+	},
+	{
+		"name": "Githzerai Zerth",
+		"ac": 17,
+		"hp": 84,
+		"cr": "6",
+		"monsterType": "Aberration (Gith)",
+		"dexMod": 4
+	},
+	{
+		"name": "Glabrezu",
+		"ac": 17,
+		"hp": 189,
+		"cr": "9",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 2
+	},
+	{
+		"name": "Gladiator",
+		"ac": 16,
+		"hp": 112,
+		"cr": "5",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{ "name": "Gnoll Demoniac", "ac": 16, "hp": 135, "cr": "8", "monsterType": "Fiend", "dexMod": 1 },
+	{
+		"name": "Gnoll Fang of Yeenoghu",
+		"ac": 14,
+		"hp": 71,
+		"cr": "4",
+		"monsterType": "Fiend",
+		"dexMod": 2
+	},
+	{ "name": "Gnoll Pack Lord", "ac": 15, "hp": 49, "cr": "2", "monsterType": "Fiend", "dexMod": 2 },
+	{ "name": "Gnoll Warrior", "ac": 15, "hp": 27, "cr": "1/2", "monsterType": "Fiend", "dexMod": 1 },
+	{ "name": "Goat", "ac": 10, "hp": 4, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Goblin Boss",
+		"ac": 17,
+		"hp": 21,
+		"cr": "1",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Goblin Hexer",
+		"ac": 13,
+		"hp": 45,
+		"cr": "3",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 3
+	},
+	{
+		"name": "Goblin Minion",
+		"ac": 12,
+		"hp": 7,
+		"cr": "1/8",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Goblin Warrior",
+		"ac": 15,
+		"hp": 10,
+		"cr": "1/4",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Gold Dragon Wyrmling",
+		"ac": 17,
+		"hp": 60,
+		"cr": "3",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 2
+	},
+	{ "name": "Gorgon", "ac": 19, "hp": 114, "cr": "5", "monsterType": "Construct", "dexMod": 0 },
+	{
+		"name": "Goristro",
+		"ac": 19,
+		"hp": 310,
+		"cr": "17",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 0
+	},
+	{
+		"name": "Graveyard Revenant",
+		"ac": 14,
+		"hp": 161,
+		"cr": "7",
+		"monsterType": "Undead",
+		"dexMod": 2
+	},
+	{ "name": "Gray Ooze", "ac": 9, "hp": 22, "cr": "1/2", "monsterType": "Ooze", "dexMod": -2 },
+	{
+		"name": "Gray Slaad",
+		"ac": 18,
+		"hp": 150,
+		"cr": "9",
+		"monsterType": "Aberration",
+		"dexMod": 3
+	},
+	{
+		"name": "Green Dragon Wyrmling",
+		"ac": 17,
+		"hp": 38,
+		"cr": "2",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 1
+	},
+	{ "name": "Green Hag", "ac": 17, "hp": 82, "cr": "3", "monsterType": "Fey", "dexMod": 1 },
+	{
+		"name": "Green Slaad",
+		"ac": 16,
+		"hp": 144,
+		"cr": "8",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{ "name": "Grell", "ac": 12, "hp": 55, "cr": "3", "monsterType": "Aberration", "dexMod": 2 },
+	{ "name": "Grick", "ac": 14, "hp": 54, "cr": "2", "monsterType": "Aberration", "dexMod": 2 },
+	{
+		"name": "Grick Ancient",
+		"ac": 18,
+		"hp": 135,
+		"cr": "7",
+		"monsterType": "Aberration",
+		"dexMod": 3
+	},
+	{ "name": "Griffon", "ac": 12, "hp": 59, "cr": "2", "monsterType": "Monstrosity", "dexMod": 2 },
+	{ "name": "Grimlock", "ac": 11, "hp": 11, "cr": "1/4", "monsterType": "Aberration", "dexMod": 1 },
+	{
+		"name": "Guard",
+		"ac": 16,
+		"hp": 11,
+		"cr": "1/8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Guard Captain",
+		"ac": 18,
+		"hp": 75,
+		"cr": "4",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{
+		"name": "Guardian Naga",
+		"ac": 18,
+		"hp": 136,
+		"cr": "10",
+		"monsterType": "Celestial",
+		"dexMod": 4
+	},
+	{
+		"name": "Gulthias Blight",
+		"ac": 20,
+		"hp": 264,
+		"cr": "16",
+		"monsterType": "Plant",
+		"dexMod": 0
+	},
+	{ "name": "Half-Dragon", "ac": 18, "hp": 105, "cr": "5", "monsterType": "Dragon", "dexMod": 2 },
+	{ "name": "Harpy", "ac": 11, "hp": 38, "cr": "1", "monsterType": "Monstrosity", "dexMod": 1 },
+	{
+		"name": "Haunting Revenant",
+		"ac": 20,
+		"hp": 203,
+		"cr": "10",
+		"monsterType": "Undead",
+		"dexMod": 1
+	},
+	{ "name": "Hawk", "ac": 13, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Hell Hound", "ac": 15, "hp": 58, "cr": "3", "monsterType": "Fiend", "dexMod": 1 },
+	{
+		"name": "Helmed Horror",
+		"ac": 20,
+		"hp": 67,
+		"cr": "4",
+		"monsterType": "Construct",
+		"dexMod": 1
+	},
+	{ "name": "Hezrou", "ac": 18, "hp": 157, "cr": "8", "monsterType": "Fiend (Demon)", "dexMod": 3 },
+	{ "name": "Hill Giant", "ac": 13, "hp": 105, "cr": "5", "monsterType": "Giant", "dexMod": -1 },
+	{
+		"name": "Hippogriff",
+		"ac": 11,
+		"hp": 26,
+		"cr": "1",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Hippopotamus", "ac": 14, "hp": 82, "cr": "4", "monsterType": "Beast", "dexMod": -2 },
+	{
+		"name": "Hobgoblin Captain",
+		"ac": 17,
+		"hp": 58,
+		"cr": "3",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Hobgoblin Warlord",
+		"ac": 20,
+		"hp": 112,
+		"cr": "6",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 2
+	},
+	{
+		"name": "Hobgoblin Warrior",
+		"ac": 18,
+		"hp": 11,
+		"cr": "1/2",
+		"monsterType": "Fey (Goblinoid)",
+		"dexMod": 1
+	},
+	{ "name": "Homunculus", "ac": 13, "hp": 4, "cr": "0", "monsterType": "Construct", "dexMod": 2 },
+	{
+		"name": "Hook Horror",
+		"ac": 15,
+		"hp": 75,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 0
+	},
+	{
+		"name": "Horned Devil",
+		"ac": 18,
+		"hp": 199,
+		"cr": "11",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 3
+	},
+	{ "name": "Hunter Shark", "ac": 12, "hp": 45, "cr": "2", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Hydra", "ac": 15, "hp": 184, "cr": "8", "monsterType": "Monstrosity", "dexMod": 1 },
+	{ "name": "Hyena", "ac": 11, "hp": 5, "cr": "0", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Ice Devil",
+		"ac": 18,
+		"hp": 228,
+		"cr": "14",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 2
+	},
+	{
+		"name": "Ice Mephit",
+		"ac": 11,
+		"hp": 21,
+		"cr": "1/2",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{ "name": "Imp", "ac": 13, "hp": 21, "cr": "1", "monsterType": "Fiend (Devil)", "dexMod": 3 },
+	{ "name": "Incubus", "ac": 15, "hp": 66, "cr": "4", "monsterType": "Fiend", "dexMod": 3 },
+	{
+		"name": "Intellect Devourer",
+		"ac": 12,
+		"hp": 28,
+		"cr": "2",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{
+		"name": "Invisible Stalker",
+		"ac": 14,
+		"hp": 97,
+		"cr": "6",
+		"monsterType": "Elemental",
+		"dexMod": 4
+	},
+	{
+		"name": "Iron Golem",
+		"ac": 20,
+		"hp": 252,
+		"cr": "16",
+		"monsterType": "Construct",
+		"dexMod": -1
+	},
+	{ "name": "Jackal", "ac": 12, "hp": 3, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Jackalwere", "ac": 12, "hp": 18, "cr": "1/2", "monsterType": "Fiend", "dexMod": 2 },
+	{
+		"name": "Juvenile Shadow Dragon",
+		"ac": 15,
+		"hp": 45,
+		"cr": "4",
+		"monsterType": "Dragon",
+		"dexMod": 2
+	},
+	{ "name": "Kenku", "ac": 13, "hp": 13, "cr": "1/4", "monsterType": "Monstrosity", "dexMod": 3 },
+	{ "name": "Killer Whale", "ac": 12, "hp": 90, "cr": "3", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Knight",
+		"ac": 18,
+		"hp": 52,
+		"cr": "3",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 0
+	},
+	{
+		"name": "Kobold Warrior",
+		"ac": 14,
+		"hp": 7,
+		"cr": "1/8",
+		"monsterType": "Dragon",
+		"dexMod": 2
+	},
+	{
+		"name": "Kraken",
+		"ac": 18,
+		"hp": 481,
+		"cr": "23",
+		"monsterType": "Monstrosity (Titan)",
+		"dexMod": 0
+	},
+	{ "name": "Kuo-toa", "ac": 13, "hp": 18, "cr": "1/4", "monsterType": "Aberration", "dexMod": 0 },
+	{
+		"name": "Kuo-toa Archpriest",
+		"ac": 13,
+		"hp": 105,
+		"cr": "6",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{
+		"name": "Kuo-toa Monitor",
+		"ac": 13,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "Aberration",
+		"dexMod": 0
+	},
+	{
+		"name": "Kuo-toa Whip",
+		"ac": 11,
+		"hp": 45,
+		"cr": "1",
+		"monsterType": "Aberration",
+		"dexMod": 0
+	},
+	{ "name": "Lacedon Ghoul", "ac": 12, "hp": 22, "cr": "1", "monsterType": "Undead", "dexMod": 2 },
+	{ "name": "Lamia", "ac": 13, "hp": 97, "cr": "4", "monsterType": "Fiend", "dexMod": 1 },
+	{ "name": "Larva", "ac": 9, "hp": 9, "cr": "0", "monsterType": "Fiend", "dexMod": -1 },
+	{ "name": "Lemure", "ac": 9, "hp": 9, "cr": "0", "monsterType": "Fiend (Devil)", "dexMod": -3 },
+	{
+		"name": "Lich",
+		"ac": 20,
+		"hp": 315,
+		"cr": "21",
+		"monsterType": "Undead (Wizard)",
+		"dexMod": 3
+	},
+	{ "name": "Lion", "ac": 12, "hp": 22, "cr": "1", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Lizard", "ac": 10, "hp": 2, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Lizardfolk Geomancer",
+		"ac": 13,
+		"hp": 33,
+		"cr": "2",
+		"monsterType": "Elemental",
+		"dexMod": 0
+	},
+	{
+		"name": "Lizardfolk Sovereign",
+		"ac": 15,
+		"hp": 78,
+		"cr": "4",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{
+		"name": "Mage",
+		"ac": 15,
+		"hp": 81,
+		"cr": "6",
+		"monsterType": "or Small Humanoid (Wizard)",
+		"dexMod": 2
+	},
+	{
+		"name": "Mage Apprentice",
+		"ac": 15,
+		"hp": 49,
+		"cr": "2",
+		"monsterType": "or Small Humanoid (Wizard)",
+		"dexMod": 2
+	},
+	{
+		"name": "Magma Mephit",
+		"ac": 11,
+		"hp": 18,
+		"cr": "1/2",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{ "name": "Magmin", "ac": 14, "hp": 13, "cr": "1/2", "monsterType": "Elemental", "dexMod": 2 },
+	{ "name": "Mammoth", "ac": 13, "hp": 126, "cr": "6", "monsterType": "Beast", "dexMod": -1 },
+	{ "name": "Manes", "ac": 9, "hp": 9, "cr": "1/8", "monsterType": "Fiend (Demon)", "dexMod": -1 },
+	{
+		"name": "Manes Vaporspawn",
+		"ac": 13,
+		"hp": 19,
+		"cr": "1",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 1
+	},
+	{ "name": "Manticore", "ac": 14, "hp": 68, "cr": "3", "monsterType": "Monstrosity", "dexMod": 3 },
+	{
+		"name": "Marid",
+		"ac": 17,
+		"hp": 229,
+		"cr": "11",
+		"monsterType": "Elemental (Genie)",
+		"dexMod": 1
+	},
+	{
+		"name": "Marilith",
+		"ac": 16,
+		"hp": 220,
+		"cr": "16",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 5
+	},
+	{ "name": "Mastiff", "ac": 12, "hp": 5, "cr": "1/8", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Medusa", "ac": 15, "hp": 127, "cr": "6", "monsterType": "Monstrosity", "dexMod": 3 },
+	{
+		"name": "Merfolk Skirmisher",
+		"ac": 11,
+		"hp": 11,
+		"cr": "1/8",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{
+		"name": "Merfolk Wavebender",
+		"ac": 14,
+		"hp": 97,
+		"cr": "6",
+		"monsterType": "Elemental",
+		"dexMod": 4
+	},
+	{ "name": "Merrow", "ac": 13, "hp": 45, "cr": "2", "monsterType": "Monstrosity", "dexMod": 2 },
+	{
+		"name": "Mezzoloth",
+		"ac": 18,
+		"hp": 75,
+		"cr": "5",
+		"monsterType": "Fiend (Yugoloth)",
+		"dexMod": 0
+	},
+	{ "name": "Mimic", "ac": 12, "hp": 58, "cr": "2", "monsterType": "Monstrosity", "dexMod": 1 },
+	{
+		"name": "Mind Flayer",
+		"ac": 15,
+		"hp": 99,
+		"cr": "7",
+		"monsterType": "Aberration",
+		"dexMod": 1
+	},
+	{
+		"name": "Mind Flayer Arcanist",
+		"ac": 16,
+		"hp": 143,
+		"cr": "11",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{
+		"name": "Minotaur of Baphomet",
+		"ac": 14,
+		"hp": 85,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 0
+	},
+	{
+		"name": "Minotaur Skeleton",
+		"ac": 12,
+		"hp": 45,
+		"cr": "2",
+		"monsterType": "Undead",
+		"dexMod": 0
+	},
+	{
+		"name": "Mud Mephit",
+		"ac": 11,
+		"hp": 13,
+		"cr": "1/4",
+		"monsterType": "Elemental",
+		"dexMod": 1
+	},
+	{ "name": "Mule", "ac": 10, "hp": 11, "cr": "1/8", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Mummy",
+		"ac": 11,
+		"hp": 58,
+		"cr": "3",
+		"monsterType": "or Small Undead",
+		"dexMod": -1
+	},
+	{
+		"name": "Mummy Lord",
+		"ac": 17,
+		"hp": 187,
+		"cr": "15",
+		"monsterType": "or Small Undead (Cleric)",
+		"dexMod": 0
+	},
+	{ "name": "Myconid Adult", "ac": 12, "hp": 16, "cr": "1/2", "monsterType": "Plant", "dexMod": 0 },
+	{
+		"name": "Myconid Sovereign",
+		"ac": 13,
+		"hp": 45,
+		"cr": "2",
+		"monsterType": "Plant",
+		"dexMod": 0
+	},
+	{
+		"name": "Myconid Spore Servant",
+		"ac": 13,
+		"hp": 37,
+		"cr": "1",
+		"monsterType": "or Small Plant",
+		"dexMod": 1
+	},
+	{ "name": "Myconid Sprout", "ac": 10, "hp": 3, "cr": "0", "monsterType": "Plant", "dexMod": 0 },
+	{
+		"name": "Nalfeshnee",
+		"ac": 18,
+		"hp": 184,
+		"cr": "13",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 0
+	},
+	{ "name": "Needle Blight", "ac": 12, "hp": 16, "cr": "1/4", "monsterType": "Plant", "dexMod": 1 },
+	{ "name": "Night Hag", "ac": 17, "hp": 112, "cr": "5", "monsterType": "Fiend", "dexMod": 2 },
+	{ "name": "Nightmare", "ac": 13, "hp": 68, "cr": "3", "monsterType": "Fiend", "dexMod": 2 },
+	{
+		"name": "Noble",
+		"ac": 15,
+		"hp": 9,
+		"cr": "1/8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Noble Prodigy",
+		"ac": 16,
+		"hp": 148,
+		"cr": "10",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{ "name": "Nothic", "ac": 15, "hp": 45, "cr": "2", "monsterType": "Aberration", "dexMod": 3 },
+	{
+		"name": "Nycaloth",
+		"ac": 18,
+		"hp": 152,
+		"cr": "9",
+		"monsterType": "Fiend (Yugoloth)",
+		"dexMod": 0
+	},
+	{ "name": "Ochre Jelly", "ac": 8, "hp": 52, "cr": "2", "monsterType": "Ooze", "dexMod": -2 },
+	{ "name": "Octopus", "ac": 12, "hp": 3, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Ogre", "ac": 11, "hp": 68, "cr": "2", "monsterType": "Giant", "dexMod": -1 },
+	{ "name": "Ogre Zombie", "ac": 8, "hp": 85, "cr": "2", "monsterType": "Undead", "dexMod": -2 },
+	{ "name": "Ogrillon Ogre", "ac": 12, "hp": 52, "cr": "1", "monsterType": "Giant", "dexMod": 0 },
+	{ "name": "Oni", "ac": 17, "hp": 119, "cr": "7", "monsterType": "Fiend", "dexMod": 0 },
+	{ "name": "Otyugh", "ac": 14, "hp": 104, "cr": "5", "monsterType": "Aberration", "dexMod": 0 },
+	{ "name": "Owl", "ac": 11, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Owlbear", "ac": 13, "hp": 59, "cr": "3", "monsterType": "Monstrosity", "dexMod": 1 },
+	{ "name": "Panther", "ac": 13, "hp": 13, "cr": "1/4", "monsterType": "Beast", "dexMod": 3 },
+	{ "name": "Pegasus", "ac": 12, "hp": 59, "cr": "2", "monsterType": "Celestial", "dexMod": 2 },
+	{
+		"name": "Performer",
+		"ac": 13,
+		"hp": 27,
+		"cr": "1/2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{
+		"name": "Performer Legend",
+		"ac": 20,
+		"hp": 162,
+		"cr": "10",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 5
+	},
+	{
+		"name": "Performer Maestro",
+		"ac": 18,
+		"hp": 110,
+		"cr": "6",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 4
+	},
+	{ "name": "Peryton", "ac": 13, "hp": 33, "cr": "2", "monsterType": "Monstrosity", "dexMod": 1 },
+	{
+		"name": "Phase Spider",
+		"ac": 14,
+		"hp": 45,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 3
+	},
+	{ "name": "Piercer", "ac": 15, "hp": 22, "cr": "1/2", "monsterType": "Aberration", "dexMod": 1 },
+	{ "name": "Piranha", "ac": 13, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 3 },
+	{
+		"name": "Pirate",
+		"ac": 14,
+		"hp": 33,
+		"cr": "1",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{
+		"name": "Pirate Admiral",
+		"ac": 20,
+		"hp": 182,
+		"cr": "12",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 6
+	},
+	{
+		"name": "Pirate Captain",
+		"ac": 17,
+		"hp": 84,
+		"cr": "6",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 4
+	},
+	{
+		"name": "Pit Fiend",
+		"ac": 21,
+		"hp": 337,
+		"cr": "20",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 2
+	},
+	{ "name": "Pixie", "ac": 15, "hp": 9, "cr": "1/4", "monsterType": "Fey", "dexMod": 5 },
+	{
+		"name": "Pixie Wonderbringer",
+		"ac": 15,
+		"hp": 60,
+		"cr": "5",
+		"monsterType": "Fey",
+		"dexMod": 5
+	},
+	{
+		"name": "Planetar",
+		"ac": 19,
+		"hp": 262,
+		"cr": "16",
+		"monsterType": "Celestial (Angel)",
+		"dexMod": 5
+	},
+	{
+		"name": "Plesiosaurus",
+		"ac": 13,
+		"hp": 68,
+		"cr": "2",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 2
+	},
+	{ "name": "Polar Bear", "ac": 12, "hp": 42, "cr": "2", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Poltergeist",
+		"ac": 12,
+		"hp": 22,
+		"cr": "2",
+		"monsterType": "or Small Undead",
+		"dexMod": 2
+	},
+	{ "name": "Pony", "ac": 10, "hp": 11, "cr": "1/8", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Priest",
+		"ac": 13,
+		"hp": 38,
+		"cr": "2",
+		"monsterType": "or Small Humanoid (Cleric)",
+		"dexMod": 0
+	},
+	{
+		"name": "Priest Acolyte",
+		"ac": 13,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "or Small Humanoid (Cleric)",
+		"dexMod": 0
+	},
+	{
+		"name": "Primeval Owlbear",
+		"ac": 16,
+		"hp": 126,
+		"cr": "7",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{ "name": "Pseudodragon", "ac": 14, "hp": 10, "cr": "1/4", "monsterType": "Dragon", "dexMod": 2 },
+	{
+		"name": "Psychic Gray Ooze",
+		"ac": 9,
+		"hp": 37,
+		"cr": "1",
+		"monsterType": "Ooze",
+		"dexMod": -1
+	},
+	{
+		"name": "Pteranodon",
+		"ac": 13,
+		"hp": 13,
+		"cr": "1/4",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 2
+	},
+	{
+		"name": "Purple Worm",
+		"ac": 18,
+		"hp": 247,
+		"cr": "15",
+		"monsterType": "Monstrosity",
+		"dexMod": -2
+	},
+	{ "name": "Quaggoth", "ac": 13, "hp": 45, "cr": "2", "monsterType": "Monstrosity", "dexMod": 1 },
+	{
+		"name": "Quaggoth Thonot",
+		"ac": 15,
+		"hp": 67,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Quasit", "ac": 13, "hp": 25, "cr": "1", "monsterType": "Fiend (Demon)", "dexMod": 3 },
+	{
+		"name": "Questing Knight",
+		"ac": 18,
+		"hp": 202,
+		"cr": "12",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{ "name": "Rakshasa", "ac": 17, "hp": 221, "cr": "13", "monsterType": "Fiend", "dexMod": 3 },
+	{ "name": "Rat", "ac": 10, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Raven", "ac": 12, "hp": 2, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Red Dragon Wyrmling",
+		"ac": 17,
+		"hp": 75,
+		"cr": "4",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{ "name": "Red Slaad", "ac": 14, "hp": 93, "cr": "5", "monsterType": "Aberration", "dexMod": 1 },
+	{ "name": "Reef Shark", "ac": 12, "hp": 22, "cr": "1/2", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Remorhaz",
+		"ac": 17,
+		"hp": 195,
+		"cr": "11",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Revenant", "ac": 13, "hp": 127, "cr": "5", "monsterType": "Undead", "dexMod": 2 },
+	{ "name": "Rhinoceros", "ac": 13, "hp": 45, "cr": "2", "monsterType": "Beast", "dexMod": -1 },
+	{ "name": "Riding Horse", "ac": 11, "hp": 13, "cr": "1/4", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Roc", "ac": 15, "hp": 248, "cr": "11", "monsterType": "Monstrosity", "dexMod": 0 },
+	{ "name": "Roper", "ac": 20, "hp": 93, "cr": "5", "monsterType": "Aberration", "dexMod": -1 },
+	{
+		"name": "Rust Monster",
+		"ac": 14,
+		"hp": 33,
+		"cr": "1/2",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{
+		"name": "Saber-Toothed Tiger",
+		"ac": 13,
+		"hp": 52,
+		"cr": "2",
+		"monsterType": "Beast",
+		"dexMod": 3
+	},
+	{ "name": "Sahuagin Baron", "ac": 16, "hp": 76, "cr": "5", "monsterType": "Fiend", "dexMod": 2 },
+	{ "name": "Sahuagin Priest", "ac": 12, "hp": 38, "cr": "2", "monsterType": "Fiend", "dexMod": 0 },
+	{
+		"name": "Sahuagin Warrior",
+		"ac": 12,
+		"hp": 22,
+		"cr": "1/2",
+		"monsterType": "Fiend",
+		"dexMod": 0
+	},
+	{ "name": "Salamander", "ac": 15, "hp": 90, "cr": "5", "monsterType": "Elemental", "dexMod": 2 },
+	{
+		"name": "Salamander Fire Snake",
+		"ac": 14,
+		"hp": 27,
+		"cr": "1",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{
+		"name": "Salamander Inferno Master",
+		"ac": 18,
+		"hp": 256,
+		"cr": "15",
+		"monsterType": "Elemental",
+		"dexMod": 3
+	},
+	{ "name": "Satyr", "ac": 13, "hp": 31, "cr": "1/2", "monsterType": "Fey", "dexMod": 3 },
+	{ "name": "Satyr Revelmaster", "ac": 17, "hp": 82, "cr": "6", "monsterType": "Fey", "dexMod": 4 },
+	{ "name": "Scarecrow", "ac": 11, "hp": 27, "cr": "1", "monsterType": "Construct", "dexMod": 1 },
+	{ "name": "Scorpion", "ac": 11, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{
+		"name": "Scout",
+		"ac": 13,
+		"hp": 16,
+		"cr": "1/2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{
+		"name": "Scout Captain",
+		"ac": 15,
+		"hp": 66,
+		"cr": "3",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{ "name": "Sea Hag", "ac": 14, "hp": 52, "cr": "2", "monsterType": "Fey", "dexMod": 1 },
+	{ "name": "Seahorse", "ac": 12, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 1 },
+	{ "name": "Shadow", "ac": 12, "hp": 27, "cr": "1/2", "monsterType": "Undead", "dexMod": 2 },
+	{
+		"name": "Shadow Dragon",
+		"ac": 16,
+		"hp": 189,
+		"cr": "13",
+		"monsterType": "Dragon",
+		"dexMod": 4
+	},
+	{
+		"name": "Shambling Mound",
+		"ac": 15,
+		"hp": 110,
+		"cr": "5",
+		"monsterType": "Plant",
+		"dexMod": -1
+	},
+	{
+		"name": "Shield Guardian",
+		"ac": 17,
+		"hp": 142,
+		"cr": "7",
+		"monsterType": "Construct",
+		"dexMod": -1
+	},
+	{ "name": "Shrieker Fungus", "ac": 5, "hp": 13, "cr": "0", "monsterType": "Plant", "dexMod": -5 },
+	{
+		"name": "Silver Dragon Wyrmling",
+		"ac": 17,
+		"hp": 45,
+		"cr": "2",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{ "name": "Skeleton", "ac": 14, "hp": 13, "cr": "1/4", "monsterType": "Undead", "dexMod": 3 },
+	{
+		"name": "Slaad Tadpole",
+		"ac": 12,
+		"hp": 7,
+		"cr": "1/8",
+		"monsterType": "Aberration",
+		"dexMod": 2
+	},
+	{
+		"name": "Smoke Mephit",
+		"ac": 12,
+		"hp": 13,
+		"cr": "1/4",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{
+		"name": "Solar",
+		"ac": 21,
+		"hp": 297,
+		"cr": "21",
+		"monsterType": "Celestial (Angel)",
+		"dexMod": 6
+	},
+	{
+		"name": "Spectator",
+		"ac": 14,
+		"hp": 45,
+		"cr": "3",
+		"monsterType": "Aberration (Beholder)",
+		"dexMod": 2
+	},
+	{ "name": "Specter", "ac": 12, "hp": 22, "cr": "1", "monsterType": "Undead", "dexMod": 2 },
+	{
+		"name": "Sphinx of Lore",
+		"ac": 17,
+		"hp": 170,
+		"cr": "11",
+		"monsterType": "Celestial",
+		"dexMod": 2
+	},
+	{
+		"name": "Sphinx of Secrets",
+		"ac": 16,
+		"hp": 136,
+		"cr": "8",
+		"monsterType": "Celestial",
+		"dexMod": 2
+	},
+	{
+		"name": "Sphinx of Valor",
+		"ac": 17,
+		"hp": 199,
+		"cr": "17",
+		"monsterType": "Celestial",
+		"dexMod": 0
+	},
+	{
+		"name": "Sphinx of Wonder",
+		"ac": 13,
+		"hp": 24,
+		"cr": "1",
+		"monsterType": "Celestial",
+		"dexMod": 3
+	},
+	{ "name": "Spider", "ac": 12, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 2 },
+	{
+		"name": "Spined Devil",
+		"ac": 13,
+		"hp": 45,
+		"cr": "2",
+		"monsterType": "Fiend (Devil)",
+		"dexMod": 2
+	},
+	{ "name": "Spirit Naga", "ac": 17, "hp": 135, "cr": "8", "monsterType": "Fiend", "dexMod": 3 },
+	{ "name": "Sprite", "ac": 15, "hp": 10, "cr": "1/4", "monsterType": "Fey", "dexMod": 4 },
+	{ "name": "Spy", "ac": 12, "hp": 27, "cr": "1", "monsterType": "or Small Humanoid", "dexMod": 2 },
+	{
+		"name": "Spy Master",
+		"ac": 19,
+		"hp": 137,
+		"cr": "10",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 5
+	},
+	{
+		"name": "Steam Mephit",
+		"ac": 10,
+		"hp": 17,
+		"cr": "1/4",
+		"monsterType": "Elemental",
+		"dexMod": 0
+	},
+	{ "name": "Stirge", "ac": 13, "hp": 5, "cr": "1/8", "monsterType": "Monstrosity", "dexMod": 3 },
+	{ "name": "Stone Giant", "ac": 17, "hp": 126, "cr": "7", "monsterType": "Giant", "dexMod": 2 },
+	{
+		"name": "Stone Golem",
+		"ac": 18,
+		"hp": 220,
+		"cr": "10",
+		"monsterType": "Construct",
+		"dexMod": -1
+	},
+	{ "name": "Storm Giant", "ac": 16, "hp": 230, "cr": "13", "monsterType": "Giant", "dexMod": 2 },
+	{ "name": "Succubus", "ac": 15, "hp": 71, "cr": "4", "monsterType": "Fiend", "dexMod": 3 },
+	{
+		"name": "Swarm of Bats",
+		"ac": 12,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 2
+	},
+	{
+		"name": "Swarm of Crawling Claws",
+		"ac": 12,
+		"hp": 49,
+		"cr": "3",
+		"monsterType": "Swarm of Tiny Undead",
+		"dexMod": 2
+	},
+	{
+		"name": "Swarm of Dretches",
+		"ac": 12,
+		"hp": 45,
+		"cr": "4",
+		"monsterType": "swarm of Small Fiends (Demon)",
+		"dexMod": 0
+	},
+	{
+		"name": "Swarm of Insects",
+		"ac": 11,
+		"hp": 19,
+		"cr": "1/2",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 1
+	},
+	{
+		"name": "Swarm of Larvae",
+		"ac": 13,
+		"hp": 22,
+		"cr": "1",
+		"monsterType": "swarm of Medium Fiends",
+		"dexMod": 0
+	},
+	{
+		"name": "Swarm of Lemures",
+		"ac": 12,
+		"hp": 45,
+		"cr": "3",
+		"monsterType": "swarm of Medium Fiends (Devil)",
+		"dexMod": -2
+	},
+	{
+		"name": "Swarm of Piranhas",
+		"ac": 13,
+		"hp": 28,
+		"cr": "1",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 3
+	},
+	{
+		"name": "Swarm of Rats",
+		"ac": 10,
+		"hp": 14,
+		"cr": "1/4",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 0
+	},
+	{
+		"name": "Swarm of Ravens",
+		"ac": 12,
+		"hp": 11,
+		"cr": "1/4",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 2
+	},
+	{
+		"name": "Swarm of Stirges",
+		"ac": 14,
+		"hp": 36,
+		"cr": "2",
+		"monsterType": "swarm of Tiny Monstrosities",
+		"dexMod": 3
+	},
+	{
+		"name": "Swarm of Venomous Snakes",
+		"ac": 14,
+		"hp": 36,
+		"cr": "2",
+		"monsterType": "Swarm of Tiny Beasts",
+		"dexMod": 4
+	},
+	{
+		"name": "Tarrasque",
+		"ac": 25,
+		"hp": 697,
+		"cr": "30",
+		"monsterType": "Monstrosity (Titan)",
+		"dexMod": 0
+	},
+	{
+		"name": "Thri-kreen Marauder",
+		"ac": 15,
+		"hp": 33,
+		"cr": "1",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{
+		"name": "Thri-kreen Psion",
+		"ac": 16,
+		"hp": 149,
+		"cr": "8",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{ "name": "Tiger", "ac": 13, "hp": 30, "cr": "1", "monsterType": "Beast", "dexMod": 3 },
+	{
+		"name": "Tough",
+		"ac": 12,
+		"hp": 32,
+		"cr": "1/2",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Tough Boss",
+		"ac": 16,
+		"hp": 82,
+		"cr": "4",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 2
+	},
+	{ "name": "Treant", "ac": 16, "hp": 138, "cr": "9", "monsterType": "Plant", "dexMod": -1 },
+	{ "name": "Tree Blight", "ac": 15, "hp": 115, "cr": "7", "monsterType": "Plant", "dexMod": 0 },
+	{
+		"name": "Triceratops",
+		"ac": 14,
+		"hp": 114,
+		"cr": "5",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": -1
+	},
+	{
+		"name": "Troglodyte",
+		"ac": 11,
+		"hp": 13,
+		"cr": "1/4",
+		"monsterType": "Monstrosity",
+		"dexMod": 0
+	},
+	{ "name": "Troll", "ac": 15, "hp": 94, "cr": "5", "monsterType": "Giant", "dexMod": 1 },
+	{ "name": "Troll Limb", "ac": 13, "hp": 14, "cr": "1/2", "monsterType": "Giant", "dexMod": 1 },
+	{ "name": "Twig Blight", "ac": 14, "hp": 7, "cr": "1/8", "monsterType": "Plant", "dexMod": 2 },
+	{
+		"name": "Tyrannosaurus Rex",
+		"ac": 13,
+		"hp": 136,
+		"cr": "8",
+		"monsterType": "Beast (Dinosaur)",
+		"dexMod": 0
+	},
+	{
+		"name": "Ultroloth",
+		"ac": 19,
+		"hp": 221,
+		"cr": "13",
+		"monsterType": "Fiend (Yugoloth)",
+		"dexMod": 3
+	},
+	{
+		"name": "Umber Hulk",
+		"ac": 18,
+		"hp": 93,
+		"cr": "5",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Unicorn", "ac": 12, "hp": 97, "cr": "5", "monsterType": "Celestial", "dexMod": 2 },
+	{
+		"name": "Vampire",
+		"ac": 16,
+		"hp": 195,
+		"cr": "13",
+		"monsterType": "or Small Undead",
+		"dexMod": 4
+	},
+	{
+		"name": "Vampire Familiar",
+		"ac": 15,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 3
+	},
+	{
+		"name": "Vampire Nightbringer",
+		"ac": 16,
+		"hp": 142,
+		"cr": "8",
+		"monsterType": "or Small Undead",
+		"dexMod": 4
+	},
+	{
+		"name": "Vampire Spawn",
+		"ac": 16,
+		"hp": 90,
+		"cr": "5",
+		"monsterType": "or Small Undead",
+		"dexMod": 3
+	},
+	{
+		"name": "Vampire Umbral Lord",
+		"ac": 16,
+		"hp": 187,
+		"cr": "15",
+		"monsterType": "or Small Undead",
+		"dexMod": 4
+	},
+	{ "name": "Venomous Snake", "ac": 12, "hp": 5, "cr": "1/8", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Vine Blight", "ac": 12, "hp": 19, "cr": "1/2", "monsterType": "Plant", "dexMod": -1 },
+	{ "name": "Violet Fungus", "ac": 5, "hp": 18, "cr": "1/4", "monsterType": "Plant", "dexMod": -5 },
+	{
+		"name": "Violet Fungus Necrohulk",
+		"ac": 17,
+		"hp": 123,
+		"cr": "7",
+		"monsterType": "Plant",
+		"dexMod": 1
+	},
+	{ "name": "Vrock", "ac": 15, "hp": 152, "cr": "6", "monsterType": "Fiend (Demon)", "dexMod": 2 },
+	{ "name": "Vulture", "ac": 10, "hp": 5, "cr": "0", "monsterType": "Beast", "dexMod": 0 },
+	{ "name": "Warhorse", "ac": 11, "hp": 19, "cr": "1/2", "monsterType": "Beast", "dexMod": 1 },
+	{
+		"name": "Warhorse Skeleton",
+		"ac": 13,
+		"hp": 22,
+		"cr": "1/2",
+		"monsterType": "Undead",
+		"dexMod": 1
+	},
+	{
+		"name": "Warrior Commander",
+		"ac": 18,
+		"hp": 161,
+		"cr": "10",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 5
+	},
+	{
+		"name": "Warrior Infantry",
+		"ac": 13,
+		"hp": 9,
+		"cr": "1/8",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 0
+	},
+	{
+		"name": "Warrior Veteran",
+		"ac": 17,
+		"hp": 65,
+		"cr": "3",
+		"monsterType": "or Small Humanoid",
+		"dexMod": 1
+	},
+	{
+		"name": "Water Elemental",
+		"ac": 14,
+		"hp": 114,
+		"cr": "5",
+		"monsterType": "Elemental",
+		"dexMod": 2
+	},
+	{ "name": "Water Weird", "ac": 13, "hp": 65, "cr": "3", "monsterType": "Elemental", "dexMod": 3 },
+	{ "name": "Weasel", "ac": 13, "hp": 1, "cr": "0", "monsterType": "Beast", "dexMod": 3 },
+	{
+		"name": "Werebear",
+		"ac": 15,
+		"hp": 135,
+		"cr": "5",
+		"monsterType": "or Small Monstrosity (Lycanthrope)",
+		"dexMod": 0
+	},
+	{
+		"name": "Wereboar",
+		"ac": 15,
+		"hp": 97,
+		"cr": "4",
+		"monsterType": "or Small Monstrosity (Lycanthrope)",
+		"dexMod": 0
+	},
+	{
+		"name": "Wererat",
+		"ac": 13,
+		"hp": 60,
+		"cr": "2",
+		"monsterType": "or Small Monstrosity (Lycanthrope)",
+		"dexMod": 3
+	},
+	{
+		"name": "Weretiger",
+		"ac": 12,
+		"hp": 120,
+		"cr": "4",
+		"monsterType": "or Small Monstrosity (Lycanthrope)",
+		"dexMod": 2
+	},
+	{
+		"name": "Werewolf",
+		"ac": 15,
+		"hp": 71,
+		"cr": "3",
+		"monsterType": "or Small Monstrosity (Lycanthrope)",
+		"dexMod": 2
+	},
+	{
+		"name": "White Dragon Wyrmling",
+		"ac": 16,
+		"hp": 32,
+		"cr": "2",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{ "name": "Wight", "ac": 14, "hp": 82, "cr": "3", "monsterType": "Undead", "dexMod": 2 },
+	{ "name": "Will-o'-Wisp", "ac": 19, "hp": 27, "cr": "2", "monsterType": "Undead", "dexMod": 9 },
+	{
+		"name": "Winged Kobold",
+		"ac": 15,
+		"hp": 10,
+		"cr": "1/4",
+		"monsterType": "Dragon",
+		"dexMod": 3
+	},
+	{
+		"name": "Winter Wolf",
+		"ac": 13,
+		"hp": 75,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{ "name": "Wolf", "ac": 12, "hp": 11, "cr": "1/4", "monsterType": "Beast", "dexMod": 2 },
+	{ "name": "Worg", "ac": 13, "hp": 26, "cr": "1/2", "monsterType": "Fey", "dexMod": 1 },
+	{
+		"name": "Wraith",
+		"ac": 13,
+		"hp": 67,
+		"cr": "5",
+		"monsterType": "or Small Undead",
+		"dexMod": 3
+	},
+	{ "name": "Wyvern", "ac": 14, "hp": 127, "cr": "6", "monsterType": "Dragon", "dexMod": 0 },
+	{ "name": "Xorn", "ac": 19, "hp": 84, "cr": "5", "monsterType": "Elemental", "dexMod": 0 },
+	{ "name": "Yeti", "ac": 12, "hp": 51, "cr": "3", "monsterType": "Monstrosity", "dexMod": 1 },
+	{
+		"name": "Yochlol",
+		"ac": 15,
+		"hp": 153,
+		"cr": "10",
+		"monsterType": "Fiend (Demon)",
+		"dexMod": 4
+	},
+	{
+		"name": "Young Black Dragon",
+		"ac": 18,
+		"hp": 127,
+		"cr": "7",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Young Blue Dragon",
+		"ac": 18,
+		"hp": 152,
+		"cr": "9",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Young Brass Dragon",
+		"ac": 17,
+		"hp": 110,
+		"cr": "6",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Young Bronze Dragon",
+		"ac": 17,
+		"hp": 142,
+		"cr": "8",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Young Copper Dragon",
+		"ac": 17,
+		"hp": 119,
+		"cr": "7",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Young Gold Dragon",
+		"ac": 18,
+		"hp": 178,
+		"cr": "10",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 2
+	},
+	{
+		"name": "Young Green Dragon",
+		"ac": 18,
+		"hp": 136,
+		"cr": "8",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 1
+	},
+	{
+		"name": "Young Red Dragon",
+		"ac": 18,
+		"hp": 178,
+		"cr": "10",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Young Remorhaz",
+		"ac": 14,
+		"hp": 93,
+		"cr": "5",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{
+		"name": "Young Silver Dragon",
+		"ac": 18,
+		"hp": 168,
+		"cr": "9",
+		"monsterType": "Dragon (Metallic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Young White Dragon",
+		"ac": 17,
+		"hp": 123,
+		"cr": "6",
+		"monsterType": "Dragon (Chromatic)",
+		"dexMod": 0
+	},
+	{
+		"name": "Yuan-ti Abomination",
+		"ac": 15,
+		"hp": 127,
+		"cr": "7",
+		"monsterType": "Monstrosity",
+		"dexMod": 3
+	},
+	{
+		"name": "Yuan-ti Infiltrator",
+		"ac": 11,
+		"hp": 40,
+		"cr": "1",
+		"monsterType": "Monstrosity",
+		"dexMod": 1
+	},
+	{
+		"name": "Yuan-ti Malison (Type 1)",
+		"ac": 12,
+		"hp": 66,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{
+		"name": "Yuan-ti Malison (Type 2)",
+		"ac": 12,
+		"hp": 66,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{
+		"name": "Yuan-ti Malison (Type 3)",
+		"ac": 12,
+		"hp": 66,
+		"cr": "3",
+		"monsterType": "Monstrosity",
+		"dexMod": 2
+	},
+	{ "name": "Zombie", "ac": 8, "hp": 15, "cr": "1/4", "monsterType": "Undead", "dexMod": -2 }
+]

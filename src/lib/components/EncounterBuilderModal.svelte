@@ -108,7 +108,9 @@
 
 	function encounterXpDisplay(enc: Encounter): number {
 		const raw = encounterRawXp(enc);
-		return ruleset === '2024' ? raw : Math.round(raw * encounterMultiplier(encounterTotalCount(enc)));
+		return ruleset === '2024'
+			? raw
+			: Math.round(raw * encounterMultiplier(encounterTotalCount(enc)));
 	}
 
 	function encounterDiff(enc: Encounter): string {
@@ -440,7 +442,8 @@
 								<!-- XP / difficulty preview -->
 								<div class="mt-2 flex items-center gap-3 text-xs text-gray-400">
 									<span
-										>{ruleset === '2024' ? 'XP' : 'Adjusted XP'}: <span class="font-semibold text-amber-300"
+										>{ruleset === '2024' ? 'XP' : 'Adjusted XP'}:
+										<span class="font-semibold text-amber-300"
 											>{stagingAdjustedXp.toLocaleString()}</span
 										></span
 									>
