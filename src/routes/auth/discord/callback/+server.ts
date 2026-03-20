@@ -27,7 +27,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	let tokens;
 	try {
 		tokens = await discord.validateAuthorizationCode(code, codeVerifier);
-	} catch {
+	} catch (err) {
+		console.error('[Discord OAuth] token_exchange error:', err);
 		redirect(303, errorRedirect + 'token_exchange');
 	}
 
