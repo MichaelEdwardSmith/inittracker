@@ -1,0 +1,284 @@
+<!-- Player notes modal. Same UX as the DM's SessionNotesModal but stored per player account.
+     Left column: dated note list with search. Right column: rich-text editor. Autosaves 800ms. -->
+<script lang="ts">
+	import RichTextEditor from './RichTextEditor.svelte';
+	import type { NoteEntry } from '$lib/types';
+	import { exportNotesPdf } from '$lib/pdfExport';
+
+	interface Props {
+		onclose: () => void;
+		playerName: string;
+	}
+
+	let { onclose, playerName }: Props = $props();
+
+	let notes = $state<NoteEntry[]>([]);
+	let selectedId = $state<string | null>(null);
+	let search = $state('');
+	let saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
+	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+	let exportingNote = $state(false);
+	let exportingAll = $state(false);
+
+	const selectedNote = $derived(notes.find((n) => n.id === selectedId) ?? null);
+
+	const filteredNotes = $derived.by(() => {
+		const q = search.trim().toLowerCase();
+		if (!q) return notes;
+		return notes.filter((n) => {
+			const dateStr = formatDate(n.date).toLowerCase();
+			const text = n.content.replace(/<[^>]*>/g, '').toLowerCase();
+			return dateStr.includes(q) || text.includes(q);
+		});
+	});
+
+	$effect(() => {
+		fetch('/api/player-notes')
+			.then((r) => (r.ok ? r.json() : { notes: [] }))
+			.then((data: { notes: NoteEntry[] }) => {
+				notes = data.notes ?? [];
+				if (notes.length > 0) selectedId = notes[0].id;
+			})
+			.catch(() => {});
+	});
+
+	function formatDate(iso: string): string {
+		return new Date(iso).toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric'
+		});
+	}
+
+	async function createNew() {
+		const r = await fetch('/api/player-notes', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ action: 'create', content: '' })
+		});
+		if (r.ok) {
+			const data: { ok: boolean; note: NoteEntry } = await r.json();
+			notes = [data.note, ...notes];
+			selectedId = data.note.id;
+			saveStatus = 'idle';
+		}
+	}
+
+	function handleChange(v: string) {
+		if (!selectedId) return;
+		notes = notes.map((n) => (n.id === selectedId ? { ...n, content: v } : n));
+		saveStatus = 'idle';
+		if (debounceTimer) clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(save, 800);
+	}
+
+	async function save() {
+		if (!selectedId) return;
+		const note = notes.find((n) => n.id === selectedId);
+		if (!note) return;
+		saveStatus = 'saving';
+		try {
+			const r = await fetch('/api/player-notes', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action: 'update', id: selectedId, content: note.content })
+			});
+			saveStatus = r.ok ? 'saved' : 'idle';
+		} catch {
+			saveStatus = 'idle';
+		}
+	}
+
+	async function exportNote() {
+		if (!selectedNote) return;
+		exportingNote = true;
+		try {
+			await exportNotesPdf([selectedNote], playerName, 'single');
+		} finally {
+			exportingNote = false;
+		}
+	}
+
+	async function exportAll() {
+		if (notes.length === 0) return;
+		exportingAll = true;
+		try {
+			await exportNotesPdf(notes, playerName, 'all');
+		} finally {
+			exportingAll = false;
+		}
+	}
+
+	async function deleteSelected() {
+		if (!selectedId) return;
+		const idToDelete = selectedId;
+		notes = notes.filter((n) => n.id !== idToDelete);
+		selectedId = notes.length > 0 ? notes[0].id : null;
+		saveStatus = 'idle';
+		await fetch('/api/player-notes', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ action: 'delete', id: idToDelete })
+		});
+	}
+</script>
+
+<div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Player notes"
+	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+	tabindex="-1"
+	onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
+	onkeydown={(e) => { if (e.key === 'Escape') onclose(); }}
+>
+	<div
+		class="flex w-full max-w-4xl flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
+		style="height: calc(100vh - 8rem)"
+	>
+		<!-- Header -->
+		<div class="shrink-0 border-b border-gray-700 px-5 py-4">
+			<div class="flex items-center justify-between">
+				<div>
+					<h3 class="font-bold tracking-wide text-gray-200">My Notes</h3>
+					<p class="text-xs text-gray-500 italic">{playerName}</p>
+				</div>
+				<div class="flex items-center gap-3">
+					{#if saveStatus === 'saving'}
+						<span class="text-xs text-gray-500">Saving…</span>
+					{:else if saveStatus === 'saved'}
+						<span class="text-xs text-green-500">Saved ✓</span>
+					{/if}
+					<!-- Export this note -->
+					{#if selectedNote}
+						<button
+							onclick={exportNote}
+							disabled={exportingNote}
+							title="Export this note as PDF"
+							aria-label="Export this note as PDF"
+							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-blue-300 disabled:opacity-40"
+						>
+							{#if exportingNote}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+							{:else}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								</svg>
+							{/if}
+							Note
+						</button>
+					{/if}
+					<!-- Export all notes -->
+					{#if notes.length > 1}
+						<button
+							onclick={exportAll}
+							disabled={exportingAll}
+							title="Export all notes as PDF"
+							aria-label="Export all notes as PDF"
+							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-blue-300 disabled:opacity-40"
+						>
+							{#if exportingAll}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+							{:else}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								</svg>
+							{/if}
+							All
+						</button>
+					{/if}
+					<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			</div>
+			<!-- Search -->
+			<div class="relative mt-3">
+				<svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+				</svg>
+				<input
+					type="text"
+					bind:value={search}
+					placeholder="Search notes…"
+					class="w-full rounded-lg border border-gray-600 bg-gray-800 py-2 pr-4 pl-9 text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-blue-500"
+				/>
+			</div>
+		</div>
+
+		<!-- Body: sidebar + editor -->
+		<div class="flex min-h-0 flex-1">
+			<!-- Left column: note list -->
+			<div class="flex w-52 shrink-0 flex-col border-r border-gray-700">
+				<div class="shrink-0 p-2">
+					<button
+						onclick={createNew}
+						class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-blue-600 px-3 py-2 text-sm font-semibold text-blue-500 transition hover:border-blue-400 hover:text-blue-400"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+						</svg>
+						New Note
+					</button>
+				</div>
+				<ul class="min-h-0 flex-1 space-y-1 overflow-y-auto p-2 pt-0">
+					{#each filteredNotes as note (note.id)}
+						<li>
+							<!-- svelte-ignore a11y_interactive_supports_focus -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<div
+								role="button"
+								onclick={() => { selectedId = note.id; saveStatus = 'idle'; }}
+								class="group flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
+									{selectedId === note.id
+										? 'bg-blue-600/20 text-blue-400'
+										: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'}"
+							>
+								<span class="truncate">{formatDate(note.date)}</span>
+								{#if selectedId === note.id}
+									<button
+										onclick={(e) => { e.stopPropagation(); deleteSelected(); }}
+										class="ml-1 shrink-0 text-gray-600 transition hover:text-red-400"
+										aria-label="Delete note"
+										title="Delete"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								{/if}
+							</div>
+						</li>
+					{:else}
+						<li class="px-3 py-4 text-center text-xs text-gray-600">
+							{search ? 'No matches' : 'No notes yet'}
+						</li>
+					{/each}
+				</ul>
+			</div>
+
+			<!-- Right column: editor -->
+			<div class="flex min-h-0 flex-1 flex-col">
+				{#if selectedNote}
+					<div class="flex min-h-0 flex-1 overflow-hidden p-4">
+						<RichTextEditor
+							value={selectedNote.content}
+							onchange={handleChange}
+							placeholder="Write your notes here…"
+						/>
+					</div>
+				{:else}
+					<div class="flex flex-1 items-center justify-center text-sm text-gray-600">
+						Select a note or create a new one
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+</div>

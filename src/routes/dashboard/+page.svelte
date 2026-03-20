@@ -197,6 +197,20 @@
 	let showMobileMenu = $state(false);
 	let guestEditionPicked = $state(false);
 	let isFullscreen = $state(false);
+	let presences = $state<Record<string, string>>({});
+
+	async function fetchPresences() {
+		try {
+			const res = await fetch(`/api/player-presence?session=${activeSession.sessionId}`);
+			if (res.ok) presences = await res.json();
+		} catch { /* silent */ }
+	}
+
+	$effect(() => {
+		fetchPresences();
+		const id = setInterval(fetchPresences, 10_000);
+		return () => clearInterval(id);
+	});
 
 	$effect(() => {
 		function onFsChange() {
@@ -281,6 +295,61 @@
 		messages = [];
 		seenCount = 0;
 	}
+
+	// ── Floating emoji reactions ───────────────────────────────────────────────────
+	interface FloatingEmoji {
+		id: string;
+		emoji: string;
+		from: string;
+		x: number;
+		duration: number;
+	}
+	let floatingEmojis = $state<FloatingEmoji[]>([]);
+	let lastEmojiPoll = Date.now();
+
+	function spawnFloatingEmoji(emoji: string, from: string) {
+		const item: FloatingEmoji = {
+			id: crypto.randomUUID(),
+			emoji,
+			from,
+			x: 10 + Math.random() * 80,
+			duration: 3.5 + Math.random() * 1.5
+		};
+		floatingEmojis = [...floatingEmojis, item];
+		setTimeout(() => {
+			floatingEmojis = floatingEmojis.filter((e) => e.id !== item.id);
+		}, (item.duration + 0.5) * 1000);
+	}
+
+	$effect(() => {
+		if (data.isGuest) return;
+		const interval = setInterval(async () => {
+			try {
+				const r = await fetch(`/api/emoji-reaction?since=${lastEmojiPoll}`);
+				if (r.ok) {
+					const { reactions } = await r.json();
+					const now = Date.now();
+					lastEmojiPoll = now;
+					for (const reaction of reactions) {
+						spawnFloatingEmoji(reaction.emoji, reaction.from);
+					}
+				}
+			} catch { /* ignore */ }
+		}, 2500);
+		return () => clearInterval(interval);
+	});
+
+	async function sendDmReply(to: string, text: string) {
+		await fetch('/api/dm-reply', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ to, text })
+		});
+	}
+
+	const playerNames = $derived(
+		combat.combatants.filter((c) => c.type === 'player').map((c) => c.name)
+	);
 
 	// Keep sessions in sync when page data refreshes (e.g. after invalidateAll)
 	$effect(() => {
@@ -903,7 +972,7 @@
 					<div class="h-[3px] w-[3px] rounded-full bg-gray-500"></div>
 				</div>
 			</div>
-			<PlayerPanel />
+			<PlayerPanel {presences} />
 		</aside>
 
 		<!-- Center: Initiative tracker -->
@@ -994,7 +1063,7 @@
 		</div>
 		<div class="min-h-0 flex-1 overflow-y-auto">
 			{#if openPanel === 'players'}
-				<PlayerPanel />
+				<PlayerPanel {presences} />
 			{:else}
 				<EnemyPanel ruleset={activeSession.ruleset} />
 			{/if}
@@ -1012,9 +1081,31 @@
 	/>
 {/if}
 
+<!-- Floating emoji reactions from viewers -->
+{#if floatingEmojis.length > 0}
+	<div class="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+		{#each floatingEmojis as item (item.id)}
+			<div
+				class="floating-emoji absolute bottom-0"
+				style="left:{item.x}%; animation-duration:{item.duration}s;"
+				aria-hidden="true"
+			>
+				<span class="text-6xl drop-shadow-lg">{item.emoji}</span>
+				<span class="mt-1 block text-center text-xs font-semibold text-white/70">{item.from}</span>
+			</div>
+		{/each}
+	</div>
+{/if}
+
 <!-- DM Inbox modal -->
 {#if showInbox}
-	<DMInboxModal {messages} onclose={() => (showInbox = false)} onclear={clearMessages} />
+	<DMInboxModal
+		{messages}
+		{playerNames}
+		onclose={() => (showInbox = false)}
+		onclear={clearMessages}
+		onsend={sendDmReply}
+	/>
 {/if}
 
 <GuidePopover />
@@ -1127,6 +1218,20 @@
 {/if}
 
 <style>
+	.floating-emoji {
+		animation: float-up linear forwards;
+		transform-origin: center bottom;
+	}
+	@keyframes float-up {
+		0%   { transform: translateY(0)     translateX(0px)   scale(0.4); opacity: 0; }
+		8%   { transform: translateY(-6vh)  translateX(12px)  scale(1.2); opacity: 1; }
+		25%  { transform: translateY(-25vh) translateX(-18px) scale(1);   opacity: 1; }
+		50%  { transform: translateY(-50vh) translateX(22px)  scale(1);   opacity: 1; }
+		70%  { transform: translateY(-70vh) translateX(-14px) scale(1);   opacity: 0.8; }
+		88%  { transform: translateY(-84vh) translateX(10px)  scale(0.9); opacity: 0.3; }
+		100% { transform: translateY(-95vh) translateX(0px)   scale(0.7); opacity: 0; }
+	}
+
 	.bg-orb {
 		position: absolute;
 		border-radius: 50%;

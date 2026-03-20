@@ -7,11 +7,14 @@
 		players: Combatant[];
 		sessionId: string;
 		onclose: () => void;
+		preselectedId?: string;
 	}
 
-	let { players, sessionId, onclose }: Props = $props();
+	let { players, sessionId, onclose, preselectedId = '' }: Props = $props();
 
-	let initCharId = $state(untrack(() => (players.length === 1 ? players[0].id : '')));
+	let initCharId = $state(
+		untrack(() => preselectedId || (players.length === 1 ? players[0].id : ''))
+	);
 	let initMode = $state<'normal' | 'advantage' | 'disadvantage'>('normal');
 	let initRoll1 = $state<number | null>(null);
 	let initRoll2 = $state<number | null>(null);
@@ -110,29 +113,36 @@
 			</div>
 		{:else}
 			<div class="flex flex-col gap-5 px-5 py-5">
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="init-char"
-						class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Character</label
-					>
-					<select
-						id="init-char"
-						bind:value={initCharId}
-						onchange={() => {
-							initRoll1 = null;
-							initRoll2 = null;
-						}}
-						class="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-amber-500 focus:outline-none"
-					>
-						<option value="" disabled>Select your character…</option>
-						{#each players as p}
-							<option value={p.id}
-								>{p.name}{#if p.dexMod}
-									(DEX {p.dexMod > 0 ? '+' : ''}{p.dexMod}){/if}</option
-							>
-						{/each}
-					</select>
-				</div>
+				{#if preselectedId}
+					<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-2.5">
+						<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Rolling for</span>
+						<span class="ml-auto text-sm font-semibold text-white">{initSelectedPlayer?.name ?? ''}</span>
+					</div>
+				{:else}
+					<div class="flex flex-col gap-1.5">
+						<label
+							for="init-char"
+							class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Character</label
+						>
+						<select
+							id="init-char"
+							bind:value={initCharId}
+							onchange={() => {
+								initRoll1 = null;
+								initRoll2 = null;
+							}}
+							class="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-amber-500 focus:outline-none"
+						>
+							<option value="" disabled>Select your character…</option>
+							{#each players as p}
+								<option value={p.id}
+									>{p.name}{#if p.dexMod}
+										(DEX {p.dexMod > 0 ? '+' : ''}{p.dexMod}){/if}</option
+								>
+							{/each}
+						</select>
+					</div>
+				{/if}
 				<div class="flex flex-col gap-1.5">
 					<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Roll Mode</span
 					>
