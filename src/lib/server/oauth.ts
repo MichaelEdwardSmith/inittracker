@@ -38,18 +38,12 @@ export const facebook = new Facebook(
 	`${base}/auth/facebook/callback`
 );
 
-// Discord OAuth for DM accounts.
-// Add https://yourdomain.com/auth/discord/callback to your Discord app's redirect URIs.
+// Discord OAuth — single callback URL for both DM and player flows.
+// Only ONE redirect URI needs to be registered in your Discord app:
+//   https://yourdomain.com/auth/discord/callback
+// The flow type (dm vs player) is encoded in the state parameter.
 export const discord = new Discord(
 	DISCORD_CLIENT_ID,
 	DISCORD_CLIENT_SECRET,
 	`${base}/auth/discord/callback`
-);
-
-// Separate Discord instance for player accounts — different callback URL.
-// Add https://yourdomain.com/auth/player/discord/callback to your Discord app's redirect URIs.
-export const discordPlayer = new Discord(
-	DISCORD_CLIENT_ID,
-	DISCORD_CLIENT_SECRET,
-	`${base}/auth/player/discord/callback`
 );

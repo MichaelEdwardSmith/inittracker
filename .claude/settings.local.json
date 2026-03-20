@@ -178,7 +178,10 @@
 			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run check 2>&1\")",
 			"Bash(powershell.exe -Command \"\n\\\\$content = [System.IO.File]::ReadAllText\\('C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\join\\\\+page.svelte'\\)\n\\\\$idx = \\\\$content.IndexOf\\('Continue with Google'\\)\nWrite-Host \\\\\"Found at index: \\\\$idx\\\\\"\nWrite-Host \\\\$content.Substring\\(\\\\$idx, 100\\) | Format-Hex\n\")",
 			"Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\join\\\\+page.svelte' | Select-Object -Skip 254 -First 25\")",
-			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1 | Select-String 'join'\")"
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1 | Select-String 'join'\")",
+			"Bash(powershell.exe -Command \"Remove-Item 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\auth\\\\player\\\\discord\\\\callback\\\\+server.ts'; Remove-Item 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\auth\\\\player\\\\discord\\\\callback' -ErrorAction SilentlyContinue; Write-Host 'Done'\")",
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run check 2>&1 | Select-String -Pattern 'ERROR|COMPLETED'\")",
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1 | Select-String -NotMatch 'unchanged'\")"
 		]
 	}
 }
