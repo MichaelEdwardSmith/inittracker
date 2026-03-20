@@ -193,27 +193,37 @@
 					href="/register"
 					class="rounded border border-amber-600 bg-amber-900/40 px-8 py-3 text-sm font-bold text-amber-300 transition hover:bg-amber-900/70 hover:text-amber-200"
 				>
-					Create Free Account
+					Create Free DM Account
 				</a>
 				<a
 					href="/login"
 					class="rounded border border-gray-700 bg-gray-900 px-8 py-3 text-sm font-semibold text-gray-300 transition hover:border-gray-500 hover:text-white"
 				>
-					Sign In
+					DM Sign In
 				</a>
 				<form method="POST" action="/login?/guest">
 					<button
 						type="submit"
 						class="text-sm text-gray-600 underline underline-offset-4 transition hover:text-gray-400"
 					>
-						Try as Guest — no account needed
+						Try as Guest DM — no account needed
 					</button>
 				</form>
 			</div>
 		</div>
 
+		<!-- Player join link -->
+		<div class="mt-10">
+			<a
+				href="https://inittracker.com/join"
+				class="text-sm text-green-400 transition hover:text-green-300"
+			>
+				Click here if you are a player — inittracker.com/join
+			</a>
+		</div>
+
 		<!-- Hero screenshot mockup -->
-		<div class="relative mx-auto mt-20 w-full max-w-5xl hero-fade" use:fadeIn>
+		<div class="relative mx-auto mt-10 w-full max-w-5xl hero-fade" use:fadeIn>
 			<div
 				class="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/80 shadow-2xl shadow-black/60"
 			>
