@@ -6,11 +6,12 @@
 		players: Combatant[];
 		sessionId: string;
 		onclose: () => void;
+		preselectedName?: string;
 	}
 
-	let { players, sessionId, onclose }: Props = $props();
+	let { players, sessionId, onclose, preselectedName = '' }: Props = $props();
 
-	let msgFrom = $state('');
+	let msgFrom = $state(preselectedName);
 	let msgText = $state('');
 	let msgSending = $state(false);
 	let msgSent = $state(false);

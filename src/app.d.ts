@@ -12,6 +12,10 @@ declare global {
 			dmFirstName: string | null;
 			dmEmail: string | null;
 			isGuest: boolean;
+			/** Logged-in player display name (null if guest). */
+			playerName: string | null;
+			/** Logged-in player avatar URL (null if guest or no avatar). */
+			playerAvatarUrl: string | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

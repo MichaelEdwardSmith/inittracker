@@ -5,20 +5,36 @@
 import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
 import { getDMBySessionId, getActiveGameSession } from '$lib/server/dmModel';
+import { getPlayerBySessionId } from '$lib/server/playerModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('dm_auth') ?? null;
 	const guestSessionId = event.cookies.get('dm_guest') ?? null;
+	const playerSessionId = event.cookies.get('player_auth') ?? null;
 	event.locals.sessionId = sessionId;
 	event.locals.gameSessionId = null;
 	event.locals.ruleset = '2014';
 	event.locals.dmFirstName = null;
 	event.locals.dmEmail = null;
 	event.locals.isGuest = false;
+	event.locals.playerName = null;
+	event.locals.playerAvatarUrl = null;
+
+	// Resolve player identity for join and display routes
+	const { pathname } = event.url;
+	if (playerSessionId && (pathname === '/join' || pathname.startsWith('/display/'))) {
+		const player = await getPlayerBySessionId(playerSessionId);
+		if (player) {
+			event.locals.playerName = player.displayName;
+			event.locals.playerAvatarUrl = player.avatarUrl ?? null;
+		} else {
+			// Stale cookie — clear it
+			event.cookies.delete('player_auth', { path: '/' });
+		}
+	}
 
 	// Protect DM-only pages. /display/*, /login, /register, /join, /api/* are open.
-	const { pathname } = event.url;
 	if (pathname === '/dashboard' || pathname === '/history') {
 		// Guest access — allowed on dashboard and history.
 		if (!sessionId && guestSessionId) {

@@ -356,11 +356,59 @@
 					Adding a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					In the left sidebar, fill in the player's <strong class="font-semibold text-white"
-						>Name</strong
-					>, <strong class="font-semibold text-white">AC</strong> (Armor Class, default 10), and
-					<strong class="font-semibold text-white">Max HP</strong>
-					(default 10), then click <strong class="font-semibold text-white">Add Player</strong>.
+					The Player Panel has two tabs: <strong class="font-semibold text-white">Manual</strong> and
+					<strong class="font-semibold text-white">D&amp;D Beyond</strong>. Click a tab to switch
+					between them.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					<strong class="font-semibold text-white">Manual:</strong> Fill in the player's
+					<strong class="font-semibold text-white">Name</strong>,
+					<strong class="font-semibold text-white">AC</strong> (Armor Class, default 10), and
+					<strong class="font-semibold text-white">Max HP</strong> (default 10), then click
+					<strong class="font-semibold text-white">Add Player</strong>.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Importing from D&amp;D Beyond
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					If your players have characters on D&amp;D Beyond, you can import them directly instead of
+					entering stats by hand. The character sheet must be set to
+					<strong class="font-semibold text-white">Public</strong> in D&amp;D Beyond's Character
+					Settings.
+				</p>
+				<ol class="mb-4 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
+					<li>
+						Click the <strong class="font-semibold text-white">D&amp;D Beyond</strong> tab in the
+						Player Panel
+					</li>
+					<li>
+						Paste a character URL (e.g.
+						<code class="rounded bg-gray-800 px-1 text-xs text-amber-300"
+							>dndbeyond.com/characters/12345678</code
+						>) or just the numeric character ID
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Fetch</strong> — the tracker contacts
+						D&amp;D Beyond and parses the sheet
+					</li>
+					<li>
+						A preview card appears with the imported values: <strong class="font-semibold text-white"
+							>Name</strong
+						>, <strong class="font-semibold text-white">Max HP</strong>,
+						<strong class="font-semibold text-white">AC</strong>,
+						<strong class="font-semibold text-white">DEX modifier</strong>, and
+						<strong class="font-semibold text-white">Passive Perception</strong>
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Add Player</strong> on the preview card to
+						add them to the roster
+					</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					The character's D&amp;D Beyond portrait is imported automatically and set as their avatar.
+					Both 2014 and 2024 ruleset characters are supported — 2024 initiative proficiency is applied
+					to the DEX modifier automatically.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">

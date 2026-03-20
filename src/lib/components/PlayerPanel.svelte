@@ -4,6 +4,11 @@
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
 
+	interface Props {
+		presences?: Record<string, string>;
+	}
+	let { presences = {} }: Props = $props();
+
 	let name = $state('');
 	let ac = $state(10);
 	let hp = $state(10);
@@ -432,6 +437,14 @@
 									: ''}{player.dexMod}{/if}{#if player.passivePerception}
 								&bull; Passive {player.passivePerception}{/if}
 						</div>
+						{#if presences[player.id]}
+							<div class="mt-0.5 flex items-center gap-1 text-xs text-blue-400">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+								</svg>
+								{presences[player.id]}
+							</div>
+						{/if}
 					</div>
 					<div class="flex shrink-0 flex-col gap-1">
 						{#if player.inCombat === false}

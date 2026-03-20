@@ -225,6 +225,15 @@ export async function getDMBySessionId(sessionId: string): Promise<(WithId<Docum
 	return (await c.findOne({ sessionId })) as unknown as (WithId<Document> & DM) | null;
 }
 
+/** Returns the name of a game session by its public 6-char ID, or null if not found. */
+export async function getGameSessionName(gameSessionId: string): Promise<string | null> {
+	const c = await col();
+	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	if (!dm) return null;
+	const session = (dm.gameSessions as DMGameSession[]).find((s) => s.sessionId === gameSessionId);
+	return session?.name ?? null;
+}
+
 /** Look up a DM by a game session's public 6-char ID (used by viewer SSE & join). */
 export async function getDMByGameSessionId(
 	gameSessionId: string

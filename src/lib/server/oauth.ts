@@ -21,6 +21,15 @@ export const google = new Google(
 	`${base}/auth/google/callback`
 );
 
+// Separate Google instance for player accounts — different callback URL.
+// Add https://yourdomain.com/auth/player/google/callback to your Google Console
+// authorized redirect URIs.
+export const googlePlayer = new Google(
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET,
+	`${base}/auth/player/google/callback`
+);
+
 export const facebook = new Facebook(
 	FACEBOOK_CLIENT_ID,
 	FACEBOOK_CLIENT_SECRET,
