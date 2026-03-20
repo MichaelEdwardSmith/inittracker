@@ -30,8 +30,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
 		activeSessionNeedsRulesetSetup(authSessionId)
 	]);
 
-	const activeSession: GameSession =
-		sessions.find((s) => s.sessionId === gameSessionId) ??
+	const activeSession: GameSession = sessions.find((s) => s.sessionId === gameSessionId) ??
 		sessions[0] ?? { id: '', sessionId: gameSessionId, name: 'Session', ruleset: '2014' };
 
 	return {

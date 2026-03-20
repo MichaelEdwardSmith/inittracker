@@ -511,7 +511,10 @@ export async function exportNotesPdf(
 type DungeonMonster = { name: string; count: number };
 type DungeonEncounter = { monsters: DungeonMonster[]; xp: number; difficulty: string };
 type DungeonRoom = {
-	id: number; name: string; isEntrance: boolean; isBoss: boolean;
+	id: number;
+	name: string;
+	isEntrance: boolean;
+	isBoss: boolean;
 	encounter: DungeonEncounter | null;
 	loot?: { coins: string; items: string[] };
 };
@@ -519,10 +522,10 @@ type DungeonFloorData = { rooms: DungeonRoom[] };
 
 const DIFF_COLOR: Record<string, [number, number, number]> = {
 	trivial: [120, 120, 130],
-	easy:    [60, 160, 90],
-	medium:  [180, 160, 40],
-	hard:    [200, 120, 40],
-	deadly:  [190, 50, 50],
+	easy: [60, 160, 90],
+	medium: [180, 160, 40],
+	hard: [200, 120, 40],
+	deadly: [190, 50, 50]
 };
 
 export async function exportDungeonPdf(
@@ -535,17 +538,17 @@ export async function exportDungeonPdf(
 
 	// A4 portrait
 	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-	const pageW = doc.internal.pageSize.getWidth();   // 210
-	const pageH = doc.internal.pageSize.getHeight();  // 297
+	const pageW = doc.internal.pageSize.getWidth(); // 210
+	const pageH = doc.internal.pageSize.getHeight(); // 297
 	const margin = 12;
 	const contentW = pageW - margin * 2; // 186
 
-	const darkHeader  = [30, 30, 35]    as [number, number, number];
-	const accentAmber = [180, 120, 30]  as [number, number, number];
-	const textMid     = [80, 80, 90]    as [number, number, number];
-	const textDark    = [20, 20, 25]    as [number, number, number];
+	const darkHeader = [30, 30, 35] as [number, number, number];
+	const accentAmber = [180, 120, 30] as [number, number, number];
+	const textMid = [80, 80, 90] as [number, number, number];
+	const textDark = [20, 20, 25] as [number, number, number];
 
-	const MAP_W = contentW;             // 186mm
+	const MAP_W = contentW; // 186mm
 	const MAP_H = Math.round(MAP_W * (672 / 992)); // ~126mm — matches canvas aspect ratio
 
 	for (let fi = 0; fi < floors.length; fi++) {
@@ -606,11 +609,9 @@ export async function exportDungeonPdf(
 			doc.text('No encounters on this floor.', margin, y);
 		} else {
 			const tableRows = roomsWithEnc.map((r) => {
-				const monsterStr = r.encounter!.monsters
-					.map((m) => `${m.count}x ${m.name}`)
-					.join(', ');
-				const diffLabel = r.encounter!.difficulty
-					.charAt(0).toUpperCase() + r.encounter!.difficulty.slice(1);
+				const monsterStr = r.encounter!.monsters.map((m) => `${m.count}x ${m.name}`).join(', ');
+				const diffLabel =
+					r.encounter!.difficulty.charAt(0).toUpperCase() + r.encounter!.difficulty.slice(1);
 				return [
 					`${r.id + 1}. ${r.name}${r.isBoss ? ' *' : ''}`,
 					monsterStr,
@@ -649,7 +650,11 @@ export async function exportDungeonPdf(
 						data.cell.styles.textColor = DIFF_COLOR[diff] ?? textMid;
 						data.cell.styles.fontStyle = 'bold';
 					}
-					if (data.section === 'body' && data.column.index === 0 && data.cell.text[0]?.includes('*')) {
+					if (
+						data.section === 'body' &&
+						data.column.index === 0 &&
+						data.cell.text[0]?.includes('*')
+					) {
 						data.cell.styles.textColor = [190, 50, 50];
 						data.cell.styles.fontStyle = 'bold';
 					}
@@ -658,9 +663,10 @@ export async function exportDungeonPdf(
 		}
 
 		// ── Entrance note ──────────────────────────────────────────────────
-		const afterTable: number = roomsWithEnc.length > 0
-			? ((doc as unknown) as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4
-			: y + 4;
+		const afterTable: number =
+			roomsWithEnc.length > 0
+				? (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4
+				: y + 4;
 
 		if (entrance) {
 			doc.setFontSize(7.5);

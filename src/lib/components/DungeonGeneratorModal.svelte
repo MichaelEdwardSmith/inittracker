@@ -32,7 +32,10 @@
 	const CVS_H = GRID_H * TILE; // 672
 
 	// Cell types
-	const VOID = 0, FLOOR = 1, CORRIDOR = 2, DOOR = 3;
+	const VOID = 0,
+		FLOOR = 1,
+		CORRIDOR = 2,
+		DOOR = 3;
 
 	// ── Types ──────────────────────────────────────────────────────────────────
 	type DungeonRoom = {
@@ -82,7 +85,9 @@
 	let activeStair = $state<{ dir: 'up' | 'down'; floor: number } | null>(null);
 	let zoom = $state(1);
 	let isExporting = $state(false);
-	const ZOOM_MIN = 0.5, ZOOM_MAX = 4, ZOOM_STEP = 0.25;
+	const ZOOM_MIN = 0.5,
+		ZOOM_MAX = 4,
+		ZOOM_STEP = 0.25;
 
 	// ── Mobile panels ──────────────────────────────────────────────────────────
 	let mobilePanel = $state<'controls' | 'encounters' | null>(null);
@@ -114,7 +119,7 @@
 			const dx = e.touches[0].clientX - e.touches[1].clientX;
 			const dy = e.touches[0].clientY - e.touches[1].clientY;
 			const dist = Math.hypot(dx, dy);
-			zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, _touchStartZoom * dist / _touchStartDist));
+			zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, (_touchStartZoom * dist) / _touchStartDist));
 		} else if (e.touches.length === 1 && mapContainerEl) {
 			const dx = _lastTouchX - e.touches[0].clientX;
 			const dy = _lastTouchY - e.touches[0].clientY;
@@ -165,8 +170,7 @@
 	}
 	function monsterMult(count: number, size: number): number {
 		let m =
-			count >= 15 ? 4 : count >= 11 ? 3 : count >= 7 ? 2.5 :
-			count >= 3 ? 2 : count === 2 ? 1.5 : 1;
+			count >= 15 ? 4 : count >= 11 ? 3 : count >= 7 ? 2.5 : count >= 3 ? 2 : count === 2 ? 1.5 : 1;
 		if (size <= 2) m *= 1.5;
 		else if (size >= 6) m *= 0.5;
 		return m;
@@ -250,12 +254,31 @@
 	];
 
 	const roomNames = [
-		'Guard Room', 'Armory', 'Torture Chamber', 'Shrine', 'Crypt',
-		'Barracks', 'Storage Room', 'Pit Room', 'Library', 'Laboratory',
-		'Antechamber', 'Fungal Cavern', 'Prison Cell', 'Trophy Room',
-		'Ritual Chamber', 'Forge', 'Flooded Chamber', 'Tomb', 'Kennel',
-		'Cistern', 'Feast Hall', 'Trap Room', 'Underground Pool',
-		'Ossuary', 'Summoning Chamber'
+		'Guard Room',
+		'Armory',
+		'Torture Chamber',
+		'Shrine',
+		'Crypt',
+		'Barracks',
+		'Storage Room',
+		'Pit Room',
+		'Library',
+		'Laboratory',
+		'Antechamber',
+		'Fungal Cavern',
+		'Prison Cell',
+		'Trophy Room',
+		'Ritual Chamber',
+		'Forge',
+		'Flooded Chamber',
+		'Tomb',
+		'Kennel',
+		'Cistern',
+		'Feast Hall',
+		'Trap Room',
+		'Underground Pool',
+		'Ossuary',
+		'Summoning Chamber'
 	];
 
 	function pickFrom<T>(arr: T[]): T {
@@ -287,24 +310,38 @@
 		let rawXp = 0;
 
 		if (arch === 'solo' && solos.length) {
-			const m = solos.reduce((b, c) => Math.abs(c.xp - budget) < Math.abs(b.xp - budget) ? c : b);
+			const m = solos.reduce((b, c) => (Math.abs(c.xp - budget) < Math.abs(b.xp - budget) ? c : b));
 			monsters = [{ name: m.name, count: 1 }];
 			rawXp = m.xp;
 		} else if (arch === 'pack' && minions.length) {
 			const target = budget / (5 * monsterMult(5, partySize));
-			const m = minions.reduce((b, c) => Math.abs(c.xp - target) < Math.abs(b.xp - target) ? c : b);
-			const count = Math.max(2, Math.min(8, Math.round(budget / (m.xp * monsterMult(5, partySize)))));
+			const m = minions.reduce((b, c) =>
+				Math.abs(c.xp - target) < Math.abs(b.xp - target) ? c : b
+			);
+			const count = Math.max(
+				2,
+				Math.min(8, Math.round(budget / (m.xp * monsterMult(5, partySize))))
+			);
 			monsters = [{ name: m.name, count }];
 			rawXp = m.xp * count;
 		} else if (arch === 'mixed' && leaders.length && minions.length) {
 			const leader = pickFrom(leaders);
 			const minion = pickFrom(minions);
-			const count = Math.max(1, Math.min(4, Math.round((budget * 0.5) / (minion.xp * monsterMult(3, partySize)))));
-			monsters = [{ name: leader.name, count: 1 }, { name: minion.name, count }];
+			const count = Math.max(
+				1,
+				Math.min(4, Math.round((budget * 0.5) / (minion.xp * monsterMult(3, partySize))))
+			);
+			monsters = [
+				{ name: leader.name, count: 1 },
+				{ name: minion.name, count }
+			];
 			rawXp = leader.xp + minion.xp * count;
 		} else {
 			const m = pickFrom(pool);
-			const count = Math.max(1, Math.min(4, Math.round(budget / (m.xp * monsterMult(2, partySize)))));
+			const count = Math.max(
+				1,
+				Math.min(4, Math.round(budget / (m.xp * monsterMult(2, partySize))))
+			);
 			monsters = [{ name: m.name, count }];
 			rawXp = m.xp * count;
 		}
@@ -343,36 +380,176 @@
 		}
 	}
 
-	const LOOT_COMMON = ["Potion of Healing (2d4+2 hp)","Spell Scroll (cantrip)","Spell Scroll (1st level)","Vial of Antitoxin","Oil Flask (1d8+1 fire dmg)","Potion of Climbing","Alchemist's Fire (1d4 fire)","Healer's Kit (10 uses)","Bag of Ball Bearings (100)","Holy Water (2d6 vs undead)"];
-	const LOOT_UNCOMMON = ["Potion of Greater Healing (4d4+4 hp)","Spell Scroll (2nd level)","Spell Scroll (3rd level)","+1 Ammunition (20 pieces)","Bag of Holding","Cloak of Protection (+1 AC and saves)","Immovable Rod","Wand of Magic Missiles (7 charges)","Hat of Disguise","Rope of Climbing (60 ft)","Pipes of Haunting","Sending Stones (pair)"];
-	const LOOT_RARE = ["Potion of Superior Healing (8d4+8 hp)","+2 Weapon (your choice of type)","+1 Shield","Flame Tongue Shortsword","Ring of Protection (+1 AC and saves)","Necklace of Fireballs (7 beads)","Wand of Fireballs (7 charges)","Belt of Hill Giant Strength (STR 21)","Cloak of Displacement","Boots of Speed (haste 1 min/day)","Amulet of Health (CON 19)","Manual of Bodily Health (+2 CON)"];
-	const LOOT_VERY_RARE = ["Potion of Supreme Healing (10d4+20 hp)","+3 Weapon (your choice of type)","+2 Shield","Ring of Regeneration (1d6 hp per 10 min)","Vorpal Sword (critical severs a limb)","Crystal Ball","Robe of the Archmagi","Staff of Power (20 charges)","Tome of Leadership and Influence (+2 CHA)","Manual of Quickness of Action (+2 DEX)","Carpet of Flying (6x9 ft, 4 passengers)","Luck Blade (+1 longsword, 3 wishes)"];
+	const LOOT_COMMON = [
+		'Potion of Healing (2d4+2 hp)',
+		'Spell Scroll (cantrip)',
+		'Spell Scroll (1st level)',
+		'Vial of Antitoxin',
+		'Oil Flask (1d8+1 fire dmg)',
+		'Potion of Climbing',
+		"Alchemist's Fire (1d4 fire)",
+		"Healer's Kit (10 uses)",
+		'Bag of Ball Bearings (100)',
+		'Holy Water (2d6 vs undead)'
+	];
+	const LOOT_UNCOMMON = [
+		'Potion of Greater Healing (4d4+4 hp)',
+		'Spell Scroll (2nd level)',
+		'Spell Scroll (3rd level)',
+		'+1 Ammunition (20 pieces)',
+		'Bag of Holding',
+		'Cloak of Protection (+1 AC and saves)',
+		'Immovable Rod',
+		'Wand of Magic Missiles (7 charges)',
+		'Hat of Disguise',
+		'Rope of Climbing (60 ft)',
+		'Pipes of Haunting',
+		'Sending Stones (pair)'
+	];
+	const LOOT_RARE = [
+		'Potion of Superior Healing (8d4+8 hp)',
+		'+2 Weapon (your choice of type)',
+		'+1 Shield',
+		'Flame Tongue Shortsword',
+		'Ring of Protection (+1 AC and saves)',
+		'Necklace of Fireballs (7 beads)',
+		'Wand of Fireballs (7 charges)',
+		'Belt of Hill Giant Strength (STR 21)',
+		'Cloak of Displacement',
+		'Boots of Speed (haste 1 min/day)',
+		'Amulet of Health (CON 19)',
+		'Manual of Bodily Health (+2 CON)'
+	];
+	const LOOT_VERY_RARE = [
+		'Potion of Supreme Healing (10d4+20 hp)',
+		'+3 Weapon (your choice of type)',
+		'+2 Shield',
+		'Ring of Regeneration (1d6 hp per 10 min)',
+		'Vorpal Sword (critical severs a limb)',
+		'Crystal Ball',
+		'Robe of the Archmagi',
+		'Staff of Power (20 charges)',
+		'Tome of Leadership and Influence (+2 CHA)',
+		'Manual of Quickness of Action (+2 DEX)',
+		'Carpet of Flying (6x9 ft, 4 passengers)',
+		'Luck Blade (+1 longsword, 3 wishes)'
+	];
 	function genLoot(level: number): LootInfo {
-		let coins: string; let pool: string[];
-		if (level <= 4) { const gp=randInt(1,6)*2,sp=randInt(2,8)*5,cp=randInt(2,12)*10; coins=`${gp} gp, ${sp} sp, ${cp} cp`; pool=LOOT_COMMON; }
-		else if (level <= 10) { const gp=randInt(2,12)*10,sp=randInt(1,6)*5; coins=`${gp} gp, ${sp} sp`; pool=LOOT_UNCOMMON; }
-		else if (level <= 16) { const gp=randInt(4,8)*50,pp=randInt(1,4)*5; coins=`${gp} gp, ${pp} pp`; pool=LOOT_RARE; }
-		else { const gp=randInt(2,6)*250,pp=randInt(2,8)*10; coins=`${gp} gp, ${pp} pp`; pool=LOOT_VERY_RARE; }
-		const numItems=Math.random()<0.3?0:Math.random()<0.7?1:2;
-		const items:string[]=[]; const usedIdx=new Set<number>();
-		for(let i=0;i<numItems;i++){let idx=Math.floor(Math.random()*pool.length);while(usedIdx.has(idx))idx=Math.floor(Math.random()*pool.length);usedIdx.add(idx);items.push(pool[idx]);}
-		return{coins,items};
+		let coins: string;
+		let pool: string[];
+		if (level <= 4) {
+			const gp = randInt(1, 6) * 2,
+				sp = randInt(2, 8) * 5,
+				cp = randInt(2, 12) * 10;
+			coins = `${gp} gp, ${sp} sp, ${cp} cp`;
+			pool = LOOT_COMMON;
+		} else if (level <= 10) {
+			const gp = randInt(2, 12) * 10,
+				sp = randInt(1, 6) * 5;
+			coins = `${gp} gp, ${sp} sp`;
+			pool = LOOT_UNCOMMON;
+		} else if (level <= 16) {
+			const gp = randInt(4, 8) * 50,
+				pp = randInt(1, 4) * 5;
+			coins = `${gp} gp, ${pp} pp`;
+			pool = LOOT_RARE;
+		} else {
+			const gp = randInt(2, 6) * 250,
+				pp = randInt(2, 8) * 10;
+			coins = `${gp} gp, ${pp} pp`;
+			pool = LOOT_VERY_RARE;
+		}
+		const numItems = Math.random() < 0.3 ? 0 : Math.random() < 0.7 ? 1 : 2;
+		const items: string[] = [];
+		const usedIdx = new Set<number>();
+		for (let i = 0; i < numItems; i++) {
+			let idx = Math.floor(Math.random() * pool.length);
+			while (usedIdx.has(idx)) idx = Math.floor(Math.random() * pool.length);
+			usedIdx.add(idx);
+			items.push(pool[idx]);
+		}
+		return { coins, items };
 	}
 
 	// Trap table
 	const TRAP_TABLE: TrapInfo[] = [
-		{ name: "Poison Needle", trigger: "Activated when the door handle is turned", dc: 15, effect: "A needle shoots from the frame. 2d4 piercing damage; DC 15 CON save or poisoned for 1 hour." },
-		{ name: "Rolling Boulder", trigger: "Pressure plate behind the door", dc: 14, effect: "A boulder drops and rolls the corridor. DC 14 DEX save or 4d6 bludgeoning damage." },
-		{ name: "Collapsing Ceiling", trigger: "Tripwire across the door frame", dc: 13, effect: "Debris rains in a 10 ft radius. DC 13 DEX save or 3d6 bludgeoning and restrained." },
-		{ name: "Pit Trap", trigger: "False floor tile just past the threshold", dc: 14, effect: "A 10 ft pit opens. DC 14 DEX save or fall in for 1d6 bludgeoning damage." },
-		{ name: "Fire Jet", trigger: "Pressure plate in the doorway", dc: 12, effect: "Jets of flame fill the doorway. DC 12 DEX save or 2d6 fire damage." },
-		{ name: "Sleep Gas", trigger: "Mechanism triggers when the door swings open", dc: 13, effect: "Colorless gas fills 10 ft. DC 13 CON save or fall unconscious for 1 hour (damage ends it)." },
-		{ name: "Alarm Bell", trigger: "Wire attached to the back of the door", dc: 10, effect: "A loud bell rings. Creatures within 300 ft are alerted; nearest enemies arrive in 1d4 rounds." },
-		{ name: "Acid Spray", trigger: "Pressure plate on the far side of the door", dc: 13, effect: "A vial of acid shatters. 2d6 acid; DC 13 DEX save or 2d6 more at end of next turn." },
-		{ name: "Crossbow Bolt", trigger: "Tripwire at ankle height across the threshold", dc: 14, effect: "Hidden crossbow fires: +6 to hit, 2d8 piercing damage." },
-		{ name: "Curse Glyph", trigger: "Magical rune on the door activates on touch", dc: 16, effect: "Glyph of warding triggers. DC 16 WIS save or cursed for 24 hours: disadvantage on attacks and saves." },
-		{ name: "Electrical Arc", trigger: "Conductive handle wired to hidden copper coils", dc: 14, effect: "3d6 lightning damage. DC 14 CON save or stunned until end of next turn." },
-		{ name: "Collapsing Floor", trigger: "Weakened floor triggers when the door fully opens", dc: 15, effect: "Floor collapses into a 20 ft pit. Creatures within 10 ft: DC 15 DEX save or fall for 2d6 bludgeoning." },
+		{
+			name: 'Poison Needle',
+			trigger: 'Activated when the door handle is turned',
+			dc: 15,
+			effect:
+				'A needle shoots from the frame. 2d4 piercing damage; DC 15 CON save or poisoned for 1 hour.'
+		},
+		{
+			name: 'Rolling Boulder',
+			trigger: 'Pressure plate behind the door',
+			dc: 14,
+			effect: 'A boulder drops and rolls the corridor. DC 14 DEX save or 4d6 bludgeoning damage.'
+		},
+		{
+			name: 'Collapsing Ceiling',
+			trigger: 'Tripwire across the door frame',
+			dc: 13,
+			effect: 'Debris rains in a 10 ft radius. DC 13 DEX save or 3d6 bludgeoning and restrained.'
+		},
+		{
+			name: 'Pit Trap',
+			trigger: 'False floor tile just past the threshold',
+			dc: 14,
+			effect: 'A 10 ft pit opens. DC 14 DEX save or fall in for 1d6 bludgeoning damage.'
+		},
+		{
+			name: 'Fire Jet',
+			trigger: 'Pressure plate in the doorway',
+			dc: 12,
+			effect: 'Jets of flame fill the doorway. DC 12 DEX save or 2d6 fire damage.'
+		},
+		{
+			name: 'Sleep Gas',
+			trigger: 'Mechanism triggers when the door swings open',
+			dc: 13,
+			effect:
+				'Colorless gas fills 10 ft. DC 13 CON save or fall unconscious for 1 hour (damage ends it).'
+		},
+		{
+			name: 'Alarm Bell',
+			trigger: 'Wire attached to the back of the door',
+			dc: 10,
+			effect:
+				'A loud bell rings. Creatures within 300 ft are alerted; nearest enemies arrive in 1d4 rounds.'
+		},
+		{
+			name: 'Acid Spray',
+			trigger: 'Pressure plate on the far side of the door',
+			dc: 13,
+			effect: 'A vial of acid shatters. 2d6 acid; DC 13 DEX save or 2d6 more at end of next turn.'
+		},
+		{
+			name: 'Crossbow Bolt',
+			trigger: 'Tripwire at ankle height across the threshold',
+			dc: 14,
+			effect: 'Hidden crossbow fires: +6 to hit, 2d8 piercing damage.'
+		},
+		{
+			name: 'Curse Glyph',
+			trigger: 'Magical rune on the door activates on touch',
+			dc: 16,
+			effect:
+				'Glyph of warding triggers. DC 16 WIS save or cursed for 24 hours: disadvantage on attacks and saves.'
+		},
+		{
+			name: 'Electrical Arc',
+			trigger: 'Conductive handle wired to hidden copper coils',
+			dc: 14,
+			effect: '3d6 lightning damage. DC 14 CON save or stunned until end of next turn.'
+		},
+		{
+			name: 'Collapsing Floor',
+			trigger: 'Weakened floor triggers when the door fully opens',
+			dc: 15,
+			effect:
+				'Floor collapses into a 20 ft pit. Creatures within 10 ft: DC 15 DEX save or fall for 2d6 bludgeoning.'
+		}
 	];
 
 	function addDoors(cells: number[][], traps: Record<string, TrapInfo>) {
@@ -380,8 +557,8 @@
 			for (let x = 1; x < GRID_W - 1; x++) {
 				if (cells[y][x] !== CORRIDOR) continue;
 				const ns = [cells[y - 1][x], cells[y + 1][x], cells[y][x - 1], cells[y][x + 1]];
-				const floorAdj = ns.filter(n => n === FLOOR).length;
-				const corrAdj = ns.filter(n => n === CORRIDOR).length;
+				const floorAdj = ns.filter((n) => n === FLOOR).length;
+				const corrAdj = ns.filter((n) => n === CORRIDOR).length;
 				if (floorAdj >= 1 && corrAdj >= 1 && Math.random() < 0.55) {
 					cells[y][x] = DOOR;
 					if (Math.random() < 0.25)
@@ -406,14 +583,13 @@
 			let ok = true;
 			for (const r of rooms) {
 				if (x < r.right + 2 && x + w > r.left - 1 && y < r.bottom + 2 && y + h > r.top - 1) {
-					ok = false; break;
+					ok = false;
+					break;
 				}
 			}
 			if (!ok) continue;
 
-			for (let ry = y; ry < y + h; ry++)
-				for (let rx = x; rx < x + w; rx++)
-					cells[ry][rx] = FLOOR;
+			for (let ry = y; ry < y + h; ry++) for (let rx = x; rx < x + w; rx++) cells[ry][rx] = FLOOR;
 
 			let name = pickFrom(roomNames);
 			while (usedNames.has(name) && usedNames.size < roomNames.length) name = pickFrom(roomNames);
@@ -421,11 +597,16 @@
 
 			rooms.push({
 				id: rooms.length,
-				left: x, right: x + w - 1,
-				top: y, bottom: y + h - 1,
+				left: x,
+				right: x + w - 1,
+				top: y,
+				bottom: y + h - 1,
 				cx: x + Math.floor(w / 2),
 				cy: y + Math.floor(h / 2),
-				name, isEntrance: false, isBoss: false, encounter: null
+				name,
+				isEntrance: false,
+				isBoss: false,
+				encounter: null
 			});
 		}
 
@@ -434,12 +615,18 @@
 		// Prim's MST
 		const connected = new Set<number>([0]);
 		while (connected.size < rooms.length) {
-			let bestDist = Infinity, bestA = -1, bestB = -1;
+			let bestDist = Infinity,
+				bestA = -1,
+				bestB = -1;
 			for (const a of connected) {
 				for (let b = 0; b < rooms.length; b++) {
 					if (connected.has(b)) continue;
 					const d = Math.hypot(rooms[a].cx - rooms[b].cx, rooms[a].cy - rooms[b].cy);
-					if (d < bestDist) { bestDist = d; bestA = a; bestB = b; }
+					if (d < bestDist) {
+						bestDist = d;
+						bestA = a;
+						bestB = b;
+					}
 				}
 			}
 			if (bestA === -1) break;
@@ -461,7 +648,8 @@
 		// Entrance: most upper-left room (first floor only)
 		if (isFirst) {
 			const entranceIdx = rooms.reduce(
-				(bi, r, i) => r.left + r.top < rooms[bi].left + rooms[bi].top ? i : bi, 0
+				(bi, r, i) => (r.left + r.top < rooms[bi].left + rooms[bi].top ? i : bi),
+				0
 			);
 			rooms[entranceIdx].isEntrance = true;
 			rooms[entranceIdx].name = 'Entrance';
@@ -469,12 +657,16 @@
 
 		// Boss: furthest room (last floor only)
 		if (isLast && includeBoss && rooms.length > 1) {
-			const ref = rooms.find(r => r.isEntrance) ?? rooms[0];
-			let bossIdx = 0, maxDist = 0;
+			const ref = rooms.find((r) => r.isEntrance) ?? rooms[0];
+			let bossIdx = 0,
+				maxDist = 0;
 			for (let i = 0; i < rooms.length; i++) {
 				if (rooms[i].isEntrance) continue;
 				const d = Math.hypot(rooms[i].cx - ref.cx, rooms[i].cy - ref.cy);
-				if (d > maxDist) { maxDist = d; bossIdx = i; }
+				if (d > maxDist) {
+					maxDist = d;
+					bossIdx = i;
+				}
 			}
 			rooms[bossIdx].isBoss = true;
 			rooms[bossIdx].name = 'Boss Chamber';
@@ -484,10 +676,13 @@
 		for (const r of rooms) {
 			if (r.isEntrance) continue;
 			if (r.isBoss) r.encounter = genEncounter(baseBudget * 2.5, true);
-			else if (Math.random() > 0.2) r.encounter = genEncounter(baseBudget * (0.6 + Math.random() * 0.8), false);
+			else if (Math.random() > 0.2)
+				r.encounter = genEncounter(baseBudget * (0.6 + Math.random() * 0.8), false);
 		}
 
-		for (const r of rooms) { if (!r.isEntrance && Math.random() < 0.25) r.loot = genLoot(partyLevel); }
+		for (const r of rooms) {
+			if (!r.isEntrance && Math.random() < 0.25) r.loot = genLoot(partyLevel);
+		}
 
 		return { cells, rooms, traps, stairs: {} };
 	}
@@ -497,7 +692,7 @@
 			[r.left + 1, r.top + 1],
 			[r.right - 1, r.top + 1],
 			[r.left + 1, r.bottom - 1],
-			[r.right - 1, r.bottom - 1],
+			[r.right - 1, r.bottom - 1]
 		];
 		const free = corners.filter(([x, y]) => !used[`${x},${y}`]);
 		return free.length > 0 ? pickFrom(free) : pickFrom(corners);
@@ -506,13 +701,17 @@
 	function placeStairs(lower: DungeonFloor, upper: DungeonFloor) {
 		const count = Math.min(2, Math.ceil(lower.rooms.length / 5));
 		for (let i = 0; i < count; i++) {
-			const upCandidates = lower.rooms.filter(r => !r.isEntrance && !lower.stairs[`${r.cx},${r.cy}`]);
+			const upCandidates = lower.rooms.filter(
+				(r) => !r.isEntrance && !lower.stairs[`${r.cx},${r.cy}`]
+			);
 			if (upCandidates.length > 0) {
 				const r = pickFrom(upCandidates);
 				const [cx, cy] = roomCorner(r, lower.stairs);
 				lower.stairs[`${cx},${cy}`] = 'down';
 			}
-			const downCandidates = upper.rooms.filter(r => !r.isBoss && !upper.stairs[`${r.cx},${r.cy}`]);
+			const downCandidates = upper.rooms.filter(
+				(r) => !r.isBoss && !upper.stairs[`${r.cx},${r.cy}`]
+			);
 			if (downCandidates.length > 0) {
 				const r = pickFrom(downCandidates);
 				const [cx, cy] = roomCorner(r, upper.stairs);
@@ -525,8 +724,7 @@
 		const floors: DungeonFloor[] = [];
 		for (let fi = 0; fi < numFloors; fi++)
 			floors.push(generateFloor(fi === 0, fi === numFloors - 1));
-		for (let fi = 0; fi < floors.length - 1; fi++)
-			placeStairs(floors[fi], floors[fi + 1]);
+		for (let fi = 0; fi < floors.length - 1; fi++) placeStairs(floors[fi], floors[fi + 1]);
 		dungeon = { floors };
 		currentFloor = 0;
 		selectedRoomId = null;
@@ -535,38 +733,41 @@
 
 	// ── Canvas color palette (DonJon-style) ───────────────────────────────────
 	const C = {
-		void:          '#0a0d12',
-		gridVoid:      '#111820',
-		floor:         '#2a3a4a',
-		floorAlt:      '#243242',
-		corridor:      '#1e2c3a',
-		gridFloor:     'rgba(0,0,0,0.18)',
-		wallLit:       '#5a8098',
-		wallDim:       '#2a4058',
-		trap:          '#cc2222',
-		trapText:      '#ff6666',
-		door:          '#c87820',
-		doorCenter:    '#6b4010',
-		entrance:      '#0d2618',
-		entranceAlt:   '#0f2e1c',
-		boss:          '#280c0c',
-		bossAlt:       '#300e0e',
-		selOverlay:    'rgba(180,130,0,0.22)',
-		selBorder:     '#e0a030',
+		void: '#0a0d12',
+		gridVoid: '#111820',
+		floor: '#2a3a4a',
+		floorAlt: '#243242',
+		corridor: '#1e2c3a',
+		gridFloor: 'rgba(0,0,0,0.18)',
+		wallLit: '#5a8098',
+		wallDim: '#2a4058',
+		trap: '#cc2222',
+		trapText: '#ff6666',
+		door: '#c87820',
+		doorCenter: '#6b4010',
+		entrance: '#0d2618',
+		entranceAlt: '#0f2e1c',
+		boss: '#280c0c',
+		bossAlt: '#300e0e',
+		selOverlay: 'rgba(180,130,0,0.22)',
+		selBorder: '#e0a030'
 	};
 
 	// ── Rendering ──────────────────────────────────────────────────────────────
-	function renderFloorToContext(ctx: CanvasRenderingContext2D, floor: DungeonFloor, selectedId: number | null) {
+	function renderFloorToContext(
+		ctx: CanvasRenderingContext2D,
+		floor: DungeonFloor,
+		selectedId: number | null
+	) {
 		const { cells, rooms, traps, stairs } = floor;
 
 		// Build room lookup
-		const roomOf: (DungeonRoom | null)[][] = Array.from(
-			{ length: GRID_H }, () => Array(GRID_W).fill(null)
+		const roomOf: (DungeonRoom | null)[][] = Array.from({ length: GRID_H }, () =>
+			Array(GRID_W).fill(null)
 		);
 		for (const r of rooms)
 			for (let y = r.top; y <= r.bottom; y++)
-				for (let x = r.left; x <= r.right; x++)
-					roomOf[y][x] = r;
+				for (let x = r.left; x <= r.right; x++) roomOf[y][x] = r;
 
 		// ── Pass 1: Void background + grid ────────────────────────────────────
 		ctx.fillStyle = C.void;
@@ -575,10 +776,16 @@
 		ctx.strokeStyle = C.gridVoid;
 		ctx.lineWidth = 0.5;
 		for (let x = 0; x <= GRID_W; x++) {
-			ctx.beginPath(); ctx.moveTo(x * TILE, 0); ctx.lineTo(x * TILE, CVS_H); ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(x * TILE, 0);
+			ctx.lineTo(x * TILE, CVS_H);
+			ctx.stroke();
 		}
 		for (let y = 0; y <= GRID_H; y++) {
-			ctx.beginPath(); ctx.moveTo(0, y * TILE); ctx.lineTo(CVS_W, y * TILE); ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(0, y * TILE);
+			ctx.lineTo(CVS_W, y * TILE);
+			ctx.stroke();
 		}
 
 		// ── Pass 2: Floors, corridors, doors ──────────────────────────────────
@@ -586,7 +793,8 @@
 			for (let x = 0; x < GRID_W; x++) {
 				const v = cells[y][x];
 				if (v === VOID) continue;
-				const px = x * TILE, py = y * TILE;
+				const px = x * TILE,
+					py = y * TILE;
 				const room = roomOf[y][x];
 				const alt = (x + y) % 3 === 0;
 
@@ -616,11 +824,11 @@
 					ctx.fillStyle = C.doorCenter;
 					ctx.fillRect(px + 4, py + 4, TILE - 8, TILE - 8);
 					if (isTrapped) {
-						ctx.font = "bold 8px monospace";
-						ctx.textAlign = "center";
-						ctx.textBaseline = "middle";
+						ctx.font = 'bold 8px monospace';
+						ctx.textAlign = 'center';
+						ctx.textBaseline = 'middle';
 						ctx.fillStyle = C.trapText;
-						ctx.fillText("!", px + TILE / 2, py + TILE / 2);
+						ctx.fillText('!', px + TILE / 2, py + TILE / 2);
 					}
 				}
 			}
@@ -636,33 +844,46 @@
 		for (let y = 0; y < GRID_H; y++) {
 			for (let x = 0; x < GRID_W; x++) {
 				if (!isOpen(x, y)) continue;
-				const px = x * TILE, py = y * TILE;
+				const px = x * TILE,
+					py = y * TILE;
 				// North — lit
 				if (!isOpen(x, y - 1)) {
 					ctx.strokeStyle = C.wallLit;
-					ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + TILE, py); ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(px, py);
+					ctx.lineTo(px + TILE, py);
+					ctx.stroke();
 				}
 				// South — dim (shadow)
 				if (!isOpen(x, y + 1)) {
 					ctx.strokeStyle = C.wallDim;
-					ctx.beginPath(); ctx.moveTo(px, py + TILE); ctx.lineTo(px + TILE, py + TILE); ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(px, py + TILE);
+					ctx.lineTo(px + TILE, py + TILE);
+					ctx.stroke();
 				}
 				// West — mid
 				if (!isOpen(x - 1, y)) {
 					ctx.strokeStyle = C.wallLit;
-					ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + TILE); ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(px, py);
+					ctx.lineTo(px, py + TILE);
+					ctx.stroke();
 				}
 				// East — mid
 				if (!isOpen(x + 1, y)) {
 					ctx.strokeStyle = C.wallDim;
-					ctx.beginPath(); ctx.moveTo(px + TILE, py); ctx.lineTo(px + TILE, py + TILE); ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(px + TILE, py);
+					ctx.lineTo(px + TILE, py + TILE);
+					ctx.stroke();
 				}
 			}
 		}
 
 		// ── Pass 4: Selected room highlight ───────────────────────────────────
 		if (selectedId !== null) {
-			const sel = rooms.find(r => r.id === selectedId);
+			const sel = rooms.find((r) => r.id === selectedId);
 			if (sel) {
 				ctx.fillStyle = C.selOverlay;
 				for (let y = sel.top; y <= sel.bottom; y++)
@@ -671,8 +892,10 @@
 				ctx.strokeStyle = C.selBorder;
 				ctx.lineWidth = 2;
 				ctx.strokeRect(
-					sel.left * TILE, sel.top * TILE,
-					(sel.right - sel.left + 1) * TILE, (sel.bottom - sel.top + 1) * TILE
+					sel.left * TILE,
+					sel.top * TILE,
+					(sel.right - sel.left + 1) * TILE,
+					(sel.bottom - sel.top + 1) * TILE
 				);
 			}
 		}
@@ -715,7 +938,12 @@
 				ctx.fillStyle = '#4ade80';
 				ctx.fillText('▼', px, py + 8);
 			}
-			if (room.loot) { ctx.font='11px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('💰',(room.right-1)*TILE+TILE/2,(room.bottom-1)*TILE+TILE/2); }
+			if (room.loot) {
+				ctx.font = '11px serif';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText('💰', (room.right - 1) * TILE + TILE / 2, (room.bottom - 1) * TILE + TILE / 2);
+			}
 		}
 
 		// ── Pass 6b: Stairs ──────────────────────────────────────────────────
@@ -746,10 +974,17 @@
 		ctx.strokeRect(5, 5, CVS_W - 10, CVS_H - 10);
 
 		// Corner marks
-		for (const [ox, oy] of [[9,9],[CVS_W-9,9],[9,CVS_H-9],[CVS_W-9,CVS_H-9]] as [number,number][]) {
+		for (const [ox, oy] of [
+			[9, 9],
+			[CVS_W - 9, 9],
+			[9, CVS_H - 9],
+			[CVS_W - 9, CVS_H - 9]
+		] as [number, number][]) {
 			ctx.beginPath();
-			ctx.moveTo(ox, oy - 5); ctx.lineTo(ox + 5, oy);
-			ctx.lineTo(ox, oy + 5); ctx.lineTo(ox - 5, oy);
+			ctx.moveTo(ox, oy - 5);
+			ctx.lineTo(ox + 5, oy);
+			ctx.lineTo(ox, oy + 5);
+			ctx.lineTo(ox - 5, oy);
 			ctx.closePath();
 			ctx.fillStyle = 'rgba(74,112,144,0.6)';
 			ctx.fill();
@@ -795,8 +1030,10 @@
 
 		// N arm (bright)
 		ctx.beginPath();
-		ctx.moveTo(0, -(r - 2)); ctx.lineTo(3, -7);
-		ctx.lineTo(0, -2); ctx.lineTo(-3, -7);
+		ctx.moveTo(0, -(r - 2));
+		ctx.lineTo(3, -7);
+		ctx.lineTo(0, -2);
+		ctx.lineTo(-3, -7);
 		ctx.closePath();
 		ctx.fillStyle = '#90c8e0';
 		ctx.fill();
@@ -806,8 +1043,10 @@
 			ctx.save();
 			ctx.rotate(angle);
 			ctx.beginPath();
-			ctx.moveTo(0, -(r - 2)); ctx.lineTo(2.5, -6);
-			ctx.lineTo(0, -2); ctx.lineTo(-2.5, -6);
+			ctx.moveTo(0, -(r - 2));
+			ctx.lineTo(2.5, -6);
+			ctx.lineTo(0, -2);
+			ctx.lineTo(-2.5, -6);
 			ctx.closePath();
 			ctx.fillStyle = '#2a5068';
 			ctx.fill();
@@ -849,16 +1088,27 @@
 		if (tx >= 0 && tx < GRID_W && ty >= 0 && ty < GRID_H) {
 			// Check for stair click
 			const stairDir = floor.stairs[`${tx},${ty}`];
-			if (stairDir) { activeStair = { dir: stairDir, floor: currentFloor }; return; }
-			for (const lr of floor.rooms) { if (lr.loot && tx===lr.right-1 && ty===lr.bottom-1) { activeLoot=lr.loot; return; } }
+			if (stairDir) {
+				activeStair = { dir: stairDir, floor: currentFloor };
+				return;
+			}
+			for (const lr of floor.rooms) {
+				if (lr.loot && tx === lr.right - 1 && ty === lr.bottom - 1) {
+					activeLoot = lr.loot;
+					return;
+				}
+			}
 			// Check for trapped door click
 			if (floor.cells[ty][tx] === DOOR) {
 				const trap = floor.traps[`${tx},${ty}`];
-				if (trap) { activeTrap = trap; return; }
+				if (trap) {
+					activeTrap = trap;
+					return;
+				}
 			}
 		}
 		const clicked = floor.rooms.find(
-			r => tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom
+			(r) => tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom
 		);
 		selectedRoomId = clicked ? (clicked.id === selectedRoomId ? null : clicked.id) : null;
 		renderCanvas();
@@ -910,7 +1160,8 @@
 			{#if dungeon}
 				<span class="text-xs text-gray-500">
 					{dungeon.floors[currentFloor].rooms.length} rooms &bull; {roomsWithEncounters.length} encounters
-					{#if dungeon.floors.length > 1}&bull; Floor {currentFloor + 1}/{dungeon.floors.length}{/if}
+					{#if dungeon.floors.length > 1}&bull; Floor {currentFloor + 1}/{dungeon.floors
+							.length}{/if}
 				</span>
 			{/if}
 		</div>
@@ -919,7 +1170,14 @@
 			class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 			aria-label="Close"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>
 		</button>
@@ -929,22 +1187,41 @@
 	<div class="relative flex min-h-0 flex-1 overflow-hidden">
 		<!-- Controls panel -->
 		<div
-			class="{mobilePanel === 'controls'
+			class={mobilePanel === 'controls'
 				? 'absolute inset-0 z-20 flex flex-col gap-4 overflow-y-auto bg-gray-900 p-4'
-				: 'hidden sm:flex w-52 shrink-0 flex-col gap-4 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4'}"
+				: 'hidden w-52 shrink-0 flex-col gap-4 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex'}
 		>
 			{#if mobilePanel === 'controls'}
 				<div class="flex items-center justify-between border-b border-gray-800 pb-3 sm:hidden">
 					<span class="text-sm font-bold text-amber-300">Generate Map</span>
-					<button onclick={() => (mobilePanel = null)} aria-label="Close panel" class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+					<button
+						onclick={() => (mobilePanel = null)}
+						aria-label="Close panel"
+						class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+							><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
+						>
 					</button>
 				</div>
 			{/if}
 
 			<div class="flex flex-col gap-1">
-				<label for="dng-party-size" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Party Size</label>
-				<select id="dng-party-size" bind:value={partySize} class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none">
+				<label
+					for="dng-party-size"
+					class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Party Size</label
+				>
+				<select
+					id="dng-party-size"
+					bind:value={partySize}
+					class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+				>
 					{#each [1, 2, 3, 4, 5, 6, 7, 8] as n}
 						<option value={n}>{n} player{n !== 1 ? 's' : ''}</option>
 					{/each}
@@ -952,8 +1229,14 @@
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<label for="dng-level" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Party Level</label>
-				<select id="dng-level" bind:value={partyLevel} class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none">
+				<label for="dng-level" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
+					>Party Level</label
+				>
+				<select
+					id="dng-level"
+					bind:value={partyLevel}
+					class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+				>
 					{#each Array.from({ length: 20 }, (_, i) => i + 1) as lv}
 						<option value={lv}>Level {lv}</option>
 					{/each}
@@ -961,8 +1244,14 @@
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<label for="dng-size" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Size</label>
-				<select id="dng-size" bind:value={dungeonSize} class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none">
+				<label for="dng-size" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
+					>Size</label
+				>
+				<select
+					id="dng-size"
+					bind:value={dungeonSize}
+					class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+				>
 					<option value="small">Small</option>
 					<option value="medium">Medium</option>
 					<option value="large">Large</option>
@@ -970,8 +1259,15 @@
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<label for="dng-difficulty" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Difficulty</label>
-				<select id="dng-difficulty" bind:value={difficulty} class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none">
+				<label
+					for="dng-difficulty"
+					class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Difficulty</label
+				>
+				<select
+					id="dng-difficulty"
+					bind:value={difficulty}
+					class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+				>
 					<option value="easy">Easy</option>
 					<option value="medium">Medium</option>
 					<option value="hard">Hard</option>
@@ -980,16 +1276,27 @@
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<label for="dng-floors" class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Floors</label>
-				<select id="dng-floors" bind:value={numFloors} class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none">
+				<label
+					for="dng-floors"
+					class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Floors</label
+				>
+				<select
+					id="dng-floors"
+					bind:value={numFloors}
+					class="rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+				>
 					{#each [1, 2, 3, 4, 5] as n}
-						<option value={n}>{n} Floor{n !== 1 ? "s" : ""}</option>
+						<option value={n}>{n} Floor{n !== 1 ? 's' : ''}</option>
 					{/each}
 				</select>
 			</div>
 
 			<label class="flex cursor-pointer items-center gap-2">
-				<input type="checkbox" bind:checked={includeBoss} class="h-4 w-4 rounded accent-amber-500" />
+				<input
+					type="checkbox"
+					bind:checked={includeBoss}
+					class="h-4 w-4 rounded accent-amber-500"
+				/>
 				<span class="text-sm text-gray-300">Include Boss</span>
 			</label>
 
@@ -1005,30 +1312,50 @@
 					<p class="mb-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase">Legend</p>
 					<div class="flex flex-col gap-1.5 text-xs text-gray-400">
 						<div class="flex items-center gap-2">
-							<span class="inline-block h-3 w-4 rounded-sm" style="background:#0f2e1c;border:1px solid #4ade80"></span>
+							<span
+								class="inline-block h-3 w-4 rounded-sm"
+								style="background:#0f2e1c;border:1px solid #4ade80"
+							></span>
 							Entrance ▼
 						</div>
 						{#if includeBoss}
 							<div class="flex items-center gap-2">
-								<span class="inline-block h-3 w-4 rounded-sm" style="background:#300e0e;border:1px solid #f87171"></span>
+								<span
+									class="inline-block h-3 w-4 rounded-sm"
+									style="background:#300e0e;border:1px solid #f87171"
+								></span>
 								Boss ☠
 							</div>
 						{/if}
 						<div class="flex items-center gap-2">
-							<span class="inline-block h-3 w-4 rounded-sm" style="background:#c87820;border:1px solid #8b5e18"></span>
+							<span
+								class="inline-block h-3 w-4 rounded-sm"
+								style="background:#c87820;border:1px solid #8b5e18"
+							></span>
 							Door
 						</div>
 						<div class="flex items-center gap-2">
-							<span class="inline-flex h-3 w-4 items-center justify-center rounded-sm text-[8px] font-bold text-red-200" style="background:#cc2222;border:1px solid #991111">!</span>
+							<span
+								class="inline-flex h-3 w-4 items-center justify-center rounded-sm text-[8px] font-bold text-red-200"
+								style="background:#cc2222;border:1px solid #991111">!</span
+							>
 							Trapped Door
 						</div>
 						{#if dungeon.floors.length > 1}
 							<div class="flex items-center gap-2">
-								<span class="inline-flex h-3 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.5)">▲</span>
+								<span
+									class="inline-flex h-3 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white"
+									style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.5)"
+									>▲</span
+								>
 								Stairs Up
 							</div>
 							<div class="flex items-center gap-2">
-								<span class="inline-flex h-3 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.5)">▼</span>
+								<span
+									class="inline-flex h-3 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white"
+									style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.5)"
+									>▼</span
+								>
 								Stairs Down
 							</div>
 						{/if}
@@ -1068,7 +1395,9 @@
 				{#if dungeon && dungeon.floors.length > 1}
 					<select
 						bind:value={currentFloor}
-						onchange={() => { selectedRoomId = null; }}
+						onchange={() => {
+							selectedRoomId = null;
+						}}
 						class="rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 text-xs text-gray-300 shadow-lg focus:border-amber-500 focus:outline-none"
 					>
 						{#each dungeon.floors as _, fi}
@@ -1077,32 +1406,38 @@
 					</select>
 				{/if}
 				{#if dungeon}
-				<button
-					onclick={downloadPdf}
-					disabled={isExporting}
-					class="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 text-xs text-gray-300 shadow-lg transition hover:border-amber-600 hover:text-amber-300 disabled:opacity-50"
-					title="Download all floors as PDF"
+					<button
+						onclick={downloadPdf}
+						disabled={isExporting}
+						class="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 text-xs text-gray-300 shadow-lg transition hover:border-amber-600 hover:text-amber-300 disabled:opacity-50"
+						title="Download all floors as PDF"
+					>
+						{#if isExporting}
+							<span
+								class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-500 border-t-amber-400"
+							></span>
+						{:else}
+							⤓
+						{/if}
+						PDF
+					</button>
+				{/if}
+				<div
+					class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 shadow-lg"
 				>
-					{#if isExporting}
-						<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-500 border-t-amber-400"></span>
-					{:else}
-						⤓
-					{/if}
-					PDF
-				</button>
-			{/if}
-			<div class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 px-2 py-1 shadow-lg">
 					<button
 						onclick={() => (zoom = Math.max(ZOOM_MIN, zoom - ZOOM_STEP))}
 						class="flex h-6 w-6 items-center justify-center rounded text-gray-300 transition hover:text-amber-300"
-						title="Zoom out"
-					>&#8722;</button>
-					<span class="min-w-[2.5rem] text-center text-xs text-gray-500">{Math.round(zoom * 100)}%</span>
+						title="Zoom out">&#8722;</button
+					>
+					<span class="min-w-[2.5rem] text-center text-xs text-gray-500"
+						>{Math.round(zoom * 100)}%</span
+					>
 					<button
 						onclick={() => (zoom = Math.min(ZOOM_MAX, zoom + ZOOM_STEP))}
 						class="flex h-6 w-6 items-center justify-center rounded text-gray-300 transition hover:text-amber-300"
-						title="Zoom in"
-					>+</button>
+						title="Zoom in">+</button
+					>
 				</div>
 			</div>
 			{#if !dungeon}
@@ -1114,48 +1449,60 @@
 				</div>
 			{:else}
 				<div class="p-4" style="min-width:fit-content;">
-				<div style="width:{CVS_W * zoom}px; height:{CVS_H * zoom}px; position:relative; flex-shrink:0; margin:0 auto;">
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<canvas
-					bind:this={canvasEl}
-					width={CVS_W}
-					height={CVS_H}
-					onclick={handleCanvasClick}
-					style="display:block; border-radius:4px; cursor:crosshair; box-shadow:0 8px 40px rgba(0,0,0,0.85); transform-origin:top left; transform:scale({zoom});"
-				></canvas>
+					<div
+						style="width:{CVS_W * zoom}px; height:{CVS_H *
+							zoom}px; position:relative; flex-shrink:0; margin:0 auto;"
+					>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<canvas
+							bind:this={canvasEl}
+							width={CVS_W}
+							height={CVS_H}
+							onclick={handleCanvasClick}
+							style="display:block; border-radius:4px; cursor:crosshair; box-shadow:0 8px 40px rgba(0,0,0,0.85); transform-origin:top left; transform:scale({zoom});"
+						></canvas>
 
-				<!-- Selected room tooltip -->
-				{#if selectedRoom}
-					<div class="absolute bottom-3 left-3 max-w-xs rounded-lg border border-amber-800/60 bg-gray-950/95 p-3 shadow-xl">
-						<p class="mb-1.5 text-xs font-bold text-amber-300">
-							Room {selectedRoom.id + 1} &mdash; {selectedRoom.name}
-						</p>
-						{#if selectedRoom.isEntrance}
-							<p class="text-xs text-green-400">Party entrance point</p>
-						{:else if selectedRoom.encounter && selectedRoom.encounter.monsters.length > 0}
-							<div class="space-y-0.5">
-								{#each selectedRoom.encounter.monsters as m}
-									<p class="text-xs text-gray-300">{m.count}&times; {m.name}</p>
-								{/each}
-								<span class="mt-1.5 inline-block rounded border px-1.5 py-0.5 text-[10px] font-bold {difficultyBadge[selectedRoom.encounter.difficulty]}">
-									{selectedRoom.encounter.difficulty} &mdash; {selectedRoom.encounter.xp.toLocaleString()} XP
-								</span>
+						<!-- Selected room tooltip -->
+						{#if selectedRoom}
+							<div
+								class="absolute bottom-3 left-3 max-w-xs rounded-lg border border-amber-800/60 bg-gray-950/95 p-3 shadow-xl"
+							>
+								<p class="mb-1.5 text-xs font-bold text-amber-300">
+									Room {selectedRoom.id + 1} &mdash; {selectedRoom.name}
+								</p>
+								{#if selectedRoom.isEntrance}
+									<p class="text-xs text-green-400">Party entrance point</p>
+								{:else if selectedRoom.encounter && selectedRoom.encounter.monsters.length > 0}
+									<div class="space-y-0.5">
+										{#each selectedRoom.encounter.monsters as m}
+											<p class="text-xs text-gray-300">{m.count}&times; {m.name}</p>
+										{/each}
+										<span
+											class="mt-1.5 inline-block rounded border px-1.5 py-0.5 text-[10px] font-bold {difficultyBadge[
+												selectedRoom.encounter.difficulty
+											]}"
+										>
+											{selectedRoom.encounter.difficulty} &mdash; {selectedRoom.encounter.xp.toLocaleString()}
+											XP
+										</span>
+									</div>
+									{#if onAddEncounter}
+										<button
+											onclick={() => onAddEncounter!(selectedRoom!.encounter!.monsters)}
+											class="mt-2 w-full rounded bg-emerald-700 px-2 py-1 text-xs font-bold text-white transition hover:bg-emerald-600"
+										>
+											Add to Initiative
+										</button>
+									{/if}
+								{:else}
+									<p class="text-xs text-gray-500">Empty room</p>
+								{/if}
 							</div>
-							{#if onAddEncounter}
-								<button
-									onclick={() => onAddEncounter!(selectedRoom!.encounter!.monsters)}
-									class="mt-2 w-full rounded bg-emerald-700 px-2 py-1 text-xs font-bold text-white transition hover:bg-emerald-600"
-								>
-									Add to Initiative
-								</button>
-							{/if}
-						{:else}
-							<p class="text-xs text-gray-500">Empty room</p>
 						{/if}
 					</div>
-				{/if}
-				</div>
-				<p class="mt-2 text-center text-[10px] text-gray-700">Click a room to view its encounter.</p>
+					<p class="mt-2 text-center text-[10px] text-gray-700">
+						Click a room to view its encounter.
+					</p>
 				</div>
 			{/if}
 		</div>
@@ -1163,15 +1510,31 @@
 		<!-- Encounter list panel -->
 		{#if dungeon}
 			<div
-				class="{mobilePanel === 'encounters'
+				class={mobilePanel === 'encounters'
 					? 'absolute inset-0 z-20 flex flex-col overflow-y-auto bg-gray-900'
-					: 'hidden sm:flex w-64 shrink-0 flex-col overflow-y-auto border-l border-gray-800 bg-gray-900/60'}"
+					: 'hidden w-64 shrink-0 flex-col overflow-y-auto border-l border-gray-800 bg-gray-900/60 sm:flex'}
 			>
 				<div class="flex items-center justify-between border-b border-gray-800 px-4 py-3">
 					<p class="text-xs font-bold tracking-widest text-gray-400 uppercase">Encounters</p>
 					{#if mobilePanel === 'encounters'}
-						<button onclick={() => (mobilePanel = null)} aria-label="Close panel" class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400 sm:hidden">
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+						<button
+							onclick={() => (mobilePanel = null)}
+							aria-label="Close panel"
+							class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400 sm:hidden"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M6 18L18 6M6 6l12 12"
+								/></svg
+							>
 						</button>
 					{/if}
 				</div>
@@ -1181,15 +1544,27 @@
 				{:else}
 					<div class="flex flex-col divide-y divide-gray-800/60">
 						{#each roomsWithEncounters as room}
-							<div class="p-3 transition {room.id === selectedRoomId ? 'bg-amber-900/10' : 'hover:bg-gray-800/40'}">
+							<div
+								class="p-3 transition {room.id === selectedRoomId
+									? 'bg-amber-900/10'
+									: 'hover:bg-gray-800/40'}"
+							>
 								<button
 									class="mb-1.5 flex w-full items-center gap-1.5 text-left"
 									onclick={() => (selectedRoomId = room.id === selectedRoomId ? null : room.id)}
 								>
-									<span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold {room.isBoss ? 'bg-red-900 text-red-300' : room.isEntrance ? 'bg-green-900 text-green-300' : 'bg-gray-800 text-gray-400'}">
+									<span
+										class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold {room.isBoss
+											? 'bg-red-900 text-red-300'
+											: room.isEntrance
+												? 'bg-green-900 text-green-300'
+												: 'bg-gray-800 text-gray-400'}"
+									>
 										{room.id + 1}
 									</span>
-									<span class="text-xs font-semibold {room.isBoss ? 'text-red-300' : 'text-gray-300'}">
+									<span
+										class="text-xs font-semibold {room.isBoss ? 'text-red-300' : 'text-gray-300'}"
+									>
 										{room.name}
 									</span>
 									{#if room.isBoss}
@@ -1202,7 +1577,10 @@
 										<div class="flex items-center gap-1">
 											<span class="text-xs text-gray-500">{m.count}&times;</span>
 											<button
-												onclick={() => { const detail = getMonsterDetail(m.name); if (detail) infoMonster = detail; }}
+												onclick={() => {
+													const detail = getMonsterDetail(m.name);
+													if (detail) infoMonster = detail;
+												}}
 												class="text-left text-xs text-amber-400 underline decoration-dotted underline-offset-2 transition hover:text-amber-300"
 											>
 												{m.name}
@@ -1211,17 +1589,23 @@
 									{/each}
 								</div>
 
-								<div class="ml-7 mt-1.5 flex items-center justify-between">
-									<span class="rounded border px-1.5 py-0.5 text-[9px] font-bold {difficultyBadge[room.encounter!.difficulty]}">
+								<div class="mt-1.5 ml-7 flex items-center justify-between">
+									<span
+										class="rounded border px-1.5 py-0.5 text-[9px] font-bold {difficultyBadge[
+											room.encounter!.difficulty
+										]}"
+									>
 										{room.encounter!.difficulty}
 									</span>
-									<span class="text-[9px] text-gray-600">{room.encounter!.xp.toLocaleString()} XP</span>
+									<span class="text-[9px] text-gray-600"
+										>{room.encounter!.xp.toLocaleString()} XP</span
+									>
 								</div>
 
 								{#if onAddEncounter}
 									<button
 										onclick={() => onAddEncounter!(room.encounter!.monsters)}
-										class="ml-7 mt-2 w-[calc(100%-1.75rem)] rounded bg-emerald-800 py-1 text-[10px] font-bold text-emerald-300 transition hover:bg-emerald-700 active:scale-95"
+										class="mt-2 ml-7 w-[calc(100%-1.75rem)] rounded bg-emerald-800 py-1 text-[10px] font-bold text-emerald-300 transition hover:bg-emerald-700 active:scale-95"
 									>
 										Add to Initiative
 									</button>
@@ -1247,7 +1631,11 @@
 		<button
 			onclick={() => (mobilePanel = mobilePanel === 'encounters' ? null : 'encounters')}
 			class="flex flex-1 flex-col items-center gap-1 py-3 text-xs transition
-				{mobilePanel === 'encounters' ? 'text-amber-300' : dungeon ? 'text-gray-500 hover:text-gray-300' : 'text-gray-700 cursor-not-allowed'}"
+				{mobilePanel === 'encounters'
+				? 'text-amber-300'
+				: dungeon
+					? 'text-gray-500 hover:text-gray-300'
+					: 'cursor-not-allowed text-gray-700'}"
 			disabled={!dungeon}
 		>
 			<span class="text-lg leading-none">⚔️</span>
@@ -1265,7 +1653,7 @@
 	<div
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
 		onclick={() => (activeTrap = null)}
-		onkeydown={(e) => e.key === "Escape" && (activeTrap = null)}
+		onkeydown={(e) => e.key === 'Escape' && (activeTrap = null)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -1274,7 +1662,9 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<!-- Modal header -->
-			<div class="flex items-center justify-between border-b border-red-900/40 bg-red-950/30 px-4 py-3 rounded-t-xl">
+			<div
+				class="flex items-center justify-between rounded-t-xl border-b border-red-900/40 bg-red-950/30 px-4 py-3"
+			>
 				<div class="flex items-center gap-2">
 					<span class="text-base">&#9888;</span>
 					<h3 class="text-sm font-bold tracking-wide text-red-300">Trap Detected</h3>
@@ -1284,7 +1674,14 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
@@ -1293,15 +1690,19 @@
 			<div class="space-y-3 p-4">
 				<p class="text-base font-bold text-red-200">{activeTrap.name}</p>
 				<div class="rounded border border-gray-800 bg-gray-900/60 px-3 py-2 text-xs text-gray-400">
-					<span class="font-bold uppercase tracking-widest text-gray-600 text-[10px]">Trigger</span>
+					<span class="text-[10px] font-bold tracking-widest text-gray-600 uppercase">Trigger</span>
 					<p class="mt-0.5 text-gray-300">{activeTrap.trigger}</p>
 				</div>
 				<div class="rounded border border-red-900/30 bg-red-950/20 px-3 py-2 text-xs">
-					<span class="font-bold uppercase tracking-widest text-red-600 text-[10px]">Effect</span>
+					<span class="text-[10px] font-bold tracking-widest text-red-600 uppercase">Effect</span>
 					<p class="mt-0.5 text-red-200">{activeTrap.effect}</p>
 				</div>
-				<div class="flex items-center gap-2 rounded border border-amber-900/30 bg-amber-950/20 px-3 py-2">
-					<span class="text-[10px] font-bold uppercase tracking-widest text-amber-600">Detection DC</span>
+				<div
+					class="flex items-center gap-2 rounded border border-amber-900/30 bg-amber-950/20 px-3 py-2"
+				>
+					<span class="text-[10px] font-bold tracking-widest text-amber-600 uppercase"
+						>Detection DC</span
+					>
 					<span class="ml-auto text-sm font-bold text-amber-300">{activeTrap.dc}</span>
 				</div>
 			</div>
@@ -1314,7 +1715,7 @@
 	<div
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
 		onclick={() => (activeStair = null)}
-		onkeydown={(e) => e.key === "Escape" && (activeStair = null)}
+		onkeydown={(e) => e.key === 'Escape' && (activeStair = null)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -1322,7 +1723,9 @@
 			class="relative z-10 w-full max-w-xs rounded-xl border border-gray-700 bg-gray-950 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
-			<div class="flex items-center justify-between border-b border-gray-800 bg-gray-900/60 px-4 py-3 rounded-t-xl">
+			<div
+				class="flex items-center justify-between rounded-t-xl border-b border-gray-800 bg-gray-900/60 px-4 py-3"
+			>
 				<div class="flex items-center gap-2">
 					<span class="text-base">{activeStair.dir === 'up' ? '▲' : '▼'}</span>
 					<h3 class="text-sm font-bold tracking-wide text-gray-200">
@@ -1334,7 +1737,14 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
@@ -1346,9 +1756,17 @@
 						: `These stairs ascend to Floor ${activeStair.floor}.`}
 				</p>
 				<button
-					onclick={() => { currentFloor = activeStair!.dir === 'down' ? activeStair!.floor + 1 : activeStair!.floor - 1; selectedRoomId = null; activeStair = null; }}
+					onclick={() => {
+						currentFloor =
+							activeStair!.dir === 'down' ? activeStair!.floor + 1 : activeStair!.floor - 1;
+						selectedRoomId = null;
+						activeStair = null;
+					}}
 					class="w-full rounded bg-gray-700 px-3 py-1.5 text-xs font-bold text-gray-200 transition hover:bg-gray-600"
-				>Go to Floor {activeStair.dir === 'down' ? activeStair.floor + 2 : activeStair.floor}</button>
+					>Go to Floor {activeStair.dir === 'down'
+						? activeStair.floor + 2
+						: activeStair.floor}</button
+				>
 			</div>
 		</div>
 	</div>
@@ -1356,22 +1774,51 @@
 
 {#if activeLoot}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="fixed inset-0 z-[60] flex items-center justify-center p-4" onclick={() => (activeLoot = null)} onkeydown={(e) => e.key === "Escape" && (activeLoot = null)}>
+	<div
+		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+		onclick={() => (activeLoot = null)}
+		onkeydown={(e) => e.key === 'Escape' && (activeLoot = null)}
+	>
 		<div class="absolute inset-0 bg-black/70"></div>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="relative z-10 w-full max-w-sm rounded-xl border border-yellow-900/50 bg-gray-950 shadow-2xl" onclick={(e) => e.stopPropagation()}>
-			<div class="flex items-center justify-between border-b border-yellow-900/40 bg-yellow-950/20 px-4 py-3 rounded-t-xl">
-				<div class="flex items-center gap-2"><span class="text-base">💰</span><h3 class="text-sm font-bold tracking-wide text-yellow-300">Loot Found!</h3></div>
-				<button onclick={() => (activeLoot = null)} class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+		<div
+			class="relative z-10 w-full max-w-sm rounded-xl border border-yellow-900/50 bg-gray-950 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<div
+				class="flex items-center justify-between rounded-t-xl border-b border-yellow-900/40 bg-yellow-950/20 px-4 py-3"
+			>
+				<div class="flex items-center gap-2">
+					<span class="text-base">💰</span>
+					<h3 class="text-sm font-bold tracking-wide text-yellow-300">Loot Found!</h3>
+				</div>
+				<button
+					onclick={() => (activeLoot = null)}
+					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
+					aria-label="Close"
+					><svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
+					></button
+				>
 			</div>
 			<div class="space-y-3 p-4">
-				<div class="flex items-center gap-2 rounded border border-yellow-900/30 bg-yellow-950/20 px-3 py-2">
-					<span class="text-[10px] font-bold uppercase tracking-widest text-yellow-600">Coins</span>
+				<div
+					class="flex items-center gap-2 rounded border border-yellow-900/30 bg-yellow-950/20 px-3 py-2"
+				>
+					<span class="text-[10px] font-bold tracking-widest text-yellow-600 uppercase">Coins</span>
 					<span class="ml-auto text-sm font-bold text-yellow-300">{activeLoot.coins}</span>
 				</div>
 				{#if activeLoot.items.length > 0}
 					<div class="rounded border border-gray-800 bg-gray-900/60 px-3 py-2">
-						<p class="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">Items</p>
+						<p class="mb-1.5 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+							Items
+						</p>
 						{#each activeLoot.items as item}<p class="text-xs text-gray-200">• {item}</p>{/each}
 					</div>
 				{:else}<p class="text-xs text-gray-600">No magic items — just the coins.</p>
@@ -1388,49 +1835,87 @@
 		filter: blur(90px);
 	}
 	.orb-1 {
-		width: min(65vw, 700px); height: min(65vw, 700px);
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
 		background: rgba(88, 28, 135, 0.45);
-		top: -15%; left: -12%;
+		top: -15%;
+		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
-		width: min(55vw, 620px); height: min(55vw, 620px);
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
 		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%; right: -10%;
+		bottom: -18%;
+		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
-		width: min(45vw, 520px); height: min(45vw, 520px);
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
 		background: rgba(120, 53, 15, 0.35);
-		top: 35%; left: 42%;
+		top: 35%;
+		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
-		width: min(38vw, 440px); height: min(38vw, 440px);
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
 		background: rgba(49, 46, 129, 0.4);
-		top: 15%; right: 18%;
+		top: 15%;
+		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 </style>

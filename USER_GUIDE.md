@@ -845,14 +845,14 @@ Click the **🗺 Dungeon** button in the DM dashboard header to open the Random 
 
 Set the following options before generating:
 
-| Setting            | Description                                                                 |
-| ------------------ | --------------------------------------------------------------------------- |
-| **Party Size**     | Number of players (affects encounter XP budgets)                            |
-| **Party Level**    | Average party level (scales encounters, loot, and trap DCs)                 |
-| **Dungeon Size**   | Small, Medium, or Large — controls the overall grid size and room count     |
-| **Difficulty**     | Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier          |
-| **Include Boss**   | Toggle on to guarantee a boss room with a harder encounter at the end       |
-| **Floors**         | 1–5 floors; each floor is generated independently and connected by stairs   |
+| Setting          | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| **Party Size**   | Number of players (affects encounter XP budgets)                          |
+| **Party Level**  | Average party level (scales encounters, loot, and trap DCs)               |
+| **Dungeon Size** | Small, Medium, or Large — controls the overall grid size and room count   |
+| **Difficulty**   | Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier        |
+| **Include Boss** | Toggle on to guarantee a boss room with a harder encounter at the end     |
+| **Floors**       | 1–5 floors; each floor is generated independently and connected by stairs |
 
 Click **Generate Dungeon** to build the map. Regenerating replaces the entire dungeon.
 
@@ -862,14 +862,14 @@ The map is a tile-based top-down grid rendered on canvas. Use the **zoom control
 
 **Cell types:**
 
-| Visual                        | Meaning                                    |
-| ----------------------------- | ------------------------------------------ |
-| Dark void                     | Impassable wall / empty space              |
-| Stone floor (with grid lines) | Walkable room tile                         |
-| Corridor (with grid lines)    | Hallway connecting rooms                   |
-| Door tile                     | Entry between a corridor and a room        |
-| Red-framed door with **!**    | Trapped door (see [Trapped Doors](#trapped-doors-1)) |
-| 💰 icon                       | Room contains loot (see [Loot](#loot-1))   |
+| Visual                        | Meaning                                               |
+| ----------------------------- | ----------------------------------------------------- |
+| Dark void                     | Impassable wall / empty space                         |
+| Stone floor (with grid lines) | Walkable room tile                                    |
+| Corridor (with grid lines)    | Hallway connecting rooms                              |
+| Door tile                     | Entry between a corridor and a room                   |
+| Red-framed door with **!**    | Trapped door (see [Trapped Doors](#trapped-doors-1))  |
+| 💰 icon                       | Room contains loot (see [Loot](#loot-1))              |
 | ▲ / ▼ icon (white circle)     | Staircase (see [Multiple Floors](#multiple-floors-1)) |
 
 **Room labels** appear on the map in each room: the entrance room is marked **Entrance**, the boss room is marked **Boss**, and all other rooms are given a themed name (e.g. _Crypt of Shadows_, _Guard Post_).
@@ -909,12 +909,12 @@ Close the modal with the **✕** button or by clicking outside it.
 - **Coins** — a gold piece total scaled to the party level
 - **Items** — 0–2 items drawn from a tier-appropriate table:
 
-| Party Level | Loot Tier  | Example Items                                  |
-| ----------- | ---------- | ---------------------------------------------- |
-| 1–4         | Common     | Healing Potion, Thieves' Tools, Torch Bundle   |
-| 5–10        | Uncommon   | Bag of Holding, Cloak of Protection, Sending Stones |
-| 11–16       | Rare       | Ring of Evasion, Staff of Fire, Carpet of Flying |
-| 17–20       | Very Rare  | Cloak of Invisibility, Manual of Bodily Health  |
+| Party Level | Loot Tier | Example Items                                       |
+| ----------- | --------- | --------------------------------------------------- |
+| 1–4         | Common    | Healing Potion, Thieves' Tools, Torch Bundle        |
+| 5–10        | Uncommon  | Bag of Holding, Cloak of Protection, Sending Stones |
+| 11–16       | Rare      | Ring of Evasion, Staff of Fire, Carpet of Flying    |
+| 17–20       | Very Rare | Cloak of Invisibility, Manual of Bodily Health      |
 
 Close the modal with the **✕** button or by clicking outside it.
 

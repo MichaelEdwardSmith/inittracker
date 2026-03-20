@@ -6,22 +6,12 @@ import {
 	saveCombatRecord,
 	getCombatHistory,
 	deleteCombatRecord,
-	clearCombatHistory,
-	getActiveGameSessionPublicId
+	clearCombatHistory
 } from '$lib/server/dmModel';
-import { authToGameSession } from '$lib/server/sessionCache';
+import { resolveGameSessionId } from '$lib/server/sessionCache';
 import { guestHistory } from '$lib/server/sseState';
 import { isValidSessionId } from '$lib/server/validate';
 import type { CombatRecord } from '$lib/types';
-
-async function resolveGameSessionId(authSessionId: string): Promise<string | null> {
-	let gameSessionId = authToGameSession.get(authSessionId) ?? null;
-	if (!gameSessionId) {
-		gameSessionId = await getActiveGameSessionPublicId(authSessionId);
-		if (gameSessionId) authToGameSession.set(authSessionId, gameSessionId);
-	}
-	return gameSessionId;
-}
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const authSessionId = cookies.get('dm_auth');

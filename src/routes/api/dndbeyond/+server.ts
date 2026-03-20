@@ -22,15 +22,12 @@ function parseDDBCharacter(data: any): DDBImport {
 		...(data.modifiers?.background ?? []),
 		...(data.modifiers?.feat ?? []),
 		...(data.modifiers?.item ?? []),
-		...(data.modifiers?.condition ?? []),
+		...(data.modifiers?.condition ?? [])
 	];
 
 	// ── Proficiency bonus ────────────────────────────────────────────────────
 	// data.proficiencyBonus is absent from the API response; derive from total level.
-	const totalLevel = (data.classes ?? []).reduce(
-		(sum: number, c: any) => sum + (c.level ?? 0),
-		0
-	);
+	const totalLevel = (data.classes ?? []).reduce((sum: number, c: any) => sum + (c.level ?? 0), 0);
 	const profBonus: number = data.proficiencyBonus ?? Math.ceil(1 + totalLevel / 4);
 
 	// ── Ability scores ───────────────────────────────────────────────────────
@@ -49,7 +46,7 @@ function parseDDBCharacter(data: any): DDBImport {
 		3: ['constitution', 'constitution-score'],
 		4: ['intelligence', 'intelligence-score'],
 		5: ['wisdom', 'wisdom-score'],
-		6: ['charisma', 'charisma-score'],
+		6: ['charisma', 'charisma-score']
 	};
 	const scores: Record<number, number> = {};
 	for (const s of data.stats ?? []) scores[s.id] = s.value ?? 10;
@@ -61,9 +58,7 @@ function parseDDBCharacter(data: any): DDBImport {
 	}
 	// Collect IDs that are fully overridden (skip modifier bonuses for those)
 	const overriddenIds = new Set(
-		(data.overrideStats ?? [])
-			.filter((s: any) => s.value != null)
-			.map((s: any) => s.id)
+		(data.overrideStats ?? []).filter((s: any) => s.value != null).map((s: any) => s.id)
 	);
 	for (const [id, subTypes] of Object.entries(statSubTypes)) {
 		const numId = Number(id);
@@ -122,15 +117,15 @@ function parseDDBCharacter(data: any): DDBImport {
 			if (t === 2) return base + Math.min(dexModBase, 2);
 			return base;
 		};
-		const armor = armors.length ? armors.reduce((best: any, i: any) => armorAcFor(i) >= armorAcFor(best) ? i : best) : null;
+		const armor = armors.length
+			? armors.reduce((best: any, i: any) => (armorAcFor(i) >= armorAcFor(best) ? i : best))
+			: null;
 
 		if (armor) {
 			ac = armorAcFor(armor);
 		} else {
 			// Unarmored — check for Unarmored Defense on primary class
-			const primaryClass: string = (
-				data.classes?.[0]?.definition?.name ?? ''
-			).toLowerCase();
+			const primaryClass: string = (data.classes?.[0]?.definition?.name ?? '').toLowerCase();
 			if (primaryClass === 'barbarian') ac = 10 + dexModBase + mod(3);
 			else if (primaryClass === 'monk') ac = 10 + dexModBase + wisMod;
 			else ac = 10 + dexModBase;
@@ -152,9 +147,7 @@ function parseDDBCharacter(data: any): DDBImport {
 	const dexMod = dexModBase + initiativeBonus;
 
 	// ── Passive Perception ───────────────────────────────────────────────────
-	const hasProfPerc = allMods.some(
-		(m) => m.type === 'proficiency' && m.subType === 'perception'
-	);
+	const hasProfPerc = allMods.some((m) => m.type === 'proficiency' && m.subType === 'perception');
 	const hasExpertisePerc = allMods.some(
 		(m) => m.type === 'expertise' && m.subType === 'perception'
 	);
@@ -167,7 +160,7 @@ function parseDDBCharacter(data: any): DDBImport {
 		ac: Math.max(1, ac),
 		dexMod,
 		passivePerception,
-		...(data.decorations?.avatarUrl ? { avatarUrl: data.decorations.avatarUrl } : {}),
+		...(data.decorations?.avatarUrl ? { avatarUrl: data.decorations.avatarUrl } : {})
 	};
 }
 
@@ -188,7 +181,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			`https://character-service.dndbeyond.com/character/v5/character/${id}`,
 			{
 				headers: { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0 (compatible)' },
-				signal: controller.signal,
+				signal: controller.signal
 			}
 		);
 		clearTimeout(timeout);

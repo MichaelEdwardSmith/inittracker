@@ -56,7 +56,10 @@ const conditionDescriptions2024Overrides: Partial<Record<string, string>> = {
 };
 
 /** Returns the correct condition description for the given edition. */
-export function getConditionDescription(condition: string, ruleset: '2014' | '2024' = '2014'): string {
+export function getConditionDescription(
+	condition: string,
+	ruleset: '2014' | '2024' = '2014'
+): string {
 	if (ruleset === '2024') {
 		return (
 			conditionDescriptions2024Overrides[condition] ??
@@ -225,9 +228,7 @@ export function encounterDifficulty2024(
 ): EncounterDifficulty2024 {
 	if (partySize <= 0 || partyLevel <= 0) return 'Trivial';
 	const level = Math.max(1, Math.min(20, Math.round(partyLevel)));
-	const [low, moderate, high, severe, deadly] = XP_THRESHOLDS_2024[level].map(
-		(t) => t * partySize
-	);
+	const [low, moderate, high, severe, deadly] = XP_THRESHOLDS_2024[level].map((t) => t * partySize);
 	if (rawXp < low) return 'Trivial';
 	if (rawXp < moderate) return 'Low';
 	if (rawXp < high) return 'Moderate';

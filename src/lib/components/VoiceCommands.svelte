@@ -149,9 +149,7 @@
 			const next: number[] = [i];
 			for (let j = 1; j <= n; j++) {
 				next[j] =
-					a[i - 1] === b[j - 1]
-						? row[j - 1]
-						: 1 + Math.min(row[j], next[j - 1], row[j - 1]);
+					a[i - 1] === b[j - 1] ? row[j - 1] : 1 + Math.min(row[j], next[j - 1], row[j - 1]);
 			}
 			row = next;
 		}
@@ -494,8 +492,7 @@
 			.map((c) => c.name)
 			.join(', ');
 		const example =
-			combat.combatants.find((c) => c.type === 'player' || c.type === 'enemy')?.name ??
-			'Aragorn';
+			combat.combatants.find((c) => c.type === 'player' || c.type === 'enemy')?.name ?? 'Aragorn';
 		const initial_prompt = `D&D combat tracker. Combatants: ${names}. Wake word: tracker. Commands: "tracker next", "tracker start combat", "tracker end combat", "tracker roll d20", "${example} takes 8 damage", "${example} heals 4 HP".`;
 		worker.postMessage({ type: 'transcribe', audio: float32, initial_prompt }, [float32.buffer]);
 	}

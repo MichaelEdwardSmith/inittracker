@@ -112,10 +112,7 @@ export async function createDM(
 	let sessionId: string;
 	do {
 		sessionId = randomSessionId();
-	} while (
-		(await c.findOne({ sessionId })) ||
-		(await c.findOne({ 'gameSessions.sessionId': sessionId }))
-	);
+	} while (await c.findOne({ $or: [{ sessionId }, { 'gameSessions.sessionId': sessionId }] }));
 
 	const passwordHash = await bcrypt.hash(password, 12);
 	const firstSession: DMGameSession = {
@@ -165,9 +162,7 @@ export interface OAuthProfile {
 	lastName: string;
 }
 
-export async function findOrCreateDMByOAuth(
-	profile: OAuthProfile
-): Promise<{ sessionId: string }> {
+export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ sessionId: string }> {
 	const c = await col();
 
 	// 1. Exact match on provider ID
@@ -179,7 +174,10 @@ export async function findOrCreateDMByOAuth(
 	if (profile.email) {
 		dm = await c.findOne({ email: profile.email });
 		if (dm) {
-			await c.updateOne({ email: profile.email }, { $set: { [providerField]: profile.providerId } });
+			await c.updateOne(
+				{ email: profile.email },
+				{ $set: { [providerField]: profile.providerId } }
+			);
 			return { sessionId: dm.sessionId };
 		}
 	}
@@ -188,10 +186,7 @@ export async function findOrCreateDMByOAuth(
 	let sessionId: string;
 	do {
 		sessionId = randomSessionId();
-	} while (
-		(await c.findOne({ sessionId })) ||
-		(await c.findOne({ 'gameSessions.sessionId': sessionId }))
-	);
+	} while (await c.findOne({ $or: [{ sessionId }, { 'gameSessions.sessionId': sessionId }] }));
 
 	const firstSession: DMGameSession = {
 		id: randomUUID(),
@@ -319,7 +314,7 @@ export async function listNotes(gameSessionId: string): Promise<NoteEntry[]> {
 	}
 
 	if (!Array.isArray(raw)) return [];
-	return (raw as NoteEntry[]).slice().sort((a, b) => b.date.localeCompare(a.date));
+	return (raw as NoteEntry[]).sort((a, b) => b.date.localeCompare(a.date));
 }
 
 /** Creates a new note entry and returns it. */
@@ -340,30 +335,20 @@ export async function updateNote(
 	content: string
 ): Promise<void> {
 	const c = await col();
-	// MongoDB positional operator can't target nested array element by id in one shot,
-	// so fetch → modify → replace the whole notes array.
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
-	if (!session) return;
-	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
-	const updated = notes.map((n) => (n.id === noteId ? { ...n, content } : n));
 	await c.updateOne(
 		{ 'gameSessions.sessionId': gameSessionId },
-		{ $set: { 'gameSessions.$.notes': updated } }
+		{ $set: { 'gameSessions.$[s].notes.$[n].content': content } } as Record<string, unknown>,
+		{ arrayFilters: [{ 's.sessionId': gameSessionId }, { 'n.id': noteId }] }
 	);
 }
 
 /** Deletes a note entry by id. */
 export async function deleteNote(gameSessionId: string, noteId: string): Promise<void> {
 	const c = await col();
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
-	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
-	if (!session) return;
-	const notes: NoteEntry[] = Array.isArray(session.notes) ? (session.notes as NoteEntry[]) : [];
-	const filtered = notes.filter((n) => n.id !== noteId);
 	await c.updateOne(
 		{ 'gameSessions.sessionId': gameSessionId },
-		{ $set: { 'gameSessions.$.notes': filtered } }
+		{ $pull: { 'gameSessions.$[s].notes': { id: noteId } } } as Record<string, unknown>,
+		{ arrayFilters: [{ 's.sessionId': gameSessionId }] }
 	);
 }
 
@@ -482,8 +467,9 @@ export async function createGameSession(
 	do {
 		gameSessionId = randomSessionId();
 	} while (
-		(await c.findOne({ sessionId: gameSessionId })) ||
-		(await c.findOne({ 'gameSessions.sessionId': gameSessionId }))
+		await c.findOne({
+			$or: [{ sessionId: gameSessionId }, { 'gameSessions.sessionId': gameSessionId }]
+		})
 	);
 
 	const newSession: DMGameSession = {
@@ -523,7 +509,7 @@ export async function renameGameSession(
 export async function deleteGameSession(
 	authSessionId: string,
 	sessionUUID: string
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; deletedPublicId?: string; error?: string }> {
 	const c = await col();
 	const dm = await c.findOne({ sessionId: authSessionId });
 	if (!dm) return { ok: false, error: 'DM not found' };
@@ -547,7 +533,7 @@ export async function deleteGameSession(
 	await c.updateOne({ sessionId: authSessionId }, {
 		$pull: { gameSessions: { id: sessionUUID } }
 	} as never);
-	return { ok: true };
+	return { ok: true, deletedPublicId: (sessionToDelete as DMGameSession).sessionId };
 }
 
 /**

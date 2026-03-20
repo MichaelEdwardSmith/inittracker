@@ -26,7 +26,9 @@
 	<title>DM Login — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col items-center justify-center overflow-hidden bg-gray-950 text-white">
+<div
+	class="flex h-screen flex-col items-center justify-center overflow-hidden bg-gray-950 text-white"
+>
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
 		<div class="bg-orb orb-2"></div>
@@ -104,7 +106,9 @@
 
 		<!-- OAuth error -->
 		{#if data?.oauthError}
-			<p class="mt-3 rounded-lg border border-red-800 bg-red-950/60 px-4 py-2 text-center text-xs text-red-400">
+			<p
+				class="mt-3 rounded-lg border border-red-800 bg-red-950/60 px-4 py-2 text-center text-xs text-red-400"
+			>
 				{oauthErrorMessages[data.oauthError] ?? 'Sign-in failed. Please try again.'}
 			</p>
 		{/if}
@@ -118,10 +122,22 @@
 			>
 				<!-- Google "G" icon -->
 				<svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-					<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-					<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-					<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+					<path
+						d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+						fill="#4285F4"
+					/>
+					<path
+						d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+						fill="#34A853"
+					/>
+					<path
+						d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+						fill="#FBBC05"
+					/>
+					<path
+						d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+						fill="#EA4335"
+					/>
 				</svg>
 				Continue with Google
 			</a>
@@ -169,49 +185,87 @@
 		filter: blur(90px);
 	}
 	.orb-1 {
-		width: min(65vw, 700px); height: min(65vw, 700px);
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
 		background: rgba(88, 28, 135, 0.45);
-		top: -15%; left: -12%;
+		top: -15%;
+		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
-		width: min(55vw, 620px); height: min(55vw, 620px);
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
 		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%; right: -10%;
+		bottom: -18%;
+		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
-		width: min(45vw, 520px); height: min(45vw, 520px);
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
 		background: rgba(120, 53, 15, 0.35);
-		top: 35%; left: 42%;
+		top: 35%;
+		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
-		width: min(38vw, 440px); height: min(38vw, 440px);
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
 		background: rgba(49, 46, 129, 0.4);
-		top: 15%; right: 18%;
+		top: 15%;
+		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 </style>

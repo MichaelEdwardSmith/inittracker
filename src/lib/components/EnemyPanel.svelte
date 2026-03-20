@@ -3,10 +3,23 @@
      (create, edit, delete, import from bestiary), and viewing monster stat blocks. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { ENEMY_TEMPLATES, MONSTER_TYPES, getMonsterDetail, preloadMonsterDetails } from '$lib/enemies';
-	import { ENEMY_TEMPLATES_2024, MONSTER_TYPES_2024, getMonsterDetail2024, preloadMonsterDetails2024 } from '$lib/enemies2024';
+	import {
+		ENEMY_TEMPLATES,
+		MONSTER_TYPES,
+		getMonsterDetail,
+		preloadMonsterDetails
+	} from '$lib/enemies';
+	import {
+		ENEMY_TEMPLATES_2024,
+		MONSTER_TYPES_2024,
+		getMonsterDetail2024,
+		preloadMonsterDetails2024
+	} from '$lib/enemies2024';
 	import { onMount } from 'svelte';
-	onMount(() => { preloadMonsterDetails(); preloadMonsterDetails2024(); });
+	onMount(() => {
+		preloadMonsterDetails();
+		preloadMonsterDetails2024();
+	});
 	import type { EnemyTemplate, CustomMonster, MonsterDetail, MonsterDetail2024 } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 	import MonsterInfoModal2024 from '$lib/components/MonsterInfoModal2024.svelte';
@@ -98,9 +111,7 @@
 	}
 
 	// ── Derived lists ────────────────────────────────────────────────────────
-	const builtinTemplates = $derived(
-		ruleset === '2024' ? ENEMY_TEMPLATES_2024 : ENEMY_TEMPLATES
-	);
+	const builtinTemplates = $derived(ruleset === '2024' ? ENEMY_TEMPLATES_2024 : ENEMY_TEMPLATES);
 
 	const allTemplates = $derived<DisplayTemplate[]>([
 		...customMonsters.map((m) => ({ ...m, isCustom: true as const })),

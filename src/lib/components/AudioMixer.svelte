@@ -637,7 +637,9 @@
 <!-- ── Channel strip snippet (reused in both single-row and two-row layouts) ── -->
 {#snippet strip(ch: Channel, i: number)}
 	<div
-		class="flex {isMobile ? 'w-[calc(50%-6px)] min-w-0' : 'w-[118px] shrink-0'} flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg"
+		class="flex {isMobile
+			? 'w-[calc(50%-6px)] min-w-0'
+			: 'w-[118px] shrink-0'} flex-col gap-2.5 rounded-xl border border-gray-700/80 bg-gray-900 px-3 py-3 shadow-lg"
 	>
 		<!-- Label + delete row -->
 		<div class="flex items-center gap-1">
@@ -886,7 +888,10 @@
 
 		<!-- Mute to DM (local only) -->
 		<button
-			onclick={() => { channels[i].muteLocal = !channels[i].muteLocal; applyVol(i); }}
+			onclick={() => {
+				channels[i].muteLocal = !channels[i].muteLocal;
+				applyVol(i);
+			}}
 			title={ch.muteLocal ? 'DM audio muted (viewers still hear it)' : 'Mute DM speaker only'}
 			class="w-full rounded border py-1 text-[10px] font-semibold tracking-wide transition
 				{ch.muteLocal
@@ -894,10 +899,38 @@
 				: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-orange-700 hover:text-orange-400'}"
 		>
 			{#if ch.muteLocal}
-				<svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="inline h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+					/><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+					/></svg
+				>
 				DM muted
 			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" class="inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-4.5-4.5M12 18l4.5-4.5" /></svg>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="inline h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-4.5-4.5M12 18l4.5-4.5"
+					/></svg
+				>
 				Mute DM
 			{/if}
 		</button>
@@ -913,44 +946,69 @@
 {#snippet masterStrip()}
 	{#if isMobile}
 		<!-- Mobile: compact horizontal bar -->
-		<div class="flex w-full items-center gap-2 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-2 shadow-lg">
-			<div class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-xs font-bold tracking-widest text-amber-400 uppercase shrink-0">Master</div>
-			<div class="flex items-center gap-1 flex-1">
+		<div
+			class="flex w-full items-center gap-2 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-2 shadow-lg"
+		>
+			<div
+				class="shrink-0 rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-xs font-bold tracking-widest text-amber-400 uppercase"
+			>
+				Master
+			</div>
+			<div class="flex flex-1 items-center gap-1">
 				<button
 					onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
-					class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700 shrink-0"
-				>−</button>
+					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
+					>−</button
+				>
 				<input
 					type="number"
 					min="0"
 					max="100"
 					step="1"
 					value={Math.round(masterVolume * 100)}
-					oninput={(e) => setMaster(Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) / 100)}
+					oninput={(e) =>
+						setMaster(
+							Math.max(0, Math.min(100, parseInt((e.target as HTMLInputElement).value) || 0)) / 100
+						)}
 					class="w-12 rounded border border-gray-700 bg-gray-800 py-1 text-center font-mono text-xs text-amber-300 focus:border-amber-500 focus:outline-none"
 				/>
 				<button
 					onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
-					class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700 shrink-0"
-				>+</button>
+					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
+					>+</button
+				>
 			</div>
 			<button
 				onclick={stopAll}
 				title="Fade out and stop all playing channels"
 				class="flex shrink-0 items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 px-2 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg
+				>
 				Stop All
 			</button>
 		</div>
 	{:else}
 		<!-- Desktop: tall vertical card (existing layout) -->
-		<div class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg">
-			<div class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold tracking-widest text-amber-400 uppercase">Master</div>
+		<div
+			class="flex w-[118px] shrink-0 flex-col gap-2.5 rounded-xl border border-amber-700/40 bg-gray-900 px-3 py-3 shadow-lg"
+		>
+			<div
+				class="rounded border border-amber-700/40 bg-gray-800 px-2 py-1 text-center text-xs font-bold tracking-widest text-amber-400 uppercase"
+			>
+				Master
+			</div>
 			<!-- Vertical fader (desktop) -->
 			<div class="flex flex-1 flex-col items-center gap-1">
 				<span class="text-[10px] font-semibold tracking-wider text-gray-500 uppercase">Vol</span>
-				<div class="relative flex flex-1 items-center justify-center self-stretch overflow-hidden" bind:clientHeight={masterFaderHeight}>
+				<div
+					class="relative flex flex-1 items-center justify-center self-stretch overflow-hidden"
+					bind:clientHeight={masterFaderHeight}
+				>
 					{#if masterFaderHeight > 0}
 						<div class="relative" style="width: 28px; height: {masterFaderHeight}px;">
 							<input
@@ -961,7 +1019,9 @@
 								value={masterVolume}
 								oninput={(e) => setMaster(parseFloat((e.target as HTMLInputElement).value))}
 								class="fader absolute"
-								style="width: {masterFaderHeight}px; height: 28px; top: {(masterFaderHeight - 28) / 2}px; left: -{(masterFaderHeight - 28) / 2}px; transform: rotate(-90deg); transform-origin: center; cursor: pointer;"
+								style="width: {masterFaderHeight}px; height: 28px; top: {(masterFaderHeight - 28) /
+									2}px; left: -{(masterFaderHeight - 28) /
+									2}px; transform: rotate(-90deg); transform-origin: center; cursor: pointer;"
 							/>
 						</div>
 					{/if}
@@ -974,7 +1034,12 @@
 				title="Fade out and stop all playing channels"
 				class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-3 w-3"
+					viewBox="0 0 24 24"
+					fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg
+				>
 				Stop All
 			</button>
 		</div>
@@ -985,7 +1050,9 @@
 {#snippet addButton()}
 	<button
 		onclick={addChannel}
-		class="flex {isMobile ? 'w-[calc(50%-6px)] min-w-0 min-h-[80px]' : 'w-[118px] shrink-0'} flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
+		class="flex {isMobile
+			? 'min-h-[80px] w-[calc(50%-6px)] min-w-0'
+			: 'w-[118px] shrink-0'} flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1098,50 +1165,88 @@
 		filter: blur(90px);
 	}
 	.orb-1 {
-		width: min(65vw, 700px); height: min(65vw, 700px);
+		width: min(65vw, 700px);
+		height: min(65vw, 700px);
 		background: rgba(88, 28, 135, 0.45);
-		top: -15%; left: -12%;
+		top: -15%;
+		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
-		width: min(55vw, 620px); height: min(55vw, 620px);
+		width: min(55vw, 620px);
+		height: min(55vw, 620px);
 		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%; right: -10%;
+		bottom: -18%;
+		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
-		width: min(45vw, 520px); height: min(45vw, 520px);
+		width: min(45vw, 520px);
+		height: min(45vw, 520px);
 		background: rgba(120, 53, 15, 0.35);
-		top: 35%; left: 42%;
+		top: 35%;
+		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
-		width: min(38vw, 440px); height: min(38vw, 440px);
+		width: min(38vw, 440px);
+		height: min(38vw, 440px);
 		background: rgba(49, 46, 129, 0.4);
-		top: 15%; right: 18%;
+		top: 15%;
+		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 
 	/* Fader track */

@@ -49,7 +49,8 @@
 	function linkDice(text: string): string {
 		return text.replace(
 			/\b(\d*d\d+(?:\s*[+-]\s*\d+)?)\b/g,
-			(match) => `<button class="dice-btn" data-dice="${match.replace(/\s/g, '')}">${match}</button>`
+			(match) =>
+				`<button class="dice-btn" data-dice="${match.replace(/\s/g, '')}">${match}</button>`
 		);
 	}
 
@@ -57,8 +58,7 @@
 	function linkAttacks(text: string): string {
 		return text.replace(
 			/((?:Melee|Ranged|Melee or Ranged)\s+Attack\s+Roll:\s*)([+-]\d+)/gi,
-			(_, prefix, mod) =>
-				`${prefix}<button class="atk-btn" data-attack="${mod}">${mod}</button>`
+			(_, prefix, mod) => `${prefix}<button class="atk-btn" data-attack="${mod}">${mod}</button>`
 		);
 	}
 
@@ -159,10 +159,7 @@
 	// ---------------------------------------------------------------------------
 	function renderSection(actions: MonsterAction2024[]): string {
 		return actions
-			.map(
-				(a) =>
-					`<p><strong>${a.name}.</strong> ${renderDesc(a.description)}</p>`
-			)
+			.map((a) => `<p><strong>${a.name}.</strong> ${renderDesc(a.description)}</p>`)
 			.join('');
 	}
 
@@ -171,14 +168,10 @@
 	const bonusActionsHtml = $derived(monster ? renderSection(monster.bonusActions) : '');
 	const reactionsHtml = $derived(monster ? renderSection(monster.reactions) : '');
 	const legendaryHtml = $derived(
-		monster && monster.legendary.actions.length > 0
-			? renderSection(monster.legendary.actions)
-			: ''
+		monster && monster.legendary.actions.length > 0 ? renderSection(monster.legendary.actions) : ''
 	);
 	const lairHtml = $derived(
-		monster?.lair && monster.lair.actions.length > 0
-			? renderSection(monster.lair.actions)
-			: ''
+		monster?.lair && monster.lair.actions.length > 0 ? renderSection(monster.lair.actions) : ''
 	);
 </script>
 
@@ -206,15 +199,20 @@
 					<div class="flex items-center gap-2">
 						<h3 class="text-lg font-black tracking-wide text-red-400">{monster.name}</h3>
 						<span
-							class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-300 ring-1 ring-blue-500/30 uppercase"
+							class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-300 uppercase ring-1 ring-blue-500/30"
 							>2024</span
 						>
 					</div>
 					<p class="text-xs text-gray-400 italic">
-						{monster.size} {monster.type}, {monster.alignment}
+						{monster.size}
+						{monster.type}, {monster.alignment}
 					</p>
 				</div>
-				<button onclick={onclose} class="text-gray-500 transition hover:text-white" aria-label="Close">
+				<button
+					onclick={onclose}
+					class="text-gray-500 transition hover:text-white"
+					aria-label="Close"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-5 w-5"
@@ -303,14 +301,16 @@
 					{/if}
 					{#if monster.vulnerabilities}
 						<div>
-							<span class="text-gray-500">Vulnerabilities </span
-							><span>{monster.vulnerabilities}</span>
+							<span class="text-gray-500">Vulnerabilities </span><span
+								>{monster.vulnerabilities}</span
+							>
 						</div>
 					{/if}
 					{#if monster.conditionImmunities}
 						<div>
-							<span class="text-gray-500">Condition Immunities </span
-							><span>{monster.conditionImmunities}</span>
+							<span class="text-gray-500">Condition Immunities </span><span
+								>{monster.conditionImmunities}</span
+							>
 						</div>
 					{/if}
 					{#if monster.senses}
@@ -323,8 +323,9 @@
 					{/if}
 					{#if monster.proficiencyBonus}
 						<div>
-							<span class="text-gray-500">Proficiency Bonus </span
-							><span>{monster.proficiencyBonus}</span>
+							<span class="text-gray-500">Proficiency Bonus </span><span
+								>{monster.proficiencyBonus}</span
+							>
 						</div>
 					{/if}
 				</div>

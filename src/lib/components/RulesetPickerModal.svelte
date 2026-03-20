@@ -53,7 +53,7 @@
 			>
 				{#if selectedRuleset === '2014'}
 					<span
-						class="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500"
+						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@
 			>
 				{#if selectedRuleset === '2024'}
 					<span
-						class="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500"
+						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +117,8 @@
 						</svg>
 					</span>
 				{/if}
-				<span class="flex items-center gap-2 text-xs font-bold tracking-widest text-blue-400 uppercase"
+				<span
+					class="flex items-center gap-2 text-xs font-bold tracking-widest text-blue-400 uppercase"
 					>D&D 5e <span
 						class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-blue-300 ring-1 ring-blue-500/30"
 						>NEW</span
@@ -146,7 +147,9 @@
 		</div>
 
 		<!-- Warning banner -->
-		<div class="mx-6 flex items-start gap-3 rounded-lg bg-orange-950/40 px-4 py-3 ring-1 ring-orange-800/50">
+		<div
+			class="mx-6 flex items-start gap-3 rounded-lg bg-orange-950/40 px-4 py-3 ring-1 ring-orange-800/50"
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				class="mt-0.5 h-4 w-4 shrink-0 text-orange-400"
@@ -160,8 +163,8 @@
 				/>
 			</svg>
 			<p class="text-xs leading-relaxed text-orange-300">
-				<strong class="font-semibold text-orange-200">This choice is permanent.</strong> The ruleset
-				cannot be changed after the session is created. Choose carefully.
+				<strong class="font-semibold text-orange-200">This choice is permanent.</strong> The ruleset cannot
+				be changed after the session is created. Choose carefully.
 			</p>
 		</div>
 

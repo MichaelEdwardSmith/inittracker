@@ -9,7 +9,9 @@
 	<title>Create Player Account — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 py-10 text-white">
+<div
+	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 py-10 text-white"
+>
 	<div
 		class="pointer-events-none absolute inset-0"
 		style="background: radial-gradient(ellipse 60% 50% at 50% 45%, rgba(59,130,246,0.06) 0%, transparent 70%);"
@@ -59,7 +61,9 @@
 			</div>
 
 			{#if form?.error}
-				<p class="mb-4 rounded-lg border border-red-800 bg-red-950/60 px-3 py-2 text-center text-sm text-red-400">
+				<p
+					class="mb-4 rounded-lg border border-red-800 bg-red-950/60 px-3 py-2 text-center text-sm text-red-400"
+				>
 					{form.error}
 				</p>
 			{/if}
@@ -78,7 +82,7 @@
 						type="text"
 						autocomplete="nickname"
 						required
-						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
+						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 transition outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
 						placeholder="Smitty"
 					/>
 				</div>
@@ -96,7 +100,7 @@
 						type="email"
 						autocomplete="email"
 						required
-						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
+						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 transition outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
 						placeholder="you@example.com"
 					/>
 				</div>
@@ -115,7 +119,7 @@
 						autocomplete="new-password"
 						required
 						minlength="8"
-						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
+						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 transition outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
 						placeholder="Min. 8 characters"
 					/>
 				</div>
@@ -133,7 +137,7 @@
 						type="password"
 						autocomplete="new-password"
 						required
-						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
+						class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-600 transition outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
 						placeholder="••••••••"
 					/>
 				</div>

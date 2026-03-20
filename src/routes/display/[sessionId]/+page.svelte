@@ -87,7 +87,9 @@
 	function showDmNotifBanner(text: string, to: string) {
 		if (dmNotifTimer) clearTimeout(dmNotifTimer);
 		dmNotif = { text, to };
-		dmNotifTimer = setTimeout(() => { dmNotif = null; }, 5000);
+		dmNotifTimer = setTimeout(() => {
+			dmNotif = null;
+		}, 5000);
 	}
 
 	// ── Initiative rolling ────────────────────────────
@@ -135,7 +137,10 @@
 	const sounds: Record<string, HTMLAudioElement> = {};
 
 	// ── Mixer track storage (plain Map — managed imperatively) ─────────
-	const viewerTracks = new Map<string, { name: string; blobUrl: string; audio: HTMLAudioElement }>();
+	const viewerTracks = new Map<
+		string,
+		{ name: string; blobUrl: string; audio: HTMLAudioElement }
+	>();
 
 	async function downloadTrack(id: string, name: string) {
 		try {
@@ -166,7 +171,13 @@
 
 	function applyMixerState(state: {
 		masterVolume: number;
-		channels: Array<{ id: string; playing: boolean; volume: number; muted: boolean; solo: boolean }>;
+		channels: Array<{
+			id: string;
+			playing: boolean;
+			volume: number;
+			muted: boolean;
+			solo: boolean;
+		}>;
 	}) {
 		const anySolo = state.channels.some((c) => c.solo);
 		for (const ch of state.channels) {
@@ -183,7 +194,15 @@
 	const JOINED_KEY = $derived(`viewer-joined-${data.sessionId}`);
 
 	function joinSession() {
-		for (const name of ['damage', 'heal', 'condition', 'battlestart', 'fanfare', 'sword', 'temphp']) {
+		for (const name of [
+			'damage',
+			'heal',
+			'condition',
+			'battlestart',
+			'fanfare',
+			'sword',
+			'temphp'
+		]) {
 			const a = new Audio(`/audio/${name}.mp3`);
 			a.preload = 'auto';
 			sounds[name] = a;
@@ -324,7 +343,8 @@
 							}
 						}
 						if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
-						else if (hadHeal) triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
+						else if (hadHeal)
+							triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
 						else if (hadTempHp) {
 							playSound('temphp');
 						} else if (addedCondition) {
@@ -359,10 +379,7 @@
 
 		source.addEventListener('dmMessage', (e) => {
 			const msg = JSON.parse((e as MessageEvent).data) as DmReply;
-			const isForMe =
-				msg.to === 'all' ||
-				msg.to === myCharacter?.name ||
-				msg.to === myPlayerName;
+			const isForMe = msg.to === 'all' || msg.to === myCharacter?.name || msg.to === myPlayerName;
 			if (isForMe) {
 				dmMessages = [...dmMessages, msg];
 				dmUnread++;
@@ -567,8 +584,8 @@
 			<div
 				class="w-full max-w-md rounded-t-2xl border-t border-gray-700 bg-gray-900 px-5 pt-5 pb-10 shadow-2xl"
 			>
-				<div class="mb-1 h-1 w-10 rounded-full bg-gray-700 mx-auto"></div>
-				<div class="mb-5 mt-4 text-center">
+				<div class="mx-auto mb-1 h-1 w-10 rounded-full bg-gray-700"></div>
+				<div class="mt-4 mb-5 text-center">
 					<p class="text-lg font-black tracking-wide text-white">Who are you?</p>
 					<p class="mt-1 text-xs text-gray-500">
 						Select your character to pre-fill initiative rolls and messages.
@@ -578,7 +595,7 @@
 					{#each players as player}
 						<button
 							onclick={() => selectCharacter(player.id)}
-							class="flex w-full items-center gap-4 rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-left transition hover:border-blue-500/60 hover:bg-gray-750 active:scale-[0.98]"
+							class="hover:bg-gray-750 flex w-full items-center gap-4 rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-left transition hover:border-blue-500/60 active:scale-[0.98]"
 						>
 							{#if player.avatarUrl}
 								<img
@@ -629,19 +646,35 @@
 	{#if dmNotif}
 		<div
 			transition:fade={{ duration: 300 }}
-			class="pointer-events-none fixed inset-0 z-[275] flex items-end justify-center pb-24 px-6"
+			class="pointer-events-none fixed inset-0 z-[275] flex items-end justify-center px-6 pb-24"
 		>
 			{#key dmNotif}
 				<button
 					transition:fly={{ y: 30, duration: 350 }}
-					onclick={() => { dmNotif = null; showDmInbox = true; }}
+					onclick={() => {
+						dmNotif = null;
+						showDmInbox = true;
+					}}
 					class="pointer-events-auto flex w-full max-w-sm flex-col gap-1.5 rounded-2xl border border-purple-500/50 bg-gray-950/95 px-5 py-4 text-left shadow-2xl shadow-purple-900/30 backdrop-blur-md"
 				>
 					<div class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 shrink-0 text-purple-400"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+							/>
 						</svg>
-						<span class="text-xs font-bold tracking-widest text-purple-400 uppercase">Message from DM</span>
+						<span class="text-xs font-bold tracking-widest text-purple-400 uppercase"
+							>Message from DM</span
+						>
 						<span class="ml-auto text-xs text-gray-600">tap to view</span>
 					</div>
 					<p class="line-clamp-2 text-sm leading-relaxed text-gray-200">{dmNotif.text}</p>
@@ -654,26 +687,32 @@
 	{#if turnNotif}
 		<div
 			transition:fade={{ duration: 300 }}
-			class="pointer-events-none fixed inset-0 z-[280] flex items-start justify-center pt-20 px-6"
+			class="pointer-events-none fixed inset-0 z-[280] flex items-start justify-center px-6 pt-20"
 		>
 			{#key turnNotif}
 				<button
 					transition:fly={{ y: -30, duration: 350 }}
-					onclick={() => { turnNotif = null; }}
+					onclick={() => {
+						turnNotif = null;
+					}}
 					class="pointer-events-auto flex flex-col items-center gap-2 rounded-2xl border px-10 py-7 text-center shadow-2xl backdrop-blur-md
 						{turnNotif === 'yours'
-							? 'border-amber-500/60 bg-gray-950/90 shadow-amber-500/20'
-							: 'border-blue-500/60 bg-gray-950/90 shadow-blue-500/20'}"
+						? 'border-amber-500/60 bg-gray-950/90 shadow-amber-500/20'
+						: 'border-blue-500/60 bg-gray-950/90 shadow-blue-500/20'}"
 				>
 					{#if turnNotif === 'yours'}
-						<div class="text-5xl animate-bounce">⚔️</div>
-						<p class="text-2xl font-black tracking-widest text-amber-400 uppercase">It's Your Turn!</p>
+						<div class="animate-bounce text-5xl">⚔️</div>
+						<p class="text-2xl font-black tracking-widest text-amber-400 uppercase">
+							It's Your Turn!
+						</p>
 						{#if myCharacter}
 							<p class="text-sm font-semibold text-amber-300/70">{myCharacter.name}</p>
 						{/if}
 					{:else}
 						<div class="text-5xl">🎲</div>
-						<p class="text-2xl font-black tracking-widest text-blue-400 uppercase">You're Up Next!</p>
+						<p class="text-2xl font-black tracking-widest text-blue-400 uppercase">
+							You're Up Next!
+						</p>
 						{#if myCharacter}
 							<p class="text-sm font-semibold text-blue-300/70">Get ready, {myCharacter.name}!</p>
 						{/if}
@@ -748,38 +787,41 @@
 			{/if}
 			<!-- Hamburger (with unread DM message badge) -->
 			<div class="relative">
-			<button
-				onclick={() => (showMobileMenu = !showMobileMenu)}
-				title="Menu"
-				class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
-			>
-				{#if showMobileMenu}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
+				<button
+					onclick={() => (showMobileMenu = !showMobileMenu)}
+					title="Menu"
+					class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
+				>
+					{#if showMobileMenu}
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					{:else}
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+						</svg>
+					{/if}
+				</button>
+				{#if dmUnread > 0}
+					<span
+						class="pointer-events-none absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white"
+						>{dmUnread}</span
 					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
-				{:else}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-					</svg>
 				{/if}
-			</button>
-			{#if dmUnread > 0}
-				<span class="pointer-events-none absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white">{dmUnread}</span>
-			{/if}
 			</div>
 		</div>
 	</header>
@@ -802,14 +844,36 @@
 					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 			>
 				{#if audioEnabled}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
-						<path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072" />
-						<path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M15.536 8.464a5 5 0 010 7.072"
+						/>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M18.364 5.636a9 9 0 010 12.728"
+						/>
 					</svg>
 					Sound On
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
 						<path stroke-linecap="round" stroke-linejoin="round" d="M23 9l-6 6M17 9l6 6" />
 					</svg>
@@ -818,17 +882,30 @@
 			</button>
 		{/if}
 		<button
-			onclick={() => { showEmojiPicker = true; showMobileMenu = false; }}
+			onclick={() => {
+				showEmojiPicker = true;
+				showMobileMenu = false;
+			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			<span class="text-base leading-none">😄</span>
 			React to DM
 		</button>
 		<button
-			onclick={() => { showDiceRoller = true; showMobileMenu = false; }}
+			onclick={() => {
+				showDiceRoller = true;
+				showMobileMenu = false;
+			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				<rect x="2" y="2" width="20" height="20" rx="3" ry="3" />
 				<circle cx="7" cy="7" r="1.2" fill="currentColor" stroke="none" />
 				<circle cx="17" cy="7" r="1.2" fill="currentColor" stroke="none" />
@@ -840,14 +917,32 @@
 		</button>
 		{#if myPlayerName && players.length > 0}
 			<button
-				onclick={() => { showCharPicker = true; showMobileMenu = false; }}
+				onclick={() => {
+					showCharPicker = true;
+					showMobileMenu = false;
+				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				{#if myCharacter?.avatarUrl}
-					<img src={myCharacter.avatarUrl} alt={myCharacter.name} class="h-4 w-4 shrink-0 rounded-full object-cover" />
+					<img
+						src={myCharacter.avatarUrl}
+						alt={myCharacter.name}
+						class="h-4 w-4 shrink-0 rounded-full object-cover"
+					/>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+						/>
 					</svg>
 				{/if}
 				{myCharacter ? myCharacter.name : 'Choose Character'}
@@ -855,48 +950,107 @@
 		{/if}
 		{#if players.length > 0}
 			<button
-				onclick={() => { showMsgModal = true; showMobileMenu = false; }}
+				onclick={() => {
+					showMsgModal = true;
+					showMobileMenu = false;
+				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
 				</svg>
 				Message DM
 			</button>
 			<button
-				onclick={() => { showInitModal = true; showMobileMenu = false; }}
+				onclick={() => {
+					showInitModal = true;
+					showMobileMenu = false;
+				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+					/>
 				</svg>
 				Roll Initiative
 			</button>
 		{/if}
 		{#if myPlayerName}
 			<button
-				onclick={() => { showNotesModal = true; showMobileMenu = false; }}
+				onclick={() => {
+					showNotesModal = true;
+					showMobileMenu = false;
+				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+					/>
 				</svg>
 				My Notes
 			</button>
 		{/if}
 		<button
-			onclick={() => { showDmInbox = true; dmUnread = 0; showMobileMenu = false; }}
+			onclick={() => {
+				showDmInbox = true;
+				dmUnread = 0;
+				showMobileMenu = false;
+			}}
 			class="relative flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm transition
 				{dmUnread > 0
-					? 'text-purple-400 hover:bg-purple-900/30'
-					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+				? 'text-purple-400 hover:bg-purple-900/30'
+				: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+				/>
 			</svg>
 			DM Messages
 			{#if dmUnread > 0}
-				<span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-[10px] font-black text-black">
+				<span
+					class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-[10px] font-black text-black"
+				>
 					{dmUnread}
 				</span>
 			{/if}
@@ -906,8 +1060,19 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+				/>
 			</svg>
 			Contact
 		</a>
@@ -916,23 +1081,59 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+				/>
 			</svg>
 			Player Guide
 		</a>
 		<button
-			onclick={() => { toggleFullscreen(); showMobileMenu = false; }}
+			onclick={() => {
+				toggleFullscreen();
+				showMobileMenu = false;
+			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			{#if isFullscreen}
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+					/>
 				</svg>
 				Exit Full Screen
 			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+					/>
 				</svg>
 				Full Screen
 			{/if}
@@ -942,8 +1143,19 @@
 				href="/player/logout"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-red-400 transition hover:bg-red-900/30 hover:text-red-300"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+					/>
 				</svg>
 				Sign Out
 			</a>
@@ -1442,7 +1654,10 @@
 	<PlayerInboxModal
 		messages={dmMessages}
 		onclose={() => (showDmInbox = false)}
-		onclear={() => { dmMessages = []; dmUnread = 0; }}
+		onclear={() => {
+			dmMessages = [];
+			dmUnread = 0;
+		}}
 	/>
 {/if}
 

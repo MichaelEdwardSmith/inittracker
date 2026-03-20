@@ -117,7 +117,6 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-950 text-white">
-
 	<!-- Drifting atmospheric orbs (fixed, behind everything) -->
 	<div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
@@ -131,7 +130,9 @@
 		<div class="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
 			<a href="/" class="flex items-center gap-2.5">
 				<span class="text-xl">⚔</span>
-				<span class="text-sm font-black tracking-[0.2em] text-amber-400 uppercase">Initiative Tracker</span>
+				<span class="text-sm font-black tracking-[0.2em] text-amber-400 uppercase"
+					>Initiative Tracker</span
+				>
 			</a>
 			<div class="ml-auto flex items-center gap-3">
 				<a
@@ -170,19 +171,25 @@
 			</div>
 
 			<h1
-				class="mb-6 text-5xl font-black leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl"
+				class="mb-6 text-5xl leading-tight font-black tracking-tight text-white sm:text-6xl lg:text-7xl"
 			>
 				Roll Initiative.<br />
 				<span class="text-amber-400">Run Better Combat.</span>
 			</h1>
 
 			<p class="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-gray-400">
-				The DM's command center for D&D 5e (2014) and 5.5e (2024). Track initiative, HP, and conditions in real time —
-				with a live display your players can follow from their own screens.
+				The DM's command center for D&D 5e (2014) and 5.5e (2024). Track initiative, HP, and
+				conditions in real time — with a live display your players can follow from their own
+				screens.
 			</p>
 
 			<div class="flex flex-wrap items-center justify-center gap-4">
-				<a href="https://www.buymeacoffee.com/inittracker" target="_blank" rel="noopener noreferrer" class="mr-2">
+				<a
+					href="https://www.buymeacoffee.com/inittracker"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="mr-2"
+				>
 					<img
 						src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png"
 						alt="Buy Me A Coffee"
@@ -223,7 +230,7 @@
 		</div>
 
 		<!-- Hero screenshot mockup -->
-		<div class="relative mx-auto mt-10 w-full max-w-5xl hero-fade" use:fadeIn>
+		<div class="hero-fade relative mx-auto mt-10 w-full max-w-5xl" use:fadeIn>
 			<div
 				class="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/80 shadow-2xl shadow-black/60"
 			>
@@ -232,7 +239,7 @@
 					<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
 					<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
 					<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
-					<div class="mx-auto flex-1 max-w-xs">
+					<div class="mx-auto max-w-xs flex-1">
 						<div class="rounded bg-gray-800 px-3 py-1 text-center text-xs text-gray-600">
 							inittracker.com / dashboard
 						</div>
@@ -281,7 +288,9 @@
 								/>
 							</a>
 						{:else}
-							<div class="mb-5 flex aspect-video w-full items-center justify-center rounded-lg border border-gray-800/80 bg-gray-950/60">
+							<div
+								class="mb-5 flex aspect-video w-full items-center justify-center rounded-lg border border-gray-800/80 bg-gray-950/60"
+							>
 								<span class="text-4xl opacity-20 {feature.color}">{feature.icon}</span>
 							</div>
 						{/if}
@@ -315,12 +324,7 @@
 						required on their end.
 					</p>
 					<ul class="space-y-3 text-sm text-gray-500">
-						{#each [
-							'Updates in real time via server-sent events',
-							'Shows current turn, round counter, and HP',
-							'Conditions visible — blinded, stunned, prone, and more',
-							'Works on any browser, no install needed'
-						] as item}
+						{#each ['Updates in real time via server-sent events', 'Shows current turn, round counter, and HP', 'Conditions visible — blinded, stunned, prone, and more', 'Works on any browser, no install needed'] as item}
 							<li class="flex items-start gap-2.5">
 								<span class="mt-0.5 shrink-0 text-green-600">✓</span>
 								{item}
@@ -338,13 +342,17 @@
 							<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
 							<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
 							<div class="h-2.5 w-2.5 rounded-full bg-gray-700"></div>
-							<div class="mx-auto flex-1 max-w-xs">
+							<div class="mx-auto max-w-xs flex-1">
 								<div class="rounded bg-gray-800 px-3 py-1 text-center text-xs text-gray-600">
 									inittracker.com / display / AB3X9K
 								</div>
 							</div>
 						</div>
-						<a href="/screenshots/ViewerDisplayScreenshot.jpg" target="_blank" rel="noopener noreferrer">
+						<a
+							href="/screenshots/ViewerDisplayScreenshot.jpg"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							<img
 								src="/screenshots/ViewerDisplayScreenshot.jpg"
 								alt="Live viewer display"
@@ -361,9 +369,7 @@
 	<section class="px-6 py-28">
 		<div class="mx-auto max-w-6xl">
 			<div class="mb-16 text-center" use:fadeIn>
-				<p class="mb-3 text-xs font-bold tracking-[0.3em] text-amber-600 uppercase">
-					How It Works
-				</p>
+				<p class="mb-3 text-xs font-bold tracking-[0.3em] text-amber-600 uppercase">How It Works</p>
 				<h2 class="text-3xl font-black tracking-tight text-white sm:text-4xl">
 					Up and running in minutes
 				</h2>
@@ -403,13 +409,17 @@
 					</div>
 					<span class="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-500">12 encounters</span>
 				</div>
-				<a href="/screenshots/CombatChronicleScreenshot.jpg" target="_blank" rel="noopener noreferrer">
-				<img
-					src="/screenshots/CombatChronicleScreenshot.jpg"
-					alt="Combat Chronicles"
-					class="aspect-[21/9] w-full object-cover transition hover:opacity-90"
-				/>
-			</a>
+				<a
+					href="/screenshots/CombatChronicleScreenshot.jpg"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<img
+						src="/screenshots/CombatChronicleScreenshot.jpg"
+						alt="Combat Chronicles"
+						class="aspect-[21/9] w-full object-cover transition hover:opacity-90"
+					/>
+				</a>
 			</div>
 		</div>
 	</section>
@@ -505,25 +515,55 @@
 	}
 
 	@keyframes orb-drift-1 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		25%       { transform: translate(8vw, 6vh) scale(1.06); }
-		55%       { transform: translate(3vw, 12vh) scale(0.94); }
-		75%       { transform: translate(-3vw, 7vh) scale(1.03); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		25% {
+			transform: translate(8vw, 6vh) scale(1.06);
+		}
+		55% {
+			transform: translate(3vw, 12vh) scale(0.94);
+		}
+		75% {
+			transform: translate(-3vw, 7vh) scale(1.03);
+		}
 	}
 	@keyframes orb-drift-2 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		30%      { transform: translate(-7vw, -9vh) scale(1.08); }
-		65%      { transform: translate(-2vw, -4vh) scale(0.92); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		30% {
+			transform: translate(-7vw, -9vh) scale(1.08);
+		}
+		65% {
+			transform: translate(-2vw, -4vh) scale(0.92);
+		}
 	}
 	@keyframes orb-drift-3 {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); }
-		40%      { transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1); }
-		70%      { transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9); }
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		40% {
+			transform: translate(calc(-50% + 7vw), calc(-50% - 9vh)) scale(1.1);
+		}
+		70% {
+			transform: translate(calc(-50% - 5vw), calc(-50% + 5vh)) scale(0.9);
+		}
 	}
 	@keyframes orb-drift-4 {
-		0%, 100% { transform: translate(0, 0) scale(1); }
-		35%      { transform: translate(6vw, 9vh) scale(0.94); }
-		68%      { transform: translate(-5vw, 4vh) scale(1.06); }
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		35% {
+			transform: translate(6vw, 9vh) scale(0.94);
+		}
+		68% {
+			transform: translate(-5vw, 4vh) scale(1.06);
+		}
 	}
 
 	:global(.hero-fade) {

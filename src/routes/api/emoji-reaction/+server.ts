@@ -6,9 +6,36 @@ import { authToGameSession } from '$lib/server/sessionCache';
 import { addEmojiReaction, getEmojiReactionsSince } from '$lib/server/emojiStore';
 
 const ALLOWED_EMOJIS = new Set([
-	'😂', '❤️', '👍', '👎', '😱', '🤔', '🥳', '😭', '😤', '😍', '🤯', '🙏',
-	'⚔️', '🛡️', '🎲', '💀', '👻', '🔥', '⚡', '💪', '🏃', '🗡️', '🐉', '✨',
-	'🎉', '🍺', '💯', '🌟', '🤣', '👀'
+	'😂',
+	'❤️',
+	'👍',
+	'👎',
+	'😱',
+	'🤔',
+	'🥳',
+	'😭',
+	'😤',
+	'😍',
+	'🤯',
+	'🙏',
+	'⚔️',
+	'🛡️',
+	'🎲',
+	'💀',
+	'👻',
+	'🔥',
+	'⚡',
+	'💪',
+	'🏃',
+	'🗡️',
+	'🐉',
+	'✨',
+	'🎉',
+	'🍺',
+	'💯',
+	'🌟',
+	'🤣',
+	'👀'
 ]);
 
 async function resolveGameSessionId(authSessionId: string): Promise<string | null> {

@@ -31,16 +31,36 @@ export function preloadMonsterDetails(): Promise<void> {
 	if (loadPromise) return loadPromise;
 	loadPromise = import('./data/monsters.json').then(({ default: raw }) => {
 		type RawMonster = {
-			name: string; meta: string;
-			'Armor Class': string; 'Hit Points': string; Speed: string;
-			STR: string; STR_mod: string; DEX: string; DEX_mod: string;
-			CON: string; CON_mod: string; INT: string; INT_mod: string;
-			WIS: string; WIS_mod: string; CHA: string; CHA_mod: string;
-			'Saving Throws'?: string; Skills?: string;
-			'Damage Immunities'?: string; 'Damage Resistances'?: string;
-			'Condition Immunities'?: string; Senses?: string; Languages?: string;
-			Challenge: string; Traits?: string; Actions?: string;
-			Reactions?: string; 'Legendary Actions'?: string; img_url?: string;
+			name: string;
+			meta: string;
+			'Armor Class': string;
+			'Hit Points': string;
+			Speed: string;
+			STR: string;
+			STR_mod: string;
+			DEX: string;
+			DEX_mod: string;
+			CON: string;
+			CON_mod: string;
+			INT: string;
+			INT_mod: string;
+			WIS: string;
+			WIS_mod: string;
+			CHA: string;
+			CHA_mod: string;
+			'Saving Throws'?: string;
+			Skills?: string;
+			'Damage Immunities'?: string;
+			'Damage Resistances'?: string;
+			'Condition Immunities'?: string;
+			Senses?: string;
+			Languages?: string;
+			Challenge: string;
+			Traits?: string;
+			Actions?: string;
+			Reactions?: string;
+			'Legendary Actions'?: string;
+			img_url?: string;
 		};
 		detailMap = new Map<string, MonsterDetail>(
 			(raw as RawMonster[]).map((m) => [
