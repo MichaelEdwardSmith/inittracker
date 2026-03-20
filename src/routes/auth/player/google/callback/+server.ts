@@ -39,6 +39,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		: (claims.name ?? 'Player');
 
 	const { sessionId } = await findOrCreatePlayerByOAuth({
+		provider: 'google',
 		providerId: claims.sub,
 		email: claims.email ?? null,
 		displayName,

@@ -44,17 +44,19 @@ export async function getPlayerBySessionId(sessionId: string): Promise<Player | 
 }
 
 export async function findOrCreatePlayerByOAuth(profile: {
+	provider: 'google' | 'discord';
 	providerId: string;
 	email: string | null;
 	displayName: string;
 	avatarUrl?: string;
 }): Promise<{ sessionId: string }> {
 	const c = await col();
+	const providerField = `oauth.${profile.provider}`;
 
-	// Existing Google account
-	let player = await c.findOne({ 'oauth.google': profile.providerId });
+	// Existing account for this provider
+	let player = await c.findOne({ [providerField]: profile.providerId });
 	if (player) {
-		// Keep avatar fresh from Google
+		// Keep avatar fresh from provider
 		if (profile.avatarUrl && profile.avatarUrl !== player.avatarUrl) {
 			await c.updateOne(
 				{ sessionId: player.sessionId },
@@ -70,7 +72,7 @@ export async function findOrCreatePlayerByOAuth(profile: {
 		if (player) {
 			await c.updateOne(
 				{ email: profile.email.toLowerCase() },
-				{ $set: { 'oauth.google': profile.providerId, avatarUrl: profile.avatarUrl } }
+				{ $set: { [providerField]: profile.providerId, avatarUrl: profile.avatarUrl } }
 			);
 			return { sessionId: player.sessionId };
 		}
@@ -84,7 +86,7 @@ export async function findOrCreatePlayerByOAuth(profile: {
 		passwordHash: '',
 		sessionId,
 		avatarUrl: profile.avatarUrl,
-		oauth: { google: profile.providerId },
+		oauth: { [profile.provider]: profile.providerId },
 		createdAt: new Date()
 	});
 

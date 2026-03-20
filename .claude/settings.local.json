@@ -171,7 +171,14 @@
 			"Bash(xargs wc:*)",
 			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; pnpm check 2>&1\")",
 			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; & npm run check 2>&1\")",
-			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1\")"
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1\")",
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm ls arctic 2>&1 | Select-String arctic\")",
+			"Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\node_modules\\\\.pnpm\\\\arctic@3.7.0\\\\node_modules\\\\arctic\\\\dist\\\\index.d.ts' | Select-String -Pattern 'Discord' | Select-Object -First 5\")",
+			"Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\node_modules\\\\.pnpm\\\\arctic@3.7.0\\\\node_modules\\\\arctic\\\\dist\\\\providers\\\\discord.d.ts' 2>&1\")",
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run check 2>&1\")",
+			"Bash(powershell.exe -Command \"\n\\\\$content = [System.IO.File]::ReadAllText\\('C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\join\\\\+page.svelte'\\)\n\\\\$idx = \\\\$content.IndexOf\\('Continue with Google'\\)\nWrite-Host \\\\\"Found at index: \\\\$idx\\\\\"\nWrite-Host \\\\$content.Substring\\(\\\\$idx, 100\\) | Format-Hex\n\")",
+			"Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative\\\\src\\\\routes\\\\join\\\\+page.svelte' | Select-Object -Skip 254 -First 25\")",
+			"Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\mojpo\\\\WebstormProjects\\\\Initiative'; npm run format 2>&1 | Select-String 'join'\")"
 		]
 	}
 }
