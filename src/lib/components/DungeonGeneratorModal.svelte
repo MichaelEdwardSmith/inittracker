@@ -21,6 +21,7 @@
 	let dungeonSize = $state('medium');
 	let difficulty = $state('medium');
 	let includeBoss = $state(true);
+	let includeBossTreasure = $state(true);
 	let numFloors = $state(1);
 
 	// ── Canvas ─────────────────────────────────────────────────────────────────
@@ -85,6 +86,59 @@
 	let activeStair = $state<{ dir: 'up' | 'down'; floor: number } | null>(null);
 	let zoom = $state(1);
 	let isExporting = $state(false);
+	let hoveredTile = $state<{ tx: number; ty: number } | null>(null);
+
+	// ── Save / Load ────────────────────────────────────────────────────────────
+	type SavedDungeon = { id: string; name: string; savedAt: string; dungeon: GeneratedDungeon };
+	const STORAGE_KEY = 'initiative_saved_dungeons';
+
+	let showSaveModal = $state(false);
+	let showLoadModal = $state(false);
+	let saveName = $state('');
+	let savedDungeons = $state<SavedDungeon[]>([]);
+
+	function readSaved(): SavedDungeon[] {
+		try {
+			return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+		} catch {
+			return [];
+		}
+	}
+	function writeSaved(list: SavedDungeon[]) {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+	}
+	function openSaveModal() {
+		saveName = '';
+		showSaveModal = true;
+	}
+	function confirmSave() {
+		if (!dungeon || !saveName.trim()) return;
+		const list = readSaved();
+		list.unshift({
+			id: crypto.randomUUID(),
+			name: saveName.trim(),
+			savedAt: new Date().toISOString(),
+			dungeon
+		});
+		writeSaved(list);
+		showSaveModal = false;
+	}
+	function openLoadModal() {
+		savedDungeons = readSaved();
+		showLoadModal = true;
+	}
+	function loadSaved(saved: SavedDungeon) {
+		dungeon = saved.dungeon;
+		currentFloor = 0;
+		selectedRoomId = null;
+		showLoadModal = false;
+		requestAnimationFrame(renderCanvas);
+	}
+	function deleteSaved(id: string) {
+		const list = readSaved().filter((s) => s.id !== id);
+		writeSaved(list);
+		savedDungeons = list;
+	}
 	const ZOOM_MIN = 0.5,
 		ZOOM_MAX = 4,
 		ZOOM_STEP = 0.25;
@@ -358,25 +412,40 @@
 
 	function carveH(cells: number[][], y: number, x1: number, x2: number) {
 		const [lo, hi] = x1 < x2 ? [x1, x2] : [x2, x1];
-		for (let x = lo; x <= hi; x++)
-			if (x >= 0 && x < GRID_W && y >= 0 && y < GRID_H && cells[y][x] === VOID)
-				cells[y][x] = CORRIDOR;
+		for (let x = lo; x <= hi; x++) {
+			if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H || cells[y][x] !== VOID) continue;
+			// Skip if a parallel corridor already runs in the adjacent row
+			const northCorr = y > 0 && cells[y - 1][x] === CORRIDOR;
+			const southCorr = y < GRID_H - 1 && cells[y + 1][x] === CORRIDOR;
+			if (!northCorr && !southCorr) cells[y][x] = CORRIDOR;
+		}
 	}
 
 	function carveV(cells: number[][], x: number, y1: number, y2: number) {
 		const [lo, hi] = y1 < y2 ? [y1, y2] : [y2, y1];
-		for (let y = lo; y <= hi; y++)
-			if (x >= 0 && x < GRID_W && y >= 0 && y < GRID_H && cells[y][x] === VOID)
-				cells[y][x] = CORRIDOR;
+		for (let y = lo; y <= hi; y++) {
+			if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H || cells[y][x] !== VOID) continue;
+			// Skip if a parallel corridor already runs in the adjacent column
+			const westCorr = x > 0 && cells[y][x - 1] === CORRIDOR;
+			const eastCorr = x < GRID_W - 1 && cells[y][x + 1] === CORRIDOR;
+			if (!westCorr && !eastCorr) cells[y][x] = CORRIDOR;
+		}
 	}
 
 	function carveCorridor(cells: number[][], a: DungeonRoom, b: DungeonRoom) {
 		if (Math.random() < 0.5) {
-			carveH(cells, a.cy, a.cx, b.cx);
-			carveV(cells, b.cx, a.cy, b.cy);
+			// S-shape: H → V → H, turning at the midpoint between the two rooms.
+			// The vertical segment lands in open space rather than running along a room wall.
+			const midX = Math.round((a.cx + b.cx) / 2);
+			carveH(cells, a.cy, a.cx, midX);
+			carveV(cells, midX, a.cy, b.cy);
+			carveH(cells, b.cy, midX, b.cx);
 		} else {
-			carveV(cells, a.cx, a.cy, b.cy);
-			carveH(cells, b.cy, a.cx, b.cx);
+			// S-shape: V → H → V, turning at the midpoint between the two rooms.
+			const midY = Math.round((a.cy + b.cy) / 2);
+			carveV(cells, a.cx, a.cy, midY);
+			carveH(cells, midY, a.cx, b.cx);
+			carveV(cells, b.cx, midY, b.cy);
 		}
 	}
 
@@ -471,7 +540,91 @@
 		return { coins, items };
 	}
 
-	// Trap table
+	// Corridor trap table
+	const CORRIDOR_TRAP_TABLE: TrapInfo[] = [
+		{
+			name: 'Pit Trap',
+			trigger: 'False floor tile concealed with thin wood and canvas',
+			dc: 14,
+			effect:
+				'A 10 ft pit opens beneath the first creature to step on it. DC 14 DEX save or fall for 1d6 bludgeoning damage.'
+		},
+		{
+			name: 'Rolling Boulder',
+			trigger: 'Pressure plate in the floor, easy to miss in low light',
+			dc: 14,
+			effect:
+				'A boulder drops from the ceiling and rolls the length of the corridor. DC 14 DEX save or 4d6 bludgeoning damage.'
+		},
+		{
+			name: 'Tripwire Crossbow',
+			trigger: 'Fine wire strung at shin height across the corridor',
+			dc: 13,
+			effect: 'A hidden crossbow fires: +6 to hit, 2d8 piercing damage.'
+		},
+		{
+			name: 'Poison Dart Wall',
+			trigger: 'Pressure plate 5 ft into the corridor',
+			dc: 13,
+			effect:
+				'Darts fire from holes in both walls. +5 to hit, 1d4 piercing; DC 13 CON save or poisoned for 1 hour.'
+		},
+		{
+			name: 'Fire Jet',
+			trigger: 'Pressure plate disguised as a slightly discoloured floor stone',
+			dc: 12,
+			effect: 'Jets of flame fill a 10 ft section. DC 12 DEX save or 2d6 fire damage.'
+		},
+		{
+			name: 'Sleep Gas Vent',
+			trigger: 'Pressure plate at the midpoint of the corridor',
+			dc: 13,
+			effect:
+				'Colourless gas fills 15 ft. DC 13 CON save or fall unconscious for 1 hour (damage ends it).'
+		},
+		{
+			name: 'Collapsing Ceiling',
+			trigger: 'Tripwire near the far end of the corridor',
+			dc: 13,
+			effect:
+				'Debris rains in a 10 ft radius. DC 13 DEX save or 3d6 bludgeoning damage and restrained.'
+		},
+		{
+			name: 'Alarm Bell',
+			trigger: 'Tripwire at chest height, nearly invisible in shadow',
+			dc: 10,
+			effect:
+				'A loud bell rings. Creatures within 300 ft are alerted; nearest enemies arrive in 1d4 rounds.'
+		},
+		{
+			name: 'Acid Spray',
+			trigger: 'Pressure plate at the centre of the corridor',
+			dc: 13,
+			effect:
+				'Nozzles in the walls spray acid in a 5 ft line. 2d6 acid; DC 13 DEX save or 2d6 more at end of next turn.'
+		},
+		{
+			name: 'Arcane Glyph',
+			trigger: 'Glyph of warding inscribed on the floor, visible only with detect magic',
+			dc: 16,
+			effect:
+				'DC 16 WIS save or cursed for 24 hours: disadvantage on attack rolls and saving throws.'
+		},
+		{
+			name: 'Swinging Blade',
+			trigger: 'Pressure plate releases a pendulum blade from the ceiling',
+			dc: 15,
+			effect: 'Blade sweeps the corridor in a 5 ft arc: +8 to hit, 2d10 slashing damage.'
+		},
+		{
+			name: 'Netting Trap',
+			trigger: 'Tripwire releases a weighted net from the ceiling',
+			dc: 12,
+			effect: 'Target is restrained. DC 12 STR check (action) to escape; net has AC 10 and 20 hp.'
+		}
+	];
+
+	// Door trap table
 	const TRAP_TABLE: TrapInfo[] = [
 		{
 			name: 'Poison Needle',
@@ -642,8 +795,70 @@
 			if (a !== b) carveCorridor(cells, rooms[a], rooms[b]);
 		}
 
+		// Maze spurs — a few short dead-end branches growing off existing corridors
+		{
+			const dirs: [number, number][] = [
+				[0, -1],
+				[0, 1],
+				[-1, 0],
+				[1, 0]
+			];
+			// Find corridor cells that have at least one void neighbour — branch points
+			const branchPoints: [number, number][] = [];
+			for (let y = 2; y < GRID_H - 2; y++) {
+				for (let x = 2; x < GRID_W - 2; x++) {
+					if (cells[y][x] !== CORRIDOR) continue;
+					if (dirs.some(([dy, dx]) => cells[y + dy][x + dx] === VOID)) branchPoints.push([x, y]);
+				}
+			}
+			branchPoints.sort(() => Math.random() - 0.5);
+			// Grow at most 4 spurs, each at most 8 cells long
+			const numSpurs = Math.min(8, Math.floor(branchPoints.length * 0.08));
+			for (let s = 0; s < numSpurs; s++) {
+				let [x, y] = branchPoints[s];
+				const maxLen = 15 + Math.floor(Math.random() * 36); // 15–50 cells
+				let curDir: [number, number] | null = null;
+				for (let step = 0; step < maxLen; step++) {
+					// Build candidate list: strongly prefer current direction (70% straight)
+					const candidates: [number, number][] =
+						curDir && Math.random() < 0.7
+							? [curDir, ...dirs.filter((d) => d !== curDir).sort(() => Math.random() - 0.5)]
+							: [...dirs].sort(() => Math.random() - 0.5);
+					let moved = false;
+					for (const [dy, dx] of candidates) {
+						const nx = x + dx;
+						const ny = y + dy;
+						if (nx < 1 || nx >= GRID_W - 1 || ny < 1 || ny >= GRID_H - 1) continue;
+						if (cells[ny][nx] !== VOID) continue;
+						const perpFree =
+							dy === 0
+								? cells[ny - 1][nx] !== CORRIDOR && cells[ny + 1][nx] !== CORRIDOR
+								: cells[ny][nx - 1] !== CORRIDOR && cells[ny][nx + 1] !== CORRIDOR;
+						if (!perpFree) continue;
+						cells[ny][nx] = CORRIDOR;
+						x = nx;
+						y = ny;
+						curDir = [dy, dx];
+						moved = true;
+						break;
+					}
+					if (!moved) break;
+				}
+			}
+		}
+
 		const traps: Record<string, TrapInfo> = {};
 		addDoors(cells, traps);
+
+		// Corridor traps — 10% chance per corridor cell
+		for (let y = 1; y < GRID_H - 1; y++) {
+			for (let x = 1; x < GRID_W - 1; x++) {
+				if (cells[y][x] === CORRIDOR && Math.random() < 0.05) {
+					traps[`${x},${y}`] =
+						CORRIDOR_TRAP_TABLE[Math.floor(Math.random() * CORRIDOR_TRAP_TABLE.length)];
+				}
+			}
+		}
 
 		// Entrance: most upper-left room (first floor only)
 		if (isFirst) {
@@ -681,7 +896,8 @@
 		}
 
 		for (const r of rooms) {
-			if (!r.isEntrance && Math.random() < 0.25) r.loot = genLoot(partyLevel);
+			if (r.isBoss && includeBossTreasure) r.loot = genLoot(partyLevel);
+			else if (!r.isEntrance && !r.isBoss && Math.random() < 0.25) r.loot = genLoot(partyLevel);
 		}
 
 		return { cells, rooms, traps, stairs: {} };
@@ -701,22 +917,25 @@
 	function placeStairs(lower: DungeonFloor, upper: DungeonFloor) {
 		const count = Math.min(2, Math.ceil(lower.rooms.length / 5));
 		for (let i = 0; i < count; i++) {
-			const upCandidates = lower.rooms.filter(
+			// Place down-stair on lower floor
+			const lowerCandidates = lower.rooms.filter(
 				(r) => !r.isEntrance && !lower.stairs[`${r.cx},${r.cy}`]
 			);
-			if (upCandidates.length > 0) {
-				const r = pickFrom(upCandidates);
-				const [cx, cy] = roomCorner(r, lower.stairs);
-				lower.stairs[`${cx},${cy}`] = 'down';
-			}
-			const downCandidates = upper.rooms.filter(
+			if (lowerCandidates.length === 0) continue;
+			const lowerRoom = pickFrom(lowerCandidates);
+			const [cx, cy] = roomCorner(lowerRoom, lower.stairs);
+			lower.stairs[`${cx},${cy}`] = 'down';
+
+			// Place matching up-stair on upper floor in the closest room to (cx, cy)
+			const upperCandidates = upper.rooms.filter(
 				(r) => !r.isBoss && !upper.stairs[`${r.cx},${r.cy}`]
 			);
-			if (downCandidates.length > 0) {
-				const r = pickFrom(downCandidates);
-				const [cx, cy] = roomCorner(r, upper.stairs);
-				upper.stairs[`${cx},${cy}`] = 'up';
-			}
+			if (upperCandidates.length === 0) continue;
+			upperCandidates.sort(
+				(a, b) => Math.hypot(a.cx - cx, a.cy - cy) - Math.hypot(b.cx - cx, b.cy - cy)
+			);
+			const [ucx, ucy] = roomCorner(upperCandidates[0], upper.stairs);
+			upper.stairs[`${ucx},${ucy}`] = 'up';
 		}
 	}
 
@@ -814,21 +1033,61 @@
 					ctx.fillStyle = C.gridFloor;
 					ctx.fillRect(px, py, TILE, 1);
 					ctx.fillRect(px, py, 1, TILE);
-				} else if (v === DOOR) {
-					const isTrapped = !!traps[`${x},${y}`];
-					ctx.fillStyle = C.corridor;
-					ctx.fillRect(px, py, TILE, TILE);
-					// Door frame (red if trapped, amber if normal) + dark center
-					ctx.fillStyle = isTrapped ? C.trap : C.door;
-					ctx.fillRect(px + 1, py + 1, TILE - 2, TILE - 2);
-					ctx.fillStyle = C.doorCenter;
-					ctx.fillRect(px + 4, py + 4, TILE - 8, TILE - 8);
-					if (isTrapped) {
-						ctx.font = 'bold 8px monospace';
+					// Corridor trap indicator — yellow square with red !
+					if (traps[`${x},${y}`]) {
+						ctx.fillStyle = '#ccaa00';
+						ctx.fillRect(px + 2, py + 2, TILE - 4, TILE - 4);
+						ctx.font = 'bold 9px monospace';
 						ctx.textAlign = 'center';
 						ctx.textBaseline = 'middle';
-						ctx.fillStyle = C.trapText;
+						ctx.fillStyle = '#cc0000';
 						ctx.fillText('!', px + TILE / 2, py + TILE / 2);
+					}
+				} else if (v === DOOR) {
+					const isTrapped = !!traps[`${x},${y}`];
+					const doorColor = isTrapped ? C.trap : C.door;
+					// Fill tile with floor color
+					ctx.fillStyle = C.corridor;
+					ctx.fillRect(px, py, TILE, TILE);
+					// Determine passage orientation by checking open neighbors
+					const leftOpen = x > 0 && cells[y][x - 1] !== VOID;
+					const rightOpen = x < GRID_W - 1 && cells[y][x + 1] !== VOID;
+					const aPx = Math.max(2, Math.floor(TILE / 6)); // jamb size
+					const dTx = Math.floor(TILE / 4); // door half-thickness
+					const xc = px + TILE / 2;
+					const yc = py + TILE / 2;
+					if (leftOpen || rightOpen) {
+						// E-W passage — door is a horizontal bar with vertical jambs
+						ctx.fillStyle = C.wallLit;
+						ctx.fillRect(xc - 1, py, 3, aPx); // north jamb
+						ctx.fillRect(xc - 1, py + TILE - aPx, 3, aPx); // south jamb
+						ctx.strokeStyle = doorColor;
+						ctx.lineWidth = 1.5;
+						ctx.strokeRect(xc - dTx, py + aPx + 1, dTx * 2, TILE - 2 * aPx - 2);
+					} else {
+						// N-S passage — door is a vertical bar with horizontal jambs
+						ctx.fillStyle = C.wallLit;
+						ctx.fillRect(px, yc - 1, aPx, 3); // west jamb
+						ctx.fillRect(px + TILE - aPx, yc - 1, aPx, 3); // east jamb
+						ctx.strokeStyle = doorColor;
+						ctx.lineWidth = 1.5;
+						ctx.strokeRect(px + aPx + 1, yc - dTx, TILE - 2 * aPx - 2, dTx * 2);
+					}
+					if (isTrapped) {
+						// Cross-bar through door center to indicate trap
+						ctx.strokeStyle = C.trap;
+						ctx.lineWidth = 1;
+						if (leftOpen || rightOpen) {
+							ctx.beginPath();
+							ctx.moveTo(xc - dTx + 2, yc);
+							ctx.lineTo(xc + dTx - 2, yc);
+							ctx.stroke();
+						} else {
+							ctx.beginPath();
+							ctx.moveTo(xc, yc - dTx + 2);
+							ctx.lineTo(xc, yc + dTx - 2);
+							ctx.stroke();
+						}
 					}
 				}
 			}
@@ -907,13 +1166,11 @@
 		for (const room of rooms) {
 			const px = room.cx * TILE + TILE / 2;
 			const py = room.cy * TILE + TILE / 2;
-			const rx = room.left * TILE;
-			const ry = room.top * TILE;
 			const hasEnc = !!room.encounter?.monsters.length;
 
-			// Number badge
+			// Number badge — centered in the room
 			ctx.beginPath();
-			ctx.arc(rx + 11, ry + 11, 9, 0, Math.PI * 2);
+			ctx.arc(px, py, 9, 0, Math.PI * 2);
 			ctx.fillStyle = room.isEntrance ? '#0d3318' : room.isBoss ? '#3a0000' : '#111e2c';
 			ctx.fill();
 			ctx.strokeStyle = room.isEntrance ? '#4ade80' : room.isBoss ? '#f87171' : '#4a7090';
@@ -921,48 +1178,51 @@
 			ctx.stroke();
 			ctx.font = `bold ${room.id >= 9 ? 8 : 9}px monospace`;
 			ctx.fillStyle = room.isEntrance ? '#bbf7d0' : room.isBoss ? '#fecaca' : '#90bcd8';
-			ctx.fillText(String(room.id + 1), rx + 11, ry + 11);
-
-			// Room name
-			ctx.font = '10px monospace';
-			ctx.fillStyle = room.isEntrance ? '#86efac' : room.isBoss ? '#f87171' : '#6a9ab8';
-			ctx.fillText(room.name, px, hasEnc ? py - 8 : py);
+			ctx.fillText(String(room.id + 1), px, py);
 
 			// Icon
 			if (hasEnc) {
 				ctx.font = room.isBoss ? '14px serif' : '11px serif';
 				ctx.fillStyle = room.isBoss ? '#f87171' : '#c87830';
-				ctx.fillText(room.isBoss ? '☠' : '⚔', px, py + 9);
+				ctx.fillText(room.isBoss ? '☠' : '⚔', px, py + 16);
 			} else if (room.isEntrance) {
 				ctx.font = 'bold 13px serif';
 				ctx.fillStyle = '#4ade80';
-				ctx.fillText('▼', px, py + 8);
-			}
-			if (room.loot) {
-				ctx.font = '11px serif';
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
-				ctx.fillText('💰', (room.right - 1) * TILE + TILE / 2, (room.bottom - 1) * TILE + TILE / 2);
+				ctx.fillText('▼', px, py + 16);
 			}
 		}
 
-		// ── Pass 6b: Stairs ──────────────────────────────────────────────────
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
+		// ── Pass 6b: Stairs (donjon-style striped triangle, 2 squares tall) ────
 		for (const [stairKey, stairDir] of Object.entries(stairs)) {
 			const [sx, sy] = stairKey.split(',').map(Number);
-			const scx = sx * TILE + TILE / 2;
-			const scy = sy * TILE + TILE / 2;
+			const px = sx * TILE;
+			const py = sy * TILE;
+			const totalH = TILE * 2;
+			const sPx = Math.floor(TILE / 2); // max half-width at widest point
+			const tPx = Math.max(3, Math.floor(TILE / 5)); // stripe pitch
+			const xc = px + TILE / 2;
+
+			// Clip to the triangular stair outline
+			ctx.save();
 			ctx.beginPath();
-			ctx.arc(scx, scy, TILE / 2 - 1, 0, Math.PI * 2);
-			ctx.fillStyle = 'rgba(255,255,255,0.12)';
-			ctx.fill();
-			ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-			ctx.lineWidth = 1.5;
-			ctx.stroke();
-			ctx.font = 'bold 9px serif';
-			ctx.fillStyle = '#ffffff';
-			ctx.fillText(stairDir === 'up' ? '▲' : '▼', scx, scy + 1);
+			if (stairDir === 'down') {
+				ctx.moveTo(xc, py);
+				ctx.lineTo(xc + sPx, py + totalH);
+				ctx.lineTo(xc - sPx, py + totalH);
+			} else {
+				ctx.moveTo(xc - sPx, py);
+				ctx.lineTo(xc + sPx, py);
+				ctx.lineTo(xc, py + totalH);
+			}
+			ctx.closePath();
+			ctx.clip();
+
+			// Fill alternating light/dark horizontal stripes within the clip region
+			for (let y = py; y < py + totalH; y += tPx) {
+				ctx.fillStyle = Math.floor((y - py) / tPx) % 2 === 0 ? C.wallLit : C.wallDim;
+				ctx.fillRect(px, y, TILE, tPx - 1);
+			}
+			ctx.restore();
 		}
 
 		// ── Pass 6: Border + compass ──────────────────────────────────────────
@@ -1004,6 +1264,27 @@
 		if (!ctx) return;
 		ctx.imageSmoothingEnabled = false;
 		renderFloorToContext(ctx, dungeon.floors[currentFloor], selectedRoomId);
+
+		// Hover glow overlay
+		if (hoveredTile) {
+			const { tx, ty } = hoveredTile;
+			const floor = dungeon.floors[currentFloor];
+			// Stairs glow spans 2 tiles tall
+			const isStair = !!(floor.stairs[`${tx},${ty}`] ?? floor.stairs[`${tx},${ty - 1}`]);
+			const stairTy = floor.stairs[`${tx},${ty}`] ? ty : ty - 1;
+			const px = tx * TILE;
+			const py = (isStair ? stairTy : ty) * TILE;
+			const h = isStair ? TILE * 2 : TILE;
+			ctx.save();
+			ctx.shadowBlur = 12;
+			ctx.shadowColor = '#ffe066';
+			ctx.strokeStyle = 'rgba(255,220,80,0.7)';
+			ctx.lineWidth = 1.5;
+			ctx.strokeRect(px + 1, py + 1, TILE - 2, h - 2);
+			ctx.fillStyle = 'rgba(255,220,80,0.08)';
+			ctx.fillRect(px + 1, py + 1, TILE - 2, h - 2);
+			ctx.restore();
+		}
 	}
 
 	function renderFloorToDataUrl(floor: DungeonFloor): string {
@@ -1086,25 +1367,17 @@
 		const ty = Math.floor(((e.clientY - rect.top) * (CVS_H / rect.height)) / TILE);
 		const floor = dungeon.floors[currentFloor];
 		if (tx >= 0 && tx < GRID_W && ty >= 0 && ty < GRID_H) {
-			// Check for stair click
-			const stairDir = floor.stairs[`${tx},${ty}`];
+			// Check for stair click — stairs span 2 tiles tall so also check the tile above
+			const stairDir = floor.stairs[`${tx},${ty}`] ?? floor.stairs[`${tx},${ty - 1}`];
 			if (stairDir) {
 				activeStair = { dir: stairDir, floor: currentFloor };
 				return;
 			}
-			for (const lr of floor.rooms) {
-				if (lr.loot && tx === lr.right - 1 && ty === lr.bottom - 1) {
-					activeLoot = lr.loot;
-					return;
-				}
-			}
-			// Check for trapped door click
-			if (floor.cells[ty][tx] === DOOR) {
-				const trap = floor.traps[`${tx},${ty}`];
-				if (trap) {
-					activeTrap = trap;
-					return;
-				}
+			// Check for trap click (door or corridor)
+			const trap = floor.traps[`${tx},${ty}`];
+			if (trap) {
+				activeTrap = trap;
+				return;
 			}
 		}
 		const clicked = floor.rooms.find(
@@ -1118,6 +1391,38 @@
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
 		zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom + delta));
+	}
+
+	function canvasTile(e: MouseEvent): { tx: number; ty: number } | null {
+		if (!canvasEl) return null;
+		const rect = canvasEl.getBoundingClientRect();
+		const tx = Math.floor(((e.clientX - rect.left) * (CVS_W / rect.width)) / TILE);
+		const ty = Math.floor(((e.clientY - rect.top) * (CVS_H / rect.height)) / TILE);
+		if (tx < 0 || tx >= GRID_W || ty < 0 || ty >= GRID_H) return null;
+		return { tx, ty };
+	}
+
+	function isClickable(tx: number, ty: number): boolean {
+		if (!dungeon) return false;
+		const floor = dungeon.floors[currentFloor];
+		// Stair (top or second tile)
+		if (floor.stairs[`${tx},${ty}`] || floor.stairs[`${tx},${ty - 1}`]) return true;
+		// Trapped door or corridor trap
+		if (floor.traps[`${tx},${ty}`]) return true;
+		return false;
+	}
+
+	function handleMouseMove(e: MouseEvent) {
+		if (!dungeon) return;
+		const tile = canvasTile(e);
+		const next = tile && isClickable(tile.tx, tile.ty) ? tile : null;
+		const changed = next?.tx !== hoveredTile?.tx || next?.ty !== hoveredTile?.ty;
+		hoveredTile = next;
+		if (changed) renderCanvas();
+	}
+
+	function handleMouseLeave() {
+		hoveredTile = null;
 	}
 
 	$effect(() => {
@@ -1300,12 +1605,42 @@
 				<span class="text-sm text-gray-300">Include Boss</span>
 			</label>
 
+			<label
+				class="flex cursor-pointer items-center gap-2 {!includeBoss
+					? 'pointer-events-none opacity-40'
+					: ''}"
+			>
+				<input
+					type="checkbox"
+					bind:checked={includeBossTreasure}
+					disabled={!includeBoss}
+					class="h-4 w-4 rounded accent-amber-500"
+				/>
+				<span class="text-sm text-gray-300">Include Boss Treasure</span>
+			</label>
+
 			<button
 				onclick={generateDungeon}
 				class="mt-1 rounded-lg bg-amber-600 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
 			>
 				{dungeon ? 'Regenerate' : 'Generate'}
 			</button>
+
+			<div class="flex gap-2">
+				<button
+					onclick={openSaveModal}
+					disabled={!dungeon}
+					class="flex-1 rounded-lg border border-blue-700 bg-blue-900/40 py-1.5 text-xs font-bold text-blue-300 transition hover:bg-blue-800/60 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					💾 Save
+				</button>
+				<button
+					onclick={openLoadModal}
+					class="flex-1 rounded-lg border border-gray-700 bg-gray-800/60 py-1.5 text-xs font-bold text-gray-300 transition hover:bg-gray-700 active:scale-95"
+				>
+					📂 Load
+				</button>
+			</div>
 
 			{#if dungeon}
 				<div class="mt-2 border-t border-gray-800 pt-3">
@@ -1459,7 +1794,11 @@
 							width={CVS_W}
 							height={CVS_H}
 							onclick={handleCanvasClick}
-							style="display:block; border-radius:4px; cursor:crosshair; box-shadow:0 8px 40px rgba(0,0,0,0.85); transform-origin:top left; transform:scale({zoom});"
+							onmousemove={handleMouseMove}
+							onmouseleave={handleMouseLeave}
+							style="display:block; border-radius:4px; cursor:{hoveredTile
+								? 'pointer'
+								: 'crosshair'}; box-shadow:0 8px 40px rgba(0,0,0,0.85); transform-origin:top left; transform:scale({zoom});"
 						></canvas>
 
 						<!-- Selected room tooltip -->
@@ -1496,6 +1835,19 @@
 									{/if}
 								{:else}
 									<p class="text-xs text-gray-500">Empty room</p>
+								{/if}
+								{#if selectedRoom.loot}
+									<button
+										onclick={() => (activeLoot = selectedRoom!.loot!)}
+										class="mt-2 flex w-full items-center gap-1.5 rounded border border-yellow-900/40 bg-yellow-950/20 px-2 py-1.5 text-left transition hover:bg-yellow-900/30"
+									>
+										<span class="text-sm">💰</span>
+										<span class="text-xs text-yellow-300">
+											{selectedRoom.loot.coins}{selectedRoom.loot.items.length > 0
+												? ` + ${selectedRoom.loot.items.length} item${selectedRoom.loot.items.length > 1 ? 's' : ''}`
+												: ''}
+										</span>
+									</button>
 								{/if}
 							</div>
 						{/if}
@@ -1602,6 +1954,20 @@
 									>
 								</div>
 
+								{#if room.loot}
+									<button
+										onclick={() => (activeLoot = room.loot!)}
+										class="mt-1.5 ml-7 flex items-center gap-1.5 text-[10px] text-yellow-500 transition hover:text-yellow-300"
+									>
+										<span>💰</span>
+										<span
+											>{room.loot.coins}{room.loot.items.length > 0
+												? ` + ${room.loot.items.length} item${room.loot.items.length > 1 ? 's' : ''}`
+												: ''}</span
+										>
+									</button>
+								{/if}
+
 								{#if onAddEncounter}
 									<button
 										onclick={() => onAddEncounter!(room.encounter!.monsters)}
@@ -1643,6 +2009,139 @@
 		</button>
 	</div>
 </div>
+
+{#if showSaveModal}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+		onclick={() => (showSaveModal = false)}
+		onkeydown={(e) => e.key === 'Escape' && (showSaveModal = false)}
+	>
+		<div class="absolute inset-0 bg-black/70"></div>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div
+			class="relative z-10 w-full max-w-sm rounded-xl border border-blue-900/60 bg-gray-950 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<div
+				class="flex items-center justify-between rounded-t-xl border-b border-blue-900/40 bg-blue-950/30 px-4 py-3"
+			>
+				<div class="flex items-center gap-2">
+					<span class="text-base">💾</span>
+					<h3 class="text-sm font-bold tracking-wide text-blue-300">Save Dungeon</h3>
+				</div>
+				<button
+					onclick={() => (showSaveModal = false)}
+					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
+					aria-label="Close"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
+					>
+				</button>
+			</div>
+			<div class="space-y-3 p-4">
+				<input
+					type="text"
+					bind:value={saveName}
+					placeholder="Dungeon name…"
+					onkeydown={(e) => e.key === 'Enter' && confirmSave()}
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-blue-500 focus:outline-none"
+				/>
+				<button
+					onclick={confirmSave}
+					disabled={!saveName.trim()}
+					class="w-full rounded-lg bg-blue-700 py-2 text-sm font-bold text-white transition hover:bg-blue-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					Save
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if showLoadModal}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+		onclick={() => (showLoadModal = false)}
+		onkeydown={(e) => e.key === 'Escape' && (showLoadModal = false)}
+	>
+		<div class="absolute inset-0 bg-black/70"></div>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div
+			class="relative z-10 w-full max-w-sm rounded-xl border border-gray-700 bg-gray-950 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<div
+				class="flex items-center justify-between rounded-t-xl border-b border-gray-800 bg-gray-900/60 px-4 py-3"
+			>
+				<div class="flex items-center gap-2">
+					<span class="text-base">📂</span>
+					<h3 class="text-sm font-bold tracking-wide text-gray-200">Load Dungeon</h3>
+				</div>
+				<button
+					onclick={() => (showLoadModal = false)}
+					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
+					aria-label="Close"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
+					>
+				</button>
+			</div>
+			<div class="max-h-96 overflow-y-auto">
+				{#if savedDungeons.length === 0}
+					<p class="p-4 text-xs text-gray-500">No saved dungeons.</p>
+				{:else}
+					<div class="divide-y divide-gray-800">
+						{#each savedDungeons as saved}
+							<div class="flex items-center gap-2 px-4 py-3">
+								<div class="min-w-0 flex-1">
+									<p class="truncate text-sm font-semibold text-gray-200">{saved.name}</p>
+									<p class="text-[10px] text-gray-600">
+										{new Date(saved.savedAt).toLocaleDateString(undefined, {
+											month: 'short',
+											day: 'numeric',
+											year: 'numeric',
+											hour: '2-digit',
+											minute: '2-digit'
+										})}
+									</p>
+								</div>
+								<button
+									onclick={() => loadSaved(saved)}
+									class="shrink-0 rounded bg-amber-700 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-600"
+								>
+									Load
+								</button>
+								<button
+									onclick={() => deleteSaved(saved.id)}
+									class="shrink-0 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-500 transition hover:border-red-700 hover:text-red-400"
+									aria-label="Delete"
+								>
+									✕
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
 
 {#if infoMonster}
 	<MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />

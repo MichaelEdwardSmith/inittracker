@@ -1,4 +1,4 @@
-<!-- Public player viewer at /display/[sessionId]. Subscribes to the DM's combat state
+﻿<!-- Public player viewer at /display/[sessionId]. Subscribes to the DM's combat state
      via SSE, renders the initiative order with HP bars and conditions (ADV_CONDITIONS hidden),
      and provides a form for players to send messages to the DM. No auth required. -->
 <script lang="ts">
@@ -16,6 +16,8 @@
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import { fly, fade } from 'svelte/transition';
+	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
+	import type { DungeonMapState } from '$lib/dungeonRender';
 
 	let { data } = $props();
 
@@ -91,6 +93,17 @@
 			dmNotif = null;
 		}, 5000);
 	}
+
+	// ── Fog-of-war dungeon map ────────────────────────────────────────────
+	let fogMapCanvas = $state<HTMLCanvasElement | null>(null);
+	let fogMapExpanded = $state(false);
+
+	$effect(() => {
+		const ms = combatState.dungeonMapState as DungeonMapState | null | undefined;
+		if (ms && fogMapCanvas) {
+			renderFogOfWarCanvas(fogMapCanvas, ms);
+		}
+	});
 
 	// ── Initiative rolling ────────────────────────────
 	let showInitModal = $state(false);
@@ -207,6 +220,9 @@
 			a.preload = 'auto';
 			sounds[name] = a;
 		}
+		const roomReveal = new Audio('/audio/room-reveal.wav');
+		roomReveal.preload = 'auto';
+		sounds['room-reveal'] = roomReveal;
 		joined = true;
 		sessionStorage.setItem(JOINED_KEY, '1');
 		// Download any tracks already uploaded before this viewer joined
@@ -302,6 +318,11 @@
 					}
 				}
 				firstMessageReceived = true;
+
+				// Play sound when room description is revealed
+				if (!combatState.dungeonRoomDescription && newState.dungeonRoomDescription) {
+					playSound('room-reveal');
+				}
 
 				// Detect changes — skip on the very first message (empty initial state)
 				if (combatState.combatants.length > 0) {
@@ -542,6 +563,93 @@
 		<div class="bg-orb orb-3"></div>
 		<div class="bg-orb orb-4"></div>
 	</div>
+
+	<!-- Fog-of-war dungeon map — full-screen, opened via hamburger menu -->
+	{#if combatState.dungeonMapState && fogMapExpanded}
+		{@const ms = combatState.dungeonMapState}
+		<div class="fixed inset-0 z-[150] flex flex-col bg-gray-950">
+			<!-- header -->
+			<div
+				class="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
+			>
+				<span class="text-sm font-semibold text-gray-200">
+					🗺️ {ms.dungeonName || 'Dungeon Map'}
+				</span>
+				<button
+					onclick={() => (fogMapExpanded = false)}
+					class="rounded p-1 text-gray-500 hover:bg-white/10 hover:text-white"
+					aria-label="Close map">✕</button
+				>
+			</div>
+			<!-- canvas — fills remaining space, letterboxed to preserve aspect ratio -->
+			<div class="flex min-h-0 flex-1 items-center justify-center overflow-hidden p-2 sm:p-4">
+				<canvas
+					bind:this={fogMapCanvas}
+					class="block max-h-full max-w-full"
+					style="image-rendering: pixelated; width: auto; height: auto;"
+				></canvas>
+			</div>
+			{#if ms.floors.length > 1}
+				<div
+					class="shrink-0 border-t border-white/10 px-2 py-1 text-center text-[10px] text-gray-500"
+				>
+					Floor {ms.currentFloor + 1} of {ms.floors.length}
+				</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Dungeon room description overlay - shown when DM opens a room in the dungeon generator -->
+	{#if combatState.dungeonRoomDescription}
+		{@const rd = combatState.dungeonRoomDescription}
+		{@const bodyWords = rd.body.split(' ')}
+		{@const nameWords = rd.name.split(' ')}
+		<div
+			class="fixed inset-0 z-[200] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm"
+			transition:fade={{ duration: 1200 }}
+		>
+			<div
+				class="room-reveal-panel mx-4 w-full max-w-sm rounded-2xl border border-white/10 bg-gray-900 p-8 text-center shadow-2xl"
+			>
+				<div
+					class="room-reveal-meta mb-1 text-xs font-semibold tracking-widest text-gray-500 uppercase"
+				>
+					{rd.theme} · {rd.label}
+				</div>
+				<h2 class="mb-5 text-2xl font-bold text-white">
+					{#each nameWords as word, i}
+						<span class="room-word" style="animation-delay: {400 + i * 120}ms"
+							>{word}{i < nameWords.length - 1 ? ' ' : ''}</span
+						>
+					{/each}
+				</h2>
+				<p class="text-base leading-relaxed text-gray-300 italic">
+					{#each bodyWords as word, i}
+						<span class="room-word" style="animation-delay: {800 + i * 80}ms"
+							>{word}{i < bodyWords.length - 1 ? ' ' : ''}</span
+						>
+					{/each}
+				</p>
+				{#if rd.hazard}
+					{@const hazardWords = rd.hazard.split(' ')}
+					<div
+						class="mt-5 flex items-start gap-2 rounded-lg border border-orange-900/40 bg-orange-950/30 px-3 py-2 text-left text-xs text-orange-300"
+					>
+						<span class="mt-0.5 shrink-0">&#x26A0;</span>
+						<span class="leading-relaxed italic">
+							{#each hazardWords as word, i}
+								<span
+									class="room-word"
+									style="animation-delay: {800 + bodyWords.length * 80 + 400 + i * 80}ms"
+									>{word}{i < hazardWords.length - 1 ? ' ' : ''}</span
+								>
+							{/each}
+						</span>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/if}
 
 	<!-- Join Session gate — satisfies browser autoplay policy -->
 	{#if !joined}
@@ -888,7 +996,19 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<span class="text-base leading-none">😄</span>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-4 w-4 shrink-0"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<circle cx="12" cy="12" r="10" />
+				<path stroke-linecap="round" d="M8 14s1.5 2 4 2 4-2 4-2" />
+				<line x1="9" y1="9" x2="9.01" y2="9" stroke-linecap="round" stroke-width="3" />
+				<line x1="15" y1="9" x2="15.01" y2="9" stroke-linecap="round" stroke-width="3" />
+			</svg>
 			React to DM
 		</button>
 		<button
@@ -915,6 +1035,29 @@
 			</svg>
 			Dice Roller
 		</button>
+		{#if combatState.dungeonMapState}
+			<button
+				onclick={() => {
+					fogMapExpanded = true;
+					showMobileMenu = false;
+				}}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke-linejoin="round" />
+					<line x1="8" y1="2" x2="8" y2="18" />
+					<line x1="16" y1="6" x2="16" y2="22" />
+				</svg>
+				View Map
+			</button>
+		{/if}
 		{#if myPlayerName && players.length > 0}
 			<button
 				onclick={() => {
@@ -1704,6 +1847,40 @@
 	}
 	.flash-overlay {
 		animation: flash-effect 0.75s ease-out forwards;
+	}
+
+	/* ── Room description reveal ── */
+	@keyframes word-rise {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	.room-word {
+		display: inline;
+		opacity: 0;
+		animation: word-rise 0.5s ease-out forwards;
+	}
+	.room-reveal-panel {
+		animation: room-panel-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+	@keyframes room-panel-in {
+		from {
+			opacity: 0;
+			transform: scale(0.88) translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1) translateY(0);
+		}
+	}
+	.room-reveal-meta {
+		opacity: 0;
+		animation: word-rise 0.6s ease-out 200ms forwards;
 	}
 
 	/* ── Atmospheric drifting orbs ── */

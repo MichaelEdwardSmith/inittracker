@@ -98,5 +98,36 @@ export function validateStorageState(raw: unknown): StorageState | null {
 		}
 	}
 
+	// Optional dungeonRoomDescription — shown on player display as a full-screen overlay
+	if (o.dungeonRoomDescription != null) {
+		const d = o.dungeonRoomDescription as Record<string, unknown>;
+		if (!d || typeof d !== 'object') return null;
+		if (!isStr(d.name, 200)) return null;
+		if (!isStr(d.label, 100)) return null;
+		if (!isStr(d.body, 2000)) return null;
+		if (d.hazard !== undefined && !isStr(d.hazard, 500)) return null;
+		if (!isStr(d.theme, 50)) return null;
+	}
+
+	// Optional dungeonMapState — fog-of-war map shown on player display
+	if (o.dungeonMapState != null) {
+		const m = o.dungeonMapState as Record<string, unknown>;
+		if (!m || typeof m !== 'object') return null;
+		if (!isStr(m.dungeonName, 200)) return null;
+		if (!isStr(m.theme, 50)) return null;
+		if (!Array.isArray(m.floors) || m.floors.length > 10) return null;
+		for (const floor of m.floors as unknown[]) {
+			if (!floor || typeof floor !== 'object') return null;
+			const f = floor as Record<string, unknown>;
+			if (!isInt(f.n_rows, 0, 500) || !isInt(f.n_cols, 0, 500)) return null;
+			if (!Array.isArray(f.cell)) return null;
+			if (!Array.isArray(f.stair)) return null;
+		}
+		if (!isInt(m.currentFloor, 0, 9)) return null;
+		if (!Array.isArray(m.bossRoomIds)) return null;
+		if (!Array.isArray(m.revealedRooms)) return null;
+		if (!Array.isArray(m.revealedCorridors)) return null;
+	}
+
 	return o as unknown as StorageState;
 }

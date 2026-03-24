@@ -165,6 +165,7 @@
 	let showQuickRules = $state(false);
 	let showGenerators = $state(false);
 	let showDungeon = $state(false);
+	let showDonjon = $state(false);
 
 	// Lazily-loaded heavy modal components
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -173,6 +174,8 @@
 	let GeneratorsModalComp = $state<any>(null);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let DungeonGeneratorModalComp = $state<any>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let DonjonModalComp = $state<any>(null);
 
 	async function openQuickRules() {
 		showQuickRules = true;
@@ -191,6 +194,11 @@
 		if (!DungeonGeneratorModalComp)
 			DungeonGeneratorModalComp = (await import('$lib/components/DungeonGeneratorModal.svelte'))
 				.default;
+	}
+	async function openDonjon() {
+		showDonjon = true;
+		if (!DonjonModalComp)
+			DonjonModalComp = (await import('$lib/components/DonjonDungeonModal.svelte')).default;
 	}
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
@@ -1170,7 +1178,7 @@
 		onclose={() => (showGenerators = false)}
 		onOpenDungeon={() => {
 			showGenerators = false;
-			openDungeon();
+			openDonjon();
 		}}
 		onAddEncounter={(monsters) => {
 			combat.clearEnemies();
@@ -1213,6 +1221,13 @@
 				showDungeon = false;
 			}}
 		/>
+	</div>
+{/if}
+
+{#if DonjonModalComp}
+	{@const DonjonModal = DonjonModalComp}
+	<div style="display:{showDonjon ? 'block' : 'none'}">
+		<DonjonModal onclose={() => (showDonjon = false)} />
 	</div>
 {/if}
 
