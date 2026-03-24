@@ -68,10 +68,12 @@ function createCombatStore() {
 	let participantStats = $state<Map<string, ParticipantStat>>(new Map());
 
 	let suppressSync = false;
+	let dungeonRoomDescription = $state<StorageState['dungeonRoomDescription']>(null);
+	let dungeonMapState = $state<StorageState['dungeonMapState']>(null);
 
 	function sync() {
 		if (suppressSync) return;
-		syncToServer({ combatants, currentTurnId, round });
+		syncToServer({ combatants, currentTurnId, round, dungeonRoomDescription, dungeonMapState });
 	}
 
 	/** Core HP mutation — shared by adjustHp and applyAoE (no sync). */
@@ -253,6 +255,17 @@ function createCombatStore() {
 		},
 		get hasCombatHistory() {
 			return combatStartedAt !== null;
+		},
+
+		/** Show or hide a dungeon room description on the player display. */
+		setDungeonRoomDescription(desc: StorageState['dungeonRoomDescription']) {
+			dungeonRoomDescription = desc;
+			sync();
+		},
+
+		setDungeonMapState(state: StorageState['dungeonMapState']) {
+			dungeonMapState = state;
+			sync();
 		},
 
 		/** Apply state received from an external source (e.g. SSE) without syncing back. */

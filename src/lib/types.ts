@@ -55,6 +55,30 @@ export interface StorageState {
 	/** Present only on the sync immediately after an AoE action; tells the viewer
 	 *  which combatants were hit (in order) so it can animate them sequentially. */
 	aoeEvents?: Array<{ id: string; name: string; delta: number }>;
+	/** When set, the player display hides combat and shows this dungeon room description. */
+	dungeonRoomDescription?: {
+		name: string;
+		label: string;
+		body: string;
+		hazard: string;
+		theme: string;
+	} | null;
+	/** When set, the player display shows a fog-of-war dungeon map in the corner. */
+	dungeonMapState?: {
+		dungeonName: string;
+		theme: string;
+		floors: Array<{
+			n_rows: number;
+			n_cols: number;
+			n_rooms: number;
+			cell: number[][];
+			stair: Array<{ row: number; col: number; connects_to_floor?: number }>;
+		}>;
+		currentFloor: number;
+		bossRoomIds: number[];
+		revealedRooms: number[][];
+		revealedCorridors: string[][];
+	} | null;
 }
 
 export interface EnemyTemplate {
