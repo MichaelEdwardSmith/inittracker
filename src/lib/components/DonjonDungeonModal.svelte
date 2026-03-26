@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, getMonsterDetail } from '$lib/enemies';
@@ -7,7 +7,7 @@
 	import jsPDF from 'jspdf';
 	import autoTable from 'jspdf-autotable';
 
-	let { onclose }: { onclose: () => void } = $props();
+	let { onclose, embedded = false }: { onclose: () => void; embedded?: boolean } = $props();
 
 	// ── cell bit flags ──────────────────────────────────────────────────────────
 	const BLOCKED = 0x00000001;
@@ -730,6 +730,243 @@
 		]
 	};
 
+	// ── puzzle tables ────────────────────────────────────────────────────────────
+	interface Puzzle {
+		type: 'Riddle' | 'Logic' | 'Environmental';
+		prompt: string;
+		solution: string;
+		stakes: string;
+	}
+
+	const PUZZLE_TABLE: Record<DungeonTheme, Puzzle[]> = {
+		Crypt: [
+			{
+				type: 'Riddle',
+				prompt:
+					'Carved into the sarcophagus lid: "I have cities, but no houses live there. I have mountains, but no trees grow. I have water, but no fish swim. I have roads, but no carts travel. What am I?"',
+				solution: 'A map. The correct answer must be spoken aloud at the lid to open it.',
+				stakes:
+					'Failure (wrong answer spoken aloud) triggers a Harm glyph — DC 14 CON save or 3d6 necrotic damage. Success reveals a hidden compartment with treasure.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'Three stone urns sit before a sealed door, each engraved with a symbol: Flame, Skull, Moon. An inscription reads: "The living fear me, the dead use me, and the gods eat me. Only the right urn opens the way."',
+				solution:
+					'Time. The Skull urn (representing death/time) is correct. Lifting its lid releases the door mechanism.',
+				stakes:
+					'Opening the wrong urn releases a cloud of choking dust — DC 13 CON save or be Poisoned for 1 minute. The door only opens for the correct urn.'
+			},
+			{
+				type: 'Environmental',
+				prompt:
+					'The floor of this room is a grid of cracked tiles, each engraved with a small glyph — crown, sword, or coin. A plaque on the wall reads: "Walk the path of the servant, not the master."',
+				solution:
+					'Step only on coin tiles (servants carry coin, not crown or sword). The safe path traces diagonally across the room.',
+				stakes:
+					'Each wrong tile collapses, dropping the creature into a 10-ft pit (2d6 bludgeoning). A creature who maps the safe path and crosses earns a reward token left on the far plinth.'
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'A weeping stone effigy holds out a bowl filled with dust. Beneath it: "Feed me and I grow. Give me water and I die. What am I?"',
+				solution:
+					'Fire. Lighting the dust in the bowl with a flame opens a hidden door in the west wall.',
+				stakes:
+					'Pouring water into the bowl triggers a cold burst — DC 12 CON save or 1d6 cold damage and speed halved for 1 round. Correct answer opens a passage to a bonus chamber.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'Four stone knights stand at each cardinal point. Each holds a weapon: Axe (North), Spear (East), Shield (South), Sword (West). The inscription: "The one who cannot attack must lead."',
+				solution:
+					'Push the Shield knight (South) forward — it cannot attack, so it "leads." A hidden pressure plate beneath it opens the far door.',
+				stakes:
+					'Pushing any other knight triggers the three others to animate and attack for one round before resetting. Correct knight opens the door and the knights bow, granting a +1 to the first attack made in the next combat.'
+			},
+			{
+				type: 'Environmental',
+				prompt:
+					'The room is filled with ankle-deep black water. A raised dais in the center holds an ornate box. Faint light pulses from runes along the walls that seem to track movement.',
+				solution:
+					'The runes detect rapid movement. Creatures who move at half speed (or crawl) are not tracked and can reach the dais safely. The box contains a key.',
+				stakes:
+					'Moving at normal speed triggers a Chill Touch bolt from each active rune (one per PC, +5 to hit, 1d8 necrotic). Moving slowly reveals the box is unlocked and contains a useful item.'
+			}
+		],
+		Sewer: [
+			{
+				type: 'Logic',
+				prompt:
+					'Three corroded levers protrude from the wall, each labeled with a faded number: I, II, III. The outflow sluice is sealed. Water is rising. A scrawled note on the wall reads: "Only the middle survives alone."',
+				solution:
+					'Pull lever II (the middle one) alone. Pulling others in combination floods the room faster or jams the gate.',
+				stakes:
+					'Each wrong combination raises water level by 1 ft (starts at 2 ft; 5 ft = difficult terrain + risk of drowning). Correct lever drains the room and opens the sluice gate.'
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'A tarnished plaque on the wall reads: "The more you take, the more you leave behind. What am I?" A hole in the floor is sealed with an iron grate.',
+				solution:
+					'Footsteps. Speaking the answer aloud causes the grate to click open, revealing a dry tunnel below.',
+				stakes:
+					'Incorrect answers cause the walls to seep more effluent — the stench is overwhelming (DC 11 CON save or Poisoned until the room is left). Correct answer opens a safe route.'
+			},
+			{
+				type: 'Environmental',
+				prompt:
+					'Three drainage pipes feed into this chamber. Colored slime — red, yellow, green — flows from each. A central basin has three slots: only the right combination of slimes will dissolve the barrier ahead.',
+				solution:
+					'Mix red and yellow (produces orange/acidic reaction) — this dissolves the barrier. Green is inert; red alone chars the edges; yellow alone does nothing.',
+				stakes:
+					'Wrong combinations cause a noxious splash — DC 12 DEX save or 1d6 acid damage and Blinded for 1 round. Correct mix dissolves the barrier, revealing a passage.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'A room with four outflow valves, each bearing a symbol: fish, rat, serpent, eye. The central cistern is draining and a door on the far wall is sealed by water pressure. A faded manual on a pedestal shows diagrams of the valves.',
+				solution:
+					'Close the fish and rat valves (high-flow), leave the serpent valve open. This maintains enough pressure to hold the door mechanism open. The eye valve is a decoy that triggers an alarm.',
+				stakes:
+					'Opening the eye valve rings a bell elsewhere in the dungeon, potentially alerting enemies. Correct configuration raises a submerged grate and reveals a chest.'
+			}
+		],
+		Cave: [
+			{
+				type: 'Environmental',
+				prompt:
+					'The cave floor is covered in luminous crystals that chime musically when struck. A stalactite formation on the ceiling forms crude letters: "Sing what the cave remembers."',
+				solution:
+					'The crystals were struck in a pattern previously — a DC 14 Investigation check reveals worn strike marks. Reproducing the sequence (4 crystals in order) opens a fissure in the east wall.',
+				stakes:
+					'Wrong sequences cause a resonance burst — DC 13 CON save or Deafened for 1 hour. Correct sequence opens the fissure and the crystals go dark and quiet.'
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'A stalagmite formation uncannily resembles a hunched figure with an open hand. Scratched in the rock: "Give me what you cannot keep, and I will give you what you cannot make."',
+				solution:
+					'Place a drop of blood (or any sacrifice of something personal) in the hand. The formation opens, revealing a natural gem cache.',
+				stakes:
+					'Placing gold or an object triggers a pressure trap — DC 13 DEX save or 2d6 piercing from rockfall. Correct offering reveals a cache of uncut gems worth 3d6 × 10 gp.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'A pool of perfectly still water sits in the center. Four stones ring the pool, each carved with an animal: bear, fish, eagle, wolf. A groove in the cave floor connects the pool to a sealed passage.',
+				solution:
+					'Submerge the fish stone. It is the only creature native to water — this triggers a hidden lever mechanism beneath the pool, draining it and opening the passage.',
+				stakes:
+					'Submerging other stones causes the pool to overflow, making the cave floor difficult terrain (shallow water). Submerging fish stone drains the pool, revealing the lever and a piece of equipment left by a previous explorer.'
+			}
+		],
+		Fortress: [
+			{
+				type: 'Logic',
+				prompt:
+					'A war room with a large tactical map on the table. Five colored tokens — red, blue, green, white, black — sit in a cup. The door out is sealed and bears the inscription: "Place your forces to defend the keep without any token touching another."',
+				solution:
+					'Arrange the five tokens on the map so no two share an edge or corner (a variation of the 5-queens-on-a-5x5 problem). One valid arrangement: corners + center-offset.',
+				stakes:
+					"Each wrong placement attempt causes a crossbow bolt to fire from the wall — +4 to hit, 1d8 piercing. Correct arrangement opens the door and reveals a hidden drawer with officer's orders (useful lore)."
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'Above the armory door, chiseled into the keystone: "I have a head and a tail, but no body. What am I?"',
+				solution: 'A coin. Inserting a gold coin into the slot above the door unlocks the armory.',
+				stakes:
+					'Incorrect objects inserted trigger a dart volley — DC 13 DEX save or 1d4 piercing. Correct answer (gold coin inserted) unlocks the armory, which contains standard military equipment.'
+			},
+			{
+				type: 'Environmental',
+				prompt:
+					'The floor of this guard post is a grid of pressure plates, some marked with the fortress crest. The exit portcullis is raised by weight applied in a specific pattern.',
+				solution:
+					'Stand on all crest-marked plates simultaneously (requires at least 2 party members to cover all plates). The portcullis rises and locks open.',
+				stakes:
+					'Triggering non-crest plates drops the portcullis on any creature passing under it — DC 14 DEX save or 2d10 bludgeoning and Restrained. Correct activation raises and locks the portcullis permanently.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'Three prison cells, each with a different prisoner: a thief, a soldier, a mage (all long-dead skeletons, their professions marked by their gear). One cell door has a real key inside it. A sign reads: "The guilty one always lies. The innocent always speaks truth. Ask one question to find the key."',
+				solution:
+					'Ask any skeleton: "Which cell does another skeleton say has the key?" Then pick the cell NOT indicated. (Classic two-guard logic puzzle variant.) The key unlocks a bonus chamber nearby.',
+				stakes:
+					'Opening the wrong cell releases a Specter trapped inside. Correct cell yields the key plus a journal with dungeon lore.'
+			}
+		],
+		Arcane: [
+			{
+				type: 'Logic',
+				prompt:
+					'Seven glowing orbs orbit a central plinth, each a different color of the spectrum. The plinth inscription: "Order chaos into light. Arrange us as the sky does after rain."',
+				solution:
+					'Arrange the orbs in rainbow order (red, orange, yellow, green, blue, indigo, violet) around the plinth. This completes a prismatic circuit that opens the sealed door.',
+				stakes:
+					'Wrong arrangements cause random orbs to discharge — each misplacement: DC 13 DEX save or 1d6 damage of a random energy type. Correct arrangement floods the room with warm light and the door opens.'
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'A magic mouth on the wall speaks when a creature enters: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?"',
+				solution:
+					'An echo. Speaking the word "echo" (or demonstrating an echo in the chamber) opens a concealed door.',
+				stakes:
+					'Wrong answers cause the magic mouth to cast Thunderwave (DC 13 STR save, 2d8 thunder, pushed 10 ft). Correct answer silences the mouth and reveals the door.'
+			},
+			{
+				type: 'Environmental',
+				prompt:
+					'A room of mirrors, each reflecting a different version of the party: past, future, shadow-self. Three mirrors have symbols — sun, moon, star. A plinth in the center has three recesses. The far door is sealed.',
+				solution:
+					'Smash the shadow-self mirrors (non-symbolic ones) to collect the shards. Place a shard in each recess on the plinth. The door unlocks.',
+				stakes:
+					'Smashing a symbolic mirror (sun, moon, star) releases the entity within — treat as a Shadow that attacks immediately. Smashing the correct mirrors and filling the plinth opens the door and grants one party member Advantage on their next saving throw.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'A chessboard-like floor with alternating rune tiles. Some tiles glow faintly. A wall inscription: "A knight\'s path covers all. Walk as a knight walks, starting from the lit corner."',
+				solution:
+					"Trace a knight's tour across the board (L-shaped moves only), starting from the glowing corner tile. Reaching the far corner opens a portal. A DC 16 Intelligence check reveals the correct route.",
+				stakes:
+					"Stepping on a non-knight-move tile causes an arcane shock — 1d6 lightning and teleported back to start. Completing the knight's tour opens a portal that deposits the party ahead of a long corridor."
+			}
+		],
+		Fungal: [
+			{
+				type: 'Environmental',
+				prompt:
+					'Bioluminescent mushrooms of five colors ring the room. Each one pulses in a slow, rhythmic pattern. An ancient pictograph on the wall shows a sequence: blue, blue, red, green, blue.',
+				solution:
+					'Touch the mushrooms in that exact sequence. This sends a recognition signal through the mycelial network and the colony grants safe passage.',
+				stakes:
+					'Wrong sequences cause the mushrooms to release a spore burst — DC 12 CON save or Poisoned for 1 minute. Correct sequence causes the colony to retract thorny growths blocking the exit.'
+			},
+			{
+				type: 'Riddle',
+				prompt:
+					'A massive toadstool bears a carved face that speaks when approached: "I die each morning and am born each night. I have no roots but I feed the world. What am I?"',
+				solution:
+					'The moon (or moonlight). Speaking "moon" or "moonlight" causes the toadstool to bloom, revealing a hollow interior with treasure.',
+				stakes:
+					'Wrong answers cause the toadstool to exhale a paralytic mist — DC 13 CON save or Poisoned. Correct answer blooms the cap open, revealing a hollow with useful fungi and a piece of equipment.'
+			},
+			{
+				type: 'Logic',
+				prompt:
+					'Three fungal growths block separate paths. Each can be destroyed by a specific element shown in pictographs above it: Growth A (fire symbol), Growth B (cold symbol), Growth C (acid symbol). But the party only has one torch, a waterskin, and a vial of oil.',
+				solution:
+					'Burn the oil for fire (destroys A), pour the waterskin to quench the oil and create cold steam (approximates cold for B), mix remaining damp ash with minerals on the ground for makeshift acid (DC 13 Nature check for C).',
+				stakes:
+					'Using the wrong element on a growth causes it to release a defensive spore cloud — DC 12 CON save or Blinded for 1 minute. All three cleared opens the main passage and reveals a spore-preserved chest.'
+			}
+		]
+	};
+
 	// ── trap tables ──────────────────────────────────────────────────────────────
 	interface TrapData {
 		name: string;
@@ -1245,6 +1482,27 @@
 			else if (tileCells <= 64) table = TREASURE_MEDIUM;
 			else table = TREASURE_LARGE;
 			result.push(table[rand(table.length)]);
+		}
+		return result;
+	}
+
+	// puzzles[floorIdx] = sparse map: roomId → Puzzle (only empty rooms, ~20%)
+	let floorPuzzles = $state<Record<number, Puzzle>[]>([]);
+	let expandedPuzzleSolutions = $state<Set<string>>(new Set());
+
+	function generatePuzzles(
+		dungeon: Dungeon,
+		encounters: string[],
+		bossRoomId = 0,
+		floorIndex = 0
+	): Record<number, Puzzle> {
+		const table = PUZZLE_TABLE[dungeonTheme];
+		const result: Record<number, Puzzle> = {};
+		for (let id = 1; id <= dungeon.n_rooms; id++) {
+			if (floorIndex === 0 && id === 1) continue; // skip start room
+			if (id === bossRoomId) continue; // no puzzles in boss room
+			if (encounters[id] !== 'Empty') continue; // only empty rooms
+			if (Math.random() < 0.22) result[id] = table[rand(table.length)];
 		}
 		return result;
 	}
@@ -2574,6 +2832,7 @@
 			const encounters = floorEncounters[fi] ?? [];
 			const treasure = floorTreasure[fi] ?? [];
 			const hazards = floorHazards[fi] ?? {};
+			const puzzles = floorPuzzles[fi] ?? {};
 
 			const rows: string[][] = [];
 			for (let roomId = 1; roomId <= d.n_rooms; roomId++) {
@@ -2585,7 +2844,16 @@
 				const desc = getRoomDescription(roomId, enc, !!tr, isBoss, isStart);
 				const hazard = hazards[roomId] ?? '';
 				const badge = isBoss ? ' \u2605' : isStart ? ' \u25b6' : '';
-				const details = [desc, tr ? `Treasure: ${tr}` : '', hazard ? `Hazard: ${hazard}` : '']
+				const puz = puzzles[roomId];
+				const puzzleStr = puz
+					? `Puzzle (${puz.type}): ${puz.prompt}\nSolution: ${puz.solution}\nStakes: ${puz.stakes}`
+					: '';
+				const details = [
+					desc,
+					tr ? `Treasure: ${tr}` : '',
+					hazard ? `Hazard: ${hazard}` : '',
+					puzzleStr
+				]
 					.filter(Boolean)
 					.join('\n');
 				rows.push([`${roomId}${badge}`, name, enc || 'Empty', details]);
@@ -2731,6 +2999,10 @@
 		floorEncounters = generated.map((d, fi) => generateEncounters(d, floorBossRoomIds[fi]));
 		floorTreasure = generated.map((d, fi) => generateTreasure(d, floorBossRoomIds[fi]));
 		floorHazards = generated.map((d, fi) => generateHazards(d, floorBossRoomIds[fi], fi));
+		floorPuzzles = generated.map((d, fi) =>
+			generatePuzzles(d, floorEncounters[fi], floorBossRoomIds[fi], fi)
+		);
+		expandedPuzzleSolutions = new Set();
 		floorVisitedRooms = generated.map(() => new Set<number>());
 		floorRevealedCorridors = generated.map(() => new Set<string>());
 		mapPushed = false;
@@ -2785,6 +3057,7 @@
 		floorTreasure: string[][];
 		floorBossRoomIds: number[];
 		floorHazards?: Record<number, string>[];
+		floorPuzzles?: Record<number, Puzzle>[];
 		floorVisitedRooms?: number[][];
 		floorRevealedCorridors?: string[][];
 		includeBossRoom: boolean;
@@ -2839,6 +3112,7 @@
 			floorTreasure,
 			floorBossRoomIds,
 			floorHazards,
+			floorPuzzles,
 			floorVisitedRooms: floorVisitedRooms.map((s) => [...s]),
 			floorRevealedCorridors: floorRevealedCorridors.map((s) => [...s]),
 			includeBossRoom,
@@ -2879,6 +3153,12 @@
 		floorHazards =
 			entry.floorHazards ??
 			entry.floors.map((d, fi) => generateHazards(d, entry.floorBossRoomIds[fi], fi));
+		floorPuzzles =
+			entry.floorPuzzles ??
+			entry.floors.map((d, fi) =>
+				generatePuzzles(d, entry.floorEncounters[fi], entry.floorBossRoomIds[fi], fi)
+			);
+		expandedPuzzleSolutions = new Set();
 		floorVisitedRooms =
 			entry.floorVisitedRooms?.map((arr) => new Set(arr)) ??
 			entry.floors.map(() => new Set<number>());
@@ -2942,24 +3222,28 @@
 
 <!-- full-screen overlay -->
 <div
-	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/80 backdrop-blur-sm"
+	class={embedded
+		? 'flex h-full flex-col overflow-hidden bg-black/80'
+		: 'fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/80 backdrop-blur-sm'}
 	role="dialog"
 	aria-modal="true"
 	aria-label="Donjon Test dungeon generator"
 >
 	<!-- header bar -->
-	<div
-		class="flex shrink-0 items-center justify-between border-b border-white/10 bg-gray-900 px-4 py-3"
-	>
-		<h2 class="text-base font-bold text-white">🗺 Dungeon Generator</h2>
-		<button
-			onclick={onclose}
-			class="ml-3 shrink-0 rounded p-1 text-gray-400 hover:bg-white/10 hover:text-white"
-			aria-label="Close"
+	{#if !embedded}
+		<div
+			class="flex shrink-0 items-center justify-between border-b border-white/10 bg-gray-900 px-4 py-3"
 		>
-			✕
-		</button>
-	</div>
+			<h2 class="text-base font-bold text-white">🗺 Dungeon Generator</h2>
+			<button
+				onclick={onclose}
+				class="ml-3 shrink-0 rounded p-1 text-gray-400 hover:bg-white/10 hover:text-white"
+				aria-label="Close"
+			>
+				✕
+			</button>
+		</div>
+	{/if}
 
 	{#snippet optionsPanelContent()}
 		<div class="flex gap-2">
@@ -3153,6 +3437,8 @@
 					{@const roomName = getRoomName(roomId, isBossRoom, isStartRoom)}
 					{@const isVisited = (floorVisitedRooms[currentFloor] ?? new Set()).has(roomId)}
 					{@const hazard = floorHazards[currentFloor]?.[roomId] ?? ''}
+					{@const puzzle = floorPuzzles[currentFloor]?.[roomId] ?? null}
+					{@const puzzleKey = `-`}
 					{@const encParts = parseEnc(enc)}
 					<div
 						class="flex flex-col gap-1 border-b border-white/5 px-3 py-2 {isVisited
@@ -3243,6 +3529,34 @@
 							<div class="ml-5 flex items-start gap-1 text-[10px] text-orange-400">
 								<span class="shrink-0">⚠</span>
 								<span class="leading-snug">{hazard}</span>
+							</div>
+						{/if}
+						{#if puzzle}
+							<div class="ml-5 flex flex-col gap-0.5 text-[10px] text-purple-300">
+								<div class="flex items-start gap-1">
+									<span class="shrink-0">🧩</span>
+									<span class="font-semibold text-purple-200">{puzzle.type} Puzzle</span>
+								</div>
+								<p class="ml-5 leading-snug text-purple-300/80 italic">{puzzle.prompt}</p>
+								<button
+									class="ml-5 self-start rounded bg-purple-900/40 px-1.5 py-0.5 text-[9px] font-semibold text-purple-400 hover:bg-purple-800/50 hover:text-purple-200"
+									onclick={() => {
+										if (expandedPuzzleSolutions.has(puzzleKey)) {
+											expandedPuzzleSolutions.delete(puzzleKey);
+										} else {
+											expandedPuzzleSolutions.add(puzzleKey);
+										}
+										expandedPuzzleSolutions = new Set(expandedPuzzleSolutions);
+									}}
+								>
+									{expandedPuzzleSolutions.has(puzzleKey) ? 'Hide Solution' : 'Show Solution'}
+								</button>
+								{#if expandedPuzzleSolutions.has(puzzleKey)}
+									<div class="mt-0.5 ml-5 rounded bg-purple-950/60 px-2 py-1.5 leading-snug">
+										<p class="mb-1 font-semibold text-green-300">Solution: {puzzle.solution}</p>
+										<p class="text-orange-300/80">Stakes: {puzzle.stakes}</p>
+									</div>
+								{/if}
 							</div>
 						{/if}
 						{#if enc !== 'Empty'}

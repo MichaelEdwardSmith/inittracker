@@ -166,6 +166,8 @@
 	let showGenerators = $state(false);
 	let showDungeon = $state(false);
 	let showDonjon = $state(false);
+	let showTown = $state(false);
+	let showInn = $state(false);
 
 	// Lazily-loaded heavy modal components
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,6 +178,10 @@
 	let DungeonGeneratorModalComp = $state<any>(null);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let DonjonModalComp = $state<any>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let TownModalComp = $state<any>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let InnModalComp = $state<any>(null);
 
 	async function openQuickRules() {
 		showQuickRules = true;
@@ -199,6 +205,16 @@
 		showDonjon = true;
 		if (!DonjonModalComp)
 			DonjonModalComp = (await import('$lib/components/DonjonDungeonModal.svelte')).default;
+	}
+	async function openTown() {
+		showTown = true;
+		if (!TownModalComp)
+			TownModalComp = (await import('$lib/components/TownGeneratorModal.svelte')).default;
+	}
+	async function openInn() {
+		showInn = true;
+		if (!InnModalComp)
+			InnModalComp = (await import('$lib/components/InnGeneratorModal.svelte')).default;
 	}
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
@@ -1180,7 +1196,15 @@
 			showGenerators = false;
 			openDonjon();
 		}}
-		onAddEncounter={(monsters) => {
+		onOpenTown={() => {
+			showGenerators = false;
+			openTown();
+		}}
+		onOpenInn={() => {
+			showGenerators = false;
+			openInn();
+		}}
+		onAddEncounter={(monsters: { name: string; count: number }[]) => {
 			combat.clearEnemies();
 			for (const m of monsters) {
 				const template = ENEMY_TEMPLATES.find((t) => t.name.toLowerCase() === m.name.toLowerCase());
@@ -1204,7 +1228,7 @@
 	<div style="display:{showDungeon ? 'block' : 'none'}">
 		<DungeonGenerator
 			onclose={() => (showDungeon = false)}
-			onAddEncounter={(monsters) => {
+			onAddEncounter={(monsters: { name: string; count: number }[]) => {
 				for (const m of monsters) {
 					const template = ENEMY_TEMPLATES.find(
 						(t) => t.name.toLowerCase() === m.name.toLowerCase()
@@ -1228,6 +1252,20 @@
 	{@const DonjonModal = DonjonModalComp}
 	<div style="display:{showDonjon ? 'block' : 'none'}">
 		<DonjonModal onclose={() => (showDonjon = false)} />
+	</div>
+{/if}
+
+{#if TownModalComp}
+	{@const TownModal = TownModalComp}
+	<div style="display:{showTown ? 'block' : 'none'}">
+		<TownModal onclose={() => (showTown = false)} />
+	</div>
+{/if}
+
+{#if InnModalComp}
+	{@const InnModal = InnModalComp}
+	<div style="display:{showInn ? 'block' : 'none'}">
+		<InnModal onclose={() => (showInn = false)} />
 	</div>
 {/if}
 

@@ -4,11 +4,15 @@
 	let {
 		onclose,
 		onAddEncounter,
-		onOpenDungeon
+		onOpenDungeon,
+		onOpenTown,
+		onOpenInn
 	}: {
 		onclose: () => void;
 		onAddEncounter?: (monsters: { name: string; count: number }[]) => void;
 		onOpenDungeon?: () => void;
+		onOpenTown?: () => void;
+		onOpenInn?: () => void;
 	} = $props();
 
 	type Category = {
@@ -18,14 +22,24 @@
 	};
 
 	const categories: Category[] = [
-		{ id: 'names', label: 'Name Generator', icon: '📛' },
 		{ id: 'weather', label: 'Weather & Travel', icon: '🌦️' },
-		{ id: 'shop', label: 'Shop Generator', icon: '🛒' },
 		{ id: 'encounter', label: 'Random Encounter', icon: '🎲' },
-		{ id: 'dungeon', label: 'Dungeon Generator', icon: '🗺️' }
+		{ id: 'wilderness', label: 'Wilderness Encounter', icon: '🌲' },
+		{ id: 'names', label: 'Name Generator', icon: '📛' },
+		{ id: 'town', label: 'Town Generator', icon: '🏘️' },
+		{ id: 'shop', label: 'Shop Generator', icon: '🛒' },
+		{ id: 'inn', label: 'Inn Generator', icon: '🍺' },
+		{ id: 'dungeon', label: 'Dungeon Generator', icon: '🗺️' },
+		{ id: 'wizard', label: "Wizard's Tower", icon: '🔮' },
+		{ id: 'cult', label: 'Cult / Secret Society', icon: '🕯️' },
+		{ id: 'guild', label: "Thieves' Guild", icon: '🗡️' },
+		{ id: 'caravan', label: 'Trade Caravan', icon: '🐎' },
+		{ id: 'blackmarket', label: 'Black Market', icon: '🪙' },
+		{ id: 'noble', label: 'Noble House', icon: '🏰' },
+		{ id: 'graveyard', label: 'Graveyard / Crypt', icon: '⚰️' }
 	];
 
-	let selected = $state('names');
+	let selected = $state('weather');
 
 	// ── Name Generator ───────────────────────────────────────────────────────
 	type SyllableDef = {
@@ -1613,6 +1627,840 @@
 			result.push({ day, slots });
 		}
 		weekWeather = result;
+	}
+
+	// ── Weather Event Generator ──────────────────────────────────────────────
+	interface WeatherEvent {
+		name: string;
+		intensity: 'minor' | 'moderate' | 'severe' | 'catastrophic';
+		duration: string;
+		onset: string;
+		description: string;
+		mechanics: string[];
+		aftermath: string;
+	}
+
+	let weatherEvent = $state<WeatherEvent | null>(null);
+
+	const EVENT_POOLS: Record<
+		string,
+		Record<
+			string,
+			{
+				name: string;
+				onset: string;
+				description: string;
+				mechanics: string[];
+				aftermath: string;
+				intensity: WeatherEvent['intensity'];
+			}[]
+		>
+	> = {
+		spring: {
+			forest: [
+				{
+					name: 'Flash Flood',
+					intensity: 'severe',
+					onset: 'Heavy rain builds over 2 hours before riverbeds overflow without warning.',
+					description:
+						'Torrential rain has swollen every stream and ditch. Trails become rivers of mud, low crossings flood in minutes, and the sound of rushing water drowns out normal communication.',
+					mechanics: [
+						'Movement halved on all ground',
+						'Streams and rivers impassable without DC 14 Athletics',
+						'Ranged attacks at disadvantage',
+						'Foraging impossible'
+					],
+					aftermath:
+						'Waters recede over 4–6 hours. Fallen trees block trails. Mudslides have reshaped slopes. Good foraging as disturbed earth exposes roots and tubers.'
+				},
+				{
+					name: 'Sudden Hailstorm',
+					intensity: 'moderate',
+					onset:
+						'Sky turns green-yellow over 30 minutes, then marble-sized hail falls without further warning.',
+					description:
+						'Hailstones the size of marbles hammer the canopy and anything exposed. Horses and pack animals panic. Leather and cloth offer no real protection.',
+					mechanics: [
+						'1d4 bludgeoning damage per round without cover',
+						'Mounts must DC 12 Animal Handling or bolt',
+						'Visibility 30 ft',
+						'Fires extinguished'
+					],
+					aftermath:
+						'Ice melts within an hour. Animals are skittish for the rest of the day. Hail strips young leaves and exposes nests.'
+				},
+				{
+					name: 'Late Frost',
+					intensity: 'minor',
+					onset: 'Temperature plummets at dusk with no warning. Ground freezes by midnight.',
+					description:
+						'An unseasonal freeze turns the world brittle overnight. Morning reveals frost-burned blossoms and frozen puddles. Small creeks ice over at the edges.',
+					mechanics: [
+						'CON save DC 10 each watch without cold weather gear or fire',
+						'Forage checks at disadvantage (plants damaged)',
+						'Trails slick — DC 12 Acrobatics on steep ground'
+					],
+					aftermath:
+						'Thaws by midday. Some trail sections remain muddy. Insects temporarily absent — unusually quiet woods.'
+				},
+				{
+					name: 'Thunderstorm',
+					intensity: 'moderate',
+					onset:
+						'Clouds build through the morning. Thunder heard in the distance for an hour before the storm arrives.',
+					description:
+						'A proper spring thunderstorm — dramatic, loud, and soaking. Lightning strikes high ground and lone trees. The forest channels wind into unexpected gusts between the trunks.',
+					mechanics: [
+						'Heavy rain: disadvantage on Perception (hearing)',
+						'Lightning: DC 13 DEX save for anyone under a lone tree when it strikes (1/hour chance)',
+						'Ranged attacks at disadvantage',
+						'DC 13 Survival to navigate without landmarks'
+					],
+					aftermath:
+						'Clears in 1d4 hours. Ozone smell lingers. Fallen branches and fresh mud. Navigation easier as landmarks washed clean.'
+				}
+			],
+			plains: [
+				{
+					name: 'Severe Thunderstorm',
+					intensity: 'severe',
+					onset: 'Wall of cloud advancing from the west, visible for an hour before arrival.',
+					description:
+						'Nothing between the party and the sky. Lightning strikes the plains with extraordinary frequency. A single bolt near the party sends a shockwave felt in the chest. Nowhere to hide.',
+					mechanics: [
+						'Lightning: DC 15 DEX save or 4d10 lightning (1/30 min on open ground)',
+						'Wind 40+ mph: disadvantage on ranged attacks, flying creatures grounded',
+						'Visibility 60 ft',
+						'Metal armour: disadvantage on saves vs. lightning'
+					],
+					aftermath:
+						'Storm passes in 1d3 hours. Scorched grass in a wide radius. Any metal objects left out may be magnetized or damaged.'
+				},
+				{
+					name: 'Tornado Warning',
+					intensity: 'catastrophic',
+					onset:
+						'Sky turns green. Absolute silence. Then a roar like a waterfall from the southwest.',
+					description:
+						'A funnel cloud drops from the sky and tears a quarter-mile path across the plains. The suction pulls loose objects into the air. Anything not sheltered or tied down is gone.',
+					mechanics: [
+						'Without shelter: DC 18 STR save or flung 2d6 × 10 ft, 4d6 bludgeoning',
+						'With shelter (ditch, stone structure): DC 13 CON save or stunned 1 round',
+						'All unsecured equipment and mounts: DC 15 STR save or lost',
+						'Lasts 1d6 minutes in one location'
+					],
+					aftermath:
+						'Path of destruction 1/4 mile wide. Debris for miles. Livestock and wildlife scattered. Potential to find unusual items carried from miles away.'
+				},
+				{
+					name: 'Dust Storm',
+					intensity: 'moderate',
+					onset: 'A brown wall on the horizon moving fast. 10 minutes warning at most.',
+					description:
+						'A rolling wall of dust and grit scours everything in its path. Breathing is difficult. Eyes water. The world turns brown and textureless. Orientation becomes impossible without a compass.',
+					mechanics: [
+						'Visibility 5 ft',
+						'CON save DC 12 each hour or gain 1 level of exhaustion',
+						'Navigation impossible without compass and DC 15 Survival',
+						'Perception (sight) checks automatically fail'
+					],
+					aftermath:
+						'Grit in everything. Food and water supplies may be compromised. Landscape features shifted or buried. Tracks completely obscured.'
+				}
+			],
+			mountains: [
+				{
+					name: 'Spring Avalanche',
+					intensity: 'catastrophic',
+					onset: 'Loud crack from above. Then nothing. Then the roar.',
+					description:
+						'Warming temperatures have destabilized the snowpack above. A slab the size of a great hall tears loose and accelerates downslope, carrying trees and boulders in its mass.',
+					mechanics: [
+						'DC 18 DEX save or 8d10 bludgeoning and buried',
+						'Buried: suffocation rules apply (PHB), DC 15 STR to dig out per round',
+						'Path width 200 ft, length up to 1 mile',
+						'Sound audible 5 miles — may attract attention'
+					],
+					aftermath:
+						'Trail completely blocked. New debris field takes days to navigate. Fresh snow surface is unstable for 24 hours. Exposed rock may reveal cave entrances.'
+				},
+				{
+					name: 'Sudden Blizzard',
+					intensity: 'severe',
+					onset:
+						'Temperature drops 20 degrees in 30 minutes. Snow begins gently, becomes a whiteout in an hour.',
+					description:
+						'A spring blizzard in the high passes is worse than a winter one — the snow is wet and heavy, clings to everything, and the melt-freeze cycle creates treacherous ice on every surface.',
+					mechanics: [
+						'Visibility 10 ft',
+						'Movement halved',
+						'CON save DC 14 per hour without shelter or fire',
+						'All exposed checks at disadvantage'
+					],
+					aftermath:
+						'May persist 1d4 days. Heavy wet snow collapses shelters not built for it. Reveals tracks perfectly once it stops — both yours and others.'
+				},
+				{
+					name: 'Mountain Fog',
+					intensity: 'minor',
+					onset: 'Fog rolls in from below the tree line as temperatures equalise at dawn.',
+					description:
+						'Dense cloud sits in the passes, reducing visibility to arm length. Sound carries oddly — voices seem distant, footsteps are muffled. The temperature difference between fog and clear air is disorienting.',
+					mechanics: [
+						'Visibility 10 ft in affected areas',
+						'Navigation: DC 14 Survival or veer off course',
+						'Sound: advantage on Stealth, disadvantage on Perception (sight)',
+						'Lasts until midday or until wind picks up'
+					],
+					aftermath:
+						'Clears suddenly when wind arrives. Wet surfaces everywhere. Moss and lichen visibly swollen with moisture.'
+				}
+			],
+			desert: [
+				{
+					name: 'Sandstorm',
+					intensity: 'severe',
+					onset: 'A brown wall visible on the horizon for 20 minutes.',
+					description:
+						'The air turns solid with moving sand. Exposed skin is flayed. Breathing requires a cloth covering. Landmarks disappear. Compass needles spin as static electricity builds.',
+					mechanics: [
+						'Visibility 0 ft',
+						'CON save DC 14 each hour or 1 level of exhaustion',
+						'All sight-based Perception automatically fail',
+						'Navigation impossible',
+						'1d4 piercing damage per round without full cover'
+					],
+					aftermath:
+						'Sand in all containers not sealed. New dunes have formed — old paths may be buried. Exposed rock cleaned smooth. Animal tracks erased entirely.'
+				},
+				{
+					name: 'Haboob',
+					intensity: 'moderate',
+					onset: 'Towering wall of dust 1,000 ft high advances at 35 mph. Visible 30 minutes out.',
+					description:
+						'A haboob rolls like a tidal wave of earth, blocking the sun and turning noon to midnight. The leading edge is a wall of grit that scours everything it touches.',
+					mechanics: [
+						'Visibility 0 ft for 1d6 hours',
+						'CON save DC 12 per hour without cover',
+						'Static electricity: metal objects spark; advantage on saves vs. lightning for 12 hours after',
+						'All food and water must be checked for contamination afterward'
+					],
+					aftermath:
+						'Fresh sand dunes repositioned. Some buried structures may be partially exposed. Others newly buried.'
+				}
+			],
+			arctic: [
+				{
+					name: 'Whiteout Blizzard',
+					intensity: 'severe',
+					onset: 'Wind picks up within minutes. Temperature drops fast.',
+					description:
+						'Wind-driven snow creates total whiteout conditions. The horizon disappears. Sky and ground merge into a single blank white. Sound is absorbed. Cold is immediate and absolute.',
+					mechanics: [
+						'Visibility 0 ft',
+						'Movement halved',
+						'CON save DC 15 per hour without shelter',
+						'Navigation impossible',
+						'Tracks erased within 10 minutes'
+					],
+					aftermath:
+						'New snow 2–4 feet deep. Paths buried. Perfect tracking conditions for fresh movement once storm ends.'
+				},
+				{
+					name: 'Ice Storm',
+					intensity: 'moderate',
+					onset: 'Temperature rises slightly, then freezing rain begins coating everything.',
+					description:
+						'Freezing rain encases the world in a shell of clear ice. Every surface becomes glass. Trees crack under the weight. Moving at speed is a near-suicidal act.',
+					mechanics: [
+						'All ground movement DC 13 Acrobatics or fall prone',
+						'Movement halved even on success',
+						'1d6 cold damage per hour without shelter',
+						'Climbing impossible without crampons'
+					],
+					aftermath:
+						'Ice persists for 1d4 days. Beautiful but treacherous. Trees continue to crack and fall for hours. Animals completely sheltered.'
+				}
+			],
+			swamp: [
+				{
+					name: 'Monsoon Surge',
+					intensity: 'severe',
+					onset: 'Rain intensifies over hours. Water levels begin rising visibly.',
+					description:
+						'The swamp has absorbed all it can. Water rises across the entire basin, submerging paths and shorelines, turning knee-deep crossings into chest-deep swims.',
+					mechanics: [
+						'All ground movement halved',
+						'Swimming required for 30% of terrain',
+						'DC 13 CON save per hour of wet cold (temp drops at night)',
+						'Visibility 30 ft in rain'
+					],
+					aftermath:
+						'Waters may take 1d4 days to recede. New channels form. Old paths vanish. Creatures displaced from deeper water move into new areas.'
+				},
+				{
+					name: 'Fog Blanket',
+					intensity: 'minor',
+					onset: 'Fog rises from the water surface at dusk. By midnight it is impenetrable.',
+					description:
+						'Swamp fog is unlike any other — it smells of rotting vegetation and carries heat, sitting heavy and warm against the skin. Sound travels in impossible ways. Lights create halos but illuminate nothing.',
+					mechanics: [
+						'Visibility 10 ft',
+						'Navigation DC 15 Survival',
+						"Will-o'-wisp encounters: roll twice, take worse result",
+						'Disadvantage on all Perception (sight)'
+					],
+					aftermath:
+						'Burns off by mid-morning. Everything is damp. Insects immediately active. Unusual silence then sudden noise as the swamp comes back to life.'
+				}
+			],
+			coast: [
+				{
+					name: 'Coastal Storm',
+					intensity: 'severe',
+					onset: 'Swell builds for 12 hours before storm makes landfall.',
+					description:
+						'A coastal storm drives waves forty feet up the cliffs and floods the beach entirely. The wind is strong enough to strip leaves from trees. Any vessel in the open water is in serious danger.',
+					mechanics: [
+						'Coastal areas flooded to 20 ft above normal tide',
+						'Wind: disadvantage on ranged attacks, flying grounded',
+						'Vessels: DC 16 Survival (Seamanship) to avoid running aground',
+						'Navigation on shore: DC 14 Survival'
+					],
+					aftermath:
+						'Significant debris on beaches. Sea caves may be newly accessible or previously accessible ones blocked. Excellent foraging for washed-up materials.'
+				}
+			]
+		},
+		summer: {
+			forest: [
+				{
+					name: 'Wildfire',
+					intensity: 'catastrophic',
+					onset:
+						'Smoke visible on the horizon. Wind shifts toward the party. The fire crests a ridge above them.',
+					description:
+						'A crown fire moves faster than a running horse through dry summer forest. Embers fly ahead of the main blaze, starting spot fires in the path of retreat. The heat is intense enough to char at fifty feet.',
+					mechanics: [
+						'Move away from fire each round or take 4d10 fire damage',
+						'DC 15 CON save per round in smoke zone or incapacitated',
+						'No safe cover within the fire zone',
+						'Exits: any clear direction perpendicular to wind'
+					],
+					aftermath:
+						'Blackened forest for miles. Ash makes tracking impossible. New growth in 1 week. Animals flee the zone — area is eerily quiet for days.'
+				},
+				{
+					name: 'Heat Lightning Storm',
+					intensity: 'moderate',
+					onset: 'No rain. Just thunder and lightning from a hot, clear-seeming sky.',
+					description:
+						'Dry thunderstorm — lightning with no rain. The forest floor crackles with static. Hair stands on end. The smell of ozone is constant. Lightning strikes without the shelter of rain to suppress fires.',
+					mechanics: [
+						'Lightning: DC 13 DEX save (1/hour near trees)',
+						'Fire risk: roll after each strike; on 1 in 6, spot fire starts',
+						'Extreme heat: DC 12 CON save per hour without shade and water',
+						'Ranged attacks at disadvantage in storm'
+					],
+					aftermath:
+						'Several small fires may have started. Smoke haze for miles. Navigation by landmark unreliable. Animals agitated and unpredictable for the rest of the day.'
+				},
+				{
+					name: 'Drought Conditions',
+					intensity: 'minor',
+					onset:
+						'Water sources have been shrinking for days. The largest stream is now ankle-deep.',
+					description:
+						'An extended dry period has reduced this normally lush forest to something brittle and tinder-dry. Streams are reduced to trickles. Usual foraging sources have failed. Wildlife congregates near the last reliable water.',
+					mechanics: [
+						'Water sources: DC 14 Survival to find any beyond marked sources',
+						'Foraging: disadvantage on all checks',
+						'Fire: any open flame is a significant risk — DC 13 to prevent spread in dry undergrowth'
+					],
+					aftermath:
+						'Ongoing until rain arrives. Creatures near water sources may include unexpected predators. First rain after drought creates a sudden riot of plant growth.'
+				}
+			],
+			plains: [
+				{
+					name: 'Heatwave',
+					intensity: 'moderate',
+					onset: 'Temperature rises above normal for days. No relief at night.',
+					description:
+						'A sustained heatwave turns the plains into a furnace. The horizon shimmers. Water evaporates from skins faster than expected. Shadows are precious and rare.',
+					mechanics: [
+						'CON save DC 13 per hour of travel without shade and water',
+						'Fail: 1 level of exhaustion',
+						'Forced march: DC increases to 16',
+						'Mounts: require double water rations'
+					],
+					aftermath:
+						'Conditions may persist 1d4 days. After a heatwave, the first cool night feels supernatural.'
+				}
+			],
+			mountains: [
+				{
+					name: 'Afternoon Thunderstorm',
+					intensity: 'moderate',
+					onset: 'Clear morning. Clouds build after noon. Storm hits by mid-afternoon on schedule.',
+					description:
+						'Mountain summer thunderstorms run on a reliable schedule — clear mornings, deadly afternoons. This one is on time. Lightning finds high ground, exposed ridges, and lone peaks with lethal reliability.',
+					mechanics: [
+						'Lightning: DC 14 DEX save on exposed high ground (every 30 min)',
+						'Visibility 100 ft in rain',
+						'Footing: DC 12 Acrobatics on steep wet rock',
+						'Temperature drops 15 degrees in 30 minutes'
+					],
+					aftermath:
+						'Clears by evening. Rock surfaces treacherous until dry. Small rockfalls may have blocked or opened passages.'
+				}
+			],
+			desert: [
+				{
+					name: 'Extreme Heat Event',
+					intensity: 'severe',
+					onset: 'Temperature has been climbing for three days. Today it will exceed 120°F.',
+					description:
+						'The air itself seems hostile. Metal burns to the touch. Shadows offer little relief. Any exertion becomes a medical emergency. The sand surface temperature could cook meat.',
+					mechanics: [
+						'CON save DC 15 per hour of travel',
+						'Fail: 1 level of exhaustion',
+						'Water: double consumption required',
+						'Without full water ration: auto-fail saves',
+						'Animal survival at risk'
+					],
+					aftermath:
+						'Heat may ease by night. Oasis water levels have dropped. Some small animals have died. Unusual mirages and optical effects persist.'
+				},
+				{
+					name: 'Flash Flood in Wadi',
+					intensity: 'severe',
+					onset: 'No local rain. Distant thunder. Then a sound like a freight train from upstream.',
+					description:
+						'Rainfall miles away in the mountains sends a wall of water through the dry wadi with no local warning. The flood carries boulders and debris. It fills a dry canyon to ten feet in minutes.',
+					mechanics: [
+						'DC 16 DEX save or swept away: 4d6 bludgeoning + drowning rules',
+						'Wall of water moves at 40 ft per round',
+						'Boulder field after flood: difficult terrain',
+						'No warning without a DC 16 Perception (hearing)'
+					],
+					aftermath:
+						'Wadi scoured clean. New boulder fields and sand deposits. Water available in pools for 1d4 days after. Unusual items deposited from upstream.'
+				}
+			],
+			arctic: [
+				{
+					name: 'Arctic Summer Storm',
+					intensity: 'moderate',
+					onset: 'Wind picks up from the north. Temperature drops despite the season.',
+					description:
+						'Even in summer the arctic delivers. A sudden storm drops visibility and temperature simultaneously. Snow in the middle of a warm day is disorienting in a way that flat winter cold is not.',
+					mechanics: [
+						'Visibility 30 ft',
+						'Movement halved',
+						'CON save DC 12 per hour',
+						'Navigation: DC 14 Survival'
+					],
+					aftermath:
+						'Clears within hours. Snow melts by afternoon. A reminder that the arctic has no off-season.'
+				}
+			],
+			swamp: [
+				{
+					name: 'Tropical Downpour',
+					intensity: 'moderate',
+					onset: 'Humidity has been building all morning. The break point comes suddenly at noon.',
+					description:
+						'Rain so heavy it is almost impossible to breathe while facing into it. Every depression fills immediately. The swamp surface becomes a moving sheet of brown water.',
+					mechanics: [
+						'Visibility 30 ft',
+						'All ground movement halved',
+						'Disadvantage on Perception (hearing)',
+						'Lasts 1d4 hours'
+					],
+					aftermath:
+						'Immediate rise in standing water. Paths that were marginal are now impassable. Intense heat returns within an hour of rain stopping.'
+				}
+			],
+			coast: [
+				{
+					name: 'Hurricane',
+					intensity: 'catastrophic',
+					onset: 'Swell builds for 24 hours. Barometric pressure drops rapidly. Birds flee inland.',
+					description:
+						'A full hurricane makes landfall. Storm surge pushes seawater miles inland. Wind speeds make standing upright impossible. The eye passes with eerie calm before the second wall hits.',
+					mechanics: [
+						'Wind: any exposed creature DC 16 STR save each round or pushed 15 ft',
+						'Storm surge: coastal areas flood 1d6 × 10 ft above normal tide',
+						'All structures: DC 18 to remain intact',
+						'Eye of storm: 1d6 hours of calm in the middle'
+					],
+					aftermath:
+						'Catastrophic damage. Roads washed out. Entire coastline reshaped. Unusual deep-sea creatures washed ashore. Weeks of cleanup.'
+				}
+			]
+		},
+		autumn: {
+			forest: [
+				{
+					name: 'Windstorm',
+					intensity: 'moderate',
+					onset: 'Wind builds through the day. By evening, gusts are stripping branches.',
+					description:
+						'An autumn windstorm tears through the trees, felling dead wood and widowmakers that have waited for exactly this moment. The canopy roars and lurches. Moving through forest is dangerous even without enemies.',
+					mechanics: [
+						'Falling branches: DC 13 DEX save each 10 min or 2d6 bludgeoning',
+						'Ranged attacks at disadvantage',
+						'Flying impossible',
+						'Navigation: DC 12 Survival (familiar landmarks obscured)'
+					],
+					aftermath:
+						'New deadfall everywhere. Some routes impassable. Excellent firewood. Tracks clearly preserved under fallen leaves.'
+				},
+				{
+					name: 'Early Snow',
+					intensity: 'minor',
+					onset: 'Temperature drops quickly. First flakes by mid-afternoon.',
+					description:
+						'The first snow of the year, earlier than expected. The leaves are still on the trees, and the wet snow clings to them in enormous clumps that fall without warning as the weight builds.',
+					mechanics: [
+						'Snow clumps: DC 10 DEX save each 5 min or soaked (disadvantage on stealth)',
+						'Movement: three-quarters speed',
+						'Navigation: familiar trails look different under fresh snow'
+					],
+					aftermath:
+						'Melts within 1d3 days. Tracking ideal during and after. Animals unusually active — feeding before true winter arrives.'
+				}
+			],
+			plains: [
+				{
+					name: 'Hard Frost',
+					intensity: 'minor',
+					onset: 'Clear night, temperature drops below freezing by midnight.',
+					description:
+						'A hard frost locks the plains in silence. The ground rings like stone underfoot. Every puddle is a mirror of ice. Breath clouds drift in the still air.',
+					mechanics: [
+						'CON save DC 11 per watch without shelter or fire',
+						'Forage: disadvantage on checks',
+						'Ice on ponds and streams: 1-inch thickness, DC 14 to cross without breaking'
+					],
+					aftermath:
+						'May persist for days as season turns. Ground freezes harder each night. Excellent tracking conditions.'
+				},
+				{
+					name: 'Autumn Storm',
+					intensity: 'moderate',
+					onset:
+						'Dark clouds rolling in from the northwest. Temperature drops 15 degrees in an hour.',
+					description:
+						'A classic autumn storm — cold rain mixed with sleet, driven horizontal by the wind. The plains offer no shelter. Everything gets wet.',
+					mechanics: [
+						'Cold rain: CON save DC 12 per hour',
+						'Visibility 60 ft',
+						'Movement: three-quarters speed',
+						'Fires difficult to start (DC 16 Survival)'
+					],
+					aftermath:
+						'Mud everywhere for 1d4 days. Temperature remains low. Good tracking conditions.'
+				}
+			],
+			mountains: [
+				{
+					name: 'First Winter Storm',
+					intensity: 'severe',
+					onset:
+						'Cloud cap descends over the summit. Temperature plummets. Snow begins at the pass.',
+					description:
+						'Winter arrives in the mountains days or weeks before the lowlands. The first real storm of the season is always serious — the snow is wet, the wind is brutal, and the passes that were open in the morning are closed by nightfall.',
+					mechanics: [
+						'Visibility 10 ft',
+						'Movement halved',
+						'CON save DC 14 per hour without shelter',
+						'Pass closes: DC 18 Survival to navigate',
+						'May persist 1d4 days'
+					],
+					aftermath:
+						'Passes may remain closed until spring. Tracks show everything that moved before the snow. Any shelter discovered during storm is genuinely valuable.'
+				}
+			],
+			desert: [
+				{
+					name: 'Cold Desert Night',
+					intensity: 'minor',
+					onset: 'Sun sets. Temperature drops 50 degrees in 2 hours.',
+					description:
+						'The desert has no insulation. The same land that baked at 100°F reaches near-freezing by midnight. The transition is faster than most expect.',
+					mechanics: [
+						'CON save DC 12 per watch without shelter or fire',
+						'Creatures without cold weather gear: disadvantage on CON saves',
+						'Condensation: water available from surfaces by morning (DC 14 Survival)'
+					],
+					aftermath: 'Desert nights get colder each week. Cold-weather hazards persist until dawn.'
+				}
+			],
+			arctic: [
+				{
+					name: 'Polar Vortex Edge',
+					intensity: 'severe',
+					onset: 'Wind from the north intensifies rapidly. Temperature drops 40 degrees overnight.',
+					description:
+						'The polar vortex has dipped south, pushing lethal cold over terrain that was merely harsh before. The air burns to breathe. Metal sticks to skin.',
+					mechanics: [
+						'CON save DC 16 per hour without full winter gear and shelter',
+						'Exposed skin: frostbite in 1 minute (Exhaustion 1)',
+						'All liquids freeze outside containers within 10 minutes',
+						'Fire: requires DC 15 Survival to start in wind'
+					],
+					aftermath:
+						'May persist 1d6 days. Cold snap often preceded by period of unusual wildlife activity. After: ice forms on all water sources.'
+				}
+			],
+			swamp: [
+				{
+					name: 'Autumn Mist',
+					intensity: 'minor',
+					onset: 'Temperature drops overnight. Mist forms on the water surface by dawn.',
+					description:
+						'The swamp vanishes into mist. Familiar landmarks disappear. The mist muffles sound and distorts distance. Lights in the mist move in impossible ways.',
+					mechanics: [
+						'Visibility 20 ft',
+						'Navigation DC 15 Survival',
+						"Will-o'-wisps more likely (DM discretion)",
+						'Disadvantage on Perception (sight)'
+					],
+					aftermath:
+						'Burns off by noon. Animals move during mist — unusual tracks. Condensation provides water on every surface.'
+				}
+			],
+			coast: [
+				{
+					name: 'Autumn Gale',
+					intensity: 'moderate',
+					onset: 'Barometric pressure drops rapidly over 6 hours.',
+					description:
+						'An autumn gale drives walls of rain and spray inland. The sea is completely impassable. Even on land, gusts reach 60 mph, turning loose objects into projectiles.',
+					mechanics: [
+						'Wind: disadvantage on ranged attacks, flying impossible',
+						'Debris: DC 12 DEX save each 30 min or 1d6 bludgeoning',
+						'Visibility 60 ft',
+						'All vessels: anchor or be driven ashore'
+					],
+					aftermath:
+						'Storm wrack deposited across miles of beach. Unusual items washed ashore. Sea calms within 12 hours.'
+				}
+			]
+		},
+		winter: {
+			forest: [
+				{
+					name: 'Ice Storm',
+					intensity: 'severe',
+					onset:
+						'Temperature hovers just below freezing. Rain begins. Within an hour, everything is encased in ice.',
+					description:
+						'Freezing rain coats the forest in glass. Every branch is a weapon waiting to fall. The trees groan and crack under the weight. Walking is nearly impossible. The beauty is absolute and lethal.',
+					mechanics: [
+						'All movement DC 13 Acrobatics or fall prone',
+						'Falling branches: DC 14 DEX save per 10 min or 2d8 bludgeoning',
+						'Climbing impossible without crampons',
+						'Temperature: CON save DC 13 per hour'
+					],
+					aftermath:
+						'Ice persists 1d4 days. Catastrophic deadfall. Trails completely impassable until ice melts. Tracking impossible on ice surface.'
+				},
+				{
+					name: 'Blizzard',
+					intensity: 'severe',
+					onset:
+						'Cloud cover builds overnight. Snow begins before dawn. Intensity builds through the morning.',
+					description:
+						'A true blizzard — not merely snow but a whiteout driven by wind. The cold is secondary to the disorientation. Every direction looks the same. The trail disappears within minutes of it being made.',
+					mechanics: [
+						'Visibility 10 ft',
+						'Movement halved',
+						'CON save DC 15 per hour without shelter',
+						'Navigation impossible without DC 18 Survival',
+						'Shelter: DC 14 Survival to construct adequate snow shelter'
+					],
+					aftermath:
+						'2–4 feet of new snow. All trails buried. Perfect tracking once it ends. Deadfall buried. Excellent natural shelter material (snow caves).'
+				}
+			],
+			plains: [
+				{
+					name: 'Prairie Blizzard',
+					intensity: 'catastrophic',
+					onset:
+						'Temperature drops. Wind increases. Snow begins lightly, then without transition becomes a whiteout.',
+					description:
+						'With nothing to break the wind, a plains blizzard is among the most dangerous weather events possible. Visibility drops to zero in minutes. People have died fifty feet from shelter they could not find.',
+					mechanics: [
+						'Visibility 0 ft in open, 10 ft with wind break',
+						'Movement halved',
+						'CON save DC 16 per hour without shelter',
+						'Navigation impossible',
+						'Each hour without shelter: auto-fail one death save from cold'
+					],
+					aftermath:
+						'Drifts 6–10 feet in hollows. Roads buried for 1d6 days. Livestock losses significant. Perfect tracking once it passes.'
+				},
+				{
+					name: 'Black Ice',
+					intensity: 'moderate',
+					onset: 'Rain followed by rapid freeze. Roads glaze overnight.',
+					description:
+						'The road surface is invisible. Black ice coats stone, dirt, and grass with equal enthusiasm. Everything looks normal until the first step proves it is not.',
+					mechanics: [
+						'All ground movement: DC 14 Acrobatics or fall prone',
+						'Mounted movement: DC 16 Animal Handling per 100 ft',
+						'Half movement even on success',
+						'Persists until temperature rises above freezing'
+					],
+					aftermath:
+						'May persist multiple days in shadow. Accidents widespread. Wagons jackknifed. Fallen riders common.'
+				}
+			],
+			mountains: [
+				{
+					name: 'Alpine Blizzard',
+					intensity: 'catastrophic',
+					onset:
+						'Cloud drops below the pass elevation. Visibility drops to ten feet. Temperature falls 30 degrees.',
+					description:
+						'The high passes become death traps. Wind drives snow horizontally. Ice forms on exposed skin in minutes. The trail is completely invisible. Crevasses, ledges, and drops are undetectable.',
+					mechanics: [
+						'Visibility 0 ft',
+						'Movement: quarter speed',
+						'CON save DC 17 per hour without shelter',
+						'Navigation impossible',
+						'Fall risk: DC 16 Perception to detect hazards'
+					],
+					aftermath:
+						'Passes closed for 1d10 days minimum. Any shelter found becomes a survival priority. New snow may have covered or revealed entrances.'
+				},
+				{
+					name: 'Rime Ice Formation',
+					intensity: 'minor',
+					onset: 'Fog at freezing temperature over several hours.',
+					description:
+						'Fog freezes directly onto every surface, creating elaborate crystal formations. The world becomes a sculpture garden of impossible beauty. Every surface is coated in white crystals that shatter at a touch.',
+					mechanics: [
+						'Movement DC 11 Acrobatics on rock surfaces',
+						'Weight: structures may be stressed',
+						'Navigation: landmarks look different',
+						'DC 13 Survival to avoid walking onto icy overhang'
+					],
+					aftermath:
+						'Rime melts when sun reaches it. Photographic beauty. Surfaces slick until fully dried.'
+				}
+			],
+			desert: [
+				{
+					name: 'Freezing Night',
+					intensity: 'moderate',
+					onset: 'Rapid temperature drop after sunset.',
+					description:
+						'The desert winter night reaches temperatures that would kill an unprepared lowlander without a second thought. The cold arrives faster than anyone expects and the clear sky offers zero insulation.',
+					mechanics: [
+						'CON save DC 14 per watch without cold gear',
+						'Water sources freeze overnight (1 inch)',
+						'Fire essential: DC 12 Survival to start in wind',
+						'Mounts at risk if not sheltered'
+					],
+					aftermath:
+						'Ice on all water sources until mid-morning. Cold lingers in shade all day. Daytime temperature may reach 60°F — a 70-degree swing in 12 hours.'
+				}
+			],
+			arctic: [
+				{
+					name: 'Deep Freeze',
+					intensity: 'catastrophic',
+					onset: 'Temperature already at -30°F. Then it drops further.',
+					description:
+						'A deep freeze event pushes temperatures to -60°F or below. Metal becomes brittle. Breath freezes before it disperses. Sound carries differently in extreme cold — distant objects seem closer. Exposed flesh freezes in seconds.',
+					mechanics: [
+						'CON save DC 18 per hour without full winter gear and shelter',
+						'Exposed skin: frostbite in 10 seconds (1 level exhaustion)',
+						'Metal weapons: shatter on roll of 1 (DC 15 STR save)',
+						'Fire: impossible above 30 mph wind without magical means'
+					],
+					aftermath:
+						'The aftermath is more cold. Extreme winter events in the arctic often persist for days. Any water source is now permafrost.'
+				},
+				{
+					name: 'Blizzard',
+					intensity: 'severe',
+					onset: 'Wind builds from the north. Snow appears from nowhere.',
+					description:
+						'A full arctic blizzard is survivable only with preparation and shelter. Wind speeds exceed 70 mph. The temperature becomes irrelevant in the face of the windchill. Navigation is impossible even with instruments.',
+					mechanics: [
+						'Visibility 0 ft',
+						'Movement quarter speed',
+						'CON save DC 16 per hour',
+						'Navigation impossible',
+						'Snow cave: DC 14 Survival, provides effective shelter'
+					],
+					aftermath:
+						'New snow 4–6 feet deep. Pressure ridges in sea ice. Any tracks from before the storm are gone.'
+				}
+			],
+			swamp: [
+				{
+					name: 'Hard Freeze',
+					intensity: 'moderate',
+					onset: 'Temperature drops below 20°F overnight. Water surfaces freeze by dawn.',
+					description:
+						'The swamp freezes — partially, unpredictably. Some surfaces can bear weight. Others are a thin crust over open water. The silence is total. Every sound carries. The ice creates unexpected paths and traps the usual ones.',
+					mechanics: [
+						'Ice thickness varies: DC 13 Perception to assess before stepping',
+						'Thin ice: break on roll of 1-3 on d6; full immersion',
+						'Movement: DC 12 Acrobatics on ice surfaces',
+						'CON save DC 13 per hour without shelter'
+					],
+					aftermath:
+						'Thaw creates worse footing than either ice or open water. Animals that usually retreat to deep water are accessible. Unusual items may be frozen into the ice.'
+				}
+			],
+			coast: [
+				{
+					name: 'Winter Storm',
+					intensity: 'severe',
+					onset:
+						'Swell builds for 24 hours. Temperature at the coast is 28°F. Rain arrives as sleet.',
+					description:
+						'A winter storm at the coast is a combination of every hazard: icing, wind, driving sleet, storm surge, and freezing spray that coats every surface. Ships in harbor are in danger at their moorings.',
+					mechanics: [
+						'All surfaces: ice coating, DC 13 Acrobatics to move',
+						'Wind: 60 mph, disadvantage on ranged, flying impossible',
+						'Cold: CON save DC 14 per hour',
+						'Storm surge: coastal flooding 1d6 × 5 ft above normal tide'
+					],
+					aftermath:
+						'Complete icing of coastal structures. Ships may be damaged at anchor. Unusual sea creatures may have been driven ashore.'
+				}
+			]
+		}
+	};
+
+	function generateWeatherEvent() {
+		const biome = selectedBiome;
+		const season = selectedSeason;
+		const pool = EVENT_POOLS[season]?.[biome] ?? EVENT_POOLS[season]?.['forest'] ?? [];
+		if (!pool.length) {
+			weatherEvent = null;
+			return;
+		}
+		const entry = pool[Math.floor(Math.random() * pool.length)];
+		// Duration based on intensity
+		const durations: Record<string, string[]> = {
+			minor: ['1d4 hours', '2d4 hours', '4–6 hours'],
+			moderate: ['1d6 hours', '4–8 hours', 'Half a day'],
+			severe: ['1d4 days', '6–24 hours', 'Until the next morning'],
+			catastrophic: ['1d6 days', '12–48 hours', 'Several days']
+		};
+		const dPool = durations[entry.intensity] ?? durations.moderate;
+		const duration = dPool[Math.floor(Math.random() * dPool.length)];
+		weatherEvent = { ...entry, duration };
 	}
 
 	function pickRandom<T>(arr: T[]): T {
@@ -4055,8 +4903,7 @@
 		<nav class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-gray-900/60 py-3">
 			{#each categories as cat}
 				<button
-					onclick={() =>
-						cat.id === 'dungeon' ? (onOpenDungeon?.(), onclose()) : (selected = cat.id)}
+					onclick={() => (selected = cat.id)}
 					class="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition
 					       {selected === cat.id
 						? 'bg-amber-900/30 font-semibold text-amber-300'
@@ -4069,11 +4916,24 @@
 		</nav>
 
 		<!-- Right content panel -->
-		<div class="min-w-0 flex-1 overflow-y-auto px-8 py-6">
+		<div
+			class="min-w-0 flex-1 {[
+				'town',
+				'inn',
+				'dungeon',
+				'wilderness',
+				'wizard',
+				'cult',
+				'noble',
+				'guild',
+				'caravan',
+				'blackmarket',
+				'graveyard'
+			].includes(selected)
+				? 'overflow-hidden'
+				: 'overflow-y-auto px-8 py-6'}"
+		>
 			{#if selected === 'names'}
-				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
-					Name Generator
-				</h3>
 				<div class="flex flex-col gap-6">
 					<!-- Controls -->
 					<div class="flex flex-wrap items-center gap-3">
@@ -4192,9 +5052,6 @@
 					{/if}
 				</div>
 			{:else if selected === 'weather'}
-				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
-					Weather &amp; Travel
-				</h3>
 				<div class="flex flex-col gap-8">
 					<!-- Controls -->
 					<div class="flex flex-wrap items-center gap-4">
@@ -4278,6 +5135,70 @@
 						</p>
 					{/if}
 
+					<!-- Weather Event Generator -->
+					<section>
+						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
+							Weather Event
+						</h4>
+						<p class="mb-3 text-sm text-gray-400">
+							Generate a dramatic weather event for the current season and biome. Uses your Season
+							and Biome selections above.
+						</p>
+						<button
+							onclick={generateWeatherEvent}
+							class="rounded-lg border border-amber-700 bg-amber-900/30 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-800/40"
+						>
+							Generate Weather Event
+						</button>
+
+						{#if weatherEvent}
+							<div class="mt-4 rounded-lg border border-gray-700 bg-gray-800/60 p-4">
+								<div class="mb-2 flex items-center gap-3">
+									<span
+										class="rounded px-2 py-0.5 text-xs font-bold tracking-wider uppercase
+										{weatherEvent.intensity === 'minor'
+											? 'bg-green-900/60 text-green-300'
+											: weatherEvent.intensity === 'moderate'
+												? 'bg-yellow-900/60 text-yellow-300'
+												: weatherEvent.intensity === 'severe'
+													? 'bg-orange-900/60 text-orange-300'
+													: 'bg-red-900/60 text-red-300'}"
+									>
+										{weatherEvent.intensity}
+									</span>
+									<span class="text-base font-bold text-white">{weatherEvent.name}</span>
+								</div>
+								<div class="mb-3 flex gap-4 text-xs text-gray-400">
+									<span
+										><span class="font-semibold text-gray-300">Duration:</span>
+										{weatherEvent.duration}</span
+									>
+								</div>
+								<p class="mb-2 text-xs font-semibold text-amber-400/80 italic">
+									{weatherEvent.onset}
+								</p>
+								<p class="mb-3 text-sm text-gray-300">{weatherEvent.description}</p>
+								{#if weatherEvent.mechanics.length}
+									<div class="mb-3">
+										<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+											Mechanics
+										</p>
+										<ul class="space-y-0.5">
+											{#each weatherEvent.mechanics as m}
+												<li class="text-xs text-gray-400">• {m}</li>
+											{/each}
+										</ul>
+									</div>
+								{/if}
+								<div>
+									<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+										Aftermath
+									</p>
+									<p class="text-xs text-gray-400">{weatherEvent.aftermath}</p>
+								</div>
+							</div>
+						{/if}
+					</section>
 					<!-- Travel Pace -->
 					<section>
 						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
@@ -4378,14 +5299,6 @@
 			{/if}
 			{#if selected === 'shop'}
 				<div class="space-y-6 text-sm">
-					<div class="mb-4 flex flex-wrap items-baseline gap-3">
-						<h3 class="text-base font-black tracking-widest text-amber-400 uppercase">
-							Shop Generator
-						</h3>
-						{#if generatedShopName}
-							<span class="text-lg font-bold text-white">— {generatedShopName}</span>
-						{/if}
-					</div>
 					<div class="flex flex-wrap items-end gap-4">
 						<div class="flex flex-col gap-1">
 							<label
@@ -4600,10 +5513,6 @@
 			{/if}
 			{#if selected === 'encounter'}
 				<div class="space-y-6 text-sm">
-					<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
-						Random Encounter Generator
-					</h3>
-
 					<!-- Controls -->
 					<div class="flex flex-wrap items-end gap-4">
 						<div class="flex flex-col gap-1">
@@ -4780,6 +5689,110 @@
 						</p>
 					{/if}
 				</div>
+			{/if}
+			{#if selected === 'town'}
+				{#await import('$lib/components/TownGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: TownGen }}
+					<TownGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+			{#if selected === 'inn'}
+				{#await import('$lib/components/InnGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: InnGen }}
+					<InnGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+			{#if selected === 'dungeon'}
+				{#await import('$lib/components/DonjonDungeonModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: DonjonGen }}
+					<DonjonGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'wizard'}
+				{#await import('$lib/components/WizardTowerModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: WizardTower }}
+					<WizardTower onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'cult'}
+				{#await import('$lib/components/CultGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: CultGen }}
+					<CultGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+			{#if selected === 'wilderness'}
+				{#await import('$lib/components/WildernessEncounterModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: WildernessGen }}
+					<WildernessGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+			{#if selected === 'noble'}
+				{#await import('$lib/components/NobleHouseGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: NobleHouseGen }}
+					<NobleHouseGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+			{#if selected === 'guild'}
+				{#await import('$lib/components/ThievesGuildModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: ThievesGuild }}
+					<ThievesGuild onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'caravan'}
+				{#await import('$lib/components/TradeCaravanModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: TradeCaravan }}
+					<TradeCaravan onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'blackmarket'}
+				{#await import('$lib/components/BlackMarketModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: BlackMarket }}
+					<BlackMarket onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'graveyard'}
+				{#await import('$lib/components/GraveyardModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: GraveyardGen }}
+					<GraveyardGen onclose={() => (selected = '')} embedded />
+				{/await}
 			{/if}
 		</div>
 	</div>
