@@ -81,6 +81,48 @@
 			desc: 'Instant access to conditions, actions, cover rules, exhaustion levels, and common DC tables — right inside the tracker.',
 			color: 'text-indigo-400',
 			screenshot: '/screenshots/QuickReference.jpg'
+		},
+		{
+			icon: '🏘️',
+			title: 'Town Generator',
+			desc: 'Generate fully detailed towns with unique NPCs, factions, districts, shops, and local lore — ready to drop into any campaign.',
+			color: 'text-orange-400',
+			screenshot: '/screenshots/TownGenerator.jpg'
+		},
+		{
+			icon: '🗺️',
+			title: 'Dungeon Generator',
+			desc: 'Procedurally generate dungeon maps with interconnected rooms, traps, secret doors, encounters, and treasure hoards.',
+			color: 'text-slate-400',
+			screenshot: '/screenshots/DungeonGenerator.jpg'
+		},
+		{
+			icon: '🍺',
+			title: 'Inn Generator',
+			desc: "Generate richly detailed inns complete with staff, regulars, today's menu, rumors heard over ale, and adventure hooks.",
+			color: 'text-teal-400',
+			screenshot: '/screenshots/InnGenerator.jpg'
+		},
+		{
+			icon: '🌦️',
+			title: 'Weather & Travel',
+			desc: 'Generate season- and biome-aware weather, 7-day forecasts, weather events, travel pace, and navigation DCs for any journey.',
+			color: 'text-sky-400',
+			screenshot: '/screenshots/WeatherGenerator.jpg'
+		},
+		{
+			icon: '🎲',
+			title: 'Random Encounter',
+			desc: 'Build balanced random encounters by difficulty and party size, with monster selections drawn from the full 5e bestiary.',
+			color: 'text-lime-400',
+			screenshot: '/screenshots/EncounterGenerator.jpg'
+		},
+		{
+			icon: '📛',
+			title: 'Name Generator',
+			desc: 'Generate names for any race and gender in seconds — humans, elves, dwarves, halflings, and more, with authentic phonetic patterns.',
+			color: 'text-rose-400',
+			screenshot: '/screenshots/NameGenerator.jpg'
 		}
 	];
 
