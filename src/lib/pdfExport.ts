@@ -506,6 +506,324 @@ export async function exportNotesPdf(
 	URL.revokeObjectURL(url);
 }
 
+// ── NPC PDF export ────────────────────────────────────────────────────────────
+
+type NpcPdfStats = {
+	cr: string;
+	xp: number;
+	ac: number;
+	acNote: string;
+	hp: number;
+	hpDice: string;
+	speed: number;
+	str: number;
+	dex: number;
+	con: number;
+	int: number;
+	wis: number;
+	cha: number;
+	savingThrows: string[];
+	skills: string[];
+	traits: { name: string; desc: string }[];
+	actions: { name: string; desc: string }[];
+	alignment: string;
+	type: string;
+};
+
+type NpcPdfData = {
+	name: string;
+	race: string;
+	gender: string;
+	ageDesc: string;
+	role: string;
+	disposition: string;
+	build: string;
+	feature: string;
+	clothing: string;
+	trait: string;
+	flaw: string;
+	voice: string;
+	motivation: string;
+	secret: string;
+	plotHook: string;
+	stats: NpcPdfStats;
+};
+
+export async function exportNpcPdf(npc: NpcPdfData): Promise<void> {
+	const { jsPDF } = await import('jspdf');
+	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+	const pageW = doc.internal.pageSize.getWidth();
+	const margin = 15;
+	const contentW = pageW - margin * 2;
+
+	const C = {
+		dark: [30, 30, 35] as [number, number, number],
+		amber: [180, 120, 30] as [number, number, number],
+		textDark: [20, 20, 25] as [number, number, number],
+		textMid: [80, 80, 90] as [number, number, number],
+		textLight: [160, 160, 170] as [number, number, number]
+	};
+
+	const colGap = 6;
+	const leftW = Math.round(contentW * 0.55);
+	const rightW = contentW - leftW - colGap;
+	const leftX = margin;
+	const rightX = margin + leftW + colGap;
+
+	// ── Header ────────────────────────────────────────────────────────────────
+	let y = margin;
+	const headerH = 22;
+	doc.setFillColor(...C.dark);
+	doc.rect(margin, y, contentW, headerH, 'F');
+
+	doc.setFontSize(7);
+	doc.setFont('helvetica', 'bold');
+	doc.setTextColor(180, 130, 40);
+	doc.text('NPC PROFILE', margin + 5, y + 6);
+
+	doc.setFontSize(14);
+	doc.setTextColor(255, 255, 255);
+	doc.text(npc.name, margin + 5, y + 14);
+
+	doc.setFontSize(7);
+	doc.setFont('helvetica', 'normal');
+	doc.setTextColor(180, 180, 185);
+	doc.text(npc.disposition.toUpperCase(), pageW - margin - 5, y + 6, { align: 'right' });
+
+	doc.setFontSize(8.5);
+	doc.setTextColor(160, 160, 170);
+	doc.text(`${npc.race} ${npc.role}`, margin + 5, y + 19);
+	doc.text(`${npc.gender} · ${npc.ageDesc}`, pageW - margin - 5, y + 19, { align: 'right' });
+
+	y += headerH + 7;
+
+	// ── Helpers ───────────────────────────────────────────────────────────────
+	function modStr(score: number): string {
+		const m = Math.floor((score - 10) / 2);
+		return m >= 0 ? `+${m}` : `${m}`;
+	}
+
+	function sectionHeader(label: string, x: number, colYRef: { v: number }, maxX: number) {
+		doc.setFontSize(6.5);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...C.amber);
+		doc.text(label, x, colYRef.v);
+		const tw = doc.getTextWidth(label) + 2;
+		doc.setDrawColor(...C.amber);
+		doc.setLineWidth(0.2);
+		doc.line(x + tw, colYRef.v - 0.5, maxX, colYRef.v - 0.5);
+		colYRef.v += 4;
+	}
+
+	function labelLine(
+		label: string,
+		value: string,
+		x: number,
+		colYRef: { v: number },
+		colW: number
+	) {
+		doc.setFontSize(8);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...C.textMid);
+		const labelStr = label + ' ';
+		const lw = doc.getTextWidth(labelStr);
+		doc.text(labelStr, x, colYRef.v);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(...C.textDark);
+		const lines = doc.splitTextToSize(value, colW - lw) as string[];
+		lines.forEach((line, i) => {
+			doc.text(line, i === 0 ? x + lw : x, colYRef.v + i * 4.5);
+		});
+		colYRef.v += lines.length * 4.5 + 1;
+	}
+
+	function inlineEntry(
+		name: string,
+		desc: string,
+		x: number,
+		colYRef: { v: number },
+		colW: number
+	) {
+		doc.setFontSize(8);
+		doc.setFont('helvetica', 'bolditalic');
+		doc.setTextColor(...C.textDark);
+		const nameStr = name + '. ';
+		const nw = doc.getTextWidth(nameStr);
+		doc.text(nameStr, x, colYRef.v);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(...C.textMid);
+		const firstChunk = doc.splitTextToSize(desc, colW - nw) as string[];
+		const firstLine = firstChunk[0] ?? '';
+		doc.text(firstLine, x + nw, colYRef.v);
+		colYRef.v += 4.5;
+		const remaining = desc.slice(firstLine.length).trim();
+		if (remaining) {
+			const rest = doc.splitTextToSize(remaining, colW) as string[];
+			rest.forEach((line) => {
+				doc.text(line, x, colYRef.v);
+				colYRef.v += 4.5;
+			});
+		}
+		colYRef.v += 1;
+	}
+
+	function amberRule(colYRef: { v: number }) {
+		doc.setDrawColor(...C.amber);
+		doc.setLineWidth(0.35);
+		doc.line(rightX, colYRef.v, rightX + rightW, colYRef.v);
+		colYRef.v += 3;
+	}
+
+	function statRow(label: string, value: string) {
+		doc.setFontSize(8);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...C.textDark);
+		const lw = doc.getTextWidth(label + ' ');
+		doc.text(label + ' ', rightX, rY.v);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(...C.textMid);
+		doc.text(value, rightX + lw, rY.v);
+		rY.v += 4.5;
+	}
+
+	// ── Left column: flavor ───────────────────────────────────────────────────
+	const lY = { v: y };
+	const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+	sectionHeader('APPEARANCE', leftX, lY, leftX + leftW);
+	labelLine('Build:', npc.build + '.', leftX, lY, leftW);
+	labelLine('Feature:', cap(npc.feature) + '.', leftX, lY, leftW);
+	labelLine('Clothing:', cap(npc.clothing) + '.', leftX, lY, leftW);
+	lY.v += 2;
+
+	sectionHeader('PERSONALITY', leftX, lY, leftX + leftW);
+	labelLine('Trait:', npc.trait, leftX, lY, leftW);
+	labelLine('Flaw:', npc.flaw, leftX, lY, leftW);
+	labelLine('Voice:', npc.voice, leftX, lY, leftW);
+	lY.v += 2;
+
+	sectionHeader('DRIVE & SECRET', leftX, lY, leftX + leftW);
+	labelLine('Wants:', npc.motivation, leftX, lY, leftW);
+	labelLine('Hides:', npc.secret, leftX, lY, leftW);
+	lY.v += 2;
+
+	sectionHeader('PLOT HOOK', leftX, lY, leftX + leftW);
+	doc.setFontSize(8);
+	doc.setFont('helvetica', 'italic');
+	doc.setTextColor(...C.textDark);
+	const hookLines = doc.splitTextToSize(npc.plotHook, leftW) as string[];
+	hookLines.forEach((line) => {
+		doc.text(line, leftX, lY.v);
+		lY.v += 4.5;
+	});
+
+	// ── Right column: stat block ──────────────────────────────────────────────
+	const rY = { v: y };
+	const sb = npc.stats;
+
+	doc.setFontSize(11);
+	doc.setFont('helvetica', 'bold');
+	doc.setTextColor(...C.textDark);
+	doc.text(npc.name, rightX, rY.v);
+	rY.v += 4.5;
+
+	doc.setFontSize(8);
+	doc.setFont('helvetica', 'italic');
+	doc.setTextColor(...C.textMid);
+	const typeLine = doc.splitTextToSize(
+		`Medium ${sb.type} (${npc.race.toLowerCase()}), ${sb.alignment}`,
+		rightW
+	) as string[];
+	typeLine.forEach((l) => {
+		doc.text(l, rightX, rY.v);
+		rY.v += 4;
+	});
+	rY.v += 1;
+
+	amberRule(rY);
+
+	statRow('Armor Class', `${sb.ac}${sb.acNote ? ` (${sb.acNote})` : ''}`);
+	statRow('Hit Points', `${sb.hp} (${sb.hpDice})`);
+	statRow('Speed', `${sb.speed} ft.`);
+	rY.v += 1;
+
+	amberRule(rY);
+
+	// Ability scores
+	const abilities = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+	const scores = [sb.str, sb.dex, sb.con, sb.int, sb.wis, sb.cha];
+	const abColW = rightW / 6;
+
+	abilities.forEach((ab, i) => {
+		const cx = rightX + abColW * i + abColW / 2;
+		doc.setFontSize(7);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...C.amber);
+		doc.text(ab, cx, rY.v, { align: 'center' });
+	});
+	rY.v += 3.5;
+
+	scores.forEach((score, i) => {
+		const cx = rightX + abColW * i + abColW / 2;
+		doc.setFontSize(8);
+		doc.setFont('helvetica', 'bold');
+		doc.setTextColor(...C.textDark);
+		doc.text(String(score), cx, rY.v, { align: 'center' });
+		doc.setFontSize(7);
+		doc.setFont('helvetica', 'normal');
+		doc.setTextColor(...C.textMid);
+		doc.text(`(${modStr(score)})`, cx, rY.v + 3.5, { align: 'center' });
+	});
+	rY.v += 8;
+
+	amberRule(rY);
+
+	if (sb.savingThrows.length) statRow('Saving Throws', sb.savingThrows.join(', '));
+	if (sb.skills.length) statRow('Skills', sb.skills.join(', '));
+	statRow('Challenge', `${sb.cr} (${sb.xp} XP)`);
+	statRow('Proficiency Bonus', '+2');
+	rY.v += 1;
+
+	if (sb.traits.length) {
+		amberRule(rY);
+		sb.traits.forEach((t) => inlineEntry(t.name, t.desc, rightX, rY, rightW));
+	}
+
+	amberRule(rY);
+
+	doc.setFontSize(9);
+	doc.setFont('helvetica', 'bold');
+	doc.setTextColor(...C.amber);
+	doc.text('Actions', rightX, rY.v);
+	rY.v += 5;
+
+	sb.actions.forEach((a) => inlineEntry(a.name, a.desc, rightX, rY, rightW));
+
+	// ── Footer ────────────────────────────────────────────────────────────────
+	const finalY = Math.max(lY.v, rY.v) + 6;
+	doc.setFontSize(7);
+	doc.setFont('helvetica', 'normal');
+	doc.setTextColor(...C.textLight);
+	doc.text(`Generated by Initiative Tracker · ${new Date().toLocaleDateString()}`, margin, finalY);
+
+	// ── Download ──────────────────────────────────────────────────────────────
+	const slug = npc.name
+		.toLowerCase()
+		.replace(/\s+/g, '-')
+		.replace(/[^a-z0-9-]/g, '');
+	const dateSlug = new Date().toISOString().slice(0, 10);
+	const filename = `npc-${slug}-${dateSlug}.pdf`;
+	const blob = doc.output('blob');
+	const url = URL.createObjectURL(blob);
+	const npcAnchor = document.createElement('a');
+	npcAnchor.href = url;
+	npcAnchor.download = filename;
+	document.body.appendChild(npcAnchor);
+	npcAnchor.click();
+	document.body.removeChild(npcAnchor);
+	URL.revokeObjectURL(url);
+}
+
 // ── Dungeon PDF export ────────────────────────────────────────────────────────
 
 type DungeonMonster = { name: string; count: number };

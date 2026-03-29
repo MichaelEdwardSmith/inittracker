@@ -19,6 +19,10 @@
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
+	function scrollInputToTop(el: HTMLElement) {
+		setTimeout(() => el.scrollIntoView({ block: 'start', behavior: 'smooth' }), 150);
+	}
+
 	async function scrollToActive() {
 		await tick();
 		document
@@ -509,6 +513,7 @@
 									placeholder="—"
 									oninput={(e) =>
 										handleInitiativeInput(c.id, e.currentTarget.value, c.name, c.initiative)}
+									onfocus={(e) => scrollInputToTop(e.currentTarget)}
 									class="h-11 w-14 rounded border border-gray-600 bg-gray-900 text-center text-xl font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
 								/>
 							</div>
@@ -584,6 +589,7 @@
 								placeholder="amt"
 								min="1"
 								bind:value={damageInputs[c.id]}
+								onfocus={(e) => scrollInputToTop(e.currentTarget)}
 								class="h-11 w-16 rounded border border-gray-600 bg-gray-900 px-2 text-center text-sm text-white focus:border-amber-500 focus:outline-none"
 							/>
 							<button

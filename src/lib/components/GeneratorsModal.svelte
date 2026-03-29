@@ -1,6 +1,8 @@
 <!-- Full-screen Generators modal for DMs. Left column lists generator categories;
      right panel shows the selected generator. -->
 <script lang="ts">
+	import { browser } from '$app/environment';
+
 	let {
 		onclose,
 		onAddEncounter,
@@ -36,7 +38,8 @@
 		{ id: 'caravan', label: 'Trade Caravan', icon: '🐎' },
 		{ id: 'blackmarket', label: 'Black Market', icon: '🪙' },
 		{ id: 'noble', label: 'Noble House', icon: '🏰' },
-		{ id: 'graveyard', label: 'Graveyard / Crypt', icon: '⚰️' }
+		{ id: 'graveyard', label: 'Graveyard / Crypt', icon: '⚰️' },
+		{ id: 'npc', label: 'NPC Generator', icon: '🧙' }
 	];
 
 	let selected = $state('weather');
@@ -2739,7 +2742,16 @@
 		if (!generatedShopName) return;
 		const aff = affluenceData[shopAffluence]?.label.toLowerCase() ?? shopAffluence;
 		const type = shopData[shopType]?.label.toLowerCase() ?? shopType;
-		const line = `<p>The party went to ${generatedShopName}, a ${aff} ${type}</p>`;
+		const inventoryRows = generatedShop
+			.map(
+				(row) =>
+					`<li>${row.name}${row.rarity ? ` <em>(${rarityLabels[row.rarity] ?? row.rarity})</em>` : ''} — Friendly: ${row.liked} / Neutral: ${row.neutral} / Hostile: ${row.disliked}</li>`
+			)
+			.join('');
+		const inventoryHtml = inventoryRows
+			? `<p><strong>Inventory:</strong></p><ul>${inventoryRows}</ul>`
+			: '';
+		const line = `<p>The party went to <strong>${generatedShopName}</strong>, a ${aff} ${type}</p>${inventoryHtml}`;
 		shopSaveStatus = 'saving';
 		try {
 			const res = await fetch('/api/notes');
@@ -2760,6 +2772,16 @@
 					body: JSON.stringify({ action: 'create', content: line })
 				});
 			}
+			// Add to saved shops list so players can revisit
+			savedShops = [
+				...savedShops,
+				{
+					name: generatedShopName,
+					typeKey: shopType,
+					affluenceKey: shopAffluence,
+					items: [...generatedShop]
+				}
+			];
 			shopSaveStatus = 'saved';
 			setTimeout(() => {
 				shopSaveStatus = 'idle';
@@ -3596,6 +3618,22 @@
 			'Strength becomes 29 for 1 hour. Tastes like lightning and sea spray.'
 	};
 	let generatedShopName = $state('');
+	type SavedShop = { name: string; typeKey: string; affluenceKey: string; items: ShopRow[] };
+	const SAVED_SHOPS_KEY = 'initiative_saved_shops';
+	let savedShops = $state<SavedShop[]>(
+		browser
+			? (() => {
+					try {
+						return JSON.parse(localStorage.getItem(SAVED_SHOPS_KEY) ?? '[]');
+					} catch {
+						return [];
+					}
+				})()
+			: []
+	);
+	$effect(() => {
+		if (browser) localStorage.setItem(SAVED_SHOPS_KEY, JSON.stringify(savedShops));
+	});
 	function pickFrom<T>(arr: T[]): T {
 		return arr[Math.floor(Math.random() * arr.length)];
 	}
@@ -4928,7 +4966,8 @@
 				'guild',
 				'caravan',
 				'blackmarket',
-				'graveyard'
+				'graveyard',
+				'npc'
 			].includes(selected)
 				? 'overflow-hidden'
 				: 'overflow-y-auto px-8 py-6'}"
@@ -5343,6 +5382,34 @@
 					{#if affluenceData[shopAffluence]}
 						<p class="text-xs text-gray-500 italic">{affluenceData[shopAffluence].note}</p>
 					{/if}
+					{#if generatedShopName}
+						<div
+							class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
+						>
+							<span class="flex-1 text-sm text-gray-300">
+								The party went to <strong class="text-white">{generatedShopName}</strong>, a {affluenceData[
+									shopAffluence
+								]?.label.toLowerCase()}
+								{shopData[shopType]?.label.toLowerCase()}
+							</span>
+							<button
+								onclick={saveShopToNotes}
+								disabled={shopSaveStatus === 'saving'}
+								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
+								'saved'
+									? 'bg-green-700 text-white'
+									: shopSaveStatus === 'error'
+										? 'bg-red-700 text-white'
+										: 'bg-amber-600 text-white hover:bg-amber-500'}"
+							>
+								{shopSaveStatus === 'saved'
+									? 'Saved!'
+									: shopSaveStatus === 'error'
+										? 'Error'
+										: 'Save to Notes'}
+							</button>
+						</div>
+					{/if}
 					{#if generatedShop.length > 0}
 						<div class="overflow-x-auto rounded-xl border border-gray-700">
 							<table class="w-full text-sm">
@@ -5480,33 +5547,39 @@
 							</div>
 						</div>
 					{/if}
-
-					{#if generatedShopName}
-						<div
-							class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
-						>
-							<span class="flex-1 text-sm text-gray-300">
-								The party went to <strong class="text-white">{generatedShopName}</strong>, a {affluenceData[
-									shopAffluence
-								]?.label.toLowerCase()}
-								{shopData[shopType]?.label.toLowerCase()}
-							</span>
-							<button
-								onclick={saveShopToNotes}
-								disabled={shopSaveStatus === 'saving'}
-								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
-								'saved'
-									? 'bg-green-700 text-white'
-									: shopSaveStatus === 'error'
-										? 'bg-red-700 text-white'
-										: 'bg-amber-600 text-white hover:bg-amber-500'}"
-							>
-								{shopSaveStatus === 'saved'
-									? 'Saved!'
-									: shopSaveStatus === 'error'
-										? 'Error'
-										: 'Save to Notes'}
-							</button>
+					{#if savedShops.length > 0}
+						<div class="mt-2 space-y-3">
+							<p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+								Previously Visited Shops
+							</p>
+							{#each savedShops as shop, i}
+								<div class="flex rounded-xl border border-gray-700 bg-gray-900/60">
+									<button
+										onclick={() => {
+											generatedShopName = shop.name;
+											shopType = shop.typeKey;
+											shopAffluence = shop.affluenceKey;
+											generatedShop = [...shop.items];
+										}}
+										class="flex min-w-0 flex-1 items-center gap-3 rounded-tl-xl rounded-bl-xl px-4 py-3 text-left transition hover:bg-gray-700/40"
+									>
+										<span class="flex-1">
+											<strong class="text-white">{shop.name}</strong>
+											<span class="ml-2 text-xs text-gray-400">
+												{affluenceData[shop.affluenceKey]?.label}
+												{shopData[shop.typeKey]?.label}
+											</span>
+										</span>
+										<span class="text-xs text-gray-500">{shop.items.length} items</span>
+									</button>
+									<button
+										onclick={() => (savedShops = savedShops.filter((_, j) => j !== i))}
+										aria-label="Remove {shop.name}"
+										class="rounded-tr-xl rounded-br-xl border-l border-gray-700 px-3 py-3 text-gray-500 transition hover:bg-red-900/40 hover:text-red-400"
+										>&#x2715;</button
+									>
+								</div>
+							{/each}
 						</div>
 					{/if}
 				</div>
@@ -5792,6 +5865,16 @@
 					</div>
 				{:then { default: GraveyardGen }}
 					<GraveyardGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'npc'}
+				{#await import('$lib/components/NpcGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: NpcGen }}
+					<NpcGen onclose={() => (selected = '')} embedded />
 				{/await}
 			{/if}
 		</div>

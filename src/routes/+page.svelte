@@ -308,7 +308,7 @@
 			<div class="mb-16 text-center" use:fadeIn>
 				<p class="mb-3 text-xs font-bold tracking-[0.3em] text-amber-600 uppercase">Features</p>
 				<h2 class="text-3xl font-black tracking-tight text-white sm:text-4xl">
-					Everything you need at the table
+					Beyond everything you need at the table
 				</h2>
 				<p class="mt-4 text-gray-500">
 					Built for DMs who want to focus on the story, not the spreadsheets.
