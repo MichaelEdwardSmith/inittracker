@@ -84,10 +84,10 @@
 		};
 	});
 
-	// Polling fallback — when panel is open but SSE hasn't delivered a game yet,
-	// poll every 3 s so the player sees a lobby the DM opened without a page reload.
+	// Polling fallback — poll whenever the panel is open so all game state transitions
+	// (lobby → bidding → reveal) reach the player even if SSE is unreliable.
 	$effect(() => {
-		if (!show || game) return;
+		if (!show) return;
 		async function fetchSnapshot() {
 			const qs = new URLSearchParams({ session: sessionId, json: 'true' });
 			if (playerId) qs.set('player', playerId);
