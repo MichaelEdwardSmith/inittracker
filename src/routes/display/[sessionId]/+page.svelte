@@ -79,6 +79,7 @@
 	let showNotesModal = $state(false);
 	let showEmojiPicker = $state(false);
 	let showDiceRoller = $state(false);
+	let showLiarsDice = $state(false);
 
 	// ── DM → Player inbox ────────────────────────────────────────────────
 	let dmMessages = $state<DmReply[]>([]);
@@ -1036,6 +1037,16 @@
 			</svg>
 			Dice Roller
 		</button>
+		<button
+			onclick={() => {
+				showLiarsDice = true;
+				showMobileMenu = false;
+			}}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<span class="h-4 w-4 shrink-0 text-center text-base leading-none">🎲</span>
+			Liar's Dice
+		</button>
 		{#if combatState.dungeonMapState}
 			<button
 				onclick={() => {
@@ -1821,6 +1832,8 @@
 	sessionId={data.sessionId}
 	playerId={myCharacterId}
 	playerName={myCharacter?.name ?? myPlayerName}
+	show={showLiarsDice}
+	onclose={() => (showLiarsDice = false)}
 />
 
 <DiceOverlay />

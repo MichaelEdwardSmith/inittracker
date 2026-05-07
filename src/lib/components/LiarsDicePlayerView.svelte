@@ -8,8 +8,11 @@
 		sessionId: string;
 		playerId: string | null;
 		playerName: string | null;
+		/** When true the panel is forced open even if no game is active yet. */
+		show?: boolean;
+		onclose?: () => void;
 	}
-	let { sessionId, playerId, playerName }: Props = $props();
+	let { sessionId, playerId, playerName, show = false, onclose }: Props = $props();
 
 	// ── State ────────────────────────────────────────────────────────────────
 	let game = $state<LiarsDiceGame | null>(null);
@@ -179,7 +182,7 @@
 	}
 </script>
 
-{#if game && game.status !== 'inactive'}
+{#if show || (game && game.status !== 'inactive')}
 	<!-- Fixed panel — bottom of screen, full width on mobile, right-aligned on desktop -->
 	<div
 		class="fixed right-4 bottom-4 z-[120] w-full max-w-sm overflow-hidden rounded-2xl border border-amber-800/60 bg-gray-950/95 shadow-2xl backdrop-blur-md sm:right-6 sm:bottom-6"
@@ -191,7 +194,9 @@
 		>
 			<span class="text-base">🎲</span>
 			<span class="flex-1 text-sm font-black tracking-wider text-amber-300 uppercase">
-				{#if game.status === 'lobby'}
+				{#if !game}
+					Liar's Dice
+				{:else if game.status === 'lobby'}
 					Liar's Dice — Lobby
 				{:else if game.status === 'game_over'}
 					Liar's Dice — Game Over
@@ -199,19 +204,37 @@
 					Liar's Dice — Round {game.roundNumber}{game.isPalifico ? ' ⚠️' : ''}
 				{/if}
 			</span>
-			<button
-				onclick={() => (minimized = !minimized)}
-				class="rounded p-1 text-gray-500 transition hover:text-amber-400"
-				aria-label={minimized ? 'Expand' : 'Minimize'}
-			>
-				{minimized ? '▲' : '▼'}
-			</button>
+			{#if !game && onclose}
+				<button
+					onclick={onclose}
+					class="rounded p-1 text-gray-500 transition hover:text-red-400"
+					aria-label="Close"
+				>
+					✕
+				</button>
+			{:else}
+				<button
+					onclick={() => (minimized = !minimized)}
+					class="rounded p-1 text-gray-500 transition hover:text-amber-400"
+					aria-label={minimized ? 'Expand' : 'Minimize'}
+				>
+					{minimized ? '▲' : '▼'}
+				</button>
+			{/if}
 		</div>
 
 		{#if !minimized}
 			<div class="flex flex-col gap-3 p-4">
-				<!-- ── LOBBY ──────────────────────────────────────────────────────────── -->
-				{#if game.status === 'lobby'}
+				<!-- ── NO GAME YET (manually opened) ─────────────────────────────────── -->
+				{#if !game}
+					<div class="flex flex-col items-center gap-3 py-4 text-center">
+						<span class="text-4xl opacity-50">🎲</span>
+						<p class="text-sm font-semibold text-gray-300">No game in progress</p>
+						<p class="text-xs text-gray-500">Waiting for the DM to open a Liar's Dice lobby…</p>
+					</div>
+
+					<!-- ── LOBBY ──────────────────────────────────────────────────────────── -->
+				{:else if game.status === 'lobby'}
 					<div class="flex flex-col gap-3">
 						<p class="text-xs text-gray-400">
 							{game.players.length} player{game.players.length !== 1 ? 's' : ''} in lobby
