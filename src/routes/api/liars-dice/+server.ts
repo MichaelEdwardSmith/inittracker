@@ -3,44 +3,14 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { LiarsDiceGame, LiarsDiceBid, LiarsDiceReveal } from '$lib/types';
+import {
+	games,
+	clients,
+	type ServerGame,
+	type ServerPlayer,
+	type ClientInfo
+} from '$lib/server/liarsDiceState';
 
-// ── Server-side extended state (full dice values, not sent raw to clients) ──
-
-interface ServerPlayer {
-	id: string;
-	name: string;
-	dice: number[];
-	diceCount: number;
-	eliminated: boolean;
-}
-
-interface ServerGame {
-	sessionId: string;
-	status: 'lobby' | 'bidding' | 'reveal' | 'game_over';
-	players: ServerPlayer[];
-	currentTurnPlayerId: string | null;
-	currentBid: LiarsDiceBid | null;
-	bidHistory: LiarsDiceBid[];
-	dmRole: 'player' | 'observer';
-	roundNumber: number;
-	isPalifico: boolean;
-	palificoFace: number | null;
-	eventLog: Array<{ type: string; description: string; timestamp: number }>;
-	winnerId: string | null;
-	winnerName: string | null;
-	reveal: LiarsDiceReveal | null;
-	autoAdvanceTimer: ReturnType<typeof setTimeout> | null;
-}
-
-interface ClientInfo {
-	playerId: string | null;
-	isDmObserver: boolean;
-}
-
-// ── In-memory state ──────────────────────────────────────────────────────────
-
-const games = new Map<string, ServerGame>();
-const clients = new Map<string, Map<ReadableStreamDefaultController<Uint8Array>, ClientInfo>>();
 const encoder = new TextEncoder();
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
