@@ -271,6 +271,60 @@ export interface Spell5e {
 	ritual?: true;
 }
 
+// ---------------------------------------------------------------------------
+// Liar's Dice Minigame
+// ---------------------------------------------------------------------------
+
+export interface LiarsDicePlayer {
+	id: string;
+	name: string;
+	diceCount: number;
+	/** Empty array when hidden from this viewer; populated when it's your own dice or during reveal. */
+	dice: number[];
+	eliminated: boolean;
+}
+
+export interface LiarsDiceBid {
+	playerId: string;
+	playerName: string;
+	quantity: number;
+	face: number;
+}
+
+export interface LiarsDiceReveal {
+	allDice: Array<{ playerId: string; playerName: string; dice: number[] }>;
+	bid: LiarsDiceBid;
+	/** Actual count of matching dice (including wilds unless Palifico). */
+	actual: number;
+	callerPlayerId: string;
+	callerPlayerName: string;
+	callerAction: 'dudo' | 'calza';
+	calzaSuccess: boolean;
+	loserId: string;
+	loserName: string;
+	/** -1 normally, +1 if calza success (gained a die back). */
+	loserDiceChange: number;
+}
+
+export type LiarsDiceStatus = 'lobby' | 'bidding' | 'reveal' | 'game_over' | 'inactive';
+
+export interface LiarsDiceGame {
+	sessionId: string;
+	status: LiarsDiceStatus;
+	players: LiarsDicePlayer[];
+	currentTurnPlayerId: string | null;
+	currentBid: LiarsDiceBid | null;
+	bidHistory: LiarsDiceBid[];
+	dmRole: 'player' | 'observer';
+	roundNumber: number;
+	isPalifico: boolean;
+	palificoFace: number | null;
+	eventLog: Array<{ type: string; description: string; timestamp: number }>;
+	winnerId: string | null;
+	winnerName: string | null;
+	reveal: LiarsDiceReveal | null;
+}
+
 export interface MonsterDetail {
 	name: string;
 	meta: string;

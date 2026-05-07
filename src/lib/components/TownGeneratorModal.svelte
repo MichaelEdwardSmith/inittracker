@@ -1366,8 +1366,11 @@
 		bulk?: boolean; // sold in multiples
 	}
 
+	import BuildingFloorplanModal from '$lib/components/BuildingFloorplanModal.svelte';
+
 	let selectedShop = $state<ListBuilding | null>(null);
 	let shopSeed = $state(0);
+	let floorplanBuilding = $state<ListBuilding | null>(null);
 
 	const ITEM_POOLS: Record<string, PoolItem[]> = {
 		Apothecary: [
@@ -2028,6 +2031,13 @@
 											{/each}
 										</div>
 									{/if}
+									<div class="mt-2.5 border-t border-slate-700/60 pt-2.5">
+										<button
+											onclick={() => (floorplanBuilding = b)}
+											class="w-full rounded bg-slate-700/40 px-2 py-1 text-xs font-semibold text-slate-300 transition hover:bg-slate-600/50"
+											>Floor Plan</button
+										>
+									</div>
 								</div>
 							{/each}
 						</div>
@@ -2067,22 +2077,27 @@
 												{/each}
 											</div>
 										{/if}
-										{#if ['shop', 'blacksmith', 'stable', 'inn', 'tavern', 'temple'].includes(b.type)}
-											<div class="mt-2.5 border-t border-gray-700/60 pt-2.5">
+										<div class="mt-2.5 flex gap-2 border-t border-gray-700/60 pt-2.5">
+											<button
+												onclick={() => (floorplanBuilding = b)}
+												class="flex-1 rounded bg-slate-700/40 px-2 py-1 text-xs font-semibold text-slate-300 transition hover:bg-slate-600/50"
+												>Floor Plan</button
+											>
+											{#if ['shop', 'blacksmith', 'stable', 'inn', 'tavern', 'temple'].includes(b.type)}
 												<button
 													onclick={() => {
 														selectedShop = b;
 														shopSeed = 0;
 													}}
-													class="w-full rounded bg-amber-700/30 px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-700/50"
+													class="flex-1 rounded bg-amber-700/30 px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-700/50"
 													>{['inn', 'tavern'].includes(b.type)
 														? 'View Menu'
 														: b.type === 'temple'
 															? 'View Services'
 															: 'View Inventory'}</button
 												>
-											</div>
-										{/if}
+											{/if}
+										</div>
 									</div>
 								{/each}
 							</div>
@@ -2238,6 +2253,10 @@
 		{/if}
 	{/if}
 </div>
+
+{#if floorplanBuilding}
+	<BuildingFloorplanModal building={floorplanBuilding} onclose={() => (floorplanBuilding = null)} />
+{/if}
 
 <style>
 	:global(.inv-dice-btn) {

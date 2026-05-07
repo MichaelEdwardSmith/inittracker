@@ -164,6 +164,15 @@
 	let showNotes = $state(false);
 	let showQuickRules = $state(false);
 	let showGenerators = $state(false);
+	let showLiarsDice = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let LiarsDiceModalComp = $state<any>(null);
+	async function openLiarsDice() {
+		showLiarsDice = true;
+		showMobileMenu = false;
+		if (!LiarsDiceModalComp)
+			LiarsDiceModalComp = (await import('$lib/components/LiarsDiceModal.svelte')).default;
+	}
 	let showDungeon = $state(false);
 	let showDonjon = $state(false);
 	let showTown = $state(false);
@@ -678,6 +687,13 @@
 			Dice Roller
 		</button>
 		<button
+			onclick={openLiarsDice}
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<span class="h-4 w-4 shrink-0 text-center text-base leading-none">🎲</span>
+			Liar's Dice
+		</button>
+		<button
 			onclick={() => {
 				showSpells = true;
 				showMobileMenu = false;
@@ -1181,6 +1197,15 @@
 	<div class={showMixer ? '' : 'hidden'}>
 		<AudioMixer onclose={() => (showMixer = false)} />
 	</div>
+{/if}
+
+{#if showLiarsDice && LiarsDiceModalComp}
+	{@const LiarsDice = LiarsDiceModalComp}
+	<LiarsDice
+		sessionId={activeSession.sessionId}
+		dmName={data.dmFirstName || 'Dungeon Master'}
+		onclose={() => (showLiarsDice = false)}
+	/>
 {/if}
 
 {#if showQuickRules && QuickRulesModalComp}

@@ -15,6 +15,7 @@
 	import EmojiPickerModal from '$lib/components/EmojiPickerModal.svelte';
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
+	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -1815,6 +1816,12 @@
 {#if showDiceRoller}
 	<DiceRollerModal onclose={() => (showDiceRoller = false)} />
 {/if}
+
+<LiarsDicePlayerView
+	sessionId={data.sessionId}
+	playerId={myCharacterId}
+	playerName={myCharacter?.name ?? myPlayerName}
+/>
 
 <DiceOverlay />
 

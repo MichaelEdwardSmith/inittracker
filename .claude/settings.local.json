@@ -211,7 +211,8 @@
 			"WebFetch(domain:onlinelibrary.wiley.com)",
 			"WebFetch(domain:digitalcommons.trinity.edu)",
 			"WebFetch(domain:www.randroll.com)",
-			"WebFetch(domain:arxiv.org)"
+			"WebFetch(domain:arxiv.org)",
+			"Bash(dd:*)"
 		]
 	}
 }
