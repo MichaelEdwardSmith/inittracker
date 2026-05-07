@@ -74,10 +74,10 @@
 		};
 	});
 
-	// Polling fallback — same as player view: if SSE doesn't deliver the game state
-	// within a tick (common in dev), poll every 2 s until game is set.
+	// Polling fallback — poll while in lobby so player joins are reflected even if
+	// SSE broadcast is unreliable. Stops once the game moves past lobby status.
 	$effect(() => {
-		if (!lobbyCreated || game) return;
+		if (!lobbyCreated || (game && game.status !== 'lobby')) return;
 		async function fetchSnapshot() {
 			const qs = new URLSearchParams({ session: sessionId, json: 'true' });
 			if (dmRole === 'observer') qs.set('dm', 'observer');
