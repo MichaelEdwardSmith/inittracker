@@ -123,7 +123,8 @@
 	}
 
 	// ── Auto-roll: trigger dice roller when a new bidding round starts ───────
-	let hasRolledThisRound = $state(false);
+	// Plain let (not $state) so writing it doesn't re-trigger the effect.
+	let hasRolledThisRound = false;
 	$effect(() => {
 		if (!game || game.status !== 'bidding') {
 			hasRolledThisRound = false;

@@ -134,7 +134,8 @@
 	}
 
 	// ── Auto-roll for DM when playing ────────────────────────────────────────
-	let hasRolledThisRound = $state(false);
+	// Plain let (not $state) so writing it doesn't re-trigger the effect.
+	let hasRolledThisRound = false;
 	$effect(() => {
 		if (dmRole !== 'player') return;
 		if (!game || game.status !== 'bidding') {
