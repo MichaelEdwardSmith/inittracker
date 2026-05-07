@@ -74,6 +74,28 @@
 		};
 	});
 
+	// Polling fallback — same as player view: if SSE doesn't deliver the game state
+	// within a tick (common in dev), poll every 2 s until game is set.
+	$effect(() => {
+		if (!lobbyCreated || game) return;
+		async function fetchSnapshot() {
+			const qs = new URLSearchParams({ session: sessionId, json: 'true' });
+			if (dmRole === 'observer') qs.set('dm', 'observer');
+			else qs.set('player', 'dm');
+			try {
+				const r = await fetch(`/api/liars-dice?${qs}`);
+				if (!r.ok) return;
+				const data = await r.json();
+				if (data?.status && data.status !== 'inactive') game = data;
+			} catch {
+				/* ignore */
+			}
+		}
+		fetchSnapshot();
+		const id = setInterval(fetchSnapshot, 2000);
+		return () => clearInterval(id);
+	});
+
 	function startCountdown() {
 		stopCountdown();
 		countdown = 8;
