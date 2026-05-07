@@ -289,7 +289,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const game = games.get(sessionId);
-	if (!game) return json({ error: 'No active game for this session' }, { status: 404 });
+	if (!game)
+		return json(
+			{
+				error: `No active game for this session`,
+				debug: { receivedSessionId: sessionId, knownSessions: [...games.keys()] }
+			},
+			{ status: 404 }
+		);
 
 	// ── join ────────────────────────────────────────────────────────────────
 	if (action === 'join') {

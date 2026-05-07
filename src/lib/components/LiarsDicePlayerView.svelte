@@ -140,8 +140,11 @@
 		});
 		if (!r.ok) {
 			const j = await r.json().catch(() => ({}));
-			error = j.error ?? 'Action failed';
-			setTimeout(() => (error = null), 3000);
+			const dbg = j.debug
+				? ` | sent: ${j.debug.receivedSessionId} | known: [${j.debug.knownSessions?.join(', ')}]`
+				: '';
+			error = (j.error ?? 'Action failed') + dbg;
+			setTimeout(() => (error = null), 8000);
 		}
 	}
 
