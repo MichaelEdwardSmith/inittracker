@@ -3,6 +3,7 @@
      controls for their turn. Non-players see a spectator view. -->
 <script lang="ts">
 	import type { LiarsDiceGame } from '$lib/types';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	interface Props {
 		sessionId: string;
@@ -120,6 +121,22 @@
 			countdownTimer = null;
 		}
 	}
+
+	// ── Auto-roll: trigger dice roller when a new bidding round starts ───────
+	let hasRolledThisRound = $state(false);
+	$effect(() => {
+		if (!game || game.status !== 'bidding') {
+			hasRolledThisRound = false;
+			return;
+		}
+		if (!playerId || hasRolledThisRound) return;
+		const me = game.players.find((p) => p.id === playerId);
+		if (!me || me.eliminated || me.dice.length > 0) return;
+		hasRolledThisRound = true;
+		triggerRoll(`${me.diceCount}d6`, (rolls) => {
+			post({ action: 'submit_roll', playerId, dice: rolls });
+		});
+	});
 
 	// ── Derived ──────────────────────────────────────────────────────────────
 	const myPlayer = $derived(game?.players.find((p) => p.id === playerId) ?? null);

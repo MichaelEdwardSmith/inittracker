@@ -155,8 +155,9 @@ function startRound(game: ServerGame, firstPlayerId: string): void {
 	game.isPalifico = !!palifico;
 	game.palificoFace = null;
 
-	// Roll all dice
-	for (const p of active) rollDiceForPlayer(p);
+	// Clear dice — each client will roll via the dice roller and submit their values.
+	// A server-side fallback rolls for any player who hasn't submitted within 5 s.
+	for (const p of active) p.dice = [];
 
 	game.status = 'bidding';
 	// Make sure firstPlayerId is active; fall back to first active player
@@ -171,6 +172,21 @@ function startRound(game: ServerGame, firstPlayerId: string): void {
 		`Round ${game.roundNumber} begins. ${starter?.name ?? '?'} bids first.${palNote}`
 	);
 	broadcast(game);
+
+	// Fallback: auto-roll any player who hasn't submitted dice within 5 seconds
+	const roundSnapshot = game.roundNumber;
+	setTimeout(() => {
+		const g = games.get(game.sessionId);
+		if (!g || g.roundNumber !== roundSnapshot || g.status !== 'bidding') return;
+		let changed = false;
+		for (const p of getActivePlayers(g)) {
+			if (p.dice.length === 0) {
+				rollDiceForPlayer(p);
+				changed = true;
+			}
+		}
+		if (changed) broadcast(g);
+	}, 5000);
 }
 
 function scheduleAutoAdvance(game: ServerGame, firstPlayerId: string): void {
@@ -336,6 +352,24 @@ export const POST: RequestHandler = async ({ request }) => {
 		log(game, 'game_start', `Game starting with ${game.players.length} players!`);
 		// startRound increments roundNumber from 0 → 1
 		startRound(game, game.players[0].id);
+		return json({ ok: true });
+	}
+
+	// ── submit_roll ──────────────────────────────────────────────────────────
+	if (action === 'submit_roll') {
+		const { playerId, dice } = body as { playerId: string; dice: number[] };
+		const player = game.players.find((p) => p.id === playerId);
+		if (!player) return json({ error: 'Player not found' }, { status: 404 });
+		if (game.status !== 'bidding') return json({ ok: true }); // round already resolved
+		if (player.dice.length > 0) return json({ ok: true }); // already submitted
+		if (
+			!Array.isArray(dice) ||
+			dice.length !== player.diceCount ||
+			dice.some((d) => d < 1 || d > 6)
+		)
+			return json({ error: 'Invalid dice values' }, { status: 400 });
+		player.dice = dice.map(Math.round);
+		broadcast(game);
 		return json({ ok: true });
 	}
 

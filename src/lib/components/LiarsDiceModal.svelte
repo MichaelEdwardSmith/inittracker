@@ -3,6 +3,7 @@
      the same interface as the players on the display page. -->
 <script lang="ts">
 	import type { LiarsDiceGame, LiarsDicePlayer } from '$lib/types';
+	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	interface Props {
 		sessionId: string;
@@ -131,6 +132,23 @@
 		await post({ action: 'create', dmRole, dmName });
 		lobbyCreated = true;
 	}
+
+	// ── Auto-roll for DM when playing ────────────────────────────────────────
+	let hasRolledThisRound = $state(false);
+	$effect(() => {
+		if (dmRole !== 'player') return;
+		if (!game || game.status !== 'bidding') {
+			hasRolledThisRound = false;
+			return;
+		}
+		if (hasRolledThisRound) return;
+		const me = game.players.find((p) => p.id === 'dm');
+		if (!me || me.eliminated || me.dice.length > 0) return;
+		hasRolledThisRound = true;
+		triggerRoll(`${me.diceCount}d6`, (rolls) => {
+			post({ action: 'submit_roll', playerId: 'dm', dice: rolls });
+		});
+	});
 
 	const myPlayer = $derived(game?.players.find((p) => p.id === 'dm') ?? null);
 	const isMyTurn = $derived(game?.currentTurnPlayerId === 'dm' && dmRole === 'player');
