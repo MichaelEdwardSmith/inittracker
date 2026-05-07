@@ -27,8 +27,9 @@
 
 	// ── SSE subscription ─────────────────────────────────────────────────────
 	$effect(() => {
-		const playerParam = playerId ? `player=${encodeURIComponent(playerId)}` : '';
-		const source = new EventSource(`/api/liars-dice?session=${sessionId}&${playerParam}`);
+		const qs = new URLSearchParams({ session: sessionId });
+		if (playerId) qs.set('player', playerId);
+		const source = new EventSource(`/api/liars-dice?${qs.toString()}`);
 
 		source.onmessage = (e) => {
 			try {
