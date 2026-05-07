@@ -460,7 +460,7 @@
 										onclick={() => post({ action: 'dudo', playerId })}
 										class="flex-1 rounded-xl bg-red-700 py-2 text-sm font-black text-white uppercase transition hover:bg-red-600 active:scale-95"
 									>
-										🎲 Dudo!
+										🎲 Liar!
 									</button>
 									<button
 										onclick={() => post({ action: 'calza', playerId })}
@@ -490,7 +490,7 @@
 									: 'text-red-400'}"
 							>
 								{rev.callerAction === 'dudo'
-									? '🎲 DUDO!'
+									? '🎲 LIAR!'
 									: rev.calzaSuccess
 										? '✅ CALZA!'
 										: '❌ CALZA MISSED!'}

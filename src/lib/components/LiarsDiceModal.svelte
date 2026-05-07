@@ -74,10 +74,10 @@
 		};
 	});
 
-	// Polling fallback — poll while in lobby so player joins are reflected even if
-	// SSE broadcast is unreliable. Stops once the game moves past lobby status.
+	// Polling fallback — poll for the entire lifetime of the lobby/game so all
+	// state transitions (joins, bids, reveals) reach the DM even if SSE is unreliable.
 	$effect(() => {
-		if (!lobbyCreated || (game && game.status !== 'lobby')) return;
+		if (!lobbyCreated) return;
 		async function fetchSnapshot() {
 			const qs = new URLSearchParams({ session: sessionId, json: 'true' });
 			if (dmRole === 'observer') qs.set('dm', 'observer');
@@ -364,7 +364,7 @@
 								: 'text-red-400'}"
 						>
 							{rev.callerAction === 'dudo'
-								? '🎲 DUDO!'
+								? '🎲 LIAR!'
 								: rev.calzaSuccess
 									? '✅ CALZA!'
 									: '❌ CALZA MISSED!'}
@@ -526,7 +526,7 @@
 										onclick={() => post({ action: 'dudo', playerId: 'dm' })}
 										class="rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white uppercase transition hover:bg-red-600 active:scale-95"
 									>
-										🎲 Dudo!
+										🎲 Liar!
 									</button>
 									<button
 										onclick={() => post({ action: 'calza', playerId: 'dm' })}
