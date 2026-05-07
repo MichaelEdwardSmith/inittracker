@@ -84,6 +84,27 @@
 		};
 	});
 
+	// Polling fallback — when panel is open but SSE hasn't delivered a game yet,
+	// poll every 3 s so the player sees a lobby the DM opened without a page reload.
+	$effect(() => {
+		if (!show || game) return;
+		async function fetchSnapshot() {
+			const qs = new URLSearchParams({ session: sessionId, json: 'true' });
+			if (playerId) qs.set('player', playerId);
+			try {
+				const r = await fetch(`/api/liars-dice?${qs}`);
+				if (!r.ok) return;
+				const data = await r.json();
+				if (data?.status && data.status !== 'inactive') game = data;
+			} catch {
+				/* ignore */
+			}
+		}
+		fetchSnapshot();
+		const id = setInterval(fetchSnapshot, 3000);
+		return () => clearInterval(id);
+	});
+
 	function startCountdown() {
 		stopCountdown();
 		countdown = 8;

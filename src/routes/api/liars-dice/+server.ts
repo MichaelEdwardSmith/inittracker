@@ -223,6 +223,13 @@ export const GET: RequestHandler = ({ url }) => {
 	const isDmObserver = url.searchParams.get('dm') === 'observer';
 	const clientInfo: ClientInfo = { playerId, isDmObserver };
 
+	// JSON snapshot path — used as polling fallback by the player view
+	if (url.searchParams.get('json') === 'true') {
+		const game = games.get(sessionId);
+		if (!game) return json({ status: 'inactive' });
+		return json(buildClientView(game, clientInfo));
+	}
+
 	let ctrl!: ReadableStreamDefaultController<Uint8Array>;
 
 	const stream = new ReadableStream<Uint8Array>({
