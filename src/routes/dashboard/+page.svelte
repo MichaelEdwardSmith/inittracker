@@ -693,7 +693,22 @@
 			onclick={openLiarsDice}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<span class="h-4 w-4 shrink-0 text-center text-base leading-none">🎲</span>
+			<svg
+				class="h-4 w-4 shrink-0"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.8"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
+				<circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+				<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+			</svg>
 			Liar's Dice
 		</button>
 		<button
