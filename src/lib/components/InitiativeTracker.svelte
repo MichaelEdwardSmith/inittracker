@@ -1,4 +1,4 @@
-<!-- Core combat tracker component. Renders the turn-order list with HP bars,
+﻿<!-- Core combat tracker component. Renders the turn-order list with HP bars,
      conditions, initiative values, and per-combatant controls (damage/heal, AC toggle,
      conditions, notes, monster stat block). Manages round/turn advancement and
      end-combat flow that writes a CombatRecord to history. DM-only. -->
@@ -19,6 +19,7 @@
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
+	// ── DOM utilities ─────────────────────────────────────────────────────────
 	function scrollInputToTop(el: HTMLElement) {
 		setTimeout(() => el.scrollIntoView({ block: 'start', behavior: 'smooth' }), 150);
 	}
@@ -30,6 +31,7 @@
 			?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	}
 
+	// ── Modal state ────────────────────────────────────────────────────────────
 	let openStatusId = $state<string | null>(null);
 	let infoMonster = $state<MonsterDetail | null>(null);
 	let conditionInfo = $state<string | null>(null);
@@ -43,6 +45,7 @@
 	);
 	let showAoE = $state(false);
 
+	// ── Concentration check queue ─────────────────────────────────────────────
 	function dequeueConcentration() {
 		if (concentrationQueue.length > 0) {
 			concentrationCheck = concentrationQueue[0];
@@ -59,12 +62,14 @@
 		concentrationQueue = rest;
 		concentrationCheck = first;
 	}
+	// ── Initiative editing ────────────────────────────────────────────────────
 	let pendingInitChange = $state<{
 		id: string;
 		name: string;
 		value: string;
 		oldValue: number | null;
 	} | null>(null);
+	// ── Custom monster detail map ─────────────────────────────────────────────
 	// Detail map for imported custom monsters — keyed by monster name
 	let customDetailMap = $state<Map<string, MonsterDetail>>(new Map());
 	// Re-fetch whenever the set of sourced enemy names in combat changes so that
@@ -98,8 +103,8 @@
 	function showMonsterInfo(c: Combatant) {
 		infoMonster = getDetailForCombatant(c);
 	}
+	// ── HP / damage inputs ────────────────────────────────────────────────────
 	let damageInputs = $state<Record<string, string>>({});
-	let tempHpInputs = $state<Record<string, string>>({});
 	let initiativeTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
 	function handleInitiativeInput(id: string, raw: string, name: string, oldValue: number | null) {
@@ -107,12 +112,12 @@
 		if (combat.isInCombat) {
 			initiativeTimers[id] = setTimeout(() => {
 				pendingInitChange = { id, name, value: raw, oldValue };
-			}, 600);
+			}, 2000);
 		} else {
 			initiativeTimers[id] = setTimeout(() => {
 				const val = parseInt(raw);
 				combat.update(id, { initiative: isNaN(val) ? null : val });
-			}, 1000);
+			}, 2000);
 		}
 	}
 
@@ -132,6 +137,7 @@
 		pendingInitChange = null;
 	}
 
+	// ── Condition state ──────────────────────────────────────────────────────
 	let legendaryInfoModal = $state<{ name: string; text: string } | null>(null);
 
 	let pendingCondition = $state<{ id: string; combatantName: string; condition: string } | null>(
@@ -160,10 +166,10 @@
 	}
 
 	function commitTempHp(id: string) {
-		const val = parseInt(tempHpInputs[id] ?? '');
+		const val = parseInt(damageInputs[id] ?? '');
 		if (isNaN(val) || val < 0) return;
 		combat.setTempHp(id, val);
-		tempHpInputs[id] = '';
+		damageInputs[id] = '';
 	}
 </script>
 
@@ -525,9 +531,14 @@
 									<span class="text-sm text-gray-400">{c.maxHp}</span>
 									{#if c.tempHp > 0}
 										<span
-											class="rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300"
+											class="flex items-center gap-0.5 rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300"
 										>
 											+{c.tempHp} THP
+											<button
+												onclick={() => combat.setTempHp(c.id, 0)}
+												class="ml-0.5 opacity-50 transition hover:opacity-100"
+												title="Clear temp HP">✕</button
+											>
 										</span>
 									{/if}
 								</div>
@@ -582,7 +593,7 @@
 							</div>
 						</div>
 
-						<!-- Damage row -->
+						<!-- Damage / Heal / THP row -->
 						<div class="flex items-center gap-2">
 							<input
 								type="number"
@@ -606,36 +617,16 @@
 							>
 								+ Heal
 							</button>
-						</div>
-
-						<!-- THP row (players only) -->
-						{#if c.type === 'player'}
-							<div class="flex items-center gap-2">
-								<input
-									type="number"
-									placeholder="THP"
-									min="0"
-									bind:value={tempHpInputs[c.id]}
-									onkeydown={(e) => e.key === 'Enter' && commitTempHp(c.id)}
-									class="h-11 w-16 rounded border border-yellow-900/60 bg-gray-900 px-2 text-center text-sm text-yellow-300 placeholder-yellow-900 focus:border-yellow-600 focus:outline-none"
-								/>
+							{#if c.type === 'player'}
 								<button
 									onclick={() => commitTempHp(c.id)}
+									title="Set temp HP"
 									class="h-11 flex-1 rounded bg-yellow-800/50 text-sm font-bold text-yellow-300 hover:bg-yellow-700/60"
 								>
-									Set Temp HP
+									+ THP
 								</button>
-								{#if c.tempHp > 0}
-									<button
-										onclick={() => combat.setTempHp(c.id, 0)}
-										class="h-11 w-11 rounded text-gray-600 hover:text-gray-400"
-										title="Clear temp HP"
-									>
-										✕
-									</button>
-								{/if}
-							</div>
-						{/if}
+							{/if}
+						</div>
 
 						<!-- Death saves row (players at 0 HP) -->
 						{#if c.type === 'player' && c.currentHp <= 0}

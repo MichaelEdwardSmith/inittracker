@@ -1,3 +1,7 @@
+// POST /api/voice-command — accepts a speech transcript and the current combatant list,
+// sends them to Claude (claude-haiku-4-5) to identify a combat action (damage/heal/unknown),
+// and returns { action, targetId, targetName, amount }.
+// Requires ANTHROPIC_API_KEY in environment; returns 503 if the key is absent.
 import { json, error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import Anthropic from '@anthropic-ai/sdk';

@@ -1,4 +1,4 @@
-﻿<!-- DM dashboard (/) — the main authenticated page. Composes PlayerPanel, EnemyPanel,
+<!-- DM dashboard (/) — the main authenticated page. Composes PlayerPanel, EnemyPanel,
      and InitiativeTracker; hosts the top header with session switcher, Messages inbox,
      light/dark toggle, and guide popover; handles DM inbox polling and mobile hamburger menu. -->
 <script lang="ts">
@@ -32,7 +32,7 @@
 	let copied = $state(false);
 	let openPanel = $state<'players' | 'enemies' | null>(null);
 
-	// Right sidebar resize (enemy panel)
+	// ── Right sidebar resize (enemy panel) ──────────────────────────────────
 	const SIDEBAR_MIN = 200;
 	const SIDEBAR_MAX = 520;
 	const SIDEBAR_DEFAULT = 288; // w-72
@@ -90,7 +90,7 @@
 		document.addEventListener('touchcancel', onUp);
 	}
 
-	// Left sidebar resize (player panel)
+	// ── Left sidebar resize (player panel) ──────────────────────────────────
 	const PLAYER_MIN = 180;
 	const PLAYER_MAX = 480;
 	const PLAYER_DEFAULT = 256; // w-64
@@ -145,7 +145,7 @@
 		document.addEventListener('touchcancel', onUp);
 	}
 
-	// Session manager state
+	// ── Modals & overlays ─────────────────────────────────────────────────────
 	let showDiceRoller = $state(false);
 	let showMixer = $state(false);
 	let mixerMounted = $state(false);
@@ -225,6 +225,8 @@
 		if (!InnModalComp)
 			InnModalComp = (await import('$lib/components/InnGeneratorModal.svelte')).default;
 	}
+
+	// ── Session management ────────────────────────────────────────────────────
 	let showSessionManager = $state(false);
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
@@ -256,7 +258,7 @@
 		return () => document.removeEventListener('fullscreenchange', onFsChange);
 	});
 
-	// Clock + battery
+	// ── Clock, battery & fullscreen ──────────────────────────────────────────
 	let currentTime = $state('');
 	let batteryLevel = $state<number | null>(null);
 	let batteryCharging = $state(false);
@@ -380,6 +382,7 @@
 		return () => clearInterval(interval);
 	});
 
+	// ── State sync & messaging ────────────────────────────────────────────────
 	async function sendDmReply(to: string, text: string) {
 		await fetch('/api/dm-reply', {
 			method: 'POST',

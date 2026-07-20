@@ -1339,8 +1339,8 @@
 				{@const isUnconsciousPlayer = dc.type === 'player' && dc.currentHp <= 0}
 				<main
 					in:fly={{ y: 28, duration: 500 }}
-					out:fly={{ y: -20, duration: 250 }}
-					class="absolute inset-0 flex flex-col items-center justify-center px-12 pb-4"
+					out:fly={{ y: -20, duration: 500 }}
+					class="absolute inset-0 flex flex-col items-center justify-center bg-gray-950 px-12 pb-4"
 				>
 					<!-- Type label -->
 					<div class="mb-5 flex items-center gap-3">

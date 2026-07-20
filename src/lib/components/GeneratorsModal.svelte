@@ -1545,9 +1545,28 @@
 	type WeatherSlot = { sky: string; temp: string; wind: string; condition: string };
 	type DayWeather = { day: string; slots: Record<string, WeatherSlot> };
 
-	let selectedSeason = $state('spring');
-	let selectedBiome = $state('forest');
-	let weekWeather = $state<DayWeather[]>([]);
+	// Persist week weather across modal close/reopen
+	function _loadWeatherCache() {
+		if (!browser) return null;
+		try {
+			return JSON.parse(localStorage.getItem('generators-weather') ?? 'null');
+		} catch {
+			return null;
+		}
+	}
+	const _wx = _loadWeatherCache();
+
+	let selectedSeason = $state(_wx?.season ?? 'spring');
+	let selectedBiome = $state(_wx?.biome ?? 'forest');
+	let weekWeather = $state<DayWeather[]>(_wx?.weekWeather ?? []);
+
+	$effect(() => {
+		if (browser)
+			localStorage.setItem(
+				'generators-weather',
+				JSON.stringify({ season: selectedSeason, biome: selectedBiome, weekWeather })
+			);
+	});
 
 	const biomePaceData: Record<string, { mult: number; reason: string }> = {
 		forest: { mult: 0.75, reason: 'Dense undergrowth, no roads' },
@@ -1643,7 +1662,21 @@
 		aftermath: string;
 	}
 
-	let weatherEvent = $state<WeatherEvent | null>(null);
+	// Persist weather event across modal close/reopen
+	function _loadWeatherEventCache() {
+		if (!browser) return null;
+		try {
+			return JSON.parse(localStorage.getItem('generators-weather-event') ?? 'null');
+		} catch {
+			return null;
+		}
+	}
+
+	let weatherEvent = $state<WeatherEvent | null>(_loadWeatherEventCache());
+
+	$effect(() => {
+		if (browser) localStorage.setItem('generators-weather-event', JSON.stringify(weatherEvent));
+	});
 
 	const EVENT_POOLS: Record<
 		string,
@@ -1932,6 +1965,21 @@
 					],
 					aftermath:
 						'Significant debris on beaches. Sea caves may be newly accessible or previously accessible ones blocked. Excellent foraging for washed-up materials.'
+				},
+				{
+					name: 'Sea Fog',
+					intensity: 'minor',
+					onset: 'Fog rolls in from the water before dawn. By sunrise the coast is invisible.',
+					description:
+						'Dense sea fog smothers the coastline, muffling sound and erasing the horizon. Ships at anchor appear and vanish. The fog is cold and wet and moves with a mind of its own — lifting for minutes before descending again.',
+					mechanics: [
+						'Visibility 30 ft on shore, 10 ft on water',
+						'Navigation at sea: DC 15 Survival or Seamanship check',
+						'Vessels risk grounding on unseen rocks: DC 14 Perception to detect',
+						'Disadvantage on Perception (sight); advantage on Stealth'
+					],
+					aftermath:
+						'Burns off by mid-morning, or may persist all day if conditions hold. Every surface soaked. Sound carries unnervingly far for an hour after it lifts.'
 				}
 			]
 		},
@@ -1999,6 +2047,21 @@
 					],
 					aftermath:
 						'Conditions may persist 1d4 days. After a heatwave, the first cool night feels supernatural.'
+				},
+				{
+					name: 'Foehn Wind',
+					intensity: 'minor',
+					onset: 'Wind picks up from the west. Temperature climbs 20 degrees in two hours.',
+					description:
+						'A foehn descends from elevated terrain, warming and drying as it goes. Grass turns from green to brittle yellow-brown in a day. Lips crack. Eyes sting. The warmth would be pleasant if it did not carry the smell of dry grass on the edge of igniting.',
+					mechanics: [
+						'CON save DC 12 per hour of travel without water',
+						'Wildfire risk: any open flame — DC 13 to prevent spreading in dry grass',
+						'Disadvantage on Perception (sight) in heat shimmer',
+						'Water consumption doubled for both party and mounts'
+					],
+					aftermath:
+						'May persist 1d3 days. Grass remains explosive tinder for a week after. The first rain following a foehn smells extraordinary.'
 				}
 			],
 			mountains: [
@@ -2016,6 +2079,22 @@
 					],
 					aftermath:
 						'Clears by evening. Rock surfaces treacherous until dry. Small rockfalls may have blocked or opened passages.'
+				},
+				{
+					name: 'Summit Hailstorm',
+					intensity: 'moderate',
+					onset:
+						'Clear sky. Cloud builds at altitude. Hail falls from what looked like a clear blue afternoon.',
+					description:
+						'The mountain manufactures its own weather at altitude. Convection builds invisible columns of air, and where they collapse, knuckle-sized hail falls without warning onto exposed ridges and passes. There is no shelter on open rock.',
+					mechanics: [
+						'1d6 bludgeoning per round on exposed ridges and passes',
+						'Visibility 30 ft',
+						'Mounts and pack animals: DC 13 Animal Handling or bolt',
+						'Movement: half speed on hail-covered wet rock'
+					],
+					aftermath:
+						'Hail melts within 2 hours but leaves surfaces glassy and treacherous until fully dry. Hail in crevices persists until evening. Rock faces slick for the rest of the day.'
 				}
 			],
 			desert: [
@@ -2066,6 +2145,21 @@
 					],
 					aftermath:
 						'Clears within hours. Snow melts by afternoon. A reminder that the arctic has no off-season.'
+				},
+				{
+					name: 'Midnight Sun Disorientation',
+					intensity: 'minor',
+					onset: 'The sun has not set in three days. Time has become subjective.',
+					description:
+						'The midnight sun provides constant daylight but no natural rhythm. The body loses track of when to rest. Everything is equally bright in the flat polar light. Judgment erodes slowly — irritability spikes, patience vanishes, and decisions that need careful thought get made carelessly.',
+					mechanics: [
+						'Long rest: DC 13 WIS save or counts as short rest only (body cannot tell when to sleep)',
+						'After 48+ hours: disadvantage on WIS-based checks and Perception',
+						'Navigation: disadvantage on checks using sun position',
+						'DM may call DC 10 WIS save before any decision requiring patience or careful thought'
+					],
+					aftermath:
+						'Resting in total darkness (cave, sealed tent) removes the effect after one full rest. The first natural sunset is experienced as genuinely restorative.'
 				}
 			],
 			swamp: [
@@ -2083,6 +2177,22 @@
 					],
 					aftermath:
 						'Immediate rise in standing water. Paths that were marginal are now impassable. Intense heat returns within an hour of rain stopping.'
+				},
+				{
+					name: 'Methane Bloom',
+					intensity: 'moderate',
+					onset:
+						'Bubbles rising in the water ahead. An oily sheen on the surface. The smell hits like a wall.',
+					description:
+						'Deep disturbance in the swamp bed has released pockets of methane and hydrogen sulfide. The gas is heavier than air and settles invisibly into every hollow. Ghost lights flicker where pockets ignite at the surface on their own.',
+					mechanics: [
+						'Low areas: DC 13 CON save per hour or poisoned for 1 hour',
+						'Open flame in concentration: DC 12 DEX save or 3d6 fire damage in 10 ft radius',
+						'Detection: DC 14 Perception (smell) before entering a concentration',
+						'Stealth at disadvantage — surface bubbling and odour betray movement'
+					],
+					aftermath:
+						'Gas dissipates within hours once disturbance stops. Ghost light activity elevated for 1d3 nights. Unusual bioluminescence in the water for days after.'
 				}
 			],
 			coast: [
@@ -2100,6 +2210,21 @@
 					],
 					aftermath:
 						'Catastrophic damage. Roads washed out. Entire coastline reshaped. Unusual deep-sea creatures washed ashore. Weeks of cleanup.'
+				},
+				{
+					name: 'Waterspout',
+					intensity: 'moderate',
+					onset: 'Funnel descends from cloud to sea. Then another. Then a third.',
+					description:
+						'Multiple waterspouts dance across the harbour and coastal waters, drawing columns of seawater into the sky. Smaller than a true tornado but lethal to vessels, they move erratically and can make landfall without warning, depositing fish, seawater, and debris far inland.',
+					mechanics: [
+						'At sea: DC 16 Seamanship check or vessel takes 4d10 structural damage',
+						'Landfall: DC 15 STR save or thrown 1d6 x 5 ft, 2d6 bludgeoning',
+						'Fish rain when landfall occurs: difficult terrain, area covered in sea life',
+						'Visibility 60 ft in coastal spray'
+					],
+					aftermath:
+						'Waterspouts collapse quickly on land. Unusual sea life deposited inland. Harbour calm afterward. Occasional fish found miles from the coast.'
 				}
 			]
 		},
@@ -2184,6 +2309,22 @@
 					],
 					aftermath:
 						'Passes may remain closed until spring. Tracks show everything that moved before the snow. Any shelter discovered during storm is genuinely valuable.'
+				},
+				{
+					name: 'Rock and Ice Fall',
+					intensity: 'moderate',
+					onset:
+						'Temperature has cycled through freezing four times this week. The cliff face is shedding continuously.',
+					description:
+						'The freeze-thaw cycle has worked water into every crack and expanded it into ice, prising loose rocks of all sizes. The cliff drops a constant rain of small stones, punctuated by larger falls without warning. Every exposed traverse becomes a game of timing.',
+					mechanics: [
+						'Exposed slopes: DC 13 DEX save every 30 min or 2d8 bludgeoning',
+						'Large fall (1 in 6 per check): DC 16 DEX save or 4d10 bludgeoning + prone',
+						'Warning: DC 15 Perception (hearing) gives advantage on the save',
+						'Movement on debris fields halved'
+					],
+					aftermath:
+						'Debris blocks some routes and clears others. New loose rock on slopes remains unstable for 1d4 days. Old route notes may describe terrain that no longer exists.'
 				}
 			],
 			desert: [
@@ -2199,6 +2340,21 @@
 						'Condensation: water available from surfaces by morning (DC 14 Survival)'
 					],
 					aftermath: 'Desert nights get colder each week. Cold-weather hazards persist until dawn.'
+				},
+				{
+					name: 'Dust Devil Swarm',
+					intensity: 'minor',
+					onset: 'Spinning columns of dust appear across the terrain ahead, moving erratically.',
+					description:
+						'Dozens of dust devils — some ten feet wide, some fifty — cross the open desert in a chaotic dance. They appear, merge, split, and vanish without warning. Most are a nuisance. A large one can bowl a person flat. They leave nothing behind.',
+					mechanics: [
+						'Large devil crossing path: DC 11 STR save or knocked prone',
+						'Visibility 60 ft while active',
+						'Disadvantage on Perception (sight) within the swarm',
+						'Mounts: DC 12 Animal Handling per large devil encountered'
+					],
+					aftermath:
+						'Dissipate as the ground cools toward evening. Fine dust settles on everything. Tracks obscured in the affected area. The silence after is striking.'
 				}
 			],
 			arctic: [
@@ -2216,6 +2372,21 @@
 					],
 					aftermath:
 						'May persist 1d6 days. Cold snap often preceded by period of unusual wildlife activity. After: ice forms on all water sources.'
+				},
+				{
+					name: 'First Sea Ice',
+					intensity: 'minor',
+					onset: 'The shallows have gone grey and still. Overnight the surface hardens.',
+					description:
+						'The first sea ice of the season forms in sheltered shallows and calm bays. It looks solid from a distance. Up close, it ranges from glass-thin panes that shatter underfoot to sections a hand-span deep. The constant groaning and cracking is informative — to those who know how to read it.',
+					mechanics: [
+						'DC 13 Survival or Perception to judge ice thickness before crossing',
+						'Thin ice: breaks on 1-3 on a d6; full immersion in near-freezing water follows',
+						'Immersion: DC 14 CON save or 1d4 levels of exhaustion',
+						'Movement on solid ice: DC 12 Acrobatics to avoid falling'
+					],
+					aftermath:
+						'Ice expands nightly. In 1d6 days some water crossings will be reliably passable. Until then, every crossing is a gamble. Items near the surface become frozen in place.'
 				}
 			],
 			swamp: [
@@ -2233,6 +2404,22 @@
 					],
 					aftermath:
 						'Burns off by noon. Animals move during mist — unusual tracks. Condensation provides water on every surface.'
+				},
+				{
+					name: 'Rotting Miasma',
+					intensity: 'moderate',
+					onset:
+						'The smell arrives first — far worse than usual. By midday it is physically difficult to breathe without gagging.',
+					description:
+						'The autumn die-off of swamp vegetation releases concentrated gas from the decomposing mass. The miasma is colourless and settles low to the ground. In open air it causes headaches and nausea. In enclosed hollows or under thick canopy, it is quietly lethal.',
+					mechanics: [
+						'CON save DC 12 per hour or poisoned (disadvantage on all ability checks)',
+						'Low areas and enclosed spaces: DC increases to 14',
+						'Open flame in concentration: DC 12 DEX save, 2d6 fire in 10 ft',
+						'Only warning: sudden animal silence before the party enters the zone'
+					],
+					aftermath:
+						'Gas disperses when wind arrives. Affected creatures recover within an hour in fresh air. Dead insects and small animals mark the worst concentrations. The smell lingers for days.'
 				}
 			],
 			coast: [
@@ -2372,6 +2559,22 @@
 					],
 					aftermath:
 						'Ice on all water sources until mid-morning. Cold lingers in shade all day. Daytime temperature may reach 60°F — a 70-degree swing in 12 hours.'
+				},
+				{
+					name: 'Night Gale',
+					intensity: 'moderate',
+					onset:
+						'Sunset brings not just cold but a driving wind from the north that strips heat in minutes.',
+					description:
+						'The desert is cold in winter — but the gale makes it lethal. A 40 mph northerly drops the effective temperature well below freezing while kicking grit into every exposed surface. A fire that was adequate becomes desperate survival.',
+					mechanics: [
+						'CON save DC 13 per watch without cold weather gear',
+						'Fire: DC 14 Survival to maintain; extinguished on a failed check',
+						'Visibility 60 ft (blowing grit)',
+						'Navigation DC 14 — familiar landmarks buried or erased by blowing sand'
+					],
+					aftermath:
+						'Wind dies at dawn. Thick grit on all surfaces. Clear tracks in fresh-deposited sand from anything that moved during the night.'
 				}
 			],
 			arctic: [
@@ -2422,6 +2625,22 @@
 					],
 					aftermath:
 						'Thaw creates worse footing than either ice or open water. Animals that usually retreat to deep water are accessible. Unusual items may be frozen into the ice.'
+				},
+				{
+					name: 'Treacherous Thaw',
+					intensity: 'moderate',
+					onset:
+						'Temperature rises above freezing for the first time in weeks. The ice looks identical to yesterday. It is not.',
+					description:
+						'A midwinter thaw softens the ice the party has been crossing safely for days. The surface appears unchanged. The weight limit has halved. Water is visible through thinning sections in places — but not always where you expect.',
+					mechanics: [
+						'DC 14 Survival or Perception to identify unsafe ice before stepping on it',
+						'Softened ice breaks on 1-4 on a d6 (was 1-3 in hard freeze)',
+						'Immersion in near-freezing water: DC 15 CON save or 1d4 levels of exhaustion',
+						'Movement on softening ice: half speed'
+					],
+					aftermath:
+						'Temperature drops again by night, refreezing over weakened areas into glass-smooth surface that looks safe. What was passable at noon is a trap by evening.'
 				}
 			],
 			coast: [
@@ -2737,11 +2956,24 @@
 	let shopType = $state('general');
 	let shopAffluence = $state('common');
 	let shopSaveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	let showShopSaveCityModal = $state(false);
+	let shopSaveCityInput = $state('');
+	let shopLoadStatus = $state<'idle' | 'loading' | 'done' | 'error'>('idle');
+	let shopLoadCount = $state(0);
 
-	async function saveShopToNotes() {
+	function promptSaveShop() {
 		if (!generatedShopName) return;
+		shopSaveCityInput = '';
+		showShopSaveCityModal = true;
+	}
+
+	async function saveShopToNotes(city: string) {
+		if (!generatedShopName) return;
+		showShopSaveCityModal = false;
 		const aff = affluenceData[shopAffluence]?.label.toLowerCase() ?? shopAffluence;
 		const type = shopData[shopType]?.label.toLowerCase() ?? shopType;
+		const cityTrimmed = city.trim();
+		const cityText = cityTrimmed ? ` in <strong>${cityTrimmed}</strong>` : '';
 		const inventoryRows = generatedShop
 			.map(
 				(row) =>
@@ -2751,7 +2983,15 @@
 		const inventoryHtml = inventoryRows
 			? `<p><strong>Inventory:</strong></p><ul>${inventoryRows}</ul>`
 			: '';
-		const line = `<p>The party went to <strong>${generatedShopName}</strong>, a ${aff} ${type}</p>${inventoryHtml}`;
+		const shopEntry: SavedShop = {
+			name: generatedShopName,
+			typeKey: shopType,
+			affluenceKey: shopAffluence,
+			items: [...generatedShop],
+			...(cityTrimmed ? { city: cityTrimmed } : {})
+		};
+		const shopJson = JSON.stringify(shopEntry).replace(/'/g, '&#39;');
+		const line = `<p data-shop='${shopJson}'>The party visited <strong>${generatedShopName}</strong>${cityText}, a ${aff} ${type}</p>${inventoryHtml}`;
 		shopSaveStatus = 'saving';
 		try {
 			const res = await fetch('/api/notes');
@@ -2772,16 +3012,7 @@
 					body: JSON.stringify({ action: 'create', content: line })
 				});
 			}
-			// Add to saved shops list so players can revisit
-			savedShops = [
-				...savedShops,
-				{
-					name: generatedShopName,
-					typeKey: shopType,
-					affluenceKey: shopAffluence,
-					items: [...generatedShop]
-				}
-			];
+			savedShops = [...savedShops, shopEntry];
 			shopSaveStatus = 'saved';
 			setTimeout(() => {
 				shopSaveStatus = 'idle';
@@ -2791,6 +3022,49 @@
 			setTimeout(() => {
 				shopSaveStatus = 'idle';
 			}, 2000);
+		}
+	}
+
+	async function loadShopsFromNotes() {
+		shopLoadStatus = 'loading';
+		shopLoadCount = 0;
+		try {
+			const res = await fetch('/api/notes');
+			const data: { notes: { id: string; content: string }[] } = res.ok
+				? await res.json()
+				: { notes: [] };
+			let added = 0;
+			for (const note of data.notes) {
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(note.content, 'text/html');
+				const shopEls = doc.querySelectorAll('[data-shop]');
+				for (const el of shopEls) {
+					try {
+						const parsed: SavedShop = JSON.parse(el.getAttribute('data-shop') ?? '');
+						if (parsed.name && parsed.typeKey && parsed.items?.length) {
+							const dupe = savedShops.find(
+								(s) => s.name === parsed.name && s.typeKey === parsed.typeKey
+							);
+							if (!dupe) {
+								savedShops = [...savedShops, parsed];
+								added++;
+							}
+						}
+					} catch {
+						// skip malformed entries
+					}
+				}
+			}
+			shopLoadCount = added;
+			shopLoadStatus = 'done';
+			setTimeout(() => {
+				shopLoadStatus = 'idle';
+			}, 3000);
+		} catch {
+			shopLoadStatus = 'error';
+			setTimeout(() => {
+				shopLoadStatus = 'idle';
+			}, 3000);
 		}
 	}
 	type ShopRow = {
@@ -3230,6 +3504,8 @@
 			'Forearm guards of hardened leather or metal, protecting without restricting wrist flexibility.',
 		'Potion of Healing':
 			'A red liquid that glimmers when agitated. Drinking it restores 2d4+2 hit points.',
+		'Potion of Greater Healing':
+			'A shimmering crimson liquid, richer in hue than a standard healing potion. Restores 4d4+4 hit points when consumed.',
 		Antitoxin:
 			'A vial of clear liquid. Drinking grants advantage on saving throws against poison for 1 hour.',
 		'Acid (vial)':
@@ -3528,6 +3804,10 @@
 			'On a natural 20 against a living creature, the target takes 10 extra necrotic damage and you gain 10 temporary HP. Requires attunement.',
 		'Sword of Wounding':
 			'A creature hit by this weapon cannot regain HP until the start of your next turn. This effect stacks with multiple hits. Requires attunement.',
+		'+2 Longsword':
+			'A masterwork enchanted blade. +2 bonus to attack rolls and damage rolls. The steel has a faint luminescent quality that intensifies in darkness.',
+		'Sword of Sharpness':
+			'A +3 weapon. On a roll of 20, the target takes an extra 14 slashing damage and loses one extremity (roll d6: 1–2 hand, 3 foot, 4 nose, 5–6 ear). Requires attunement.',
 		'+2 Shield':
 			'A potently enchanted shield. +4 AC total. Solid, lighter than mundane equivalents. Requires attunement.',
 		'+2 Breastplate':
@@ -3618,7 +3898,13 @@
 			'Strength becomes 29 for 1 hour. Tastes like lightning and sea spray.'
 	};
 	let generatedShopName = $state('');
-	type SavedShop = { name: string; typeKey: string; affluenceKey: string; items: ShopRow[] };
+	type SavedShop = {
+		name: string;
+		typeKey: string;
+		affluenceKey: string;
+		items: ShopRow[];
+		city?: string;
+	};
 	const SAVED_SHOPS_KEY = 'initiative_saved_shops';
 	let savedShops = $state<SavedShop[]>(
 		browser
@@ -4739,11 +5025,36 @@
 		]
 	};
 
-	let encounterBiome = $state('forest');
-	let partySize = $state(4);
-	let partyLevel = $state(5);
-	let encounterDifficulty = $state('medium');
-	let generatedEncounter = $state<EncounterResult | null>(null);
+	// Persist encounter result across modal close/reopen so the DM can return to it
+	function _loadEncounterCache() {
+		if (!browser) return null;
+		try {
+			return JSON.parse(localStorage.getItem('generators-encounter') ?? 'null');
+		} catch {
+			return null;
+		}
+	}
+	const _enc = _loadEncounterCache();
+
+	let encounterBiome = $state(_enc?.biome ?? 'forest');
+	let partySize = $state(_enc?.partySize ?? 4);
+	let partyLevel = $state(_enc?.partyLevel ?? 5);
+	let encounterDifficulty = $state(_enc?.difficulty ?? 'medium');
+	let generatedEncounter = $state<EncounterResult | null>(_enc?.result ?? null);
+
+	$effect(() => {
+		if (browser)
+			localStorage.setItem(
+				'generators-encounter',
+				JSON.stringify({
+					biome: encounterBiome,
+					partySize,
+					partyLevel,
+					difficulty: encounterDifficulty,
+					result: generatedEncounter
+				})
+			);
+	});
 
 	const biomeEncounterLabel: Record<string, string> = {
 		forest: 'Forest',
@@ -5393,7 +5704,7 @@
 								{shopData[shopType]?.label.toLowerCase()}
 							</span>
 							<button
-								onclick={saveShopToNotes}
+								onclick={promptSaveShop}
 								disabled={shopSaveStatus === 'saving'}
 								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
 								'saved'
@@ -5547,11 +5858,76 @@
 							</div>
 						</div>
 					{/if}
+					{#if showShopSaveCityModal}
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+							onclick={() => (showShopSaveCityModal = false)}
+							onkeydown={(e) => e.key === 'Escape' && (showShopSaveCityModal = false)}
+						>
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<div
+								class="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
+								onclick={(e) => e.stopPropagation()}
+							>
+								<h4 class="mb-1 text-base font-bold text-white">Save Shop to Notes</h4>
+								<p class="mb-4 text-xs text-gray-400">
+									Which city or town is <strong class="text-gray-200">{generatedShopName}</strong> located
+									in? (optional)
+								</p>
+								<input
+									type="text"
+									bind:value={shopSaveCityInput}
+									placeholder="e.g. Waterdeep, Baldur's Gate…"
+									onkeydown={(e) => {
+										if (e.key === 'Enter') saveShopToNotes(shopSaveCityInput);
+										if (e.key === 'Escape') showShopSaveCityModal = false;
+									}}
+									class="mb-4 w-full rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+								/>
+								<div class="flex gap-2">
+									<button
+										onclick={() => saveShopToNotes(shopSaveCityInput)}
+										class="flex-1 rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
+										>Save</button
+									>
+									<button
+										onclick={() => (showShopSaveCityModal = false)}
+										class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 transition hover:border-gray-400 hover:text-white"
+										>Cancel</button
+									>
+								</div>
+							</div>
+						</div>
+					{/if}
 					{#if savedShops.length > 0}
 						<div class="mt-2 space-y-3">
-							<p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-								Previously Visited Shops
-							</p>
+							<div class="flex items-center gap-3">
+								<p class="flex-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+									Previously Visited Shops
+								</p>
+								<button
+									onclick={loadShopsFromNotes}
+									disabled={shopLoadStatus === 'loading'}
+									class="rounded-lg border border-gray-700 px-3 py-1 text-[10px] font-bold tracking-widest text-gray-400 uppercase transition hover:border-gray-500 hover:text-white disabled:opacity-50 {shopLoadStatus ===
+									'done'
+										? 'border-green-700 text-green-400'
+										: shopLoadStatus === 'error'
+											? 'border-red-700 text-red-400'
+											: ''}"
+								>
+									{shopLoadStatus === 'loading'
+										? 'Loading…'
+										: shopLoadStatus === 'done'
+											? shopLoadCount > 0
+												? `+${shopLoadCount} restored`
+												: 'Up to date'
+											: shopLoadStatus === 'error'
+												? 'Error'
+												: 'Load from Notes'}
+								</button>
+							</div>
 							{#each savedShops as shop, i}
 								<div class="flex rounded-xl border border-gray-700 bg-gray-900/60">
 									<button
@@ -5565,6 +5941,9 @@
 									>
 										<span class="flex-1">
 											<strong class="text-white">{shop.name}</strong>
+											{#if shop.city}
+												<span class="ml-1 text-xs text-amber-400">{shop.city}</span>
+											{/if}
 											<span class="ml-2 text-xs text-gray-400">
 												{affluenceData[shop.affluenceKey]?.label}
 												{shopData[shop.typeKey]?.label}
@@ -5580,6 +5959,29 @@
 									>
 								</div>
 							{/each}
+						</div>
+					{:else}
+						<div class="mt-2 flex justify-end">
+							<button
+								onclick={loadShopsFromNotes}
+								disabled={shopLoadStatus === 'loading'}
+								class="rounded-lg border border-gray-700 px-3 py-1 text-[10px] font-bold tracking-widest text-gray-400 uppercase transition hover:border-gray-500 hover:text-white disabled:opacity-50 {shopLoadStatus ===
+								'done'
+									? 'border-green-700 text-green-400'
+									: shopLoadStatus === 'error'
+										? 'border-red-700 text-red-400'
+										: ''}"
+							>
+								{shopLoadStatus === 'loading'
+									? 'Loading…'
+									: shopLoadStatus === 'done'
+										? shopLoadCount > 0
+											? `+${shopLoadCount} restored`
+											: 'None found in notes'
+										: shopLoadStatus === 'error'
+											? 'Error'
+											: 'Load from Notes'}
+							</button>
 						</div>
 					{/if}
 				</div>
