@@ -23,11 +23,13 @@
 		{ id: 'encounter-builder', label: '14. Encounter Builder' },
 		{ id: 'spell-reference', label: '15. Spell Reference' },
 		{ id: 'player-messaging', label: '16. Player Messaging' },
-		{ id: 'contact', label: '17. Contact & Support' },
-		{ id: 'voice-commands', label: '18. Voice Commands (Beta)' },
-		{ id: 'audio-mixer', label: '19. Audio Mixer' },
-		{ id: 'quick-reference', label: '20. Quick Reference' },
-		{ id: 'dungeon-generator', label: '21. Random Dungeon Generator' }
+		{ id: 'quick-reference', label: '17. Quick Reference' },
+		{ id: 'generators', label: '18. Generators' },
+		{ id: 'liars-dice', label: '19. Liar’s Dice' },
+		{ id: 'stream-overlay', label: '20. Stream Overlay' },
+		{ id: 'voice-commands', label: '21. Voice Commands (Beta)' },
+		{ id: 'audio-mixer', label: '22. Audio Mixer' },
+		{ id: 'contact', label: '23. Contact & Support' }
 	];
 
 	const conditions = [
@@ -173,10 +175,12 @@
 						class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
 						>/register</code
 					>
-					and fill in your first and last name, email address, a password (minimum 8 characters), and
-					a password confirmation. Click
-					<strong class="font-semibold text-white">Create Account</strong> — you will land directly on
-					your dashboard.
+					and either fill in your first and last name, email address, a password (minimum 8 characters),
+					and a password confirmation, or click
+					<strong class="font-semibold text-white">Continue with Google</strong> to sign up with
+					your Google account instead. Click
+					<strong class="font-semibold text-white">Create Account</strong> (or complete the Google flow)
+					— you will land directly on your dashboard.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -185,9 +189,13 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Go to <code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
 						>/login</code
-					>, enter your email and password, and click
-					<strong class="font-semibold text-white">Enter</strong>. Your last active combat state is
-					restored automatically.
+					>
+					and sign in with your email and password, or click
+					<strong class="font-semibold text-white">Continue with Google</strong> or
+					<strong class="font-semibold text-white">Continue with Discord</strong>. All three land
+					you on your dashboard with your last active combat state restored automatically. Click
+					<strong class="font-semibold text-white">Enter as Guest</strong> instead if you just want to
+					try the app without an account.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -219,13 +227,41 @@
 					<li>
 						Type in the Session ID — it auto-formats to uppercase and ignores invalid characters
 					</li>
-					<li>Click <strong class="font-semibold text-white">Join Session</strong></li>
+					<li>Click <strong class="font-semibold text-white">Continue as Guest</strong></li>
 					<li>
 						You are taken to the live <strong class="font-semibold text-white"
 							>Player Display</strong
 						> for that session
 					</li>
 				</ol>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Optional: Player Accounts
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					If you'd rather not retype the Session ID every session, sign in from the "sign in for a
+					better experience" section on <code
+						class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300">/join</code
+					>
+					— <strong class="font-semibold text-white">Continue with Google</strong>,
+					<strong class="font-semibold text-white">Continue with Discord</strong>, or an
+					email/password account at
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>/player/register</code
+					>
+					/
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>/player/login</code
+					>. Signed-in players get a
+					<strong class="font-semibold text-white">"Your Sessions"</strong> list for one-tap rejoining,
+					and their account name/avatar becomes their default identity in DM messaging and Liar's Dice
+					whenever they haven't picked a specific in-game character. Signing in is entirely optional —
+					guest joining still works exactly as before.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					The Join Gate
+				</h3>
 				<p class="text-sm leading-relaxed">
 					On the display screen, tap <strong class="font-semibold text-white">Join Session</strong>
 					to enable live audio, or
@@ -329,19 +365,76 @@
 						<strong class="font-semibold text-white">copy icon</strong> to copy it to your clipboard (turns
 						into a green checkmark to confirm).
 					</li>
+					<li><strong class="font-semibold text-white">Guide</strong> — opens this page</li>
 					<li>
-						<strong class="font-semibold text-white">Dice</strong> — opens the Dice Roller modal
-						(see
+						<strong class="font-semibold text-white">Messages</strong> — opens the DM inbox (see
+						<a href="#player-messaging" class="text-amber-400 transition hover:text-amber-300"
+							>section 16</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Notes</strong> — opens the current session's DM notes
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Dice Roller</strong> — opens the Dice Roller
+						modal (see
 						<a href="#dice-roller" class="text-amber-400 transition hover:text-amber-300"
-							>section 12</a
+							>section 13</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Liar's Dice</strong> — starts or joins a Liar's
+						Dice game (see
+						<a href="#liars-dice" class="text-amber-400 transition hover:text-amber-300"
+							>section 19</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Spells</strong> — opens the Spell Reference
+						(see
+						<a href="#spell-reference" class="text-amber-400 transition hover:text-amber-300"
+							>section 15</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Voice</strong> — enables hands-free voice
+						commands, Chrome/Edge only (see
+						<a href="#voice-commands" class="text-amber-400 transition hover:text-amber-300"
+							>section 21</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Mixer</strong> — opens the Audio Mixer (see
+						<a href="#audio-mixer" class="text-amber-400 transition hover:text-amber-300"
+							>section 22</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Quick Reference</strong> — opens the
+						rules-lookup panel (see
+						<a href="#quick-reference" class="text-amber-400 transition hover:text-amber-300"
+							>section 17</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Generators</strong> — opens the
+						content-generator hub (see
+						<a href="#generators" class="text-amber-400 transition hover:text-amber-300"
+							>section 18</a
+						>)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Encounters</strong> — opens the Encounter
+						Builder (see
+						<a href="#encounter-builder" class="text-amber-400 transition hover:text-amber-300"
+							>section 14</a
 						>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Sessions</strong> — opens the Session Manager modal
 					</li>
-					<li><strong class="font-semibold text-white">Guide</strong> — opens this page</li>
 					<li>
-						<strong class="font-semibold text-white">Chronicle</strong> — opens the Combat History page
+						<strong class="font-semibold text-white">History</strong> — opens the Combat Chronicle page
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Player Display</strong> — opens the viewer screen
@@ -426,6 +519,12 @@
 					to a square and resized to 256×256. To remove an avatar, hover over it and click the <strong
 						class="font-semibold text-white">✕</strong
 					> that appears.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					On the initiative order, clicking a player's avatar opens it full-size in a lightbox
+					preview — click outside the image, press <strong class="font-semibold text-white"
+						>Escape</strong
+					>, or click the <strong class="font-semibold text-white">✕</strong> to close it.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -678,8 +777,9 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Once at least one combatant has an initiative set, click <strong
 						class="font-semibold text-white">Start Combat</strong
-					>. The highest-initiative combatant becomes active (highlighted in amber). The round
-					counter starts at <strong class="font-semibold text-white">1</strong>.
+					>. The highest-initiative combatant becomes active (highlighted in amber), the tracker
+					auto-scrolls to bring them into view, and the round counter starts at
+					<strong class="font-semibold text-white">1</strong>.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -695,7 +795,8 @@
 					</li>
 				</ul>
 				<p class="mb-4 text-sm leading-relaxed">
-					Dead enemies (0 HP) are automatically skipped in the turn rotation.
+					Both buttons auto-scroll the tracker to keep the active combatant in view. Dead enemies (0
+					HP) are automatically skipped in the turn rotation.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -725,6 +826,11 @@
 				{@render dataTable(
 					['Button', 'What it does'],
 					[
+						['↺ Undo', 'Reverts the most recent damage/heal, condition/effect, or turn change'],
+						[
+							'AoE',
+							'Opens the bulk-action modal for damage, healing, conditions, or spell effects'
+						],
 						['Reset Init', 'Clears all initiative values and resets the round counter to 1'],
 						[
 							'Reset Players',
@@ -734,6 +840,74 @@
 						['Save', 'Saves a snapshot to Chronicles without ending combat']
 					]
 				)}
+
+				<h3 id="undo" class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Undo
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">↺ Undo</strong> button reverts the single most
+					recent action: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save
+					update, or a turn advance/rewind. It's greyed out when there's nothing to undo.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed">
+					Undo is <strong class="font-semibold text-white">single-level</strong> — taking any other action
+					after the one you want to undo clears the undo slot, so you can't chain multiple undos. The
+					button stays available across the dashboard's own live-update echo of your last change, but
+					it clears if a genuinely different external change comes in first — e.g. a player rolling their
+					own initiative on the viewer screen.
+				</p>
+
+				<h3
+					id="bulk-actions-aoe"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Bulk Actions (AoE)
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">AoE</strong> to apply one action to several combatants
+					at once — handy for fireballs, auras, or any effect that hits a whole group. The modal has two
+					tabs:
+				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">Damage / Heal tab</p>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Every active combatant is listed with checkboxes, all selected by default (benched
+						players and lair cards are excluded); click a row to deselect it
+					</li>
+					<li>
+						Check <strong class="font-semibold text-white">Saved</strong> on any combatant who made a
+						saving throw for half damage
+					</li>
+					<li>
+						Type an <strong class="font-semibold text-white">Amount</strong>, then click
+						<strong class="font-semibold text-red-400">− Damage</strong>
+						or <strong class="font-semibold text-green-400">+ Heal</strong> to apply it to every selected,
+						un-saved combatant at once (saved combatants take half)
+					</li>
+					<li>
+						Any concentration checks triggered by the damage are queued after the modal closes
+					</li>
+				</ol>
+				<p class="mb-2 text-sm font-semibold text-gray-200">Condition / Effect tab</p>
+				<ol class="ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Same combatant checklist, but <strong class="font-semibold text-white">Saved</strong> now
+						means "made their save — unaffected," excluding that combatant from the effect
+					</li>
+					<li>
+						Choose a condition, an Adv/Disadv marker, a quick-pick spell effect, or
+						<strong class="font-semibold text-white">Custom…</strong> to type a freeform name
+					</li>
+					<li>
+						Optionally set a number of <strong class="font-semibold text-white">Rounds</strong> for the
+						effect to last (blank = indefinite)
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Apply</strong> to add it to every selected,
+						un-saved combatant in one sync; combatants who already have that status are skipped rather
+						than toggled off
+					</li>
+				</ol>
 			</section>
 
 			<!-- 8 ─────────────────────────────────────── -->
@@ -974,16 +1148,29 @@
 				{@render h2('9', 'Conditions & Status Effects')}
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Adding a Condition
+					Adding a Condition or Spell Effect
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Condition</strong> on any combatant row.
-					A dropdown lists all conditions in two sections. Click one to apply it — the badge appears
-					immediately on the row. Dead and Unconscious are not selectable: when a player drops to 0
-					HP they automatically become Unconscious (all other conditions cleared) and a
+					Click <strong class="font-semibold text-white">+ Condition/Spell Effect</strong> on any
+					combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv markers, a
+					quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more), and a
+					<strong class="font-semibold text-fuchsia-300">Custom</strong> text field for any other
+					effect name. Click one to apply it — the badge appears immediately on the row, styled grey
+					for standard conditions/markers and
+					<strong class="font-semibold text-fuchsia-300">fuchsia</strong> for spell effects. A
+					prompt lets you set a number of rounds for the effect to last, or leave it blank for
+					indefinite. Dead and Unconscious are not selectable: when a player drops to 0 HP they
+					automatically become Unconscious (all other conditions cleared) and a
 					<a href="#death-saves" class="text-amber-400 transition hover:text-amber-300"
 						>death saving throw tracker</a
 					> appears on their row. Enemies at 0 HP are simply removed from the turn order.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					To apply the same condition or spell effect to several combatants in one action (e.g. a
+					fireball's Frightened save, or a party-wide Bless), use the Condition/Effect tab of the
+					<a href="#bulk-actions-aoe" class="text-amber-400 transition hover:text-amber-300"
+						>AoE modal</a
+					> instead of adding it one row at a time.
 				</p>
 
 				<p class="mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
@@ -1017,24 +1204,26 @@
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Viewing a Condition Description
+					Viewing a Condition or Spell Effect Description
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Every active condition badge has a small <strong class="font-semibold text-white"
+					Every active badge has a small <strong class="font-semibold text-white"
 						>ⓘ info icon</strong
-					> on its right edge. Clicking it opens a modal showing the condition name and a summary of its
-					mechanical effects — what saves it imposes, what actions it prevents, and any special rules.
-					This works on both the DM dashboard and the Player Display.
+					> on its right edge. Clicking it opens a modal labeled "Condition" or "Spell Effect" showing
+					the name and a summary of its mechanical effects — for standard conditions, the rules text;
+					for quick-pick spell effects, a short mechanical summary; for a freeform custom name with no
+					known description, "No description available." This works on both the DM dashboard and the Player
+					Display.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Removing a Condition
+					Removing a Condition or Spell Effect
 				</h3>
 				<p class="text-sm leading-relaxed">
-					On the <strong class="font-semibold text-white">DM screen</strong>, click the condition
-					name portion of the badge to remove it. The ⓘ icon and the remove action are separate —
-					clicking the icon only opens the description, it does not remove the condition. Condition
-					changes appear as a colored flash and audio cue on the viewer screen.
+					On the <strong class="font-semibold text-white">DM screen</strong>, click the name portion
+					of the badge to remove it. The ⓘ icon and the remove action are separate — clicking the
+					icon only opens the description, it does not remove the condition. Changes appear as a
+					colored flash and audio cue on the viewer screen.
 				</p>
 			</section>
 
@@ -1072,6 +1261,12 @@
 					— required by browsers before playing audio.
 					<strong class="font-semibold text-white">Continue without sound</strong> skips audio entirely.
 				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					A <strong class="font-semibold text-white">Liar's Dice</strong> entry also appears in the
+					viewer's header (or hamburger menu on mobile) whenever the DM has an active game — see
+					<a href="#liars-dice" class="text-amber-400 transition hover:text-amber-300">section 19</a
+					>.
+				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					What Players See
@@ -1096,7 +1291,7 @@
 					<li>Name in large responsive text with a colored glow</li>
 					<li>Stats row: Initiative · Armor Class · Hit Points (players only)</li>
 					<li>HP bar with color coding and a yellow temp HP extension (players only)</li>
-					<li>Active conditions as color-coded badges</li>
+					<li>Active conditions and spell effects as color-coded badges</li>
 					<li>
 						<strong class="font-semibold text-white">Up Next</strong> strip — the next 1–4 combatants
 						in order
@@ -1425,6 +1620,7 @@
 						throws, skill checks)
 					</li>
 					<li>Clickable dice in spell descriptions and legendary action text</li>
+					<li>Liar's Dice rolls</li>
 					<li>Voice command dice rolls (e.g. <em>"Tracker roll d20"</em>)</li>
 				</ul>
 				<p class="text-sm leading-relaxed">
@@ -1711,21 +1907,574 @@
 			</section>
 
 			<!-- 17 ─────────────────────────────────────── -->
-			<section id="contact">
-				{@render h2('17', 'Contact & Support')}
-				<p class="text-sm leading-relaxed">
-					Have a question, found a bug, or want to suggest a feature? Email us at
-					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
-						>dm@inittracker.com</a
+			<section id="quick-reference">
+				{@render h2('17', 'Quick Reference')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">Quick Reference</strong> panel is a
+					full-screen rules-lookup panel opened from the DM header — pure D&amp;D 5e reference
+					material, no randomization or content generation. (For randomized content, see
+					<a href="#generators" class="text-amber-400 transition hover:text-amber-300">section 18</a
+					>, Generators.) The panel is aware of your session's ruleset (2014 or 2024) and adjusts
+					tables accordingly where the rules differ.
+				</p>
+
+				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Categories
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">15 tabs, alphabetized:</p>
+				{@render dataTable(
+					['Tab', 'Contents'],
+					[
+						[
+							'Ability Check DCs',
+							'Difficulty-to-DC table (Very Easy 5 → Nearly Impossible 30), contested checks, passive checks, group checks'
+						],
+						[
+							'Actions in Combat',
+							'Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, Ready, Search, Use an Object'
+						],
+						[
+							'Bonus Actions',
+							'Common bonus actions by class and spell, two-weapon fighting, and healing potions'
+						],
+						[
+							'Common Save DCs',
+							'Spell save DC formula, concentration saves, grapple/shove contests, trap and poison DCs, and a save-DC lookup grid by ability modifier × proficiency bonus'
+						],
+						['Concentration', 'Damage thresholds, what breaks concentration, and how to check'],
+						['Conditions', 'All 15 standard conditions and their effects'],
+						['Cover', 'Half cover (+2 AC/Dex saves), three-quarters cover (+5), and total cover'],
+						[
+							'Death Saving Throws',
+							'Stabilisation, success/failure thresholds, and instant death rules'
+						],
+						[
+							'Encounter Difficulty',
+							'Ruleset-aware: 2014 shows the DMG XP-threshold table and monster-count multiplier; 2024 shows the new XP Budget table'
+						],
+						['Exhaustion', 'All exhaustion levels and their effects'],
+						[
+							'Light &amp; Vision',
+							'Light-level effects, vision types (Darkvision, Blindsight, Tremorsense, Truesight), obscurement rules'
+						],
+						[
+							'Magic &amp; Casting',
+							'Casting times, ritual casting, spell components, area-of-effect shapes, spell attack vs. saving throw'
+						],
+						[
+							'Magic Items List',
+							'A searchable, filterable DMG magic item database (armor, potions, rings, rods, staffs, wands, weapons) with a detail pane showing source, attunement, cost, and description'
+						],
+						[
+							'Movement &amp; Position',
+							'Speed rules, difficult terrain, jumping, climbing, swimming, and prone'
+						],
+						['Resting', 'Short rest and long rest rules including what each restores']
+					]
+				)}
+			</section>
+
+			<!-- 18 ─────────────────────────────────────── -->
+			<section id="generators">
+				{@render h2('18', 'Generators')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">Generators</strong> button (gear/flower icon)
+					in the dashboard header to open a full-screen hub of 16 D&amp;D 5e content generators — names,
+					settlements, factions, dungeons, and more. Everything here is randomized and can be regenerated,
+					tweaked, and (for most tools) saved for later.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed">
+					A left sidebar lists all 16 generators by icon and name; click one to load it into the
+					right-hand content panel. Most tools regenerate their output <strong
+						class="font-semibold text-white">live</strong
 					>
-					— or click the <strong class="font-semibold text-white">✉ Contact</strong> link found on the
-					login page, the join page, and in both the DM and viewer headers.
+					as you change any control — there's often no separate "Generate" button beyond a
+					<strong class="font-semibold text-white">Randomize</strong> action that rerolls the random seed.
+					Tools that support saving keep a small "Saved [Things]" list in their left panel, backed by
+					your browser's local storage (not your DM account, so saved items are per-browser).
+				</p>
+
+				<h3
+					id="gen-weather"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Weather &amp; Travel
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Pick a <strong class="font-semibold text-white">Season</strong> and
+					<strong class="font-semibold text-white">Biome</strong> (4 seasons × 8 biomes), then click
+					<strong class="font-semibold text-white">Generate Week</strong> to produce a 7-day weather
+					table across five time slots (Dawn, Morning, Midday, Evening, Night). A
+					<strong class="font-semibold text-white">Travel Pace</strong> table dynamically adjusts
+					movement rates by the combined biome × season multiplier, with a badge showing the active
+					modifier, plus a <strong class="font-semibold text-white">Navigation DC</strong> table. A
+					<strong class="font-semibold text-white">Generate Weather Event</strong> button produces a standalone
+					dramatic weather event card (intensity: minor/moderate/severe/extreme) with a name, duration,
+					onset, description, mechanics, and an aftermath note — driven by your current Season/Biome selection.
+				</p>
+
+				<h3
+					id="gen-encounter"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Random Encounter
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Select a biome/terrain (12 options), <strong class="font-semibold text-white"
+						>Party Size</strong
+					>
+					(1–8), <strong class="font-semibold text-white">Party Level</strong> (1–20), and
+					<strong class="font-semibold text-white">Difficulty</strong> (Easy/Medium/Hard/Deadly),
+					then click <strong class="font-semibold text-white">Generate</strong> for a fully
+					XP-budgeted combat encounter: title, scene flavor text, archetype description, a monster
+					list with individual XP values, an XP breakdown strip (raw → multiplier → adjusted →
+					per-player), an actual difficulty badge, a tactics note, and a terrain feature.
+					<strong class="font-semibold text-white">Roll Again</strong> re-generates with the same
+					settings;
+					<strong class="font-semibold text-white">Add to Initiative</strong> clears current enemies and
+					loads the generated monsters directly into the initiative tracker.
+				</p>
+
+				<h3
+					id="gen-wilderness"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Wilderness Encounter
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					A narrative-first counterpart to Random Encounter: pick a
+					<strong class="font-semibold text-white">Terrain</strong> (10 options),
+					<strong class="font-semibold text-white">Time of Day</strong>
+					(Dawn/Morning/Afternoon/Dusk/Night), and
+					<strong class="font-semibold text-white">Party Level</strong>, then click
+					<strong class="font-semibold text-white">Roll Encounter</strong>. The result is one of six
+					encounter types — Combat, Hazard, Discovery, Flora &amp; Fauna, Travelers, or Mystery
+					(weighted toward the non-combat types) — with a headline, a time-of-day-flavored scene
+					line, a terrain-specific detail paragraph, a Complication/Opportunity pair, and 2–3
+					relevant skills. There's no difficulty control or monster stat block here — use Random
+					Encounter above when you need an XP-budgeted fight, and Wilderness Encounter when you want
+					an evocative road/travel moment instead.
+				</p>
+
+				<h3
+					id="gen-names"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Name Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Select a race/type — 11 options: Human (Male), Human (Female), Elf, Dwarf, Halfling,
+					Gnome, Orc/Half-Orc, Tiefling, Dragonborn, Tavern Name, Town/Village — then click
+					<strong class="font-semibold text-white">First Names</strong> and/or
+					<strong class="font-semibold text-white">Surnames</strong> to generate 10 of each. Click
+					any name to select it (amber highlight); a preview strip shows "Party met
+					<strong class="font-semibold text-white">Firstname Lastname</strong>, a Dwarf," and
+					<strong class="font-semibold text-white">Save to Notes</strong> appends the entry to the current
+					session's DM notes.
+				</p>
+
+				<h3
+					id="gen-town"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Town Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Set a <strong class="font-semibold text-white">Town Name</strong> (auto-filled, freely
+					editable), <strong class="font-semibold text-white">Settlement Size</strong> (Thorp →
+					Metropolis), <strong class="font-semibold text-white">Wealth</strong> (Poor → Wealthy),
+					and whether it <strong class="font-semibold text-white">Has Keep</strong>, then click
+					<strong class="font-semibold text-white">Randomize</strong> for a new town (or just edit the
+					fields — the town regenerates live). The output includes a prose "About [Town]" description,
+					an optional Keep section, and grouped building sections (Civic &amp; Religious, Inns &amp; Taverns,
+					Trades &amp; Services, Farms &amp; Outbuildings, Residences) — each building has a name, description,
+					and NPC roster.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Buildings with an inventory (shops, smithies, stables, inns, taverns, temples) have a
+					<strong class="font-semibold text-white">View Inventory/Menu/Services</strong> button
+					showing 7–10 priced items with a <strong class="font-semibold text-white">Restock</strong>
+					option. Every building also has a
+					<strong class="font-semibold text-white">Floor Plan</strong>
+					button that opens an embedded third-party floor-plan generator (seeded to that building) with
+					its own
+					<strong class="font-semibold text-white">New Layout</strong> reroll and an
+					<strong class="font-semibold text-white">Open ↗</strong> link to view it full-page. Click
+					<strong class="font-semibold text-white">Save Town</strong> to keep it in a "Saved Towns" list.
+				</p>
+
+				<h3
+					id="gen-shop"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Shop Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic
+					Shop, Jeweler, Tavern &amp; Inn, Bookshop, Herbalist, Fletcher &amp; Bowyer, Stable) and
+					town affluence (6 tiers: Impoverished → Opulent), then click
+					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named shop
+					with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items
+					appropriate to affluence are included. Click any item for a detail modal.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Save to Notes</strong> to open a small
+					prompt for which city/town the shop is in (optional), then save — the note records the
+					shop, its city, affluence, and type, plus a full itemized inventory list. A "Previously
+					Visited Shops" section with
+					<strong class="font-semibold text-white">Load from Notes</strong> lets you pull any shop you've
+					saved back out of your DM notes to view or reload later.
+				</p>
+
+				<h3
+					id="gen-inn"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Inn Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Pick an <strong class="font-semibold text-white">Inn Quality</strong> (Poor → Legendary),
+					<strong class="font-semibold text-white">Party Size</strong>, and
+					<strong class="font-semibold text-white">Party Level</strong>, then click
+					<strong class="font-semibold text-white">Randomize</strong>. You get a named inn with an
+					italic tagline, an owner (with race and backstory), a staff roster, a Food/Drink menu with
+					prices, room types/rates, a set of 3–6 level-scaled
+					<strong class="font-semibold text-white">Guests and Quests</strong>
+					(each with a Hook/Complication/Goal/Reward and a difficulty badge), and a
+					<strong class="font-semibold text-white">Rumor Mill</strong> of 3–4 overheard rumors (each
+					secretly flagged True or False for the DM's reference). Click
+					<strong class="font-semibold text-white">Save Inn</strong> to keep it in a "Saved Inns" list.
+				</p>
+
+				<h3
+					id="gen-dungeon"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Dungeon Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					A from-scratch port of the classic Donjon dungeon algorithm, wrapped in this app's
+					encounter/treasure/hazard/puzzle systems. Configure
+					<strong class="font-semibold text-white">Rows/Cols</strong> (grid size),
+					<strong class="font-semibold text-white">Corridors</strong> (Labyrinth/Bent/Straight),
+					<strong class="font-semibold text-white">Floors</strong> (1–9), a
+					<strong class="font-semibold text-white">Theme</strong> (⚰️ Crypt, Sewer, Cave, 🏰
+					Fortress, 🔮 Arcane, 🍄 Fungal), an optional
+					<strong class="font-semibold text-white">Boss Room</strong>, and Party
+					Size/Level/Difficulty (recorded for reference), then click
+					<strong class="font-semibold text-white">Generate</strong>.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					The map renders on a zoomable canvas with a room/corridor/door/trap/loot/stairs legend.
+					The
+					<strong class="font-semibold text-white">Encounters</strong> panel lists every room with
+					its monster encounter (dice-based counts, clickable monster names), treasure line, hazard
+					line, and — on about a fifth of empty rooms — a collapsible
+					<strong class="font-semibold text-white">puzzle</strong>
+					(Riddle/Logic/Environmental) with a Show/Hide Solution toggle. Each room with an encounter has
+					an
+					<strong class="font-semibold text-white">+ Add to Initiative</strong> button. About a quarter
+					of doors (plus some corridor cells) are locked or trapped — click one for a detail popup (name,
+					trigger, detect/pick DC, effect/save).
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via
+					floor tabs. Toggle <strong class="font-semibold text-white">🗺️ Map Live</strong> to push
+					the current floor to players and manually reveal corridors/doors/rooms as you explore (a
+					fog-of-war system, not an instant full reveal).
+					<strong class="font-semibold text-white">Save</strong>/<strong
+						class="font-semibold text-white">Load</strong
+					>
+					persist dungeons to your browser;
+					<strong class="font-semibold text-white">PDF</strong> exports a print-ready, per-floor GM handout
+					with the map and a full room table.
+				</p>
+
+				<h3
+					id="gen-wizard"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Wizard's Tower
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Set <strong class="font-semibold text-white">Party Size</strong>,
+					<strong class="font-semibold text-white">Party Level</strong> (shown as a Tier, which
+					affects apprentice frequency/tier), and
+					<strong class="font-semibold text-white">Number of Floors</strong>
+					(2–8), then click <strong class="font-semibold text-white">Randomize</strong>. You get a
+					named tower with a school-of-magic badge, an exterior description, and a Wizard Status
+					(Present, Absent, Deceased, or Transformed, with a specific reason). Each floor has a
+					themed room (Laboratory, Library, Summoning Chamber, etc.), and may include a
+					<strong class="font-semibold text-white">Magical Anomaly</strong> (a weird localized
+					physics quirk), an <strong class="font-semibold text-white">Apprentice</strong> (with a
+					disposition and interaction note), and/or a dangerous
+					<strong class="font-semibold text-white">Experiment</strong>
+					(with a danger-level badge). Click
+					<strong class="font-semibold text-white">Save Tower</strong> to keep it in a "Saved Towers"
+					list.
+				</p>
+
+				<h3
+					id="gen-cult"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Cult / Secret Society
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Set <strong class="font-semibold text-white">Party Size</strong> and
+					<strong class="font-semibold text-white">Party Level</strong> (higher levels skew the
+					organization toward more advanced/dangerous stages), then click
+					<strong class="font-semibold text-white">Randomize</strong>. You get a cult name, type
+					badge, symbol, public cover, doctrine, a goal with an operational Stage
+					(cell/established/ascendant/critical), three named rituals, a leadership structure, and
+					two covert recognition signs. Click
+					<strong class="font-semibold text-white">Save Cult</strong> to keep it in a "Saved Cults" list.
+				</p>
+
+				<h3
+					id="gen-guild"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Thieves' Guild
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Generate New Den</strong> for a criminal
+					organization: guild name and internal alias, a Heat badge (Cold/Warm/Hot/Burning),
+					district, cover business, secret entrance, a 5-room den layout, a 4-member leadership
+					hierarchy, a 5-item fence inventory, and a
+					<strong class="font-semibold text-white">Current Job Board</strong>
+					of 3–4 expandable jobs (type, risk, payout, and — when expanded — target, details, and a twist).
+					Also includes a house rule and a current rumor. Click
+					<strong class="font-semibold text-white">Save Den</strong> to keep it in a "Saved Dens" list.
+				</p>
+
+				<h3
+					id="gen-caravan"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Trade Caravan
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Generate New Caravan</strong> for a
+					merchant caravan on the road: a route (origin → destination), size badge, caravan master,
+					a stat strip (wagons, days out/remaining, guard quality), a cargo manifest (with a 35%
+					chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a complication, and
+					an overheard rumor. Click
+					<strong class="font-semibold text-white">Save Caravan</strong> to keep it in a "Saved Caravans"
+					list.
+				</p>
+
+				<h3
+					id="gen-blackmarket"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Black Market
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Generate New Market</strong> for an illicit
+					marketplace: market name, location, Heat badge, cover business, access method, a broker
+					NPC, a "Today's Condition" situational event, and 5–7 inventory items each with a
+					legal-status badge, risk badge, and a legal-vs-street price comparison. Also includes a
+					house rule and a "Word on the Street" rumor. Click
+					<strong class="font-semibold text-white">Save Market</strong> to keep it in a "Saved Markets"
+					list.
+				</p>
+
+				<h3
+					id="gen-noble"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Noble House
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Generate New House</strong> for a noble
+					family: a heraldically-accurate shield/motto/rank banner (field and charge tinctures
+					follow the real rule of contrast), holdings (seat, territory, resource, military strength,
+					income tier), political alliances, a rival house with a feud cause, current scandals (type
+					+ severity + description), a succession note, and a public-reputation summary. Click
+					<strong class="font-semibold text-white">Save House</strong> to keep it in a "Saved Houses"
+					list.
+				</p>
+
+				<h3
+					id="gen-graveyard"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Graveyard / Crypt
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Set <strong class="font-semibold text-white">Party Size</strong> and
+					<strong class="font-semibold text-white">Party Level</strong> (which sets a Tier that
+					skews site type and scales content), then click
+					<strong class="font-semibold text-white">Generate New Site</strong>. You get a burial site
+					(Graveyard/Crypt/Catacomb/Barrow/Ossuary) with a condition badge, an optional keeper NPC,
+					a layout of 4–5 sections, several notable graves with epitaphs and plot hooks, expandable
+					<strong class="font-semibold text-white">Haunts</strong> (trigger + manifestation +
+					resolution), expandable
+					<strong class="font-semibold text-white">Buried Treasure Hooks</strong>
+					(location + contents + complication), a recent event, and a local rumor. Click
+					<strong class="font-semibold text-white">Save Site</strong> to keep it in a "Saved Sites" list.
+				</p>
+
+				<h3
+					id="gen-npc"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					NPC Generator
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Choose a <strong class="font-semibold text-white">Role</strong> (10 options: Commoner,
+					Merchant, Guard, Innkeeper, Noble, Criminal, Retired Adventurer, Sage, Clergy, Soldier),
+					<strong class="font-semibold text-white">Gender</strong>, and cosmetic
+					<strong class="font-semibold text-white">Disposition</strong> badge, then let it
+					regenerate (or set a specific <strong class="font-semibold text-white">Seed</strong>). You
+					get a full NPC — appearance, personality trait/flaw/voice, motivation and secret, a plot
+					hook, and a complete D&amp;D 5e stat block (AC, HP, speed, ability scores, saves, skills,
+					CR/XP, traits, and actions). Click
+					<strong class="font-semibold text-white">Save NPC</strong>
+					to keep it in a "Saved NPCs" list, or
+					<strong class="font-semibold text-white">Export PDF</strong> to download the NPC as a handout.
 				</p>
 			</section>
+
+			<!-- 19 ─────────────────────────────────────── -->
+			<section id="liars-dice">
+				{@render h2('19', "Liar's Dice")}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Liar's Dice is a built-in bluffing dice minigame you can run with your players as a side
+					activity, separate from combat — useful for a tavern scene, a break between encounters, or
+					just a fun diversion. It runs over the same live session connection as combat, so it
+					updates instantly on the DM dashboard and every player's viewer screen.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Starting a Game (DM)
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Liar's Dice</strong> in the dashboard
+					header. Choose a role: <strong class="font-semibold text-white">Observe</strong> (see
+					everyone's dice and run the game without playing) or
+					<strong class="font-semibold text-white">Play</strong>
+					(join the table yourself with a normal hand). Click
+					<strong class="font-semibold text-white">Open Lobby</strong> to create the game; players then
+					join from their viewer screens and appear in the lobby list as they do.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Once at least 2 players have joined, click <strong class="font-semibold text-white"
+						>Start Game (N players)</strong
+					>. Every player starts with 5 dice — there are no other configurable house rules.
+					<strong class="font-semibold text-white">Cancel</strong> aborts the lobby.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Playing (Players)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					A <strong class="font-semibold text-white">Liar's Dice</strong> entry appears in the viewer's
+					header/hamburger menu once a game is active, opening a floating panel. After joining from the
+					lobby, each round the 3D dice roller animates and automatically rolls and submits your dice
+					(if you don't submit within 5 seconds, the server rolls for you). You'll see everyone's remaining
+					dice counts, your own dice face-up, the current bid, and whose turn it is.
+				</p>
+				{@render dataTable(
+					['Action', 'Button', 'Effect'],
+					[
+						[
+							'Raise the bid',
+							'Bid!',
+							'Must raise the face value, or keep the same face with a strictly higher quantity'
+						],
+						['Challenge the bid', '🎲 Liar!', 'Calls "Dudo" — forces an immediate reveal'],
+						['Claim it’s exact', '✓', 'Calls "Calza" — bets the current bid is exactly right']
+					]
+				)}
+				<p class="mt-4 mb-6 text-sm leading-relaxed">
+					<strong class="font-semibold text-white">Ones are wild</strong> (count toward any face) by
+					default. If any active player is down to their last die, that round automatically becomes
+					a
+					<strong class="font-semibold text-amber-300">⚠️ Palifico</strong> round: wilds are disabled,
+					and the face of the first bid that round locks all further bids to that same face.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Resolving a Round
+				</h3>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Dudo</strong> (Liar!): dice are revealed and counted
+						— if the actual count meets or beats the bid, the challenger loses a die; otherwise the bidder
+						does.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Calza</strong> (exact call): if the actual count
+						exactly matches the bid, the caller gains a die (up to a cap of 5); otherwise they lose one.
+					</li>
+					<li>A player who reaches 0 dice is eliminated and drops out of future rounds.</li>
+					<li>
+						The reveal screen shows everyone's dice and highlights matches, then auto-advances after
+						8 seconds (or click <strong class="font-semibold text-white">Next Round →</strong> to advance
+						immediately).
+					</li>
+					<li>
+						The game ends when one player remains — they're declared the winner. An
+						<strong class="font-semibold text-white">End Game</strong> button (with a confirmation) is
+						available to the DM at any time.
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					DM Controls
+				</h3>
+				<p class="text-sm leading-relaxed">
+					An Observing DM sees every player's dice face-up at all times, the current bid, bid
+					history, and a live event log, but cannot intervene in bids or force a turn to end. A
+					Playing DM has the same Bid/Liar/exact-call controls as any player.
+				</p>
+			</section>
+
+			<!-- 20 ─────────────────────────────────────── -->
+			<section id="stream-overlay">
+				{@render h2('20', 'Stream Overlay')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
+						>/overlay/[sessionId]</code
+					>
+					is a separate, transparent view designed to be added as an
+					<strong class="font-semibold text-white">OBS (or similar) browser source</strong> for streaming
+					your combat sessions — it is not part of the normal DM/player workflow and has no Liar's Dice
+					content.
+				</p>
+				<p class="mb-3 text-sm leading-relaxed">
+					It subscribes to the same live combat-state feed as the player display and shows:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						A <strong class="font-semibold text-white">"Now Acting"</strong> panel — portrait, HP bar,
+						condition badges, and the current round number
+					</li>
+					<li>
+						A scrolling <strong class="font-semibold text-white">combat event ticker</strong> — damage,
+						healing, and condition changes as they happen
+					</li>
+					<li>
+						An <strong class="font-semibold text-white">"Up Next"</strong> bar across the bottom showing
+						upcoming turns, with a wrap marker at the end of the round
+					</li>
+				</ul>
+				<p class="text-sm leading-relaxed">
+					The background is fully transparent and the overlay ignores mouse/click input, so it
+					composites cleanly over your other stream sources without blocking anything underneath.
+				</p>
+			</section>
+
 			{#if data.showVoiceCommands}
-				<!-- 18 ─────────────────────────────────────── -->
+				<!-- 21 ─────────────────────────────────────── -->
 				<section id="voice-commands">
-					{@render h2('18', 'Voice Commands (Beta)')}
+					{@render h2('21', 'Voice Commands (Beta)')}
 
 					<div
 						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
@@ -1807,491 +2556,125 @@
 						</li>
 					</ul>
 				</section>
-
-				<!-- 19 ─────────────────────────────────────── -->
-				<section id="audio-mixer">
-					{@render h2('19', 'Audio Mixer')}
-
-					<p class="mb-4 text-sm leading-relaxed">
-						Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the dashboard
-						header to open a full-screen ambient audio board. Layer music, atmosphere, and sound effects
-						across as many channels as you need — audio keeps playing in the background when the mixer
-						is closed.
-					</p>
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Channel Controls
-					</h3>
-					{@render dataTable(
-						['Control', 'What it does'],
-						[
-							['Label', 'Click to rename the channel — saved automatically'],
-							['Coloured dot', 'Status: grey = stopped, green = playing, amber = solo active'],
-							[
-								'File area',
-								'Click to pick an audio file from your device (see File Persistence below)'
-							],
-							['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
-							['▶ / ■ button', 'Start or stop playback on this channel'],
-							['S (Solo)', 'Solo this channel — mutes all others while active'],
-							['M (Mute)', 'Mute this channel without stopping playback'],
-							['✕', 'Remove the channel and delete its saved file reference']
-						]
-					)}
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Master Channel
-					</h3>
-					<p class="mb-4 text-sm leading-relaxed">
-						The leftmost strip is the master channel. Its fader scales every channel simultaneously.
-						The <strong class="font-semibold text-white">Stop All</strong> button stops playback on every
-						channel at once.
-					</p>
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Adding Channels
-					</h3>
-					<p class="mb-4 text-sm leading-relaxed">
-						Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end of
-						the mixer to append a new blank channel. The mixer starts with 5 channels; there is no maximum.
-					</p>
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						What Is Remembered
-					</h3>
-					{@render dataTable(
-						['Setting', 'Remembered?'],
-						[
-							['Channel count &amp; order', 'Always — saved in browser storage'],
-							['Channel labels', 'Always — saved in browser storage'],
-							['Volume faders (per channel &amp; master)', 'Always — saved in browser storage'],
-							['Selected audio files', 'Chrome / Edge only (see below) — not remembered on Firefox']
-						]
-					)}
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						File Persistence (Chrome &amp; Edge)
-					</h3>
-					<p class="mb-4 text-sm leading-relaxed">
-						On Chrome and Edge, the mixer uses the browser's
-						<strong class="font-semibold text-white">File System Access API</strong> to remember your
-						chosen files — it stores a lightweight reference to the file on disk rather than copying audio
-						data into browser storage, so there are no storage quota issues.
-					</p>
-					<p class="mb-2 text-sm font-semibold text-gray-200">Same browser session</p>
-					<p class="mb-4 text-sm leading-relaxed">
-						Files reload silently — permission is already held and nothing extra is required.
-					</p>
-					<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
-					<p class="mb-4 text-sm leading-relaxed">
-						The browser clears file permissions on exit. Channels that need re-authorization show a
-						<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber. Click
-						it once — the browser shows a one-time permission prompt — and the file reloads automatically.
-					</p>
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tips</h3>
-					<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
-						<li>
-							The mixer keeps playing after you close it — run combat while music plays in the
-							background
-						</li>
-						<li>
-							Use <strong class="font-semibold text-white">Solo</strong> to quickly audition a single
-							channel without changing other faders
-						</li>
-						<li>
-							Use <strong class="font-semibold text-white">Mute</strong> for a clean cut; setting the
-							fader to 0 still leaves the channel technically active
-						</li>
-						<li>
-							On Firefox, audio files must be re-selected after every page reload; consider keeping
-							the mixer tab open for long sessions
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset
-							faders or unload files
-						</li>
-					</ul>
-				</section>
-
-				<section id="quick-reference">
-					{@render h2('20', 'Quick Reference')}
-
-					<p class="mb-4 text-sm leading-relaxed">
-						The <strong class="font-semibold text-white">Quick Reference</strong> panel is a
-						full-screen reference opened from the
-						<strong class="font-semibold text-white">☰ hamburger menu</strong> in the DM header. It is
-						organised into 17 tabs covering both rules lookups and procedural generation tools.
-					</p>
-
-					<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Rules Tabs
-					</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						Twelve tabs provide concise, table-formatted lookups for the most commonly referenced 5e
-						rules mid-session:
-					</p>
-					{@render dataTable(
-						['Tab', 'Contents'],
-						[
-							[
-								'Actions in Combat',
-								'Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, Ready, Search, Use an Object'
-							],
-							[
-								'Bonus Actions',
-								'Common bonus actions by class and spell, two-weapon fighting, and healing potions'
-							],
-							[
-								'Movement & Position',
-								'Speed rules, difficult terrain, jumping, climbing, swimming, and prone'
-							],
-							[
-								'Conditions',
-								'All 15 standard 5e conditions with full mechanical effects and colour-coded badges'
-							],
-							['Concentration', 'Damage thresholds, what breaks concentration, and how to check'],
-							[
-								'Death Saving Throws',
-								'Stabilisation, success/failure thresholds, and instant death rules'
-							],
-							['Exhaustion', 'All 6 exhaustion levels and their effects'],
-							['Cover', 'Half cover (+2 AC/Dex saves), three-quarters cover (+5), and total cover'],
-							['Resting', 'Short rest and long rest rules including what each restores'],
-							[
-								'Skills & Ability Checks',
-								'All 18 skills with their associated ability scores and common DC benchmarks'
-							],
-							['Spellcasting', 'Spell slot usage, concentration, components, and ritual casting'],
-							[
-								'Magic & Casting',
-								'Spell attack rolls, saving throws, counterspell, and multi-class slot tables'
-							]
-						]
-					)}
-				</section>
-
-				<section id="qr-name-generator">
-					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Name Generator
-					</h3>
-
-					<p class="mb-3 text-sm leading-relaxed">
-						Generate fantasy names for NPCs, locations, and taverns on the fly.
-					</p>
-					{@render dataTable(
-						['Control', 'Description'],
-						[
-							[
-								'Type dropdown',
-								'Human (Male/Female), Elf, Dwarf, Halfling, Gnome, Orc, Tiefling, Dragonborn, Tavern Name, Town / Village'
-							],
-							['First Names', 'Generates 10 first names for the selected type'],
-							['Surnames', 'Generates 10 surnames (disabled for Tavern / Town types)'],
-							[
-								'Selecting a name',
-								'Click any name to select it (amber highlight). Click again to deselect. First name and surname can each be selected independently.'
-							],
-							[
-								'Save to Notes',
-								'Appears once a first name is selected. Appends "Party met Firstname Lastname, a Dwarf" to the latest session note, or creates a new note if none exists.'
-							]
-						]
-					)}
-				</section>
-
-				<section id="qr-weather-travel">
-					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Weather &amp; Travel
-					</h3>
-
-					<p class="mb-3 text-sm leading-relaxed">
-						Generate a week of weather and calculate adjusted travel speeds for any biome and season
-						combination.
-					</p>
-					{@render dataTable(
-						['Feature', 'Description'],
-						[
-							[
-								'Season',
-								'Spring, Summer, Autumn, or Winter — affects temperature ranges and weather probability'
-							],
-							['Biome', 'Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, or Jungle'],
-							[
-								'Generate Week',
-								'Produces a 7-day table with conditions across five daily time slots: Dawn, Morning, Midday, Afternoon, Night'
-							],
-							[
-								'Travel Pace table',
-								'Fast / Normal / Slow rates (ft/min, mph, miles/day) dynamically adjusted by the biome × season multiplier; a modifier badge shows the combined value'
-							],
-							['Navigation DC table', 'Suggested Survival check DCs for navigation by terrain type']
-						]
-					)}
-				</section>
-
-				<section id="qr-shop-generator">
-					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Shop Generator
-					</h3>
-
-					<p class="mb-3 text-sm leading-relaxed">
-						Instantly stock a shop with a random inventory scaled to the town's wealth.
-					</p>
-					{@render dataTable(
-						['Control', 'Description'],
-						[
-							[
-								'Shop type',
-								'11 options: General Store, Weapon Shop, Armor Shop, Alchemist, Magic Shop, Jeweler, Tavern, Bookshop, Herbalist, Fletcher, Stable'
-							],
-							[
-								'Town affluence',
-								'6 tiers from Impoverished (×0.6 prices, 4–6 items) to Opulent (×2.2 prices, 14–18 items)'
-							],
-							[
-								'Stock Shop',
-								'Generates a random shop name and a full item list with three price columns'
-							],
-							['Price columns', '😊 Friendly (−15%), 😐 Neutral (base), 😠 Hostile (+25%)'],
-							[
-								'Magic items',
-								'Higher affluence tiers include magic items of appropriate rarity (Common → Legendary) with colour-coded rarity badges'
-							],
-							[
-								'Item detail',
-								'Click any item row to open a detail overlay with the item description, rarity badge, and all three prices'
-							],
-							[
-								'Save to Notes',
-								'Appends "The party went to [Shop Name], a common general store" to the latest session note, or creates one if none exists'
-							]
-						]
-					)}
-				</section>
-
-				<section id="qr-encounter-generator">
-					<h3 class="mt-8 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Random Encounter Generator
-					</h3>
-
-					<p class="mb-3 text-sm leading-relaxed">
-						Generate a complete, balanced random encounter — flavor text, monsters, XP breakdown,
-						tactics, and terrain — tuned to your party's level and chosen difficulty.
-					</p>
-					{@render dataTable(
-						['Control', 'Description'],
-						[
-							[
-								'Biome / Terrain',
-								'12 options: Forest, Plains, Mountains, Desert, Arctic, Coastal, Swamp, Jungle, Underdark, Urban, Dungeon, Ruins'
-							],
-							['Party Size', '1–8 players — affects the XP multiplier and monster count'],
-							['Party Level', '1–20 — sets the XP budget tier from the DMG thresholds'],
-							[
-								'Difficulty',
-								'Easy, Medium, Hard, or Deadly — directly controls the XP budget and scales monster strength'
-							]
-						]
-					)}
-
-					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Generated Output
-					</h3>
-					<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
-						<li>
-							<strong class="font-semibold text-white">Title & difficulty badge</strong> — encounter name
-							with a colour-coded actual difficulty label (may differ from the requested difficulty)
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Scene flavor text</strong> — atmospheric description
-							of the encounter setting
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Encounter description</strong> — archetype-flavored
-							narration (Solo, Pack, Mixed, Ambush, or Swarm)
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Monster list</strong> — each monster with count
-							and individual XP value
-						</li>
-						<li>
-							<strong class="font-semibold text-white">XP breakdown</strong> — Raw XP → Multiplier → Adjusted
-							XP → XP per player
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Tactics</strong> — how the monsters behave in this
-							specific encounter
-						</li>
-						<li>
-							<strong class="font-semibold text-white">Terrain feature</strong> — an environmental detail
-							to use during the fight
-						</li>
-					</ul>
-					{@render dataTable(
-						['Button', 'Action'],
-						[
-							['Roll Again', 'Re-generates a new encounter with the same settings'],
-							[
-								'Add to Initiative',
-								'Clears current enemies, loads the generated monsters with auto-rolled initiative, and closes the Quick Reference panel'
-							]
-						]
-					)}
-				</section>
 			{/if}
 
-			<!-- 21 ─────────────────────────────────────── -->
-			<section id="dungeon-generator">
-				{@render h2('21', 'Random Dungeon Generator')}
+			<!-- 22 ─────────────────────────────────────── -->
+			<section id="audio-mixer">
+				{@render h2('22', 'Audio Mixer')}
+
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">🗺 Dungeon</strong> button in the DM
-					header to open the Random Dungeon Generator. Configure your options and click
-					<strong class="font-semibold text-white">Generate Dungeon</strong> to produce a complete tile-based
-					dungeon map with level-appropriate encounters, trapped doors, loot, and optional multi-floor
-					stairs.
+					Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the dashboard
+					header to open a full-screen ambient audio board. Layer music, atmosphere, and sound effects
+					across as many channels as you need — audio keeps playing in the background when the mixer is
+					closed.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-					Configuration
+					Channel Controls
 				</h3>
 				{@render dataTable(
-					['Setting', 'Description'],
+					['Control', 'What it does'],
 					[
-						['Party Size', 'Number of players — affects encounter XP budgets'],
-						['Party Level', 'Average party level — scales encounters, loot, and trap DCs'],
+						['Label', 'Click to rename the channel — saved automatically'],
+						['Coloured dot', 'Status: grey = stopped, green = playing, amber = solo active'],
 						[
-							'Dungeon Size',
-							'Small, Medium, or Large — controls the overall grid size and room count'
+							'File area',
+							'Click to pick an audio file from your device (see File Persistence below)'
 						],
-						['Difficulty', 'Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier'],
-						[
-							'Include Boss',
-							'Toggle on to guarantee a boss room with a harder encounter at the end'
-						],
-						['Floors', '1–5 floors; each floor is generated independently and connected by stairs']
+						['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
+						['▶ / ■ button', 'Start or stop playback on this channel'],
+						['S (Solo)', 'Solo this channel — mutes all others while active'],
+						['M (Mute)', 'Mute this channel without stopping playback'],
+						['✕', 'Remove the channel and delete its saved file reference']
 					]
 				)}
 
-				<!-- Reading the Map -->
-				<section id="dungeon-map">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Reading the Map
-					</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						The map is a tile-based top-down grid. Use the
-						<strong class="font-semibold text-white">− / +</strong> zoom controls in the top-right corner
-						to scale the view. On smaller screens the map scrolls both horizontally and vertically. A
-						north-pointing compass appears in the top-left corner.
-					</p>
-					{@render dataTable(
-						['Visual', 'Meaning'],
-						[
-							['Dark void', 'Impassable wall / empty space'],
-							['Stone floor with grid lines', 'Walkable room tile'],
-							['Corridor with grid lines', 'Hallway connecting rooms'],
-							['Door tile', 'Entry between a corridor and a room'],
-							['Red-framed door with !', 'Trapped door — click for trap details'],
-							['💰 icon', 'Room contains loot — click for treasure'],
-							['▲ / ▼ icon (white circle)', 'Staircase — click to navigate between floors']
-						]
-					)}
-					<p class="mt-3 text-sm leading-relaxed">
-						<strong class="font-semibold text-white">Room labels</strong> appear inside each room:
-						the entrance is marked <em>Entrance</em>, the boss room is marked <em>Boss</em>, and all
-						other rooms receive a themed name (e.g. <em>Crypt of Shadows</em>,
-						<em>Guard Post</em>).
-					</p>
-				</section>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Master Channel
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The leftmost strip is the master channel. Its fader scales every channel simultaneously.
+					The <strong class="font-semibold text-white">Stop All</strong> button stops playback on every
+					channel at once.
+				</p>
 
-				<!-- Room Encounters -->
-				<section id="dungeon-encounters">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Room Encounters
-					</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						Click any room on the map to open the
-						<strong class="font-semibold text-white">Encounter Panel</strong>. The panel shows the
-						room name and type, the enemy list with CR and individual XP values, a total XP
-						breakdown, and a difficulty badge (Trivial / Easy / Medium / Hard / Deadly). Click the
-						same room again to deselect it.
-					</p>
-				</section>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Adding Channels
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end of
+					the mixer to append a new blank channel. The mixer starts with 5 channels; there is no maximum.
+				</p>
 
-				<!-- Trapped Doors -->
-				<section id="dungeon-traps">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Trapped Doors
-					</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						Approximately <strong class="font-semibold text-white">25% of doors</strong> are
-						randomly trapped. They are drawn with a
-						<strong class="font-semibold text-white">red frame</strong>
-						and a white <strong class="font-semibold text-white">!</strong> in the center. Click a trapped
-						door to open the Trap modal:
-					</p>
-					{@render dataTable(
-						['Field', 'Description'],
-						[
-							['Name', 'The trap type — e.g. Poison Needle Trap, Collapsing Ceiling'],
-							['Trigger', 'How it activates — e.g. pressure plate, tripwire, arcane glyph'],
-							['DC', 'The Perception or Disarm DC to detect or disable the trap'],
-							['Effect', 'Damage or condition inflicted on a failed save']
-						]
-					)}
-				</section>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					What Is Remembered
+				</h3>
+				{@render dataTable(
+					['Setting', 'Remembered?'],
+					[
+						['Channel count &amp; order', 'Always — saved in browser storage'],
+						['Channel labels', 'Always — saved in browser storage'],
+						['Volume faders (per channel &amp; master)', 'Always — saved in browser storage'],
+						['Selected audio files', 'Chrome / Edge only (see below) — not remembered on Firefox']
+					]
+				)}
 
-				<!-- Loot -->
-				<section id="dungeon-loot">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Loot</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						<strong class="font-semibold text-white">25% of non-entrance rooms</strong> contain a
-						<strong class="font-semibold text-white">💰 moneybag icon</strong> in the room's bottom-right
-						inner corner. Click it to open the Loot modal showing a level-appropriate coin total and 0–2
-						items from the appropriate tier:
-					</p>
-					{@render dataTable(
-						['Party Level', 'Loot Tier', 'Example Items'],
-						[
-							['1–4', 'Common', "Healing Potion, Thieves' Tools, Torch Bundle"],
-							['5–10', 'Uncommon', 'Bag of Holding, Cloak of Protection, Sending Stones'],
-							['11–16', 'Rare', 'Ring of Evasion, Staff of Fire, Carpet of Flying'],
-							['17–20', 'Very Rare', 'Cloak of Invisibility, Manual of Bodily Health']
-						]
-					)}
-				</section>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					File Persistence (Chrome &amp; Edge)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					On Chrome and Edge, the mixer uses the browser's
+					<strong class="font-semibold text-white">File System Access API</strong> to remember your chosen
+					files — it stores a lightweight reference to the file on disk rather than copying audio data
+					into browser storage, so there are no storage quota issues.
+				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">Same browser session</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Files reload silently — permission is already held and nothing extra is required.
+				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					The browser clears file permissions on exit. Channels that need re-authorization show a
+					<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber. Click it
+					once — the browser shows a one-time permission prompt — and the file reloads automatically.
+				</p>
 
-				<!-- Multiple Floors -->
-				<section id="dungeon-floors">
-					<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
-						Multiple Floors
-					</h3>
-					<p class="mb-3 text-sm leading-relaxed">
-						When <strong class="font-semibold text-white">Floors</strong> is set to 2 or more, each floor
-						is generated independently and linked by staircases. Stair icons are placed in the corner
-						of their room:
-					</p>
-					{@render dataTable(
-						['Icon', 'Meaning'],
-						[
-							['▼', 'Stairs going deeper — down to the next floor below'],
-							['▲', 'Stairs going back up — to the floor above']
-						]
-					)}
-					<p class="mt-3 text-sm leading-relaxed">
-						Click any stair icon to open the <strong class="font-semibold text-white"
-							>Stairs modal</strong
-						>, which shows the direction and destination floor. Click
-						<strong class="font-semibold text-white">Go to Floor X</strong> to jump there. A
-						<strong class="font-semibold text-white">Floor dropdown</strong> also appears in the top-right
-						corner next to the zoom controls — select any floor directly from the list.
-					</p>
-					<p class="mt-3 text-sm leading-relaxed">
-						<strong class="font-semibold text-white">Floor 1</strong> is the ground floor (entry level).
-						Higher numbers go deeper underground — Floor 2 is one level below Floor 1, Floor 3 is one
-						level below Floor 2, and so on.
-					</p>
-				</section>
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tips</h3>
+				<ul class="ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						The mixer keeps playing after you close it — run combat while music plays in the
+						background
+					</li>
+					<li>
+						Use <strong class="font-semibold text-white">Solo</strong> to quickly audition a single channel
+						without changing other faders
+					</li>
+					<li>
+						Use <strong class="font-semibold text-white">Mute</strong> for a clean cut; setting the fader
+						to 0 still leaves the channel technically active
+					</li>
+					<li>
+						On Firefox, audio files must be re-selected after every page reload; consider keeping
+						the mixer tab open for long sessions
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Stop All</strong> stops playback but does not reset
+						faders or unload files
+					</li>
+				</ul>
+			</section>
+
+			<!-- 23 ─────────────────────────────────────── -->
+			<section id="contact">
+				{@render h2('23', 'Contact & Support')}
+				<p class="text-sm leading-relaxed">
+					Have a question, found a bug, or want to suggest a feature? Email us at
+					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
+						>dm@inittracker.com</a
+					>
+					— or click the <strong class="font-semibold text-white">✉ Contact</strong> link found on the
+					login page, the join page, and in both the DM and viewer headers.
+				</p>
 			</section>
 		</main>
 	</div>

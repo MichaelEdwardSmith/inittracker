@@ -32,11 +32,13 @@
 				<div class="flex items-center gap-3">
 					<span
 						class="rounded-full px-3 py-1 text-sm font-bold {conditionColors[condition] ??
-							'bg-gray-700 text-gray-200'}"
+							'bg-fuchsia-900/60 text-fuchsia-200'}"
 					>
 						{condition}
 					</span>
-					<span class="text-xs tracking-widest text-gray-500 uppercase">Condition</span>
+					<span class="text-xs tracking-widest text-gray-500 uppercase"
+						>{conditionColors[condition] ? 'Condition' : 'Spell Effect'}</span
+					>
 				</div>
 				<button
 					onclick={onclose}

@@ -135,3 +135,36 @@ export const ADV_CONDITIONS = [
 	'Disadvantage For',
 	'Disadvantage Against'
 ] as const;
+
+// ---------------------------------------------------------------------------
+// Spell effects — common buffs/debuffs a DM tracks on a combatant during combat.
+// Not exhaustive (anything can be added as a custom name); this is a quick-pick
+// list of the spells that come up most often.
+// ---------------------------------------------------------------------------
+
+export const SPELL_EFFECTS = [
+	'Aid',
+	'Bane',
+	'Barkskin',
+	'Bestow Curse',
+	'Bless',
+	'Blur',
+	'Enlarge',
+	'Faerie Fire',
+	'Fire Shield',
+	'Guidance',
+	'Haste',
+	'Heroism',
+	'Hex',
+	"Hunter's Mark",
+	'Mage Armor',
+	'Mirror Image',
+	'Reduce',
+	'Resistance',
+	'Sanctuary',
+	'Shield of Faith',
+	'Silenced',
+	'Slow',
+	'Stoneskin',
+	'Warding Bond'
+] as const;

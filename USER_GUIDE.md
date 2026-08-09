@@ -13,6 +13,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
    - [Importing from D&D Beyond](#importing-from-dd-beyond)
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
+   - [Undo](#undo)
+   - [Bulk Actions (AoE)](#bulk-actions-aoe)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
    - [Death Saving Throws](#death-saving-throws)
    - [Legendary Actions](#legendary-actions)
@@ -25,10 +27,29 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 13. [Encounter Builder](#13-encounter-builder)
 14. [Spell Reference](#14-spell-reference)
 15. [Player Messaging](#15-player-messaging)
-16. [Voice Commands _(Beta)_](#16-voice-commands-beta)
-17. [Audio Mixer](#17-audio-mixer)
-18. [Contact & Support](#18-contact--support)
-19. [Random Dungeon Generator](#19-random-dungeon-generator)
+16. [Quick Reference](#16-quick-reference)
+17. [Generators](#17-generators)
+    - [Weather & Travel](#171-weather--travel)
+    - [Random Encounter](#172-random-encounter)
+    - [Wilderness Encounter](#173-wilderness-encounter)
+    - [Name Generator](#174-name-generator)
+    - [Town Generator](#175-town-generator)
+    - [Shop Generator](#176-shop-generator)
+    - [Inn Generator](#177-inn-generator)
+    - [Dungeon Generator](#178-dungeon-generator)
+    - [Wizard's Tower](#179-wizards-tower)
+    - [Cult / Secret Society](#1710-cult--secret-society)
+    - [Thieves' Guild](#1711-thieves-guild)
+    - [Trade Caravan](#1712-trade-caravan)
+    - [Black Market](#1713-black-market)
+    - [Noble House](#1714-noble-house)
+    - [Graveyard / Crypt](#1715-graveyard--crypt)
+    - [NPC Generator](#1716-npc-generator)
+18. [Liar's Dice](#18-liars-dice)
+19. [Stream Overlay](#19-stream-overlay)
+20. [Voice Commands _(Beta)_](#20-voice-commands-beta)
+21. [Audio Mixer](#21-audio-mixer)
+22. [Contact & Support](#22-contact--support)
 
 ---
 
@@ -36,18 +57,17 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 
 ### Creating an Account
 
-Navigate to `/register` and fill in:
-
-- **First & Last Name**
-- **Email** — your login identifier
-- **Password** — minimum 8 characters
-- **Confirm Password** — must match
-
-Click **Create Account**. You will be taken directly to your DM dashboard.
+Navigate to `/register` and either fill in the email/password form (**First & Last Name**, **Email**, **Password** — minimum 8 characters, **Confirm Password**), or click **Continue with Google** to sign up with your Google account instead. Click **Create Account** (or complete the Google flow). You will be taken directly to your DM dashboard.
 
 ### Logging In
 
-Go to `/login`, enter your email and password, and click **Enter**. You will land on your DM dashboard, with your last active combat state restored.
+Go to `/login` and sign in one of three ways:
+
+- **Email and password** — enter your credentials and click **Enter**
+- **Continue with Google**
+- **Continue with Discord**
+
+All three land you on your DM dashboard with your last active combat state restored. If you just want to try the app, click **Enter as Guest** on the login page — you'll get a temporary DM account with no email/password required.
 
 ### Logging Out
 
@@ -57,12 +77,24 @@ Click the **logout icon** (arrow pointing right) in the top-right corner of the 
 
 ## 2. Getting Started (Players)
 
-Players do **not** need an account. Your DM will give you a **6-character Session ID** (e.g. `AB3X9K`).
+Players do **not** need an account — a **6-character Session ID** (e.g. `AB3X9K`) from your DM is enough:
 
 1. Navigate to `/join`
 2. Type in the Session ID (it auto-formats to uppercase)
-3. Click **Join Session**
+3. Click **Continue as Guest**
 4. You will be taken to the live **Player Display** for that session
+
+### Optional: Player Accounts
+
+If you'd rather not retype the Session ID every session, you can sign in on `/join` via the "sign in for a better experience" section (**Continue with Google**, **Continue with Discord**, or an email/password account at `/player/register` / `/player/login`). Signed-in players get:
+
+- A **"Your Sessions"** list on `/join` for one-tap rejoining of any session you've previously joined
+- A persistent display name/avatar (pulled from your Google/Discord profile, or set at registration) used as your default identity in DM messaging and Liar's Dice whenever you haven't picked a specific in-game character
+- A **"Not you? Sign out"** link if you need to switch accounts
+
+Signing in is entirely optional — the classic "type the code, join as guest" flow still works exactly as before.
+
+### The Join Gate
 
 On the display screen, tap **Join Session** to enable live audio effects, or **Continue without sound** if you prefer a silent view.
 
@@ -78,20 +110,27 @@ The dashboard is your command center. It is divided into three panels:
 | **Center**        | Initiative Order |
 | **Right sidebar** | Enemy Library    |
 
-On mobile, the sidebars are hidden behind a bottom action bar — tap **Party** or **Enemies** to open them as overlays.
+On mobile, the sidebars are hidden behind a bottom action bar — tap **Party** or **Enemies** to open them as overlays. All header actions below are also reachable from a **☰ hamburger menu** on small screens.
 
 ### Header Bar
 
-The header runs across the top of every screen. From left to right:
+The header runs across the top of every screen. Its actions include:
 
 - **⚔️ Initiative Tracker** — app title
-- **Session display** — shows the active session name and its 6-char public ID
-  - Click the **copy icon** next to the ID to copy it to your clipboard (the icon turns into a green checkmark to confirm)
-- **Messages** — shows unread player messages; opens the DM inbox
-- **Dice** — opens the Dice Roller modal (see [Dice Roller](#12-dice-roller))
-- **Sessions** — opens the Session Manager modal (see [Game Sessions](#10-game-sessions))
-- **Chronicle** — opens the Combat History page
+- **Session display** — shows the active session name and its 6-char public ID; click the **copy icon** next to the ID to copy it to your clipboard (the icon turns into a green checkmark to confirm)
 - **Guide** — opens the in-app user guide
+- **Messages** — shows unread player messages; opens the DM inbox
+- **Notes** — opens the current session's DM notes
+- **Dice Roller** — opens the Dice Roller modal (see [Dice Roller](#12-dice-roller))
+- **Liar's Dice** — starts or joins a Liar's Dice game (see [Liar's Dice](#18-liars-dice))
+- **Spells** — opens the Spell Reference (see [Spell Reference](#14-spell-reference))
+- **Voice** _(Chrome/Edge only)_ — enables hands-free voice commands (see [Voice Commands](#20-voice-commands-beta))
+- **Mixer** — opens the Audio Mixer (see [Audio Mixer](#21-audio-mixer))
+- **Quick Reference** — opens the rules-lookup panel (see [Quick Reference](#16-quick-reference))
+- **Generators** — opens the content-generator hub (see [Generators](#17-generators))
+- **Encounters** — opens the Encounter Builder (see [Encounter Builder](#13-encounter-builder))
+- **Sessions** — opens the Session Manager modal (see [Game Sessions](#10-game-sessions))
+- **History** — opens the Combat Chronicle page
 - **Player Display** — opens the viewer screen in a new tab (desktop only)
 - **Contact** — opens your email client to contact support
 - **Logout** — ends your session
@@ -138,6 +177,8 @@ The character's **D&D Beyond portrait** is imported automatically and set as the
 ### Player Avatars
 
 Each player card shows a circular avatar. Click the avatar circle to upload an image (JPEG/PNG). The image is automatically cropped to a square and resized to 256×256. To remove an avatar, hover over it and click the **✕** button that appears.
+
+On the initiative order (the DM's center panel), clicking a player's avatar opens it full-size in a lightbox preview — click outside the image, press **Escape**, or click the **✕** to close it.
 
 ### Editing a Player
 
@@ -223,14 +264,14 @@ A button is dimmed and inactive when there is no same-initiative neighbour in th
 
 ### Starting Combat
 
-Once at least one combatant has an initiative set, click **Start Combat**. The combatant with the highest initiative becomes the active turn (highlighted in amber with a glowing border). The round counter starts at **1**.
+Once at least one combatant has an initiative set, click **Start Combat**. The combatant with the highest initiative becomes the active turn (highlighted in amber with a glowing border), the tracker auto-scrolls to bring them into view, and the round counter starts at **1**.
 
 ### Advancing Turns
 
 - Click **Next** to advance to the next combatant in order. When the last combatant acts, the round counter increments and the turn wraps back to the top.
 - Click **Prev** to go back one turn (useful for corrections).
 
-Dead enemies (0 HP) are automatically skipped — they are excluded from the turn rotation.
+Both buttons auto-scroll the tracker to keep the active combatant in view. Dead enemies (0 HP) are automatically skipped — they are excluded from the turn rotation.
 
 ### Ending Combat
 
@@ -238,12 +279,38 @@ Click **End** to conclude the current combat. The encounter is automatically sav
 
 ### Utility Buttons
 
-| Button            | What it does                                                           |
-| ----------------- | ---------------------------------------------------------------------- |
-| **Reset Init**    | Clears all initiative values and resets the round counter to 1         |
-| **Reset Players** | Restores all players to max HP, removes temp HP and all conditions     |
-| **Clear Enemies** | Removes all enemies from the combat tracker                            |
-| **Save**          | Saves a snapshot of the current combat to Chronicles without ending it |
+| Button            | What it does                                                                                                                |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **↺ Undo**        | Reverts the most recent damage/heal, condition/effect, or turn change (see [Undo](#undo))                                   |
+| **AoE**           | Opens the bulk-action modal for damage, healing, conditions, or spell effects (see [Bulk Actions (AoE)](#bulk-actions-aoe)) |
+| **Reset Init**    | Clears all initiative values and resets the round counter to 1                                                              |
+| **Reset Players** | Restores all players to max HP, removes temp HP and all conditions                                                          |
+| **Clear Enemies** | Removes all enemies from the combat tracker                                                                                 |
+| **Save**          | Saves a snapshot of the current combat to Chronicles without ending it                                                      |
+
+### Undo
+
+The **↺ Undo** button in the initiative order toolbar reverts the single most recent action from this list: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save update, or a turn advance/rewind. It's greyed out when there's nothing to undo.
+
+Undo is **single-level** — taking any other action after the one you want to undo clears the undo slot, so you can't chain multiple undos. The button stays available across the DM dashboard's own live-update echo of your last change (so it doesn't flicker unavailable a moment after you act), but it does clear if a genuinely different external change comes in first — e.g. a player rolling their own initiative on the viewer screen.
+
+### Bulk Actions (AoE)
+
+Click **AoE** in the initiative order toolbar to open a modal for applying one action to several combatants at once — handy for fireballs, auras, or any effect that hits the whole party or a whole group of enemies. The modal has two tabs:
+
+**Damage / Heal tab:**
+
+1. The combatant list shows every active combatant (benched players and lair cards are excluded) with checkboxes — all are selected by default; click a row to deselect it
+2. Check **Saved** on any combatant who made a saving throw for half damage
+3. Type an **Amount**, then click **− Damage** or **+ Heal** to apply it to every selected, un-saved combatant at once (saved combatants take half, rounded per the usual damage rules) in a single sync
+4. Any concentration checks triggered by the damage are queued and shown after the modal closes, just like single-target damage
+
+**Condition / Effect tab:**
+
+1. Same combatant checklist, but the **Saved** column now means "made their save — unaffected," excluding that combatant from the effect
+2. Choose a condition from the dropdown — any of the 15 standard conditions, the four Advantage/Disadvantage markers, a spell effect from the quick-pick list, or **Custom…** to type a freeform name
+3. Optionally set a number of **Rounds** for the effect to last (leave blank for indefinite)
+4. Click **Apply** to add it to every selected, un-saved combatant in one sync; combatants who already have that status are silently skipped rather than having it toggled off
 
 ---
 
@@ -326,7 +393,7 @@ Two buttons resolve the check:
 - **Success** — closes the modal; the Concentrating condition remains
 - **Fail** — closes the modal and automatically removes the Concentrating condition from that combatant
 
-This works for both players and enemies.
+This works for both players and enemies, including when the damage is applied through the [Bulk Actions (AoE)](#bulk-actions-aoe) modal.
 
 ---
 
@@ -385,25 +452,34 @@ By default, enemy AC is hidden from the player display. To reveal an enemy's AC 
 
 ## 8. Conditions & Status Effects
 
-### Adding a Condition
+### Adding a Condition or Spell Effect
 
-Click the **+ Condition** button on any combatant row. A dropdown menu lists 15 conditions:
+Click the **+ Condition/Spell Effect** button on any combatant row. A dropdown menu lists:
 
-Blinded · Charmed · Concentrating · Deafened · Exhausted · Frightened · Grappled · Incapacitated · Invisible · Paralyzed · Petrified · Poisoned · Prone · Restrained · Stunned
+- **Conditions** — the 15 standard conditions: Blinded · Charmed · Concentrating · Deafened · Exhausted · Frightened · Grappled · Incapacitated · Invisible · Paralyzed · Petrified · Poisoned · Prone · Restrained · Stunned
+- **Adv / Disadv** — the four Advantage/Disadvantage markers (Advantage For, Advantage Against, Disadvantage For, Disadvantage Against)
+- **Spell Effects** — a quick-pick list of common buffs/debuffs (Bless, Bane, Haste, Slow, Hunter's Mark, Hex, Mage Armor, Barkskin, and more)
+- **Custom** — a text field at the bottom of the menu for any other spell or effect name (up to 50 characters); type a name and click **Add** or press **Enter**
 
 > **Note:** Dead and Unconscious are not in the selectable list. When a **player** reaches 0 HP, they automatically become Unconscious (all other conditions are cleared) and a death saving throw tracker appears on their row — see [Death Saving Throws](#death-saving-throws). Enemies at 0 HP are simply removed from the turn order.
 
-Click any condition to apply it. Conditions already active are hidden from the list.
+Click any condition or spell effect to apply it. Conditions/effects already active on that combatant are hidden from the list (except the custom field, which is always available). If you set a number of rounds in the timing prompt, the effect is automatically removed once that many rounds have elapsed; leave it blank for an indefinite effect you remove manually.
 
-### Viewing a Condition Description
+Standard conditions and Adv/Disadv markers are styled as grey badges; spell effects (whether from the quick-pick list or typed as custom) are styled as fuchsia badges to visually distinguish "official condition" from "tracked spell/buff."
 
-Each active condition badge has a small **ⓘ info icon** on its right edge. Clicking it opens a modal with the condition's name and a summary of its mechanical effects (e.g. what saves it imposes, what it prevents, etc.). This works on both the DM dashboard and the Player Display.
+### Viewing a Condition or Spell Effect Description
 
-### Removing a Condition
+Each active badge has a small **ⓘ info icon** on its right edge. Clicking it opens a modal with the name and a summary of its mechanical effects — for standard conditions this is the rules text (e.g. what saves it imposes, what it prevents); for the built-in quick-pick spell effects it's a short mechanical summary (e.g. Bless: "Add 1d4 to attack rolls and saving throws while concentrating"); for a freeform custom name with no known description it shows "No description available." The modal labels the badge **"Condition"** or **"Spell Effect"** depending on which it is. This works on both the DM dashboard and the Player Display.
 
-On the **DM screen**, click the condition name portion of the badge to remove it immediately. The info icon and the remove action are separate — clicking the ⓘ only opens the description, it does not remove the condition.
+### Removing a Condition or Spell Effect
 
-Conditions are displayed as color-coded badges on both the DM dashboard and the live player display. Condition changes trigger a visual flash and audio cue on the viewer screen.
+On the **DM screen**, click the name portion of the badge to remove it immediately. The info icon and the remove action are separate — clicking the ⓘ only opens the description, it does not remove the condition.
+
+Conditions and spell effects are displayed as color-coded badges on both the DM dashboard and the live player display. Changes trigger a visual flash and audio cue on the viewer screen.
+
+### Applying to Multiple Combatants at Once
+
+To apply the same condition or spell effect to several combatants in one action (e.g. a fireball's Frightened save, or a party-wide Bless), use the **Condition / Effect** tab of the [Bulk Actions (AoE)](#bulk-actions-aoe) modal instead of adding it one row at a time.
 
 ---
 
@@ -428,6 +504,7 @@ The viewer header contains several actions. On **desktop** they are always visib
 | **🔊 / 🔇**         | Toggle all sound effects on or off                                                               |
 | **Message DM**      | Send a private message to the DM (appears when party members exist)                              |
 | **Roll Initiative** | Roll your character's initiative and submit it to the tracker (appears when party members exist) |
+| **Liar's Dice**     | Join and play a Liar's Dice game the DM has started (appears once a game is active)              |
 | **Contact**         | Opens your email client to contact support                                                       |
 | **⛶ Fullscreen**    | Toggles fullscreen mode — ideal for a TV or projector                                            |
 
@@ -445,7 +522,7 @@ The viewer header contains several actions. On **desktop** they are always visib
 - The combatant's **name** in large responsive text with a colored glow
 - A **stats row**: Initiative · Armor Class · Hit Points (players only)
 - An **HP bar** (players only) with color coding and a yellow temp HP extension
-- Any **active conditions** as color-coded badges
+- Any **active conditions and spell effects** as color-coded badges
 - An **"Up Next"** strip at the bottom showing the next 1–4 combatants in order
 
 The background subtly glows blue during a player's turn and red during an enemy's turn.
@@ -471,7 +548,7 @@ Click **Message DM** in the header (or hamburger menu on mobile) to open the mes
 2. Type your message
 3. Click **Send Message**
 
-A confirmation appears briefly, then the modal closes. The DM sees a live unread count badge on their Messages button and can read the full inbox at any time.
+A confirmation appears briefly, then the modal closes. The DM sees a live unread count badge on their Messages button and can read the full inbox at any time. If you're signed in with a player account, your account's display name is used as a fallback identity anywhere a character name would otherwise be shown.
 
 ### Flash Effects
 
@@ -637,6 +714,7 @@ Virtual dice fire on **every roll surface in the app**:
 - Clickable dice expressions in monster stat blocks (damage rolls, attack rolls, saving throws, skill checks)
 - Clickable dice in spell descriptions
 - Legendary action dice and attack rolls
+- Liar's Dice rolls
 - Voice command dice rolls ("Tracker roll d20", etc.)
 
 **Disabling virtual dice:** A **Disable virtual dice** checkbox at the bottom of the Dice Roller modal switches to instant results with no animation. The preference is saved between sessions. When disabled, all rolls across the entire app return to instant results.
@@ -681,7 +759,7 @@ Click **New Encounter** to expand the builder form.
    - **Difficulty badge** — based on the party size and level inputs at the top of the modal
 7. Click **Save Encounter** to persist it to your account
 
-> **Tip:** Encounters are stored at the account level and are available in every game session — build your library once and reuse it across campaigns.
+> **Tip:** Encounters are stored at the account level and are available in every game session — build your library once and reuse it across campaigns. You can also generate a ready-made encounter with the [Random Encounter](#172-random-encounter) or [Wilderness Encounter](#173-wilderness-encounter) generators and send it straight to the tracker with **Add to Initiative**.
 
 ### Difficulty Calculation
 
@@ -771,13 +849,215 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 
 ---
 
-## 18. Contact & Support
+## 16. Quick Reference
 
-Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
+Click the **Quick Reference** button (document icon) in the dashboard header to open a full-screen rules-lookup panel — pure D&D 5e reference material, no randomization or content generation (for that, see [Generators](#17-generators)).
+
+### Layout
+
+A left sidebar lists every rules category; the right panel shows the selected one. The panel is aware of your session's ruleset (2014 or 2024) and adjusts tables accordingly where the rules differ.
+
+### Categories
+
+15 tabs, alphabetized:
+
+| Tab                      | Contents                                                                                                                                                                    |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ability Check DCs**    | Difficulty-to-DC table (Very Easy 5 → Nearly Impossible 30), contested checks, passive checks, group checks                                                                 |
+| **Actions in Combat**    | Quick lookup of the standard combat actions                                                                                                                                 |
+| **Bonus Actions**        | Common bonus-action options                                                                                                                                                 |
+| **Common Save DCs**      | Spell save DC formula, concentration saves, grapple/shove contests, trap and poison DCs, and a save-DC lookup grid by ability modifier × proficiency bonus                  |
+| **Concentration**        | Concentration rules summary                                                                                                                                                 |
+| **Conditions**           | The 15 standard conditions and their effects                                                                                                                                |
+| **Cover**                | Half/three-quarters/full cover rules                                                                                                                                        |
+| **Death Saving Throws**  | The death save rules (see also [Death Saving Throws](#death-saving-throws) for the in-tracker version)                                                                      |
+| **Encounter Difficulty** | Ruleset-aware: 2014 shows the DMG XP-threshold table and monster-count multiplier; 2024 shows the new XP Budget table                                                       |
+| **Exhaustion**           | Exhaustion level effects                                                                                                                                                    |
+| **Light & Vision**       | Light-level effects, vision types (Darkvision, Blindsight, Tremorsense, Truesight), obscurement rules                                                                       |
+| **Magic & Casting**      | Casting times, ritual casting, spell components, area-of-effect shapes, spell attack vs. saving throw                                                                       |
+| **Magic Items List**     | A searchable, filterable DMG magic item database (armor, potions, rings, rods, staffs, wands, weapons) with a detail pane showing source, attunement, cost, and description |
+| **Movement & Position**  | Movement, difficult terrain, and positioning rules                                                                                                                          |
+| **Resting**              | Short rest / long rest rules                                                                                                                                                |
 
 ---
 
-## 17. Audio Mixer
+## 17. Generators
+
+Click the **Generators** button (gear/flower icon) in the dashboard header to open a full-screen hub of 16 D&D 5e content generators — names, settlements, factions, dungeons, and more. Unlike Quick Reference, everything here is randomized and can be regenerated, tweaked, and (for most tools) saved for later.
+
+### Layout
+
+A left sidebar lists all 16 generators by icon and name; click one to load it into the right-hand content panel. Most tools regenerate their output **live** as you change any control — there's often no separate "Generate" button beyond a **Randomize** action that rerolls the random seed. Tools that support saving keep a small "Saved [Things]" list in their left panel, backed by your browser's local storage (not your DM account, so saved items are per-browser).
+
+### 17.1 Weather & Travel
+
+Pick a **Season** and **Biome** (4 seasons × 8 biomes), then click **Generate Week** to produce a 7-day weather table across five time slots (Dawn, Morning, Midday, Evening, Night). A **Travel Pace** table dynamically adjusts movement rates by the combined biome × season multiplier, with a badge showing the active modifier, plus a **Navigation DC** table.
+
+A **Generate Weather Event** button produces a standalone dramatic weather event card (intensity: minor/moderate/severe/extreme) with a name, duration, onset, description, a "Mechanics" bullet list, and an "Aftermath" note — driven by your current Season/Biome selection.
+
+### 17.2 Random Encounter
+
+Select a biome/terrain (12 options), **Party Size** (1–8), **Party Level** (1–20), and **Difficulty** (Easy/Medium/Hard/Deadly), then click **Generate** to produce a fully XP-budgeted combat encounter: title, scene flavor text, archetype description, a monster list with individual XP values, an XP breakdown strip (raw → multiplier → adjusted → per-player), an actual difficulty badge, a tactics note, and a terrain feature. **Roll Again** re-generates with the same settings; **Add to Initiative** clears current enemies and loads the generated monsters directly into the initiative tracker, then closes the panel.
+
+### 17.3 Wilderness Encounter
+
+A narrative-first counterpart to Random Encounter: pick a **Terrain** (10 options), **Time of Day** (Dawn/Morning/Afternoon/Dusk/Night), and **Party Level**, then click **Roll Encounter**. The result is one of six encounter types — Combat, Hazard, Discovery, Flora & Fauna, Travelers, or Mystery (weighted toward the non-combat types) — with a headline, a time-of-day-flavored scene line, a terrain-specific detail paragraph, a Complication/Opportunity pair, and 2–3 relevant skills. There's no difficulty control or monster stat block here — use [Random Encounter](#172-random-encounter) when you need an XP-budgeted fight, and Wilderness Encounter when you want an evocative road/travel moment instead.
+
+### 17.4 Name Generator
+
+Select a race/type — 11 options: Human (Male), Human (Female), Elf, Dwarf, Halfling, Gnome, Orc/Half-Orc, Tiefling, Dragonborn, Tavern Name, Town/Village — then click **First Names** and/or **Surnames** to generate 10 of each. Click any name to select it (amber highlight); a preview strip shows "Party met **Firstname Lastname**, a Dwarf," and **Save to Notes** appends the entry to the current session's DM notes (creating a note if none exists).
+
+### 17.5 Town Generator
+
+Set a **Town Name** (auto-filled, freely editable), **Settlement Size** (Thorp → Metropolis), **Wealth** (Poor → Wealthy), and whether it **Has Keep**, then click **Randomize** for a new town (or just edit the fields — the town regenerates live). The output includes a prose "About [Town]" description, an optional Keep section (Great Hall, Barracks, Armory, and size-dependent Chapel/Dungeon/Lord's Chambers), and grouped building sections (Civic & Religious, Inns & Taverns, Trades & Services, Farms & Outbuildings, Residences) — each building has a name, description, and NPC roster.
+
+Buildings with an inventory (shops, smithies, stables, inns, taverns, temples) have a **View Inventory/Menu/Services** button showing 7–10 priced items with a **Restock** option. Every building also has a **Floor Plan** button that opens an embedded third-party floor-plan generator (seeded to that building) with its own **New Layout** reroll and an **Open ↗** link to view it full-page. Click **Save Town** to keep it in a "Saved Towns" list.
+
+### 17.6 Shop Generator
+
+Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic Shop, Jeweler, Tavern & Inn, Bookshop, Herbalist, Fletcher & Bowyer, Stable) and town affluence (6 tiers: Impoverished → Opulent), then click **Stock Shop** to generate a random named shop with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items appropriate to affluence are included. Click any item for a detail modal.
+
+Click **Save to Notes** to open a small prompt for which city/town the shop is in (optional), then save — the note records the shop, its city, affluence, and type, plus a full itemized inventory list. A **"Previously Visited Shops"** section with **Load from Notes** lets you pull any shop you've saved back out of your DM notes to view or reload later.
+
+### 17.7 Inn Generator
+
+Pick an **Inn Quality** (Poor → Legendary), **Party Size**, and **Party Level**, then click **Randomize**. You get a named inn with an italic tagline, an owner (with race and backstory), a staff roster, a Food/Drink menu with prices, room types/rates, a set of 3–6 level-scaled **Guests and Quests** (each with a Hook/Complication/Goal/Reward and a difficulty badge), and a **Rumor Mill** of 3–4 overheard rumors (each secretly flagged True or False for the DM's reference). Click **Save Inn** to keep it in a "Saved Inns" list.
+
+### 17.8 Dungeon Generator
+
+A from-scratch port of the classic Donjon dungeon algorithm, wrapped in this app's encounter/treasure/hazard/puzzle systems. Configure **Rows/Cols** (grid size), **Corridors** (Labyrinth/Bent/Straight), **Floors** (1–9), a **Theme** (⚰️ Crypt, Sewer, Cave, 🏰 Fortress, 🔮 Arcane, 🍄 Fungal), an optional **Boss Room**, and **Party Size/Level**/**Difficulty** (recorded for reference), then click **Generate**.
+
+The map renders on a zoomable canvas with a room/corridor/door/trap/loot/stairs legend. The **Encounters** panel lists every room with its monster encounter (dice-based counts, clickable monster names), treasure line, hazard line, and — on about a fifth of empty rooms — a collapsible **puzzle** (Riddle/Logic/Environmental) with a Show/Hide Solution toggle. Each room with an encounter has an **+ Add to Initiative** button. About a quarter of doors (plus some corridor cells) are locked or trapped — click one for a detail popup (name, trigger, detect/pick DC, effect/save).
+
+Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via floor tabs. Toggle **🗺️ Map Live** to push the current floor to players and manually reveal corridors/doors/rooms as you explore (a fog-of-war system, not an instant full reveal). **Save**/**Load** persist dungeons to your browser; **PDF** exports a print-ready, per-floor GM handout with the map and a full room table.
+
+### 17.9 Wizard's Tower
+
+Set **Party Size**, **Party Level** (shown as a Tier, which affects apprentice frequency/tier), and **Number of Floors** (2–8), then click **Randomize**. You get a named tower with a school-of-magic badge, an exterior description, and a Wizard Status (Present, Absent, Deceased, or Transformed, with a specific reason). Each floor has a themed room (Laboratory, Library, Summoning Chamber, etc.), and may include a **Magical Anomaly** (a weird localized physics quirk), an **Apprentice** (with a disposition and interaction note), and/or a dangerous **Experiment** (with a danger-level badge). Click **Save Tower** to keep it in a "Saved Towers" list.
+
+### 17.10 Cult / Secret Society
+
+Set **Party Size** and **Party Level** (higher levels skew the organization toward more advanced/dangerous stages), then click **Randomize**. You get a cult name, type badge, symbol, public cover, doctrine, a goal with an operational **Stage** (cell/established/ascendant/critical), three named rituals, a leadership structure, and two covert recognition signs. Click **Save Cult** to keep it in a "Saved Cults" list.
+
+### 17.11 Thieves' Guild
+
+Click **Generate New Den** for a criminal organization: guild name and internal alias, a **Heat** badge (Cold/Warm/Hot/Burning), district, cover business, secret entrance, a 5-room den layout, a 4-member leadership hierarchy, a 5-item fence inventory, and a **Current Job Board** of 3–4 expandable jobs (type, risk, payout, and — when expanded — target, details, and a twist). Also includes a house rule and a current rumor. Click **Save Den** to keep it in a "Saved Dens" list.
+
+### 17.12 Trade Caravan
+
+Click **Generate New Caravan** for a merchant caravan on the road: a route (origin → destination), size badge, caravan master, a stat strip (wagons, days out/remaining, guard quality), a cargo manifest (with a 35% chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a complication, and an overheard rumor. Click **Save Caravan** to keep it in a "Saved Caravans" list.
+
+### 17.13 Black Market
+
+Click **Generate New Market** for an illicit marketplace: market name, location, **Heat** badge, cover business, access method, a broker NPC, a "Today's Condition" situational event, and 5–7 inventory items each with a legal-status badge, risk badge, and a legal-vs-street price comparison. Also includes a house rule and a "Word on the Street" rumor. Click **Save Market** to keep it in a "Saved Markets" list.
+
+### 17.14 Noble House
+
+Click **Generate New House** for a noble family: a heraldically-accurate shield/motto/rank banner (field and charge tinctures follow the real rule of contrast), holdings (seat, territory, resource, military strength, income tier), political alliances, a rival house with a feud cause, current scandals (type + severity + description), a succession note, and a public-reputation summary. Click **Save House** to keep it in a "Saved Houses" list.
+
+### 17.15 Graveyard / Crypt
+
+Set **Party Size** and **Party Level** (which sets a Tier that skews site type and scales content), then click **Generate New Site**. You get a burial site (Graveyard/Crypt/Catacomb/Barrow/Ossuary) with a condition badge, an optional keeper NPC, a layout of 4–5 sections, several notable graves with epitaphs and plot hooks, expandable **Haunts** (trigger + manifestation + resolution), expandable **Buried Treasure Hooks** (location + contents + complication), a recent event, and a local rumor. Click **Save Site** to keep it in a "Saved Sites" list.
+
+### 17.16 NPC Generator
+
+Choose a **Role** (10 options: Commoner, Merchant, Guard, Innkeeper, Noble, Criminal, Retired Adventurer, Sage, Clergy, Soldier), **Gender**, and cosmetic **Disposition** badge, then let it regenerate (or set a specific **Seed**). You get a full NPC — appearance, personality trait/flaw/voice, motivation and secret, a plot hook, and a complete D&D 5e stat block (AC, HP, speed, ability scores, saves, skills, CR/XP, traits, and actions). Click **Save NPC** to keep it in a "Saved NPCs" list, or **Export PDF** to download the NPC as a handout.
+
+---
+
+## 18. Liar's Dice
+
+Liar's Dice is a built-in bluffing dice minigame you can run with your players as a side activity, separate from combat — useful for a tavern scene, a break between encounters, or just a fun diversion. It runs over the same live session connection as combat, so it updates instantly on the DM dashboard and every player's viewer screen.
+
+### Starting a Game (DM)
+
+Click **Liar's Dice** in the dashboard header. Choose a role:
+
+- **Observe** — see everyone's dice and run the game without playing
+- **Play** — join the table yourself with a normal hand
+
+Click **Open Lobby** to create the game; players then join from their viewer screens and appear in the lobby list as they do. Once at least 2 players have joined, click **Start Game (N players)**. Every player starts with 5 dice — there are no other configurable house rules. **Cancel** aborts the lobby.
+
+### Playing (Players)
+
+A **Liar's Dice** entry appears in the viewer's header/hamburger menu once a game is active, opening a floating panel. After joining from the lobby, each round the 3D dice roller animates and automatically rolls and submits your dice (if you don't submit within 5 seconds, the server rolls for you). You'll see everyone's remaining dice counts, your own dice face-up, the current bid, and whose turn it is.
+
+On your turn:
+
+| Action            | Button       | Effect                                                                           |
+| ----------------- | ------------ | -------------------------------------------------------------------------------- |
+| Raise the bid     | **Bid!**     | Must raise the face value, or keep the same face with a strictly higher quantity |
+| Challenge the bid | **🎲 Liar!** | Calls "Dudo" — forces an immediate reveal                                        |
+| Claim it's exact  | **✓**        | Calls "Calza" — bets the current bid is exactly right                            |
+
+**Ones are wild** (count toward any face) by default. If any active player is down to their last die, that round automatically becomes a **⚠️ Palifico** round: wilds are disabled, and the face of the first bid that round locks all further bids to that same face.
+
+### Resolving a Round
+
+- **Dudo** (Liar!): the dice are revealed and counted — if the actual count meets or beats the bid, the challenger loses a die; otherwise the bidder does.
+- **Calza** (exact call): if the actual count exactly matches the bid, the caller gains a die (up to a cap of 5); otherwise they lose one.
+- A player who reaches 0 dice is eliminated and drops out of future rounds.
+- The reveal screen shows everyone's dice and highlights matches, then auto-advances after 8 seconds (or click **Next Round →** to advance immediately).
+- The game ends when one player remains — they're declared the winner. An **End Game** button (with a confirmation) is available to the DM at any time.
+
+### DM Controls
+
+An Observing DM sees every player's dice face-up at all times, the current bid, bid history, and a live event log, but cannot intervene in bids or force a turn to end. A Playing DM has the same Bid/Liar/exact-call controls as any player.
+
+---
+
+## 19. Stream Overlay
+
+`/overlay/[sessionId]` is a separate, transparent view designed to be added as an **OBS (or similar) browser source** for streaming your combat sessions — it is not part of the normal DM/player workflow and has no Liar's Dice content.
+
+It subscribes to the same live combat-state feed as the player display and shows:
+
+- A **"Now Acting"** panel — portrait, HP bar, condition badges, and the current round number
+- A scrolling **combat event ticker** — damage, healing, and condition changes as they happen
+- An **"Up Next"** bar across the bottom showing upcoming turns, with a wrap marker at the end of the round
+
+The background is fully transparent and the overlay ignores mouse/click input, so it composites cleanly over your other stream sources without blocking anything underneath.
+
+---
+
+## 20. Voice Commands _(Beta)_
+
+> ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
+
+Click the **🎤 Voice** button in the DM dashboard header to enable hands-free control of the tracker. The button is only visible when your browser supports speech recognition.
+
+### Activating Voice Commands
+
+Click **Voice** to start listening. The button turns amber with a **pulsing dot** to indicate the microphone is active. The browser will prompt for microphone permission the first time you enable it. Click the button again at any time to stop listening.
+
+### Supported Commands
+
+Speak clearly and naturally. Every command begins with the wake word **"Tracker"** so the app ignores normal table conversation.
+
+| Say                                  | Action                                                     |
+| ------------------------------------ | ---------------------------------------------------------- |
+| **"Tracker Next"**                   | Advance to the next combatant's turn                       |
+| **"Tracker Previous"**               | Go back to the previous combatant's turn                   |
+| **"Tracker Start Combat"**           | Start the combat (equivalent to clicking **Start Combat**) |
+| **"Tracker End Combat"**             | End the current combat and save it to Chronicles           |
+| **"Tracker roll d20"**               | Roll a single d20 — 3D dice animate on screen              |
+| **"Tracker roll two d6 plus three"** | Roll 2d6+3 — number words and modifiers are supported      |
+| **"Tracker roll a d100"**            | Roll a d100 (percentile)                                   |
+
+**Dice rolls via voice** trigger the same 3D virtual dice animation as clicking dice anywhere in the app. The result appears in a toast once the dice settle.
+
+A small **confirmation toast** appears at the bottom of the screen whenever a command is successfully recognized.
+
+### Tips
+
+- Commands only trigger when appropriate — for example, **"Tracker Next"** does nothing if combat has not started yet
+- If **"Tracker End Combat"** is not recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"
+- The microphone listens continuously and auto-restarts after silence; you do not need to re-click the button between commands
+- Click **Voice** again (or navigate away) to stop the microphone
+
+---
+
+## 21. Audio Mixer
 
 Click the **🎚 Mixer** button in the DM dashboard header to open the full-screen audio mixer. Use it to layer ambient sounds — dungeon ambience, tavern noise, battle music — that play in the background while you run your session.
 
@@ -837,135 +1117,6 @@ When you pick a file on Chrome or Edge, the mixer saves a lightweight **referenc
 
 ---
 
-## 19. Random Dungeon Generator
+## 22. Contact & Support
 
-Click the **🗺 Dungeon** button in the DM dashboard header to open the Random Dungeon Generator. This tool procedurally creates a complete multi-room dungeon map with level-appropriate encounters, traps, loot, and stairs between floors.
-
-### Configuration
-
-Set the following options before generating:
-
-| Setting          | Description                                                               |
-| ---------------- | ------------------------------------------------------------------------- |
-| **Party Size**   | Number of players (affects encounter XP budgets)                          |
-| **Party Level**  | Average party level (scales encounters, loot, and trap DCs)               |
-| **Dungeon Size** | Small, Medium, or Large — controls the overall grid size and room count   |
-| **Difficulty**   | Easy, Medium, Hard, or Deadly — sets the encounter difficulty tier        |
-| **Include Boss** | Toggle on to guarantee a boss room with a harder encounter at the end     |
-| **Floors**       | 1–5 floors; each floor is generated independently and connected by stairs |
-
-Click **Generate Dungeon** to build the map. Regenerating replaces the entire dungeon.
-
-### Reading the Map
-
-The map is a tile-based top-down grid rendered on canvas. Use the **zoom controls** (− / +) in the top-right corner to scale the view. On smaller screens the map scrolls both horizontally and vertically — slide left and right to reach the full width.
-
-**Cell types:**
-
-| Visual                        | Meaning                                               |
-| ----------------------------- | ----------------------------------------------------- |
-| Dark void                     | Impassable wall / empty space                         |
-| Stone floor (with grid lines) | Walkable room tile                                    |
-| Corridor (with grid lines)    | Hallway connecting rooms                              |
-| Door tile                     | Entry between a corridor and a room                   |
-| Red-framed door with **!**    | Trapped door (see [Trapped Doors](#trapped-doors-1))  |
-| 💰 icon                       | Room contains loot (see [Loot](#loot-1))              |
-| ▲ / ▼ icon (white circle)     | Staircase (see [Multiple Floors](#multiple-floors-1)) |
-
-**Room labels** appear on the map in each room: the entrance room is marked **Entrance**, the boss room is marked **Boss**, and all other rooms are given a themed name (e.g. _Crypt of Shadows_, _Guard Post_).
-
-A north-pointing **compass** is drawn in the top-left corner of the map.
-
-### Room Encounters
-
-Click any room on the map to open the **Encounter Panel** below (or to the side on wider screens). The panel shows:
-
-- **Room name** and type
-- **Enemy list** — the monsters in that encounter with their count, CR, and XP
-- **XP summary** — total raw XP and adjusted XP for the encounter
-- **Difficulty badge** — Trivial / Easy / Medium / Hard / Deadly
-
-The "Click a room to view its encounter" hint disappears once a room is selected. Click the same room again to deselect it.
-
-### Trapped Doors
-
-Approximately **25% of doors** are randomly trapped. Trapped doors are drawn with a **red frame** and a white **!** in the center.
-
-Click a trapped door to open the **Trap modal**, which shows:
-
-| Field       | Description                                                          |
-| ----------- | -------------------------------------------------------------------- |
-| **Name**    | The type of trap (e.g. _Poison Needle Trap_, _Collapsing Ceiling_)   |
-| **Trigger** | How it activates (e.g. _pressure plate_, _tripwire_, _arcane glyph_) |
-| **DC**      | The Perception or Disarm DC to detect/disable it                     |
-| **Effect**  | The damage or condition the trap inflicts on a failed save           |
-
-Close the modal with the **✕** button or by clicking outside it.
-
-### Loot
-
-**25% of non-entrance rooms** contain a **💰 moneybag icon** in the room's bottom-right inner corner. Click the icon to open the **Loot modal**, which shows level-appropriate treasure:
-
-- **Coins** — a gold piece total scaled to the party level
-- **Items** — 0–2 items drawn from a tier-appropriate table:
-
-| Party Level | Loot Tier | Example Items                                       |
-| ----------- | --------- | --------------------------------------------------- |
-| 1–4         | Common    | Healing Potion, Thieves' Tools, Torch Bundle        |
-| 5–10        | Uncommon  | Bag of Holding, Cloak of Protection, Sending Stones |
-| 11–16       | Rare      | Ring of Evasion, Staff of Fire, Carpet of Flying    |
-| 17–20       | Very Rare | Cloak of Invisibility, Manual of Bodily Health      |
-
-Close the modal with the **✕** button or by clicking outside it.
-
-### Multiple Floors
-
-When **Floors** is set to 2 or more, each floor is generated as an independent dungeon and connected by staircases.
-
-**Stair icons:**
-
-- **▼ (down arrow)** — stairs going deeper into the dungeon (to the next floor below)
-- **▲ (up arrow)** — stairs going back up (to the floor above)
-
-Stairs are drawn as white circular icons placed in the **corner of their room**. Click a stair icon to open the **Stairs modal**, which tells you the direction and destination floor. Click **Go to Floor X** to jump directly to that floor.
-
-**Floor selector:** When a dungeon has more than one floor, a **Floor dropdown** appears in the top-right corner next to the zoom controls. Select any floor from the list to view it. Switching floors resets the selected room.
-
-> **Floor 1** is the ground floor (entry level). Higher floor numbers go deeper underground — Floor 2 is one level below Floor 1, Floor 3 is one level below Floor 2, and so on.
-
----
-
-## 16. Voice Commands _(Beta)_
-
-> ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
-
-Click the **🎤 Voice** button in the DM dashboard header to enable hands-free control of the tracker. The button is only visible when your browser supports speech recognition.
-
-### Activating Voice Commands
-
-Click **Voice** to start listening. The button turns amber with a **pulsing dot** to indicate the microphone is active. The browser will prompt for microphone permission the first time you enable it. Click the button again at any time to stop listening.
-
-### Supported Commands
-
-Speak clearly and naturally. Every command begins with the wake word **"Tracker"** so the app ignores normal table conversation.
-
-| Say                                  | Action                                                     |
-| ------------------------------------ | ---------------------------------------------------------- |
-| **"Tracker Next"**                   | Advance to the next combatant's turn                       |
-| **"Tracker Previous"**               | Go back to the previous combatant's turn                   |
-| **"Tracker Start Combat"**           | Start the combat (equivalent to clicking **Start Combat**) |
-| **"Tracker End Combat"**             | End the current combat and save it to Chronicles           |
-| **"Tracker roll d20"**               | Roll a single d20 — 3D dice animate on screen              |
-| **"Tracker roll two d6 plus three"** | Roll 2d6+3 — number words and modifiers are supported      |
-| **"Tracker roll a d100"**            | Roll a d100 (percentile)                                   |
-
-**Dice rolls via voice** trigger the same 3D virtual dice animation as clicking dice anywhere in the app. The result appears in a toast once the dice settle.
-
-A small **confirmation toast** appears at the bottom of the screen whenever a command is successfully recognized.
-
-### Tips
-
-- Commands only trigger when appropriate — for example, **"Tracker Next"** does nothing if combat has not started yet
-- If **"Tracker End Combat"** is not recognized, try saying it slightly more slowly — speech engines sometimes hear "end" as "and"
-- The microphone listens continuously and auto-restarts after silence; you do not need to re-click the button between commands
-- Click **Voice** again (or navigate away) to stop the microphone
+Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
