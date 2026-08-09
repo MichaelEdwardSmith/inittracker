@@ -1,9 +1,11 @@
-<!-- AoE Damage modal — apply one damage/heal value to multiple combatants at once.
-     Supports per-combatant "saved for half" checkbox. Fires onconcentrationchecks
+<!-- AoE Damage modal — apply one damage/heal value, or a single condition/spell effect, to
+     multiple combatants at once. The "Saved" checkbox means half damage in Damage/Heal mode,
+     or "made their save — unaffected" in Condition/Effect mode. Fires onconcentrationchecks
      with any concentration saves that need to be resolved after applying damage. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
+	import { hpPercent, hpBarColor, hpTextColor, conditionColors } from '$lib/utils';
+	import { CONDITIONS, ADV_CONDITIONS, SPELL_EFFECTS } from '$lib/enemies';
 
 	interface ConcentrationCheck {
 		id: string;
@@ -19,15 +21,22 @@
 
 	let { onclose, onconcentrationchecks }: Props = $props();
 
+	const CUSTOM_VALUE = '__custom';
+
 	// Active combatants only — exclude lair cards and benched players
 	const combatants = $derived(
 		combat.sorted.filter((c) => c.type !== 'lair' && c.inCombat !== false)
 	);
 
+	let mode = $state<'damage' | 'condition'>('damage');
+
 	// Treat undefined as selected (true). Only false = explicitly deselected.
 	let selected = $state<Record<string, boolean>>({});
 	let saved = $state<Record<string, boolean>>({});
 	let amount = $state('');
+	let selectedEffect = $state('');
+	let customEffect = $state('');
+	let effectRounds = $state('');
 
 	const isSelected = (id: string) => selected[id] !== false;
 
@@ -71,7 +80,22 @@
 		onclose();
 	}
 
-	const valid = $derived(parseInt(amount) > 0);
+	function applyCondition() {
+		const name = (selectedEffect === CUSTOM_VALUE ? customEffect : selectedEffect).trim();
+		if (!name) return;
+		const targets = combatants
+			.filter((c) => isSelected(c.id) && !saved[c.id])
+			.map((c) => ({ id: c.id }));
+		if (targets.length === 0) return;
+		const rounds = parseInt(effectRounds);
+		combat.applyBulkStatus(targets, name, isNaN(rounds) || rounds <= 0 ? undefined : rounds);
+		onclose();
+	}
+
+	const damageValid = $derived(parseInt(amount) > 0);
+	const conditionValid = $derived(
+		(selectedEffect === CUSTOM_VALUE ? customEffect : selectedEffect).trim().length > 0
+	);
 </script>
 
 <svelte:window
@@ -117,6 +141,24 @@
 			</button>
 		</div>
 
+		<!-- Mode tabs -->
+		<div class="flex gap-1 border-b border-gray-800 px-4 pt-3">
+			<button
+				onclick={() => (mode = 'damage')}
+				class="rounded-t px-3 py-1.5 text-xs font-semibold transition
+			       {mode === 'damage' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'}"
+			>
+				Damage / Heal
+			</button>
+			<button
+				onclick={() => (mode = 'condition')}
+				class="rounded-t px-3 py-1.5 text-xs font-semibold transition
+			       {mode === 'condition' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'}"
+			>
+				Condition / Effect
+			</button>
+		</div>
+
 		<!-- Column headers -->
 		<div
 			class="flex items-center gap-3 border-b border-gray-800 px-4 py-2 text-[10px] font-semibold tracking-wider text-gray-600 uppercase"
@@ -131,7 +173,7 @@
 			>
 			<span class="flex-1">Combatant</span>
 			<span class="w-20 text-right">HP</span>
-			<span class="w-10 text-center">Half</span>
+			<span class="w-10 text-center">{mode === 'damage' ? 'Half' : 'Saved'}</span>
 		</div>
 
 		<!-- Combatant list -->
@@ -176,7 +218,7 @@
 						>{c.currentHp}/{c.maxHp}</span
 					>
 
-					<!-- Saved (half) checkbox -->
+					<!-- Saved (half dmg, or no-effect in condition mode) checkbox -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						onclick={(e) => {
@@ -189,7 +231,7 @@
 								if (isSelected(c.id)) saved[c.id] = !saved[c.id];
 							}
 						}}
-						title="Saved for half"
+						title={mode === 'damage' ? 'Saved for half' : 'Saved — no effect'}
 						class="flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center rounded border text-[9px] transition
 						       {saved[c.id] && isSelected(c.id)
 							? 'border-blue-400 bg-blue-500 text-white'
@@ -205,40 +247,110 @@
 			{/if}
 		</div>
 
-		<!-- Footer: amount input + action buttons -->
-		<div class="flex items-center gap-2 border-t border-gray-700 px-4 py-3">
-			<!-- svelte-ignore a11y_autofocus -->
-			<input
-				autofocus
-				bind:value={amount}
-				type="number"
-				min="1"
-				placeholder="Amount"
-				onkeydown={(e) => {
-					if (e.key === 'Enter') applyDamage();
-				}}
-				class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-center text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
-			/>
-			<button
-				onclick={applyDamage}
-				disabled={!valid}
-				class="flex-1 rounded bg-red-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
-			>
-				− Damage
-			</button>
-			<button
-				onclick={applyHeal}
-				disabled={!valid}
-				class="flex-1 rounded bg-green-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
-			>
-				+ Heal
-			</button>
-			<button
-				onclick={onclose}
-				class="rounded border border-gray-700 px-3 py-1.5 text-sm text-gray-400 transition hover:border-gray-600 hover:text-white"
-			>
-				Cancel
-			</button>
-		</div>
+		{#if mode === 'damage'}
+			<!-- Footer: amount input + action buttons -->
+			<div class="flex items-center gap-2 border-t border-gray-700 px-4 py-3">
+				<!-- svelte-ignore a11y_autofocus -->
+				<input
+					autofocus
+					bind:value={amount}
+					type="number"
+					min="1"
+					placeholder="Amount"
+					onkeydown={(e) => {
+						if (e.key === 'Enter') applyDamage();
+					}}
+					class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-center text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
+				/>
+				<button
+					onclick={applyDamage}
+					disabled={!damageValid}
+					class="flex-1 rounded bg-red-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					− Damage
+				</button>
+				<button
+					onclick={applyHeal}
+					disabled={!damageValid}
+					class="flex-1 rounded bg-green-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
+				>
+					+ Heal
+				</button>
+				<button
+					onclick={onclose}
+					class="rounded border border-gray-700 px-3 py-1.5 text-sm text-gray-400 transition hover:border-gray-600 hover:text-white"
+				>
+					Cancel
+				</button>
+			</div>
+		{:else}
+			<!-- Footer: condition/effect picker -->
+			<div class="flex flex-col gap-2 border-t border-gray-700 px-4 py-3">
+				<div class="flex items-center gap-2">
+					<!-- svelte-ignore a11y_autofocus -->
+					<select
+						autofocus
+						bind:value={selectedEffect}
+						class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+					>
+						<option value="" disabled selected>Choose a condition or effect…</option>
+						<optgroup label="Conditions">
+							{#each CONDITIONS as cond}
+								<option value={cond}>{cond}</option>
+							{/each}
+						</optgroup>
+						<optgroup label="Adv / Disadv">
+							{#each ADV_CONDITIONS as cond}
+								<option value={cond}>{cond}</option>
+							{/each}
+						</optgroup>
+						<optgroup label="Spell Effects">
+							{#each SPELL_EFFECTS as effect}
+								<option value={effect}>{effect}</option>
+							{/each}
+						</optgroup>
+						<option value={CUSTOM_VALUE}>Custom…</option>
+					</select>
+					<input
+						bind:value={effectRounds}
+						type="number"
+						min="1"
+						placeholder="Rounds"
+						title="Rounds (optional — blank for indefinite)"
+						class="w-20 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-center text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
+					/>
+				</div>
+				{#if selectedEffect === CUSTOM_VALUE}
+					<input
+						bind:value={customEffect}
+						type="text"
+						maxlength="50"
+						placeholder="Custom condition / effect name…"
+						onkeydown={(e) => {
+							if (e.key === 'Enter') applyCondition();
+						}}
+						class="rounded border border-fuchsia-700/60 bg-gray-800 px-2 py-1.5 text-sm text-fuchsia-100 focus:border-fuchsia-500 focus:outline-none"
+					/>
+				{/if}
+				<div class="flex items-center gap-2">
+					<button
+						onclick={applyCondition}
+						disabled={!conditionValid}
+						class="flex-1 rounded px-3 py-1.5 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-40
+					       {conditionColors[selectedEffect]
+							? 'bg-violet-800 hover:bg-violet-700'
+							: 'bg-fuchsia-800 hover:bg-fuchsia-700'}"
+					>
+						Apply
+					</button>
+					<button
+						onclick={onclose}
+						class="rounded border border-gray-700 px-3 py-1.5 text-sm text-gray-400 transition hover:border-gray-600 hover:text-white"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>

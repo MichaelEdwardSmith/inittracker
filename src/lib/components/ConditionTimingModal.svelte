@@ -1,7 +1,12 @@
 <!-- Condition timing modal — asks how long a condition should last before applying it. -->
 <script lang="ts">
 	interface Props {
-		pending: { id: string; combatantName: string; condition: string } | null;
+		pending: {
+			id: string;
+			combatantName: string;
+			condition: string;
+			kind?: 'condition' | 'spell';
+		} | null;
 		onconfirmtimed: (rounds: number) => void;
 		onconfirmindefinite: () => void;
 		oncancel: () => void;
@@ -28,7 +33,7 @@
 			<div class="flex items-center gap-2 border-b border-violet-900/40 px-5 py-3">
 				<span class="text-violet-400">⏱</span>
 				<span class="text-sm font-bold tracking-widest text-violet-300 uppercase"
-					>Add Condition</span
+					>Add {pending.kind === 'spell' ? 'Spell Effect' : 'Condition'}</span
 				>
 			</div>
 			<div class="px-5 py-4">
@@ -36,7 +41,9 @@
 					Adding <span class="font-bold text-white">{pending.condition}</span> to
 					<span class="font-bold text-violet-300">{pending.combatantName}</span>
 				</p>
-				<p class="mb-4 text-xs text-gray-500">How long should this condition last?</p>
+				<p class="mb-4 text-xs text-gray-500">
+					How long should this {pending.kind === 'spell' ? 'effect' : 'condition'} last?
+				</p>
 				<div class="flex items-center gap-3">
 					<label
 						for="condition-rounds-input"

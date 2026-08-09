@@ -57,6 +57,30 @@ type ParticipantStat = {
 	wasSlain: boolean;
 };
 
+/** Snapshot of the fields a single-level undo can restore. */
+type UndoSnapshot = {
+	combatants: Combatant[];
+	currentTurnId: string | null;
+	round: number;
+	combatEvents: CombatEvent[];
+	combatStartedAt: string | null;
+	participantStats: Map<string, ParticipantStat>;
+};
+
+// Methods that push a snapshot before running, so `undo()` can revert them. Every other
+// mutating method instead clears the snapshot (see the Proxy at the bottom of this file) —
+// otherwise undo could silently discard an unrelated change made after the snapshot was taken.
+const UNDOABLE_METHODS = new Set([
+	'adjustHp',
+	'applyAoE',
+	'applyBulkStatus',
+	'toggleStatus',
+	'setTempHp',
+	'setDeathSaves',
+	'nextTurn',
+	'prevTurn'
+]);
+
 function createCombatStore() {
 	let combatants = $state<Combatant[]>([]);
 	let currentTurnId = $state<string | null>(null);
@@ -70,6 +94,41 @@ function createCombatStore() {
 	let suppressSync = false;
 	let dungeonRoomDescription = $state<StorageState['dungeonRoomDescription']>(null);
 	let dungeonMapState = $state<StorageState['dungeonMapState']>(null);
+
+	let lastSnapshot = $state<UndoSnapshot | null>(null);
+
+	function snapshotForUndo() {
+		lastSnapshot = {
+			combatants,
+			currentTurnId,
+			round,
+			combatEvents,
+			combatStartedAt,
+			participantStats: new Map(participantStats)
+		};
+	}
+
+	/** Cheap, order-independent-safe fingerprint of the fields undo cares about — used to
+	 *  tell a genuine external change (another tab/device) apart from the SSE echo of our
+	 *  own last sync (see applyExternalState). Builds a fresh object with fixed key order
+	 *  instead of stringifying combatants directly, so it isn't sensitive to property
+	 *  insertion order surviving (or not) a server round-trip. */
+	function undoFingerprint(list: Combatant[], turnId: string | null, r: number): string {
+		return JSON.stringify({
+			turnId,
+			r,
+			list: list.map((c) => ({
+				id: c.id,
+				hp: c.currentHp,
+				thp: c.tempHp,
+				init: c.initiative,
+				statuses: c.statuses,
+				rounds: c.conditionRounds ?? {},
+				legendary: c.legendaryActionsSpent ?? null,
+				death: c.deathSaves ?? null
+			}))
+		});
+	}
 
 	function sync() {
 		if (suppressSync) return;
@@ -231,7 +290,7 @@ function createCombatStore() {
 		participantStats = new Map();
 	}
 
-	return {
+	const api = {
 		get combatants() {
 			return combatants;
 		},
@@ -256,6 +315,24 @@ function createCombatStore() {
 		get hasCombatHistory() {
 			return combatStartedAt !== null;
 		},
+		get canUndo() {
+			return lastSnapshot !== null;
+		},
+
+		/** Reverts the most recent damage/heal, condition/effect, or turn-advance action.
+		 *  Single-level — any other action taken in between clears the ability to undo. */
+		undo() {
+			if (!lastSnapshot) return;
+			const snap = lastSnapshot;
+			combatants = snap.combatants;
+			currentTurnId = snap.currentTurnId;
+			round = snap.round;
+			combatEvents = snap.combatEvents;
+			combatStartedAt = snap.combatStartedAt;
+			participantStats = snap.participantStats;
+			lastSnapshot = null;
+			sync();
+		},
 
 		/** Show or hide a dungeon room description on the player display. */
 		setDungeonRoomDescription(desc: StorageState['dungeonRoomDescription']) {
@@ -268,11 +345,20 @@ function createCombatStore() {
 			sync();
 		},
 
-		/** Apply state received from an external source (e.g. SSE) without syncing back. */
+		/** Apply state received from an external source (e.g. SSE) without syncing back.
+		 *  The DM dashboard subscribes to its own session's SSE stream (so e.g. a
+		 *  player-rolled initiative shows up live), which means every local sync() echoes
+		 *  straight back here a moment later. Only drop the undo snapshot when the incoming
+		 *  state actually differs from what we already had — a genuine external change —
+		 *  not on that self-echo, or undo would never stay available long enough to use. */
 		applyExternalState(s: StorageState) {
+			const before = undoFingerprint(combatants, currentTurnId, round);
 			combatants = s.combatants;
 			currentTurnId = s.currentTurnId;
 			round = s.round;
+			if (undoFingerprint(s.combatants, s.currentTurnId, s.round) !== before) {
+				lastSnapshot = null;
+			}
 		},
 
 		/** Hydrate store from the server — call once on DM page mount. */
@@ -460,6 +546,43 @@ function createCombatStore() {
 			}
 			suppressSync = false;
 			syncToServer({ combatants, currentTurnId, round, aoeEvents });
+		},
+
+		/** Apply a condition/spell effect to multiple combatants in a single sync — used by
+		 *  the bulk "Condition/Effect" tab in AoEDamageModal. Skips any target that already
+		 *  has the status so it never accidentally removes it (unlike toggleStatus). */
+		applyBulkStatus(targets: Array<{ id: string }>, status: string, rounds?: number) {
+			const targetIds = new Set(targets.map((t) => t.id));
+			const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
+			const actorFields = actor
+				? { actorId: actor.id, actorName: actor.name, actorType: actor.type as 'player' | 'enemy' }
+				: {};
+			const addedEvents: CombatEvent[] = [];
+			combatants = combatants.map((c) => {
+				if (!targetIds.has(c.id) || c.statuses.includes(status)) return c;
+				if (combatStartedAt !== null) {
+					addedEvents.push({
+						type: 'condition_add',
+						round,
+						...actorFields,
+						combatantId: c.id,
+						combatantName: c.name,
+						combatantType: c.type as 'player' | 'enemy',
+						condition: status
+					});
+				}
+				const statuses = [...c.statuses, status];
+				if (rounds !== undefined && rounds > 0) {
+					return {
+						...c,
+						statuses,
+						conditionRounds: { ...(c.conditionRounds ?? {}), [status]: rounds }
+					};
+				}
+				return { ...c, statuses };
+			});
+			if (addedEvents.length > 0) combatEvents = [...combatEvents, ...addedEvents];
+			sync();
 		},
 
 		setTempHp(id: string, value: number) {
@@ -702,6 +825,29 @@ function createCombatStore() {
 			saveRecordToServer(record);
 		}
 	};
+
+	// Wrap every method so undo bookkeeping can't be forgotten on a future addition: an
+	// UNDOABLE_METHODS call snapshots state first; any other mutating call invalidates the
+	// existing snapshot (it may reference combatants/state that call would otherwise change
+	// underneath it). `undo` and `applyExternalState` manage lastSnapshot themselves (see
+	// their own definitions above) and plain getters pass straight through unwrapped.
+	const SELF_MANAGED_METHODS = new Set(['undo', 'applyExternalState']);
+	return new Proxy(api, {
+		get(target, prop, receiver) {
+			const value = Reflect.get(target, prop, receiver);
+			if (typeof value !== 'function' || SELF_MANAGED_METHODS.has(prop as string)) {
+				return value;
+			}
+			return (...args: unknown[]) => {
+				if (UNDOABLE_METHODS.has(prop as string)) {
+					snapshotForUndo();
+				} else {
+					lastSnapshot = null;
+				}
+				return (value as (...a: unknown[]) => unknown).apply(target, args);
+			};
+		}
+	});
 }
 
 export const combat = createCombatStore();

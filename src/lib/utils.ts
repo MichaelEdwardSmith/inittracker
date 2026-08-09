@@ -55,7 +55,43 @@ const conditionDescriptions2024Overrides: Partial<Record<string, string>> = {
 		'Can only crawl, or spend half Speed to stand up. Disadvantage on attack rolls. Attacks from within 5 ft. have advantage; attacks from farther away have disadvantage.'
 };
 
-/** Returns the correct condition description for the given edition. */
+// Descriptions for the SPELL_EFFECTS quick-pick list (see src/lib/enemies.ts). Custom,
+// freely-typed spell effect names fall through to the generic "no description" text.
+export const spellEffectDescriptions: Record<string, string> = {
+	Bless: 'Add 1d4 to attack rolls and saving throws while concentrating.',
+	Bane: 'Subtract 1d4 from attack rolls and saving throws while concentrating.',
+	"Hunter's Mark":
+		'Deals an extra 1d6 damage to the marked target on hit; caster has advantage on Wisdom (Perception) or Wisdom (Survival) checks to find it.',
+	Hex: 'Deals an extra 1d6 necrotic damage to the cursed target on hit; caster has disadvantage on ability checks with the chosen ability.',
+	Guidance: 'Add 1d4 to one ability check before the spell ends.',
+	Resistance: 'Add 1d4 to one saving throw before the spell ends.',
+	'Shield of Faith': '+2 bonus to AC while concentrating.',
+	'Mage Armor': 'AC becomes 13 + DEX modifier (if not wearing armor) for the duration.',
+	Barkskin: "AC can't be lower than 16, regardless of armor worn.",
+	Stoneskin: 'Resistance to nonmagical bludgeoning, piercing, and slashing damage.',
+	'Fire Shield':
+		'Wreathed in flame, shedding light and gaining resistance to cold or fire damage; melee attackers take 2d8 fire or cold damage.',
+	Haste:
+		'Speed doubled, +2 AC, advantage on DEX saves, and an extra action (attack, dash, disengage, hide, or use object).',
+	Slow: 'Speed halved, -2 AC and DEX saves, and can only take an action or a bonus action, not both.',
+	Heroism: 'Immune to being frightened; gains temporary HP each turn while concentrating.',
+	Enlarge: 'Size doubles, gains advantage on STR checks/saves, and deals an extra 1d4 damage.',
+	Reduce: 'Size halved, disadvantage on STR checks/saves, and deals 1d4 less damage.',
+	'Faerie Fire':
+		'Outlined in light; attacks against it have advantage, and it can’t benefit from being invisible.',
+	Sanctuary: 'Attackers must make a Wisdom save or choose a new target; ends if it attacks.',
+	'Warding Bond': '+1 AC and saves, resistance to all damage; caster takes the same damage taken.',
+	'Bestow Curse':
+		'Disadvantage on ability checks/attacks with a chosen ability, disadvantage on saves of one type, or caster deals extra 1d8 damage to it (DM choice of effect).',
+	'Mirror Image':
+		'Three illusory duplicates; attackers may hit a duplicate instead of the real target.',
+	Blur: 'Attackers have disadvantage on attack rolls against it due to its blurred, shifting form.',
+	Silenced:
+		"Can't cast spells with verbal components and no sound can be heard from within the area.",
+	Aid: 'Maximum and current HP increased by 5 (or more at higher levels) for the duration.'
+};
+
+/** Returns the correct condition/spell-effect description for the given edition. */
 export function getConditionDescription(
 	condition: string,
 	ruleset: '2014' | '2024' = '2014'
@@ -64,10 +100,15 @@ export function getConditionDescription(
 		return (
 			conditionDescriptions2024Overrides[condition] ??
 			conditionDescriptions[condition] ??
+			spellEffectDescriptions[condition] ??
 			'No description available.'
 		);
 	}
-	return conditionDescriptions[condition] ?? 'No description available.';
+	return (
+		conditionDescriptions[condition] ??
+		spellEffectDescriptions[condition] ??
+		'No description available.'
+	);
 }
 
 export const conditionColors: Record<string, string> = {

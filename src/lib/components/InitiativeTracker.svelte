@@ -4,7 +4,7 @@
      end-combat flow that writes a CombatRecord to history. DM-only. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { CONDITIONS, ADV_CONDITIONS, getMonsterDetail } from '$lib/enemies';
+	import { CONDITIONS, ADV_CONDITIONS, SPELL_EFFECTS, getMonsterDetail } from '$lib/enemies';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
@@ -16,6 +16,7 @@
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
 	import LootModal from '$lib/components/LootModal.svelte';
 	import AoEDamageModal from '$lib/components/AoEDamageModal.svelte';
+	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
@@ -32,7 +33,7 @@
 	}
 
 	// ── Modal state ────────────────────────────────────────────────────────────
-	let openStatusId = $state<string | null>(null);
+	let openEffectMenuId = $state<string | null>(null);
 	let infoMonster = $state<MonsterDetail | null>(null);
 	let conditionInfo = $state<string | null>(null);
 	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
@@ -44,6 +45,7 @@
 		[]
 	);
 	let showAoE = $state(false);
+	let avatarPreview = $state<Combatant | null>(null);
 
 	// ── Concentration check queue ─────────────────────────────────────────────
 	function dequeueConcentration() {
@@ -140,13 +142,40 @@
 	// ── Condition state ──────────────────────────────────────────────────────
 	let legendaryInfoModal = $state<{ name: string; text: string } | null>(null);
 
-	let pendingCondition = $state<{ id: string; combatantName: string; condition: string } | null>(
-		null
-	);
+	let pendingCondition = $state<{
+		id: string;
+		combatantName: string;
+		condition: string;
+		kind?: 'condition' | 'spell';
+	} | null>(null);
 
-	function requestAddCondition(id: string, combatantName: string, condition: string) {
-		pendingCondition = { id, combatantName, condition };
-		openStatusId = null;
+	function requestAddCondition(
+		id: string,
+		combatantName: string,
+		condition: string,
+		kind: 'condition' | 'spell' = 'condition'
+	) {
+		pendingCondition = { id, combatantName, condition, kind };
+		openEffectMenuId = null;
+	}
+
+	// ── Spell effect state ────────────────────────────────────────────────────
+	// Statuses NOT in this set are treated as freeform spell effects (e.g. "Bless",
+	// "Hex") and styled/labelled differently from the fixed D&D conditions, even
+	// though both are added via the same combined "+ Condition/Spell Effect" menu.
+	const NON_SPELL_STATUSES = new Set<string>([
+		...CONDITIONS,
+		...ADV_CONDITIONS,
+		'Dead',
+		'Unconscious'
+	]);
+	let spellEffectDraft = $state('');
+
+	function addSpellEffectDraft(c: Combatant) {
+		const name = spellEffectDraft.trim();
+		if (!name) return;
+		requestAddCondition(c.id, c.name, name, 'spell');
+		spellEffectDraft = '';
 	}
 
 	function commitDamage(c: Combatant, sign: 1 | -1) {
@@ -189,7 +218,10 @@
 			{#if combat.sorted.length > 0}
 				{#if !combat.isInCombat}
 					<button
-						onclick={() => combat.startCombat()}
+						onclick={() => {
+							combat.startCombat();
+							scrollToActive();
+						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
 						▶ Start Combat
@@ -239,8 +271,16 @@
 			<!-- Utility buttons -->
 			<div class="h-4 w-px bg-gray-700"></div>
 			<button
+				onclick={() => combat.undo()}
+				disabled={!combat.canUndo}
+				title="Undo the last damage/heal, condition/effect, or turn change"
+				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+			>
+				↺ Undo
+			</button>
+			<button
 				onclick={() => (showAoE = true)}
-				title="Apply damage or healing to multiple combatants"
+				title="Apply damage, healing, a condition, or a spell effect to multiple combatants"
 				class="rounded bg-orange-900/60 px-2 py-1 text-xs text-orange-300 transition hover:bg-orange-800 hover:text-white"
 			>
 				AoE
@@ -392,9 +432,13 @@
 								<span class="text-amber-400" title="Active turn">▶</span>
 							{/if}
 							{#if c.type === 'player' && c.avatarUrl}
-								<div class="h-7 w-7 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700">
+								<button
+									onclick={() => (avatarPreview = c)}
+									title="View {c.name}'s avatar"
+									class="h-7 w-7 shrink-0 overflow-hidden rounded-full ring-1 ring-blue-700 transition hover:ring-2 hover:ring-blue-400"
+								>
 									<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
-								</div>
+								</button>
 							{:else}
 								<span
 									class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold
@@ -711,12 +755,15 @@
 							</div>
 						{/if}
 
-						<!-- Conditions row -->
+						<!-- Conditions & spell effects row -->
 						<div class="relative flex flex-wrap items-start gap-1.5">
 							{#each c.statuses as status}
+								{@const isCondition = NON_SPELL_STATUSES.has(status)}
 								<div
 									class="flex items-center rounded text-xs font-medium {conditionColors[status] ??
-										'bg-gray-700 text-gray-300'}"
+										(isCondition
+											? 'bg-gray-700 text-gray-300'
+											: 'bg-fuchsia-900/60 text-fuchsia-200')}"
 								>
 									<button
 										onclick={() => combat.toggleStatus(c.id, status)}
@@ -751,16 +798,19 @@
 								</div>
 							{/each}
 							<button
-								onclick={() => (openStatusId = openStatusId === c.id ? null : c.id)}
+								onclick={() => {
+									openEffectMenuId = openEffectMenuId === c.id ? null : c.id;
+									spellEffectDraft = '';
+								}}
 								class="rounded border border-gray-600 px-2 py-1.5 text-xs text-gray-500 transition hover:border-gray-500 hover:text-gray-300"
 							>
-								+ Condition
+								+ Condition/Spell Effect
 							</button>
-							{#if openStatusId === c.id}
+							{#if openEffectMenuId === c.id}
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
 								<div
-									class="absolute top-full left-0 z-20 mt-1 w-48 rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
-									onmouseleave={() => (openStatusId = null)}
+									class="absolute top-full left-0 z-20 mt-1 max-h-96 w-56 overflow-y-auto rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
+									onmouseleave={() => (openEffectMenuId = null)}
 								>
 									<div class="grid grid-cols-2 gap-1">
 										{#each CONDITIONS as cond}
@@ -802,6 +852,54 @@
 												{cond}
 											</button>
 										{/each}
+									</div>
+									<div class="my-1.5 flex items-center gap-1.5 border-t border-gray-700 pt-1.5">
+										<span class="text-[10px] font-semibold tracking-wider text-gray-600 uppercase"
+											>Spell Effects</span
+										>
+									</div>
+									<div class="grid grid-cols-2 gap-1">
+										{#each SPELL_EFFECTS as effect}
+											{@const active = c.statuses.includes(effect)}
+											<button
+												onclick={() =>
+													active
+														? combat.toggleStatus(c.id, effect)
+														: requestAddCondition(c.id, c.name, effect, 'spell')}
+												class="rounded px-2 py-1 text-left text-xs transition
+											       {active
+													? 'bg-fuchsia-800 text-white ring-1 ring-white/20'
+													: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+											>
+												{effect}
+											</button>
+										{/each}
+									</div>
+									<div class="my-1.5 flex items-center gap-1.5 border-t border-gray-700 pt-1.5">
+										<span class="text-[10px] font-semibold tracking-wider text-gray-600 uppercase"
+											>Custom</span
+										>
+									</div>
+									<div class="flex gap-1">
+										<input
+											id="spell-effect-input-{c.id}"
+											type="text"
+											bind:value={spellEffectDraft}
+											placeholder="Other spell / effect…"
+											maxlength="50"
+											onkeydown={(e) => {
+												if (e.key === 'Enter') addSpellEffectDraft(c);
+												if (e.key === 'Escape') openEffectMenuId = null;
+											}}
+											class="h-8 flex-1 rounded border border-fuchsia-700/60 bg-gray-800 px-2 text-xs text-fuchsia-100 focus:border-fuchsia-500 focus:outline-none"
+										/>
+										<button
+											onclick={() => addSpellEffectDraft(c)}
+											disabled={!spellEffectDraft.trim()}
+											class="rounded bg-fuchsia-800/60 px-2 text-xs font-semibold text-fuchsia-200 transition hover:bg-fuchsia-700/70 disabled:cursor-default disabled:opacity-30"
+										>
+											Add
+										</button>
 									</div>
 								</div>
 							{/if}
@@ -871,6 +969,7 @@
 </div>
 
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
+<AvatarPreviewModal combatant={avatarPreview} onclose={() => (avatarPreview = null)} />
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
 <CombatantNoteModal
 	combatant={noteTarget}
