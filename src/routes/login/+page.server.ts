@@ -25,6 +25,9 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	// Surface OAuth errors (e.g. invalid_state, token_exchange) to the page
 	const oauthError = url.searchParams.get('oauth_error');
 	if (oauthError) return { oauthError };
+
+	// Bounced back here from hooks.server.ts after a suspended account tried to reach /dashboard
+	if (url.searchParams.get('suspended')) return { suspended: true };
 };
 
 export const actions: Actions = {
@@ -53,6 +56,11 @@ export const actions: Actions = {
 		const dm = await loginDM(email, password);
 		if (!dm) {
 			return fail(401, { error: 'Incorrect email or password.' });
+		}
+		if (dm.suspendedAt) {
+			return fail(403, {
+				error: 'This account has been suspended. Contact the system administrator.'
+			});
 		}
 
 		cookies.set('dm_auth', dm.sessionId, {

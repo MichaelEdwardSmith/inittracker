@@ -39,8 +39,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	// Admin-only page: system-wide list of every DM account, gated to a single owner email.
-	if (pathname === '/admin') {
+	// Admin-only pages: system-wide DM list plus support tools (export, etc.), gated to a
+	// single owner email.
+	if (pathname === '/admin' || pathname.startsWith('/admin/')) {
 		if (!sessionId) redirect(303, '/login');
 		const dm = await getDMBySessionId(sessionId);
 		if (!dm) {
@@ -71,6 +72,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (!realDm) {
 			event.cookies.delete('dm_auth', { path: '/' });
 			redirect(303, '/login');
+		}
+		if (realDm.suspendedAt) {
+			event.cookies.delete('dm_auth', { path: '/' });
+			redirect(303, '/login?suspended=1');
 		}
 		event.locals.realSessionId = sessionId;
 		event.locals.isAdmin = isAdminEmail(realDm.email);

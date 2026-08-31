@@ -1,20 +1,35 @@
 // Server logic for /admin — system-wide list of every DM account (gated to a single owner
 // email by hooks.server.ts, which also populates locals.isAdmin/dmEmail before this runs).
-// The `impersonate` action lets the admin take full read/write control of another DM's
-// dashboard by setting the dm_impersonate cookie; `stop` clears it. Both are logged to the
-// adminAudit collection for accountability.
+//
+// Actions:
+//   impersonate    — take full read/write control of a DM's dashboard (dm_impersonate cookie).
+//   stop           — exit an active impersonation.
+//   suspend/unsuspend — block/restore login + dashboard access without touching their data.
+//   resetPassword  — generate a new password for a locked-out DM, shown once in the UI.
+//   delete         — permanently remove a DM account and everything embedded in it.
+// All except stop/impersonate-cancel are logged to the adminAudit collection.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { listAllDMs, getDMBySessionId, deleteDM, logAdminAction } from '$lib/server/dmModel';
+import {
+	listAllDMs,
+	listAdminAudit,
+	getDMBySessionId,
+	deleteDM,
+	suspendDM,
+	unsuspendDM,
+	resetDMPassword,
+	logAdminAction
+} from '$lib/server/dmModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { sessionStates, sessionClients } from '$lib/server/sseState';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const dms = await listAllDMs();
+	const [dms, auditLog] = await Promise.all([listAllDMs(), listAdminAudit()]);
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
 		realSessionId: locals.realSessionId,
-		dms
+		dms,
+		auditLog
 	};
 };
 
@@ -70,6 +85,69 @@ export const actions: Actions = {
 		}
 
 		redirect(303, '/admin');
+	},
+
+	suspend: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.realSessionId || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+		if (targetSessionId === locals.realSessionId) {
+			return fail(400, { error: 'You cannot suspend your own account.' });
+		}
+
+		const result = await suspendDM(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'suspend',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { suspended: true };
+	},
+
+	unsuspend: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await unsuspendDM(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'unsuspend',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { unsuspended: true };
+	},
+
+	resetPassword: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await resetDMPassword(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'password-reset',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { tempPassword: result.tempPassword, tempPasswordFor: result.email };
 	},
 
 	delete: async ({ request, cookies, locals }) => {
