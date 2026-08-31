@@ -251,12 +251,14 @@
 								</button>
 							</td>
 							<td class="px-4 py-3 font-semibold text-gray-100">
-								{dm.firstName}
-								{dm.lastName}
-								{#if isSelf}<span class="ml-1 text-xs font-normal text-gray-600">(you)</span>{/if}
+								<div>
+									{dm.firstName}
+									{dm.lastName}
+									{#if isSelf}<span class="ml-1 text-xs font-normal text-gray-600">(you)</span>{/if}
+								</div>
 								{#if dm.isAdmin}
 									<span
-										class="ml-1 rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-300 uppercase"
+										class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
 										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
 									>
 										{dm.isRootAdmin ? '★ Root Admin' : 'Admin'}
