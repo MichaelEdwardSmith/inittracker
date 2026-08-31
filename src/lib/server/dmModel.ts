@@ -840,8 +840,13 @@ export async function logAdminAction(entry: Omit<AdminAuditEntry, 'at'>): Promis
  *  the UI groups these per-target and shows them progressively disclosed, not as one long feed. */
 export async function listAdminAudit(limit = 500): Promise<AdminAuditEntry[]> {
 	const db = await getDb();
-	return db
-		.collection<AdminAuditEntry>('adminAudit')
-		.find({}, { sort: { at: -1 }, limit })
-		.toArray();
+	return (
+		db
+			.collection<AdminAuditEntry>('adminAudit')
+			// Exclude _id — it's a MongoDB ObjectId instance, not a plain object, and SvelteKit's
+			// load-data serializer can't stringify it for the client (Data returned from `load` ...
+			// is not serializable).
+			.find({}, { projection: { _id: 0 }, sort: { at: -1 }, limit })
+			.toArray()
+	);
 }
