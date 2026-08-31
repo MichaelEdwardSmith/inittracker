@@ -14,6 +14,19 @@
 			timeStyle: 'short'
 		});
 	}
+
+	/** Confirms before letting the delete form actually submit. */
+	function confirmDelete(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (
+				!confirm(
+					`Permanently delete ${name}'s account? This removes all of their game sessions, combat history, custom monsters, and encounters. This cannot be undone.`
+				)
+			) {
+				cancel();
+			}
+		};
+	}
 </script>
 
 <svelte:head>
@@ -64,17 +77,34 @@
 							<td class="px-4 py-3 text-gray-400">{dm.email}</td>
 							<td class="px-4 py-3 text-gray-400">{dm.gameSessionCount}</td>
 							<td class="px-4 py-3 text-gray-500">{formatDate(dm.createdAt)}</td>
-							<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastLoginAt)}</td>
+							<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastActiveAt)}</td>
 							<td class="px-4 py-3 text-right">
-								<form method="POST" action="?/impersonate" use:enhance>
-									<input type="hidden" name="sessionId" value={dm.sessionId} />
-									<button
-										type="submit"
-										class="rounded border border-amber-700/60 bg-amber-900/20 px-3 py-1 text-xs font-semibold text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
-									>
-										Enter dashboard
-									</button>
-								</form>
+								<div class="flex justify-end gap-2">
+									<form method="POST" action="?/impersonate" use:enhance>
+										<input type="hidden" name="sessionId" value={dm.sessionId} />
+										<button
+											type="submit"
+											class="rounded border border-amber-700/60 bg-amber-900/20 px-3 py-1 text-xs font-semibold text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
+										>
+											Enter dashboard
+										</button>
+									</form>
+									{#if dm.sessionId !== data.realSessionId}
+										<form
+											method="POST"
+											action="?/delete"
+											use:enhance={confirmDelete(`${dm.firstName} ${dm.lastName}`)}
+										>
+											<input type="hidden" name="sessionId" value={dm.sessionId} />
+											<button
+												type="submit"
+												class="rounded border border-red-800/60 bg-red-950/20 px-3 py-1 text-xs font-semibold text-red-300 transition hover:border-red-600 hover:bg-red-900/40"
+											>
+												Delete
+											</button>
+										</form>
+									{/if}
+								</div>
 							</td>
 						</tr>
 					{/each}
