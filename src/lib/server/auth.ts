@@ -5,7 +5,7 @@
 // read/write control of that account from /admin for support and debugging.
 import type { Cookies } from '@sveltejs/kit';
 import { getDMBySessionId } from './dmModel';
-import { isAdminEmail } from './admin';
+import { isAdminDM } from './admin';
 
 export async function resolveActingSessionId(cookies: Cookies): Promise<string | null> {
 	const realSessionId = cookies.get('dm_auth') ?? null;
@@ -21,6 +21,6 @@ export async function resolveActingSessionId(cookies: Cookies): Promise<string |
 
 	// Only a verified admin can act as someone else; fall back silently otherwise
 	// (e.g. a stale/tampered cookie).
-	if (!real || !isAdminEmail(real.email) || !target) return realSessionId;
+	if (!real || !isAdminDM(real) || !target) return realSessionId;
 	return impersonateId;
 }

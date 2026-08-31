@@ -7,7 +7,7 @@ import type { Handle } from '@sveltejs/kit';
 import { getDMBySessionId, getActiveGameSession, touchDMActivity } from '$lib/server/dmModel';
 import { getPlayerBySessionId } from '$lib/server/playerModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
-import { isAdminEmail } from '$lib/server/admin';
+import { isAdminDM, isRootAdminEmail } from '$lib/server/admin';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('dm_auth') ?? null;
@@ -20,6 +20,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.dmEmail = null;
 	event.locals.isGuest = false;
 	event.locals.isAdmin = false;
+	event.locals.isRootAdmin = false;
 	event.locals.realSessionId = null;
 	event.locals.isImpersonating = false;
 	event.locals.impersonatingAdminEmail = null;
@@ -49,7 +50,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			redirect(303, '/login');
 		}
 		event.locals.realSessionId = sessionId;
-		event.locals.isAdmin = isAdminEmail(dm.email);
+		event.locals.isAdmin = isAdminDM(dm);
+		event.locals.isRootAdmin = isRootAdminEmail(dm.email);
 		if (!event.locals.isAdmin) redirect(303, '/dashboard');
 		event.locals.dmFirstName = dm.firstName;
 		event.locals.dmEmail = dm.email;
@@ -78,7 +80,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			redirect(303, '/login?suspended=1');
 		}
 		event.locals.realSessionId = sessionId;
-		event.locals.isAdmin = isAdminEmail(realDm.email);
+		event.locals.isAdmin = isAdminDM(realDm);
+		event.locals.isRootAdmin = isRootAdminEmail(realDm.email);
 		// Track the real account's activity, not the impersonated target's — impersonation is
 		// the admin looking at someone else's dashboard, not that DM actually using the system.
 		touchDMActivity(sessionId, realDm.lastActiveAt ?? null);
