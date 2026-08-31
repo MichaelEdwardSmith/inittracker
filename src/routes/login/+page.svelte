@@ -113,6 +113,15 @@
 			</p>
 		{/if}
 
+		<!-- Suspended account, bounced back from a stale session -->
+		{#if data?.suspended}
+			<p
+				class="mt-3 rounded-lg border border-red-800 bg-red-950/60 px-4 py-2 text-center text-xs text-red-400"
+			>
+				This account has been suspended. Contact the system administrator.
+			</p>
+		{/if}
+
 		<!-- Social sign-in -->
 		<div class="mt-4 flex flex-col gap-2">
 			<a

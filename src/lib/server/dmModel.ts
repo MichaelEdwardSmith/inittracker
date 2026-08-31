@@ -3,7 +3,7 @@
 // Also contains ensureGameSessions() which migrates legacy single-session documents to the
 // multi-session schema on first access.
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes, createHash } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
 import type {
@@ -48,6 +48,9 @@ export interface DM {
 	 *  the admin panel's "Last active" column actually reflects, since most sessions are a
 	 *  standing 30-day cookie that never triggers another loginDM() call. */
 	lastActiveAt?: Date;
+	/** Set when an admin suspends this account; absent means active. Checked in hooks.server.ts
+	 *  to block dashboard/history access, and at login to reject the attempt outright. */
+	suspendedAt?: Date;
 }
 
 // 6 chars from an unambiguous alphabet (no O/0/I/1 confusion)
@@ -58,6 +61,22 @@ function randomSessionId(): string {
 		{ length: 6 },
 		() => SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)]
 	).join('');
+}
+
+// Readable charset for admin-generated temporary passwords — avoids visually ambiguous
+// characters (0/O, 1/l/I) since these get read aloud or typed from a screen.
+const TEMP_PASSWORD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+
+function randomTempPassword(length = 14): string {
+	const bytes = randomBytes(length);
+	return Array.from(bytes, (b) => TEMP_PASSWORD_CHARS[b % TEMP_PASSWORD_CHARS.length]).join('');
+}
+
+// The login/register forms SHA-256 the password client-side before it ever reaches the server
+// (see /login and /register +page.svelte), so passwordHash is always bcrypt(sha256(raw)). A
+// server-generated temp password has to go through the same sha256 step to verify later.
+function sha256Hex(text: string): string {
+	return createHash('sha256').update(text).digest('hex');
 }
 
 async function col() {
@@ -661,12 +680,21 @@ export interface DMSummary {
 	firstName: string;
 	lastName: string;
 	email: string;
-	/** Auth sessionId — pass to the impersonate/delete actions to target this account. */
+	/** Auth sessionId — pass to the impersonate/suspend/delete/export actions to target this account. */
 	sessionId: string;
 	createdAt: Date;
 	/** lastActiveAt (real usage) if we have it, else lastLoginAt (explicit sign-in), else never. */
 	lastActiveAt: Date | null;
+	suspended: boolean;
+	/** False for OAuth-only accounts that have never had a password set. */
+	hasPassword: boolean;
+	/** Public 6-char ID of the DM's currently active game session — for the read-only Inspect link. */
+	activeSessionPublicId: string | null;
 	gameSessionCount: number;
+	customMonsterCount: number;
+	encounterCount: number;
+	/** Total combat records across all of this DM's game sessions (each capped at 100). */
+	combatHistoryCount: number;
 }
 
 /** Returns every DM account in the system, most recently active first. */
@@ -684,27 +712,83 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					createdAt: 1,
 					lastLoginAt: 1,
 					lastActiveAt: 1,
-					gameSessions: 1
+					suspendedAt: 1,
+					passwordHash: 1,
+					activeGameSessionId: 1,
+					gameSessions: 1,
+					customMonsters: 1,
+					encounters: 1
 				}
 			}
 		)
 		.toArray();
 
 	return dms
-		.map((dm) => ({
-			firstName: dm.firstName,
-			lastName: dm.lastName,
-			email: dm.email,
-			sessionId: dm.sessionId,
-			createdAt: dm.createdAt,
-			lastActiveAt: (dm as DM).lastActiveAt ?? (dm as DM).lastLoginAt ?? null,
-			gameSessionCount: (dm.gameSessions as DMGameSession[] | undefined)?.length ?? 0
-		}))
+		.map((dm) => {
+			const sessions = (dm.gameSessions as DMGameSession[] | undefined) ?? [];
+			const active = sessions.find((s) => s.id === dm.activeGameSessionId);
+			return {
+				firstName: dm.firstName,
+				lastName: dm.lastName,
+				email: dm.email,
+				sessionId: dm.sessionId,
+				createdAt: dm.createdAt,
+				lastActiveAt: (dm as DM).lastActiveAt ?? (dm as DM).lastLoginAt ?? null,
+				suspended: !!(dm as DM).suspendedAt,
+				hasPassword: !!dm.passwordHash,
+				activeSessionPublicId: active?.sessionId ?? sessions[0]?.sessionId ?? null,
+				gameSessionCount: sessions.length,
+				customMonsterCount: (dm.customMonsters as CustomMonster[] | undefined)?.length ?? 0,
+				encounterCount: (dm.encounters as Encounter[] | undefined)?.length ?? 0,
+				combatHistoryCount: sessions.reduce((sum, s) => sum + (s.combatHistory?.length ?? 0), 0)
+			};
+		})
 		.sort((a, b) => {
 			const at = a.lastActiveAt ?? a.createdAt;
 			const bt = b.lastActiveAt ?? b.createdAt;
 			return new Date(bt).getTime() - new Date(at).getTime();
 		});
+}
+
+/** Suspends a DM account — blocks login and kicks them out of /dashboard and /history. */
+export async function suspendDM(
+	authSessionId: string
+): Promise<{ ok: boolean; email?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+	await c.updateOne({ sessionId: authSessionId }, { $set: { suspendedAt: new Date() } });
+	return { ok: true, email: dm.email };
+}
+
+/** Lifts a suspension, restoring normal access. */
+export async function unsuspendDM(
+	authSessionId: string
+): Promise<{ ok: boolean; email?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+	await c.updateOne({ sessionId: authSessionId }, { $unset: { suspendedAt: '' } });
+	return { ok: true, email: dm.email };
+}
+
+/**
+ * Generates a new random password for a locked-out DM and returns it in plaintext — shown once
+ * in the admin UI for the admin to relay out-of-band (there's no transactional email sender in
+ * this app). Works for OAuth-only accounts too, giving them a password-login fallback.
+ */
+export async function resetDMPassword(
+	authSessionId: string
+): Promise<{ ok: boolean; email?: string; tempPassword?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+
+	const tempPassword = randomTempPassword();
+	const passwordHash = await bcrypt.hash(sha256Hex(tempPassword), 12);
+	await c.updateOne({ sessionId: authSessionId }, { $set: { passwordHash } });
+
+	return { ok: true, email: dm.email, tempPassword };
 }
 
 /**
@@ -725,15 +809,24 @@ export async function deleteDM(
 	return { ok: true, email: dm.email, gameSessionIds };
 }
 
-interface AdminAuditEntry {
+export type AdminAuditAction =
+	| 'impersonate-start'
+	| 'impersonate-stop'
+	| 'suspend'
+	| 'unsuspend'
+	| 'password-reset'
+	| 'export-data'
+	| 'delete-account';
+
+export interface AdminAuditEntry {
 	adminEmail: string;
-	action: 'impersonate-start' | 'impersonate-stop' | 'delete-account';
+	action: AdminAuditAction;
 	targetEmail: string;
 	targetSessionId: string;
 	at: Date;
 }
 
-/** Best-effort audit trail for admin impersonation — never blocks the caller on failure. */
+/** Best-effort audit trail for admin actions on other accounts — never blocks the caller on failure. */
 export async function logAdminAction(entry: Omit<AdminAuditEntry, 'at'>): Promise<void> {
 	try {
 		const db = await getDb();
@@ -741,4 +834,14 @@ export async function logAdminAction(entry: Omit<AdminAuditEntry, 'at'>): Promis
 	} catch (err) {
 		console.error('Failed to write admin audit log entry', err);
 	}
+}
+
+/** Returns the most recent admin audit entries, newest first. Capped so the page stays light —
+ *  the UI groups these per-target and shows them progressively disclosed, not as one long feed. */
+export async function listAdminAudit(limit = 500): Promise<AdminAuditEntry[]> {
+	const db = await getDb();
+	return db
+		.collection<AdminAuditEntry>('adminAudit')
+		.find({}, { sort: { at: -1 }, limit })
+		.toArray();
 }
