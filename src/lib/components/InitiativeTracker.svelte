@@ -952,7 +952,7 @@
 								</div>
 							{/if}
 						{/if}
-						{#if c.currentHp <= 0}
+						{#if c.type === 'enemy' && c.currentHp <= 0}
 							<button
 								onclick={() => (lootTarget = c)}
 								title={c.loot?.length ? 'Edit loot' : 'Roll loot'}
