@@ -45,6 +45,7 @@
 		attunement: string;
 		cost: string;
 		description: string;
+		tables?: { title?: string; columns: string[]; rows: string[][] }[];
 	};
 
 	const magicItems: MagicItem[] = [
@@ -1081,7 +1082,82 @@
 			attunement: 'Yes (Spellcaster)',
 			cost: '3,500 gp',
 			description:
-				'The wand has 7 charges. While holding it, you can use an action to expend 1 of its charges and choose a target within 120 feet of you. The target can be a creature, an object, or a point in space. Roll d100 and consult the table in the DMG to discover what happens. The wand regains 1d6 + 1 expended charges daily at dawn.'
+				"The wand has 7 charges. While holding it, you can use an action to expend 1 of its charges and choose a target within 120 feet of you. The target can be a creature, an object, or a point in space. Roll d100 and consult the table below to discover what happens. If the effect causes a spell to be cast, the spell's save DC is 15, and if it normally has a range expressed in feet, its range instead becomes 120 feet if it isn't so already. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20 — on a 1, the wand crumbles into ashes and is destroyed.",
+			tables: [
+				{
+					title: 'd100 Wonder Effects',
+					columns: ['d100', 'Effect'],
+					rows: [
+						['01–05', 'The target is affected as though by a slow spell for 1 minute.'],
+						['06–10', 'You cast faerie fire, centered on the target.'],
+						[
+							'11–15',
+							'You are stunned until the start of your next turn, believing something awesome just happened.'
+						],
+						['16–20', 'A gust of wind blows outward from the target (as the gust of wind spell).'],
+						[
+							'21–25',
+							"You cast detect thoughts on the target you chose. If you didn't target a creature, you instead take 1d6 psychic damage."
+						],
+						[
+							'26–30',
+							'A cloud of noxious gas (as the stinking cloud spell) forms, centered on the target.'
+						],
+						[
+							'31–33',
+							'Heavy rain falls in a 60-foot radius centered on the target, lightly obscuring the area until the start of your next turn.'
+						],
+						[
+							'34–36',
+							'1d4 rhinoceroses (or 1 elephant on a roll of 1, or 1d6 rats on a roll of 2–4) burst from the wand and rampage for 1 minute before disappearing.'
+						],
+						[
+							'37–46',
+							'A bolt of lightning shoots out from the target (as the lightning bolt spell).'
+						],
+						[
+							'47–49',
+							'A cloud of 600 oversized butterflies fills a 30-foot radius centered on the target, heavily obscuring the area for 10 minutes.'
+						],
+						[
+							'50–53',
+							'A random creature within 60 feet of the target (or the target, if no other creature is in range) grows or shrinks (as the enlarge/reduce spell) for 1d4 hours.'
+						],
+						['54–58', 'You cast darkness centered on the target.'],
+						[
+							'59–62',
+							'Grass grows rapidly in a 60-foot radius centered on the target, growing to ten times its normal size for 1 minute.'
+						],
+						[
+							'63–65',
+							"An object of the DM's choice, weighing up to 10 pounds and within 120 feet, vanishes to the Ethereal Plane."
+						],
+						[
+							'66–69',
+							"You grow or shrink (as the enlarge/reduce spell) for 1d4 hours, DM's choice of which effect."
+						],
+						['70–79', 'A burst of flame erupts from the target (as the fireball spell).'],
+						['80–84', 'You turn invisible for 1 minute (as the invisibility spell).'],
+						[
+							'85–87',
+							'Leaves grow from the target if it is a creature. The leaves are brown and fall off after 24 hours unless removed sooner.'
+						],
+						[
+							'88–90',
+							'A stream of 1d4 × 10 gems, each worth 1 gp, shoots from the wand in a line 30 feet long and 5 feet wide, each dealing 1 bludgeoning damage to creatures it passes through.'
+						],
+						[
+							'91–95',
+							'A burst of blinding light flashes at the target in a 30-foot radius. Each creature there must succeed on a DC 15 Constitution saving throw or be blinded for 1 minute.'
+						],
+						['96–97', "The target's skin turns bright blue for 1d10 days."],
+						[
+							'98–00',
+							'The target must succeed on a DC 15 Constitution saving throw or begin turning to stone (as the flesh to stone spell). If it fails the save by 5 or more, it is instantly petrified; otherwise it is restrained and repeats the save each turn, becoming petrified on a third failure or ending the effect on a success.'
+						]
+					]
+				}
+			]
 		},
 		// WEAPONS
 		{
@@ -1410,7 +1486,25 @@
 			attunement: 'No',
 			cost: '400 gp',
 			description:
-				'This ceramic jug appears to be able to hold a gallon of liquid and weighs 12 pounds whether full or empty. Sloshing sounds can be heard from within the jug when it is shaken, even if the jug is empty. You can use an action and name one liquid from the table below to cause the jug to produce the chosen liquid. Afterward, you can uncork the jug as an action and pour that liquid out.'
+				"This ceramic jug appears to be able to hold a gallon of liquid and weighs 12 pounds whether full or empty. Sloshing sounds can be heard from within the jug when it is shaken, even if the jug is empty. You can use an action and name one liquid from the table below to cause the jug to produce the chosen liquid. The liquid stops flowing at the start of your next turn or when the jug has produced its maximum amount for that liquid, whichever comes first. Once the jug produces a liquid, it can't produce a different one (or more of one that's reached its maximum) until the next dawn. Afterward, you can uncork the jug as an action and pour out its contents at a rate of 2 gallons per minute.",
+			tables: [
+				{
+					title: 'Liquids',
+					columns: ['Liquid', 'Maximum Amount'],
+					rows: [
+						['Acid', '8 ounces'],
+						['Basic poison', '1/2 ounce'],
+						['Beer', '4 gallons'],
+						['Honey', '1 gallon'],
+						['Mayonnaise', '2 gallons'],
+						['Oil', '1 quart'],
+						['Vinegar', '2 gallons'],
+						['Water, fresh', '8 gallons'],
+						['Water, salt', '12 gallons'],
+						['Wine', '1 gallon']
+					]
+				}
+			]
 		},
 		{
 			name: 'Amulet of Health',
@@ -1476,7 +1570,51 @@
 			attunement: 'No',
 			cost: '300 gp',
 			description:
-				'This ordinary bag, made from gray, rust, or tan cloth, appears empty. Reaching inside the bag, however, reveals the presence of a small, fuzzy object. You can use an action to pull the fuzzy object from the bag and throw it up to 20 feet. When the object lands, it transforms into a creature determined by rolling a d8.'
+				"This ordinary bag, made from gray, rust, or tan cloth, appears empty. Reaching inside the bag, however, reveals the presence of a small, fuzzy object. You can use an action to pull the fuzzy object from the bag and throw it up to 20 feet. When the object lands, it transforms into a creature determined by rolling a d8 and consulting the table for the bag's color. The creature is friendly to you and your companions, and it acts on your turn. You can use a bonus action to command how the creature moves and what action it takes on its next turn, or to give it general orders. In the absence of such orders, the creature acts in a fashion appropriate to its nature. The creature remains for 10 minutes, until it drops to 0 hit points, or until you use an action to dismiss it. Once you use an action to pull three fuzzy objects from the bag, the bag can't be used again until the next dawn.",
+			tables: [
+				{
+					title: 'Gray Bag of Tricks (d8)',
+					columns: ['d8', 'Creature'],
+					rows: [
+						['1', 'Weasel'],
+						['2', 'Giant rat'],
+						['3', 'Badger'],
+						['4', 'Boar'],
+						['5', 'Panther'],
+						['6', 'Giant badger'],
+						['7', 'Dire wolf'],
+						['8', 'Giant elk']
+					]
+				},
+				{
+					title: 'Rust Bag of Tricks (d8)',
+					columns: ['d8', 'Creature'],
+					rows: [
+						['1', 'Rat'],
+						['2', 'Owl'],
+						['3', 'Mastiff'],
+						['4', 'Goat'],
+						['5', 'Giant goat'],
+						['6', 'Giant boar'],
+						['7', 'Lion'],
+						['8', 'Brown bear']
+					]
+				},
+				{
+					title: 'Tan Bag of Tricks (d8)',
+					columns: ['d8', 'Creature'],
+					rows: [
+						['1', 'Jackal'],
+						['2', 'Ape'],
+						['3', 'Baboon'],
+						['4', 'Axe beak'],
+						['5', 'Black bear'],
+						['6', 'Giant weasel'],
+						['7', 'Giant hyena'],
+						['8', 'Tiger']
+					]
+				}
+			]
 		},
 		{
 			name: 'Bead of Force',
@@ -1805,7 +1943,48 @@
 			attunement: 'No',
 			cost: '400 gp',
 			description:
-				'This box contains a set of parchment cards. A full deck has 34 cards. A deck found as treasure is usually missing 1d20 − 1 cards. The magic of the deck functions only if cards are drawn at random. You can use an action to draw a card at random from the deck and throw it to the ground at a point within 30 feet of you. An illusion of one or more creatures forms over the thrown card.'
+				'This box contains a set of parchment cards. A full deck has 34 cards. A deck found as treasure is usually missing 1d20 − 1 cards. The magic of the deck functions only if cards are drawn at random. You can use an action to draw a card at random from the deck and throw it to the ground at a point within 30 feet of you. An illusion of one or more creatures forms over the thrown card, seeming as real as the creatures it depicts. The illusion lasts until dispelled, until the card is moved or destroyed, or until you use an action to touch the card and cause the illusion to end.',
+			tables: [
+				{
+					title: 'The 34 Cards',
+					columns: ['Card', 'Illusion'],
+					rows: [
+						['Ace of Hearts', 'Red dragon'],
+						['King of Hearts', 'Knight and four guards'],
+						['Queen of Hearts', 'Succubus or incubus'],
+						['Jack of Hearts', 'Druid'],
+						['Ten of Hearts', 'Cloud giant'],
+						['Nine of Hearts', 'Ettin'],
+						['Eight of Hearts', 'Bugbear'],
+						['Two of Hearts', 'Goblin'],
+						['Ace of Diamonds', 'Beholder'],
+						['King of Diamonds', 'Archmage and mage apprentice'],
+						['Queen of Diamonds', 'Night hag'],
+						['Jack of Diamonds', 'Assassin'],
+						['Ten of Diamonds', 'Fire giant'],
+						['Nine of Diamonds', 'Ogre mage'],
+						['Eight of Diamonds', 'Gnoll'],
+						['Two of Diamonds', 'Kobold'],
+						['Ace of Spades', 'Lich'],
+						['King of Spades', 'Priest and two acolytes'],
+						['Queen of Spades', 'Medusa'],
+						['Jack of Spades', 'Veteran'],
+						['Ten of Spades', 'Frost giant'],
+						['Nine of Spades', 'Troll'],
+						['Eight of Spades', 'Hobgoblin'],
+						['Two of Spades', 'Goblin'],
+						['Ace of Clubs', 'Iron golem'],
+						['King of Clubs', 'Bandit captain and three bandits'],
+						['Queen of Clubs', 'Erinyes'],
+						['Jack of Clubs', 'Berserker'],
+						['Ten of Clubs', 'Hill giant'],
+						['Nine of Clubs', 'Ogre'],
+						['Eight of Clubs', 'Orc'],
+						['Two of Clubs', 'Kobold'],
+						['Joker (x2)', "An illusory duplicate of you, the deck's owner"]
+					]
+				}
+			]
 		},
 		{
 			name: 'Deck of Many Things',
@@ -1816,7 +1995,100 @@
 			attunement: 'No',
 			cost: '— gp',
 			description:
-				'Usually found in a box or pouch, this deck contains a number of cards made of ivory or vellum. Before you draw a card, you must declare how many cards you intend to draw and then draw them randomly. Any number of cards in excess of this number have no effect. Otherwise, as soon as you draw a card from the deck, its magic takes effect.'
+				'Usually found in a box or pouch, this deck contains a number of cards made of ivory or vellum. Before you draw a card, you must declare how many cards you intend to draw and then draw them randomly. Any number of cards in excess of this number have no effect. Otherwise, as soon as you draw a card from the deck, its magic takes effect. Unless the card is the fool or the jester, drawing it also causes you to lose all benefits gained from previous draws with the same deck. A full deck has 22 cards.',
+			tables: [
+				{
+					title: 'The 22 Cards',
+					columns: ['Card', 'Effect'],
+					rows: [
+						[
+							'Balance',
+							"Your mental or physical faculties change through a shift of alignment. If you're lawful, you become chaotic; if chaotic, you become lawful; if neutral (with respect to law and chaos), you become lawful or chaotic as you choose."
+						],
+						[
+							'Comet',
+							'If you single-handedly defeat the next hostile monster or group of monsters you encounter, you gain experience points enough to attain your next level. Otherwise, this card has no effect.'
+						],
+						[
+							'Donjon',
+							"You disappear and become entombed in a state of suspended animation in an extradimensional sphere. Everything you were wearing and carrying stays behind in the space you occupied when you disappeared. You remain imprisoned until you are found and removed from the sphere. You can't be found by any divination magic, but a wish spell can reveal your location. You draw no more cards."
+						],
+						[
+							'Euryale',
+							"The card's medusa-like visage curses you. You take a −2 penalty to saving throws while cursed in this way. Only a god or the magic of the fates card can end this curse."
+						],
+						[
+							'The Fates',
+							"Reality's fabric unravels and spins anew, allowing you to avoid or erase one event as if it never happened. You can use this card's magic as soon as you draw it, even in the midst of combat."
+						],
+						[
+							'Flames',
+							'A powerful devil becomes your enemy. The devil seeks your ruin and plagues your life, savoring your suffering before attempting to slay you. This enmity lasts until either you or the devil dies.'
+						],
+						[
+							'Fool',
+							'You lose 10,000 XP, discard this card, and draw again, ignoring this card for the purpose of determining if you have drawn more cards than you can. If losing that much XP would reduce your total XP to less than 0, you lose no XP. If you have less than 10,000 XP, you lose no XP.'
+						],
+						[
+							'Gem',
+							'Twenty-five pieces of jewelry (worth 2,000 gp each) or fifty gems (worth 1,000 gp each) appear at your feet.'
+						],
+						[
+							'The Idiot',
+							'Permanently reduce your Intelligence by 1d4 + 1 (to a minimum of 1). You can draw one additional card beyond your declared draws.'
+						],
+						[
+							'Jester',
+							'You gain 10,000 XP, or you can draw two additional cards beyond your declared draws.'
+						],
+						[
+							'Key',
+							'A rare or rarer magic weapon with which you are proficient appears in your hand. The DM chooses the weapon.'
+						],
+						[
+							'Knight',
+							'You gain the service of a 4th-level fighter who is loyal to you, not necessarily of your race, who appears in a space you choose within 30 feet of you. The fighter serves you until death.'
+						],
+						['Moon', 'You are granted the ability to cast the wish spell 1d3 times.'],
+						[
+							'Rogue',
+							"A nonplayer character of the DM's choice becomes hostile toward you. The identity of your new enemy isn't known to you until the NPC or someone else reveals it. Nothing less than a wish spell or divine intervention can end the NPC's hostility toward you."
+						],
+						[
+							'Ruin',
+							'All forms of wealth that you carry or own, other than magic items, are lost to you. Portable property vanishes. Businesses, buildings, and land you own are lost in a way that alters reality the least. Any documentation that proves you should own something lost to this card also disappears.'
+						],
+						[
+							'Skull',
+							"You summon an avatar of death — a ghostly humanoid skeleton clad in a tattered black robe and carrying a spectral scythe. It appears in a space of the DM's choice within 10 feet of you and attacks you, warning all others not to interfere. Any creature slain by the avatar can't be restored to life. The avatar fights until you die or it drops to 0 hit points, whereupon it disappears. If anyone tries to help you, the avatar attacks that creature instead."
+						],
+						[
+							'Star',
+							"Increase one of your ability scores by 2. The score can exceed 20 but can't exceed 24."
+						],
+						[
+							'Sun',
+							'You gain 50,000 XP, and a wondrous item (chosen by the DM) appears in your hand.'
+						],
+						[
+							'Talons',
+							"Every magic item you wear or carry disintegrates. Artifacts in your possession aren't destroyed, but they disappear."
+						],
+						[
+							'Throne',
+							'You gain proficiency in the Persuasion skill, and you double your proficiency bonus on checks made with that skill. In addition, you gain rightful ownership of a small keep somewhere in the world. However, the keep is currently in the hands of monsters, which you must clear out before you can claim the keep as yours.'
+						],
+						[
+							'Vizier',
+							'At any time you choose within one year of drawing this card, you can ask a question in meditation and mentally receive a truthful answer to that question. Besides simple yes or no answers, the DM can give you a one-paragraph reply.'
+						],
+						[
+							'Void',
+							"This card curses you. Your soul is drawn from your body and trapped inside an object in a place of the DM's choice. One or more powerful beings guard the place. While your soul is trapped this way, your body is incapacitated. A wish spell can't restore your soul, but the spell reveals the location of the object that holds it. You draw no more cards."
+						]
+					]
+				}
+			]
 		},
 		{
 			name: 'Dimensional Shackles',
@@ -2322,7 +2594,43 @@
 			attunement: 'No',
 			cost: '400 gp',
 			description:
-				'This robe has cloth patches of various shapes and colors covering it. While wearing the robe, you can use an action to detach one of the patches, causing it to become the object or creature it represents. The robe has two of each of the following patches.'
+				"This robe has cloth patches of various shapes and colors covering it. While wearing the robe, you can use an action to detach one of the patches, causing it to become the object or creature it represents. Once removed, a patch reverts to its normal size and material. Any creature created by a patch is friendly to you and your companions, and it acts on your turn (you decide its actions with a bonus action). The robe has two of each of the standard patches below. In addition, it has 4d4 other patches, determined randomly by the DM (or by rolling d100 on the table below), that can be used only once; once removed, a patch can't be replaced.",
+			tables: [
+				{
+					title: 'Standard Patches (two of each)',
+					columns: ['Patch'],
+					rows: [
+						['Dagger'],
+						['Bullseye lantern (filled and lit)'],
+						['Steel mirror'],
+						['10-foot pole'],
+						['Hempen rope (50 feet, coiled)'],
+						['Sack']
+					]
+				},
+				{
+					title: 'Random Patches (4d4, d100)',
+					columns: ['d100', 'Patch'],
+					rows: [
+						['01–08', 'Bag of 100 gp'],
+						['09–15', 'Silver coffer (1 ft long, 6 in wide and deep) worth 500 gp'],
+						[
+							'16–22',
+							'Iron door (up to 10 ft wide and 10 ft high, barred on one side of your choice)'
+						],
+						['23–30', '10 gems worth 100 gp each'],
+						['31–44', 'Wooden ladder (24 feet long)'],
+						['45–51', 'A riding horse with saddlebags'],
+						['52–59', 'Pit (a cube 10 feet on a side)'],
+						['60–68', '4 potions of healing'],
+						['69–75', 'Rowboat (12 feet long)'],
+						['76–83', 'Spell scroll containing one spell of 1st to 3rd level'],
+						['84–90', '2 mastiffs'],
+						['91–96', 'Window (2 feet by 4 feet, up to 2 feet deep)'],
+						['97–00', 'Portable ram']
+					]
+				}
+			]
 		},
 		{
 			name: 'Rope of Climbing',
@@ -4602,6 +4910,41 @@
 								</div>
 								<hr class="mb-4 border-gray-700" />
 								<p class="text-sm leading-relaxed text-gray-300">{selectedMagicItem.description}</p>
+								{#if selectedMagicItem.tables}
+									{#each selectedMagicItem.tables as tbl}
+										<div class="mt-4">
+											{#if tbl.title}
+												<h5 class="mb-2 text-xs font-bold tracking-wide text-amber-400 uppercase">
+													{tbl.title}
+												</h5>
+											{/if}
+											<div class="overflow-x-auto rounded-lg border border-gray-800">
+												<table class="w-full text-sm">
+													<thead>
+														<tr class="bg-gray-800/50 text-left text-gray-400">
+															{#each tbl.columns as col}
+																<th class="px-3 py-1.5 font-semibold whitespace-nowrap">{col}</th>
+															{/each}
+														</tr>
+													</thead>
+													<tbody class="divide-y divide-gray-800/50">
+														{#each tbl.rows as row}
+															<tr>
+																{#each row as cell, i}
+																	<td
+																		class="px-3 py-1.5 align-top {i === 0
+																			? 'font-semibold whitespace-nowrap text-white'
+																			: 'text-gray-300'}">{cell}</td
+																	>
+																{/each}
+															</tr>
+														{/each}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									{/each}
+								{/if}
 							</div>
 						{:else}
 							<div

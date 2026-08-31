@@ -456,14 +456,18 @@
 					Adding a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					The Player Panel has two tabs: <strong class="font-semibold text-white">Manual</strong>
+					Click <strong class="font-semibold text-white">+ Add Player</strong> to open the
+					add-player popup. It has two tabs:
+					<strong class="font-semibold text-white">Manual</strong>
 					and
 					<strong class="font-semibold text-white">D&amp;D Beyond</strong>. Click a tab to switch
-					between them.
+					between them. The popup stays open after each add, so you can add your whole party in one
+					go.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					<strong class="font-semibold text-white">Manual:</strong> Fill in the player's
 					<strong class="font-semibold text-white">Name</strong>,
+					<strong class="font-semibold text-white">Level</strong> (default 1),
 					<strong class="font-semibold text-white">AC</strong> (Armor Class, default 10), and
 					<strong class="font-semibold text-white">Max HP</strong> (default 10), then click
 					<strong class="font-semibold text-white">Add Player</strong>.
@@ -479,8 +483,8 @@
 				</p>
 				<ol class="mb-4 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
 					<li>
-						Click the <strong class="font-semibold text-white">D&amp;D Beyond</strong> tab in the Player
-						Panel
+						Click the <strong class="font-semibold text-white">D&amp;D Beyond</strong> tab in the add-player
+						popup
 					</li>
 					<li>
 						Paste a character URL (e.g.
@@ -495,7 +499,8 @@
 					<li>
 						A preview card appears with the imported values: <strong
 							class="font-semibold text-white">Name</strong
-						>, <strong class="font-semibold text-white">Max HP</strong>,
+						>, <strong class="font-semibold text-white">Level</strong>,
+						<strong class="font-semibold text-white">Max HP</strong>,
 						<strong class="font-semibold text-white">AC</strong>,
 						<strong class="font-semibold text-white">DEX modifier</strong>, and
 						<strong class="font-semibold text-white">Passive Perception</strong>
@@ -536,6 +541,23 @@
 						class="font-semibold text-white">Save</strong
 					>
 					or <strong class="font-semibold text-white">Cancel</strong>.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Leveling Up a Player
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">⬆ Level Up</strong> below the add-player
+					form to open a wizard that steps through the party one player at a time. Each step shows
+					that player's current stats and lets you enter their new
+					<strong class="font-semibold text-white">Level</strong>,
+					<strong class="font-semibold text-white">AC</strong>,
+					<strong class="font-semibold text-white">Max HP</strong>,
+					<strong class="font-semibold text-white">DEX modifier</strong>, and
+					<strong class="font-semibold text-white">Passive Perception</strong>. Raising Max HP
+					carries the gain over to current HP rather than fully healing them. Click
+					<strong class="font-semibold text-white">Save &amp; Next</strong> to move on — changes save
+					as you go, so closing partway through keeps whatever you've already stepped past.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -845,16 +867,17 @@
 					Undo
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					The <strong class="font-semibold text-white">↺ Undo</strong> button reverts the single most
-					recent action: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save
-					update, or a turn advance/rewind. It's greyed out when there's nothing to undo.
+					The <strong class="font-semibold text-white">↺ Undo</strong> button reverts the most recent
+					action: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save update,
+					or a turn advance/rewind. It's greyed out when there's nothing to undo.
 				</p>
 				<p class="mb-6 text-sm leading-relaxed">
-					Undo is <strong class="font-semibold text-white">single-level</strong> — taking any other action
-					after the one you want to undo clears the undo slot, so you can't chain multiple undos. The
-					button stays available across the dashboard's own live-update echo of your last change, but
-					it clears if a genuinely different external change comes in first — e.g. a player rolling their
-					own initiative on the viewer screen.
+					Undo keeps the last <strong class="font-semibold text-white">5</strong> actions — clicking it
+					repeatedly walks back through each one in turn. Taking any other action clears the whole undo
+					history, so you can't reach further back than your most recent unbroken streak of undoable actions.
+					The button stays available across the dashboard's own live-update echo of your last change,
+					but it clears if a genuinely different external change comes in first — e.g. a player rolling
+					their own initiative on the viewer screen.
 				</p>
 
 				<h3

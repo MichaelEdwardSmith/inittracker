@@ -42,6 +42,8 @@ export interface DM {
 	combatState?: StorageState;
 	combatHistory?: CombatRecord[];
 	createdAt: Date;
+	/** Set on every successful password/OAuth login. Absent for accounts that haven't logged in since this field was added. */
+	lastLoginAt?: Date;
 }
 
 // 6 chars from an unambiguous alphabet (no O/0/I/1 confusion)
@@ -125,6 +127,7 @@ export async function createDM(
 		createdAt: new Date()
 	};
 
+	const now = new Date();
 	await c.insertOne({
 		firstName,
 		lastName,
@@ -134,7 +137,8 @@ export async function createDM(
 		activeGameSessionId: firstSession.id,
 		gameSessions: [firstSession],
 		customMonsters: [],
-		createdAt: new Date()
+		createdAt: now,
+		lastLoginAt: now
 	});
 
 	return { sessionId };
@@ -148,7 +152,10 @@ export async function loginDM(
 	const dm = await c.findOne({ email });
 	if (!dm) return null;
 	const valid = await bcrypt.compare(password, dm.passwordHash);
-	return valid ? (dm as unknown as WithId<Document> & DM) : null;
+	if (!valid) return null;
+	const lastLoginAt = new Date();
+	await c.updateOne({ email }, { $set: { lastLoginAt } });
+	return { ...dm, lastLoginAt } as unknown as WithId<Document> & DM;
 }
 
 // ---------------------------------------------------------------------------
@@ -168,7 +175,13 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 	// 1. Exact match on provider ID
 	const providerField = `oauth.${profile.provider}`;
 	let dm = await c.findOne({ [providerField]: profile.providerId });
-	if (dm) return { sessionId: dm.sessionId };
+	if (dm) {
+		await c.updateOne(
+			{ [providerField]: profile.providerId },
+			{ $set: { lastLoginAt: new Date() } }
+		);
+		return { sessionId: dm.sessionId };
+	}
 
 	// 2. Email match — link the OAuth identity to an existing account
 	if (profile.email) {
@@ -176,7 +189,7 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 		if (dm) {
 			await c.updateOne(
 				{ email: profile.email },
-				{ $set: { [providerField]: profile.providerId } }
+				{ $set: { [providerField]: profile.providerId, lastLoginAt: new Date() } }
 			);
 			return { sessionId: dm.sessionId };
 		}
@@ -198,6 +211,7 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 		createdAt: new Date()
 	};
 
+	const now = new Date();
 	await c.insertOne({
 		firstName: profile.firstName,
 		lastName: profile.lastName,
@@ -207,7 +221,8 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 		activeGameSessionId: firstSession.id,
 		gameSessions: [firstSession],
 		customMonsters: [],
-		createdAt: new Date(),
+		createdAt: now,
+		lastLoginAt: now,
 		[providerField]: profile.providerId
 	} as unknown as DM);
 
@@ -612,4 +627,75 @@ export async function setSessionRuleset(
 		{ $set: { 'gameSessions.$.ruleset': ruleset } }
 	);
 	return result.matchedCount > 0;
+}
+
+// ---------------------------------------------------------------------------
+// Admin — system-wide DM listing + impersonation audit log.
+// Gated by isAdminEmail() at the route level (see src/lib/server/admin.ts); these
+// functions themselves are not access-controlled.
+// ---------------------------------------------------------------------------
+export interface DMSummary {
+	firstName: string;
+	lastName: string;
+	email: string;
+	/** Auth sessionId — pass to the impersonate action to view/control this account. */
+	sessionId: string;
+	createdAt: Date;
+	lastLoginAt: Date | null;
+	gameSessionCount: number;
+}
+
+/** Returns every DM account in the system, most recently active first. */
+export async function listAllDMs(): Promise<DMSummary[]> {
+	const c = await col();
+	const dms = await c
+		.find(
+			{},
+			{
+				projection: {
+					firstName: 1,
+					lastName: 1,
+					email: 1,
+					sessionId: 1,
+					createdAt: 1,
+					lastLoginAt: 1,
+					gameSessions: 1
+				}
+			}
+		)
+		.toArray();
+
+	return dms
+		.map((dm) => ({
+			firstName: dm.firstName,
+			lastName: dm.lastName,
+			email: dm.email,
+			sessionId: dm.sessionId,
+			createdAt: dm.createdAt,
+			lastLoginAt: (dm as DM).lastLoginAt ?? null,
+			gameSessionCount: (dm.gameSessions as DMGameSession[] | undefined)?.length ?? 0
+		}))
+		.sort((a, b) => {
+			const at = a.lastLoginAt ?? a.createdAt;
+			const bt = b.lastLoginAt ?? b.createdAt;
+			return new Date(bt).getTime() - new Date(at).getTime();
+		});
+}
+
+interface AdminAuditEntry {
+	adminEmail: string;
+	action: 'impersonate-start' | 'impersonate-stop';
+	targetEmail: string;
+	targetSessionId: string;
+	at: Date;
+}
+
+/** Best-effort audit trail for admin impersonation — never blocks the caller on failure. */
+export async function logAdminAction(entry: Omit<AdminAuditEntry, 'at'>): Promise<void> {
+	try {
+		const db = await getDb();
+		await db.collection<AdminAuditEntry>('adminAudit').insertOne({ ...entry, at: new Date() });
+	} catch (err) {
+		console.error('Failed to write admin audit log entry', err);
+	}
 }

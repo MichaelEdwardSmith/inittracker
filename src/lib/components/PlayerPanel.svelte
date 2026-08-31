@@ -3,97 +3,27 @@
      options to edit their AC/initiative or remove them. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
+	import LevelUpModal from './LevelUpModal.svelte';
+	import AddPlayerModal from './AddPlayerModal.svelte';
 
 	interface Props {
 		presences?: Record<string, string>;
 	}
 	let { presences = {} }: Props = $props();
 
-	let name = $state('');
-	let ac = $state(10);
-	let hp = $state(10);
-	let dexMod = $state(0);
-	let passivePerception = $state(10);
 	let editDexMod = $state(0);
 	let editPassivePerception = $state(10);
 	let editingId = $state<string | null>(null);
+	let showAddPlayer = $state(false);
+	let showLevelUp = $state(false);
 	let confirmDeleteId = $state<string | null>(null);
 	let editAc = $state(0);
 	let editHp = $state(0);
 	let editName = $state('');
 
-	// D&D Beyond import
-	let activeTab = $state<'manual' | 'ddb'>('manual');
-	let ddbUrl = $state('');
-	let ddbFetching = $state(false);
-	let ddbError = $state('');
-	let ddbPreview = $state<{
-		name: string;
-		maxHp: number;
-		ac: number;
-		dexMod: number;
-		passivePerception: number;
-		avatarUrl?: string;
-	} | null>(null);
-
-	function extractDDBId(input: string): string | null {
-		const trimmed = input.trim();
-		const match = trimmed.match(/\/characters?\/(\d+)/i) ?? trimmed.match(/^(\d+)$/);
-		return match ? match[1] : null;
-	}
-
-	async function fetchDDBCharacter() {
-		ddbError = '';
-		ddbPreview = null;
-		const id = extractDDBId(ddbUrl);
-		if (!id) {
-			ddbError = 'Paste a D&D Beyond character URL or numeric ID.';
-			return;
-		}
-		ddbFetching = true;
-		try {
-			const res = await fetch(`/api/dndbeyond?id=${id}`);
-			const json = await res.json().catch(() => null);
-			if (!res.ok) {
-				ddbError = json?.error ?? `Error ${res.status}`;
-				return;
-			}
-			ddbPreview = json;
-		} catch {
-			ddbError = 'Network error — check your connection.';
-		} finally {
-			ddbFetching = false;
-		}
-	}
-
-	function addDDBPlayer() {
-		if (!ddbPreview) return;
-		combat.addPlayer(
-			ddbPreview.name,
-			ddbPreview.ac,
-			ddbPreview.maxHp,
-			ddbPreview.dexMod || undefined,
-			ddbPreview.passivePerception || undefined,
-			ddbPreview.avatarUrl || undefined
-		);
-		ddbUrl = '';
-		ddbPreview = null;
-		ddbError = '';
-	}
-
 	// Avatar upload state
 	let fileInput: HTMLInputElement;
 	let uploadingFor = $state<string | null>(null);
-
-	function addPlayer() {
-		if (!name.trim()) return;
-		combat.addPlayer(name.trim(), ac, hp, dexMod || undefined, passivePerception || undefined);
-		name = '';
-		ac = 10;
-		hp = 10;
-		dexMod = 0;
-		passivePerception = 10;
-	}
 
 	function startEdit(
 		id: string,
@@ -178,157 +108,23 @@
 <div class="flex h-full flex-col gap-3">
 	<h2 class="text-lg font-bold tracking-wide text-amber-400">Party</h2>
 
-	<!-- Tab switcher -->
-	<div class="flex rounded-lg border border-gray-700 bg-gray-800 p-0.5 text-xs font-medium">
-		<button
-			type="button"
-			onclick={() => (activeTab = 'manual')}
-			class="flex-1 rounded-md py-1 transition {activeTab === 'manual'
-				? 'bg-amber-600 text-white'
-				: 'text-gray-400 hover:text-gray-200'}"
-		>
-			Manual
-		</button>
-		<button
-			type="button"
-			onclick={() => {
-				activeTab = 'ddb';
-				ddbError = '';
-				ddbPreview = null;
-			}}
-			class="flex-1 rounded-md py-1 transition {activeTab === 'ddb'
-				? 'bg-amber-600 text-white'
-				: 'text-gray-400 hover:text-gray-200'}"
-		>
-			D&amp;D Beyond
-		</button>
-	</div>
+	<button
+		type="button"
+		onclick={() => (showAddPlayer = true)}
+		class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
+	>
+		+ Add Player
+	</button>
 
-	<!-- D&D Beyond import form -->
-	{#if activeTab === 'ddb'}
-		<div class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3">
-			<p class="text-xs text-gray-400">Paste a D&amp;D Beyond character URL or ID.</p>
-			<div class="flex gap-2">
-				<input
-					bind:value={ddbUrl}
-					placeholder="dndbeyond.com/characters/12345678"
-					class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-xs text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
-					onkeydown={(e) => {
-						if (e.key === 'Enter') {
-							e.preventDefault();
-							fetchDDBCharacter();
-						}
-					}}
-				/>
-				<button
-					type="button"
-					onclick={fetchDDBCharacter}
-					disabled={ddbFetching}
-					class="shrink-0 rounded bg-blue-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-800 disabled:opacity-50"
-				>
-					{ddbFetching ? 'Fetching…' : 'Fetch'}
-				</button>
-			</div>
-			{#if ddbError}
-				<p class="text-xs text-red-400">{ddbError}</p>
-			{/if}
-			{#if ddbPreview}
-				<div class="rounded-md border border-blue-800/60 bg-gray-900 p-2.5">
-					<div class="mb-1.5 text-sm font-semibold text-white">{ddbPreview.name}</div>
-					<div class="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-gray-400">
-						<span>Max HP: <span class="text-white">{ddbPreview.maxHp}</span></span>
-						<span>AC: <span class="text-white">{ddbPreview.ac}</span></span>
-						<span
-							>DEX: <span class="text-white"
-								>{ddbPreview.dexMod >= 0 ? '+' : ''}{ddbPreview.dexMod}</span
-							></span
-						>
-						<span>Passive: <span class="text-white">{ddbPreview.passivePerception}</span></span>
-					</div>
-				</div>
-				<button
-					type="button"
-					onclick={addDDBPlayer}
-					class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
-				>
-					+ Add Player
-				</button>
-			{/if}
-		</div>
-	{/if}
-
-	<!-- Manual add form -->
-	{#if activeTab === 'manual'}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				addPlayer();
-			}}
-			class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3"
-		>
-			<input
-				bind:value={name}
-				placeholder="Player name"
-				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
-			/>
-			<div class="flex gap-2">
-				<label class="flex flex-1 flex-col gap-1">
-					<span class="cursor-help text-xs text-gray-400" title="This is your player's Armor Class"
-						>AC</span
-					>
-					<input
-						type="number"
-						bind:value={ac}
-						min="1"
-						max="30"
-						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-					/>
-				</label>
-				<label class="flex flex-1 flex-col gap-1">
-					<span class="cursor-help text-xs text-gray-400" title="This is your player's Max HP"
-						>HP</span
-					>
-					<input
-						type="number"
-						bind:value={hp}
-						min="1"
-						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-					/>
-				</label>
-				<label class="flex flex-1 flex-col gap-1">
-					<span class="cursor-help text-xs text-gray-400" title="This is your player's DEX Modifier"
-						>DEX</span
-					>
-					<input
-						type="number"
-						bind:value={dexMod}
-						min="-10"
-						max="10"
-						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-					/>
-				</label>
-				<label class="flex flex-1 flex-col gap-1">
-					<span
-						class="cursor-help text-xs text-gray-400"
-						title="This is your player's Passive Perception">Passive</span
-					>
-					<input
-						type="number"
-						bind:value={passivePerception}
-						min="1"
-						max="30"
-						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
-					/>
-				</label>
-			</div>
-			<button
-				type="submit"
-				class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
-			>
-				+ Add Player
-			</button>
-		</form>
-	{/if}
+	<button
+		type="button"
+		onclick={() => (showLevelUp = true)}
+		disabled={combat.players.length === 0}
+		title="Step through the party and update each player's level, AC, HP, DEX, and Passive Perception"
+		class="rounded bg-violet-700 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-violet-600 active:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-40"
+	>
+		⬆ Level Up
+	</button>
 
 	<!-- Player list -->
 	<div class="flex flex-1 flex-col gap-2 overflow-y-auto">
@@ -455,7 +251,9 @@
 							{/if}
 						</div>
 						<div class="text-xs text-gray-400">
-							AC {player.ac} &bull; {player.maxHp} HP{#if player.dexMod}
+							{#if player.level}Level {player.level} &bull;
+							{/if}AC {player.ac} &bull; {player.maxHp}
+							HP{#if player.dexMod}
 								&bull; DEX {player.dexMod > 0
 									? '+'
 									: ''}{player.dexMod}{/if}{#if player.passivePerception}
@@ -576,3 +374,11 @@
 		{/if}
 	</div>
 </div>
+
+{#if showAddPlayer}
+	<AddPlayerModal onclose={() => (showAddPlayer = false)} />
+{/if}
+
+{#if showLevelUp}
+	<LevelUpModal onclose={() => (showLevelUp = false)} />
+{/if}

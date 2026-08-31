@@ -5,6 +5,7 @@
 //     keepalive ping every 25 s and the current snapshot immediately on connect.
 //   • Any other Accept (no query param)        → returns a JSON snapshot for DM page refresh.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import type { StorageState } from '$lib/types';
 import { saveCombatState, getCombatState, getDMByGameSessionId } from '$lib/server/dmModel';
 import { isValidSessionId, validateStorageState } from '$lib/server/validate';
@@ -27,7 +28,7 @@ function getClients(sessionId: string): Set<ReadableStreamDefaultController<Uint
 // Guests use the dm_guest cookie — state is cached in memory only, not persisted.
 // ---------------------------------------------------------------------------
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });
@@ -73,7 +74,7 @@ export const GET: RequestHandler = async ({ request, url, cookies }) => {
 
 	if (!wantsStream) {
 		// DM screen polling — resolve game session from auth or guest cookie
-		const authSessionId = cookies.get('dm_auth');
+		const authSessionId = await resolveActingSessionId(cookies);
 		const guestSessionId = cookies.get('dm_guest');
 
 		if (!authSessionId && guestSessionId && isValidSessionId(guestSessionId)) {

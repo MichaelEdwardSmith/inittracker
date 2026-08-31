@@ -18,7 +18,11 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
 				sessionId: locals.gameSessionId ?? '',
 				name: 'Guest Session',
 				ruleset: '2014' as const // placeholder until guest picks
-			} as GameSession
+			} as GameSession,
+			isAdmin: false,
+			isImpersonating: false,
+			impersonatingAdminEmail: null,
+			dmEmail: null
 		};
 	}
 
@@ -35,10 +39,14 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
 
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
+		dmEmail: locals.dmEmail ?? null,
 		isGuest: false,
 		showVoiceCommands: true,
 		sessions,
 		activeSession,
-		needsEditionSetup
+		needsEditionSetup,
+		isAdmin: locals.isAdmin,
+		isImpersonating: locals.isImpersonating,
+		impersonatingAdminEmail: locals.impersonatingAdminEmail
 	};
 };

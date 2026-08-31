@@ -1,6 +1,7 @@
 // GET  /api/notes  — returns { notes: NoteEntry[] } for the active game session (newest first).
 // POST /api/notes  — handles create / update / delete actions on note entries.
 import type { RequestHandler } from '@sveltejs/kit';
+import { resolveActingSessionId } from '$lib/server/auth';
 import {
 	listNotes,
 	createNote,
@@ -20,7 +21,7 @@ async function resolveGameSessionId(authSessionId: string): Promise<string | nul
 }
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const gameSessionId = await resolveGameSessionId(authSessionId);
@@ -31,7 +32,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const gameSessionId = await resolveGameSessionId(authSessionId);

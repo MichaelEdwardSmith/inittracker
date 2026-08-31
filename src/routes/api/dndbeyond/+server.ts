@@ -2,6 +2,7 @@
 // GET /api/dndbeyond?id=<numericCharacterId>
 // Returns a small parsed object: { name, maxHp, ac, dexMod, passivePerception }
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 
 interface DDBImport {
 	name: string;
@@ -165,7 +166,7 @@ function parseDDBCharacter(data: any): DDBImport {
 }
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const id = url.searchParams.get('id');

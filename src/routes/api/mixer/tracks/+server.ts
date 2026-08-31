@@ -1,6 +1,7 @@
 // GET  /api/mixer/tracks?session=<id> — list track metadata for a session (viewers call on join).
 // POST /api/mixer/tracks              — DM pushes mixer play state; broadcasts to viewers.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { isValidSessionId } from '$lib/server/validate';
 import { authToGameSession } from '$lib/server/sessionCache';
 import { getActiveGameSessionPublicId } from '$lib/server/dmModel';
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async ({ url }) => {
 // POST /api/mixer/tracks — DM pushes mixer play state
 // ---------------------------------------------------------------------------
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });

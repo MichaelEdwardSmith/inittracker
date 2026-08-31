@@ -2,6 +2,7 @@
 // GET    /api/history             — returns all combat records for the active session.
 // DELETE /api/history             — deletes all records, or a single record when ?id= is provided.
 import type { RequestHandler } from '@sveltejs/kit';
+import { resolveActingSessionId } from '$lib/server/auth';
 import {
 	saveCombatRecord,
 	getCombatHistory,
@@ -14,7 +15,7 @@ import { isValidSessionId } from '$lib/server/validate';
 import type { CombatRecord } from '$lib/types';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });
@@ -46,7 +47,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 };
 
 export const DELETE: RequestHandler = async ({ url, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });
@@ -78,7 +79,7 @@ export const DELETE: RequestHandler = async ({ url, cookies }) => {
 };
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && guestSessionId && isValidSessionId(guestSessionId)) {

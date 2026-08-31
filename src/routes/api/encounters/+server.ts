@@ -2,11 +2,12 @@
 // POST /api/encounters        — creates a new encounter; validates name and enemies array.
 // DELETE /api/encounters?id=  — deletes an encounter by id.
 import type { RequestEvent } from '@sveltejs/kit';
+import { resolveActingSessionId } from '$lib/server/auth';
 import type { Encounter, EncounterEnemy } from '$lib/types';
 import { getEncounters, saveEncounter, deleteEncounter } from '$lib/server/dmModel';
 
 export async function GET({ cookies }: RequestEvent) {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const encounters = await getEncounters(sessionId);
@@ -14,7 +15,7 @@ export async function GET({ cookies }: RequestEvent) {
 }
 
 export async function POST({ request, cookies }: RequestEvent) {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const body = await request.json().catch(() => null);
@@ -42,7 +43,7 @@ export async function POST({ request, cookies }: RequestEvent) {
 }
 
 export async function DELETE({ url, cookies }: RequestEvent) {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const id = url.searchParams.get('id');

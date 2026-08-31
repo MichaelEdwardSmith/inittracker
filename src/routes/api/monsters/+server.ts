@@ -1,11 +1,12 @@
 // GET  /api/monsters  — returns all custom monsters for the authenticated DM.
 // POST /api/monsters  — creates a new custom monster; validates name, AC, HP, CR, and type.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import type { CustomMonster } from '$lib/types';
 import { getCustomMonsters, addCustomMonster } from '$lib/server/dmModel';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return Response.json([]); // guests have no custom monsters
 
 	const monsters = await getCustomMonsters(sessionId);
@@ -13,7 +14,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const body = await request.json().catch(() => null);

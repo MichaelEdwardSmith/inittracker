@@ -1,10 +1,11 @@
 // PUT    /api/monsters/[id]  — updates an existing custom monster's fields (name, AC, HP, CR, type, avatar).
 // DELETE /api/monsters/[id]  — permanently deletes a custom monster by its UUID.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { updateCustomMonster, deleteCustomMonster } from '$lib/server/dmModel';
 
 export const PUT: RequestHandler = async ({ request, cookies, params }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const body = await request.json().catch(() => null);
@@ -39,7 +40,7 @@ export const PUT: RequestHandler = async ({ request, cookies, params }) => {
 };
 
 export const DELETE: RequestHandler = async ({ cookies, params }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	await deleteCustomMonster(sessionId, params.id);
