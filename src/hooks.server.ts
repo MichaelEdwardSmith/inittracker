@@ -4,7 +4,7 @@
 // event.locals for downstream load functions.
 import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
-import { getDMBySessionId, getActiveGameSession } from '$lib/server/dmModel';
+import { getDMBySessionId, getActiveGameSession, touchDMActivity } from '$lib/server/dmModel';
 import { getPlayerBySessionId } from '$lib/server/playerModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { isAdminEmail } from '$lib/server/admin';
@@ -52,6 +52,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (!event.locals.isAdmin) redirect(303, '/dashboard');
 		event.locals.dmFirstName = dm.firstName;
 		event.locals.dmEmail = dm.email;
+		touchDMActivity(sessionId, dm.lastActiveAt ?? null);
 		return resolve(event);
 	}
 
@@ -73,6 +74,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 		event.locals.realSessionId = sessionId;
 		event.locals.isAdmin = isAdminEmail(realDm.email);
+		// Track the real account's activity, not the impersonated target's — impersonation is
+		// the admin looking at someone else's dashboard, not that DM actually using the system.
+		touchDMActivity(sessionId, realDm.lastActiveAt ?? null);
 
 		// Admin impersonation — act as the target DM's account instead of the admin's own.
 		let actingSessionId = sessionId;

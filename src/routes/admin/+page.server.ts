@@ -5,12 +5,15 @@
 // adminAudit collection for accountability.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { listAllDMs, getDMBySessionId, logAdminAction } from '$lib/server/dmModel';
+import { listAllDMs, getDMBySessionId, deleteDM, logAdminAction } from '$lib/server/dmModel';
+import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
+import { sessionStates, sessionClients } from '$lib/server/sseState';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const dms = await listAllDMs();
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
+		realSessionId: locals.realSessionId,
 		dms
 	};
 };
@@ -67,5 +70,42 @@ export const actions: Actions = {
 		}
 
 		redirect(303, '/admin');
+	},
+
+	delete: async ({ request, cookies, locals }) => {
+		if (!locals.isAdmin || !locals.realSessionId || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+		if (targetSessionId === locals.realSessionId) {
+			return fail(400, { error: 'You cannot delete your own account.' });
+		}
+
+		const result = await deleteDM(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		// Evict the deleted account from every in-memory cache so nothing keeps serving or
+		// accepting requests for it until the next server restart.
+		authToGameSession.delete(targetSessionId);
+		authToRuleset.delete(targetSessionId);
+		for (const gameSessionId of result.gameSessionIds ?? []) {
+			sessionStates.delete(gameSessionId);
+			sessionClients.delete(gameSessionId);
+		}
+
+		// If the admin was mid-impersonation of the account they just deleted, exit that view.
+		if (cookies.get('dm_impersonate') === targetSessionId) {
+			cookies.delete('dm_impersonate', { path: '/' });
+		}
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'delete-account',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { deleted: true };
 	}
 };

@@ -44,6 +44,10 @@ export interface DM {
 	createdAt: Date;
 	/** Set on every successful password/OAuth login. Absent for accounts that haven't logged in since this field was added. */
 	lastLoginAt?: Date;
+	/** Bumped (throttled) on every authenticated page hit — see touchDMActivity(). This is what
+	 *  the admin panel's "Last active" column actually reflects, since most sessions are a
+	 *  standing 30-day cookie that never triggers another loginDM() call. */
+	lastActiveAt?: Date;
 }
 
 // 6 chars from an unambiguous alphabet (no O/0/I/1 confusion)
@@ -227,6 +231,25 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 	} as unknown as DM);
 
 	return { sessionId };
+}
+
+const ACTIVITY_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Fire-and-forget: bumps lastActiveAt for a DM, throttled so a burst of requests from the same
+ * session doesn't turn into a write per request. Pass the DM's already-known lastActiveAt (from
+ * a document the caller already fetched) to skip an extra read.
+ */
+export function touchDMActivity(authSessionId: string, knownLastActiveAt?: Date | null): void {
+	if (
+		knownLastActiveAt &&
+		Date.now() - new Date(knownLastActiveAt).getTime() < ACTIVITY_THROTTLE_MS
+	) {
+		return;
+	}
+	col()
+		.then((c) => c.updateOne({ sessionId: authSessionId }, { $set: { lastActiveAt: new Date() } }))
+		.catch((err) => console.error('Failed to update DM lastActiveAt', err));
 }
 
 /** Look up a DM by their auth sessionId (cookie value). */
@@ -638,10 +661,11 @@ export interface DMSummary {
 	firstName: string;
 	lastName: string;
 	email: string;
-	/** Auth sessionId — pass to the impersonate action to view/control this account. */
+	/** Auth sessionId — pass to the impersonate/delete actions to target this account. */
 	sessionId: string;
 	createdAt: Date;
-	lastLoginAt: Date | null;
+	/** lastActiveAt (real usage) if we have it, else lastLoginAt (explicit sign-in), else never. */
+	lastActiveAt: Date | null;
 	gameSessionCount: number;
 }
 
@@ -659,6 +683,7 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					sessionId: 1,
 					createdAt: 1,
 					lastLoginAt: 1,
+					lastActiveAt: 1,
 					gameSessions: 1
 				}
 			}
@@ -672,19 +697,37 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 			email: dm.email,
 			sessionId: dm.sessionId,
 			createdAt: dm.createdAt,
-			lastLoginAt: (dm as DM).lastLoginAt ?? null,
+			lastActiveAt: (dm as DM).lastActiveAt ?? (dm as DM).lastLoginAt ?? null,
 			gameSessionCount: (dm.gameSessions as DMGameSession[] | undefined)?.length ?? 0
 		}))
 		.sort((a, b) => {
-			const at = a.lastLoginAt ?? a.createdAt;
-			const bt = b.lastLoginAt ?? b.createdAt;
+			const at = a.lastActiveAt ?? a.createdAt;
+			const bt = b.lastActiveAt ?? b.createdAt;
 			return new Date(bt).getTime() - new Date(at).getTime();
 		});
 }
 
+/**
+ * Permanently deletes a DM account and everything embedded in it (game sessions, combat
+ * history, custom monsters, encounters). Returns the deleted account's email and the public
+ * 6-char IDs of its game sessions so the caller can evict them from in-memory caches.
+ */
+export async function deleteDM(
+	authSessionId: string
+): Promise<{ ok: boolean; email?: string; gameSessionIds?: string[]; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+
+	const gameSessionIds = ((dm.gameSessions as DMGameSession[]) ?? []).map((s) => s.sessionId);
+	await c.deleteOne({ sessionId: authSessionId });
+
+	return { ok: true, email: dm.email, gameSessionIds };
+}
+
 interface AdminAuditEntry {
 	adminEmail: string;
-	action: 'impersonate-start' | 'impersonate-stop';
+	action: 'impersonate-start' | 'impersonate-stop' | 'delete-account';
 	targetEmail: string;
 	targetSessionId: string;
 	at: Date;
