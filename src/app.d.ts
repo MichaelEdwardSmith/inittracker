@@ -12,8 +12,12 @@ declare global {
 			dmFirstName: string | null;
 			dmEmail: string | null;
 			isGuest: boolean;
-			/** True when the real logged-in account is the system admin (see $lib/server/admin.ts). */
+			/** True when the real logged-in account has admin access — the root admin or a DM
+			 *  they've promoted (see $lib/server/admin.ts). */
 			isAdmin: boolean;
+			/** True only for the one hardcoded root admin — the sole account that can promote or
+			 *  demote other DMs' admin status. */
+			isRootAdmin: boolean;
 			/** Auth sessionId of the real logged-in account, ignoring any active impersonation. */
 			realSessionId: string | null;
 			/** True when the admin is currently viewing/controlling another DM's account. */

@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
+import { isRootAdminEmail } from './admin';
 import type {
 	StorageState,
 	CustomMonster,
@@ -51,6 +52,9 @@ export interface DM {
 	/** Set when an admin suspends this account; absent means active. Checked in hooks.server.ts
 	 *  to block dashboard/history access, and at login to reject the attempt outright. */
 	suspendedAt?: Date;
+	/** Set by the root admin via the /admin "Make admin" action — grants full admin access
+	 *  (see isAdminDM() in $lib/server/admin.ts). Only the root admin can set or clear this. */
+	isAdmin?: boolean;
 }
 
 // 6 chars from an unambiguous alphabet (no O/0/I/1 confusion)
@@ -673,7 +677,7 @@ export async function setSessionRuleset(
 
 // ---------------------------------------------------------------------------
 // Admin — system-wide DM listing + impersonation audit log.
-// Gated by isAdminEmail() at the route level (see src/lib/server/admin.ts); these
+// Gated by isAdminDM() at the route level (see src/lib/server/admin.ts); these
 // functions themselves are not access-controlled.
 // ---------------------------------------------------------------------------
 export interface DMSummary {
@@ -686,6 +690,10 @@ export interface DMSummary {
 	/** lastActiveAt (real usage) if we have it, else lastLoginAt (explicit sign-in), else never. */
 	lastActiveAt: Date | null;
 	suspended: boolean;
+	/** True for the root admin or anyone they've promoted — see isAdminDM(). */
+	isAdmin: boolean;
+	/** True only for the one hardcoded root admin — can't be revoked via the promote/demote action. */
+	isRootAdmin: boolean;
 	/** False for OAuth-only accounts that have never had a password set. */
 	hasPassword: boolean;
 	/** Public 6-char ID of the DM's currently active game session — for the read-only Inspect link. */
@@ -713,6 +721,7 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					lastLoginAt: 1,
 					lastActiveAt: 1,
 					suspendedAt: 1,
+					isAdmin: 1,
 					passwordHash: 1,
 					activeGameSessionId: 1,
 					gameSessions: 1,
@@ -735,6 +744,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 				createdAt: dm.createdAt,
 				lastActiveAt: (dm as DM).lastActiveAt ?? (dm as DM).lastLoginAt ?? null,
 				suspended: !!(dm as DM).suspendedAt,
+				isAdmin: isRootAdminEmail(dm.email) || !!(dm as DM).isAdmin,
+				isRootAdmin: isRootAdminEmail(dm.email),
 				hasPassword: !!dm.passwordHash,
 				activeSessionPublicId: active?.sessionId ?? sessions[0]?.sessionId ?? null,
 				gameSessionCount: sessions.length,
@@ -769,6 +780,30 @@ export async function unsuspendDM(
 	const dm = await c.findOne({ sessionId: authSessionId });
 	if (!dm) return { ok: false, error: 'DM account not found.' };
 	await c.updateOne({ sessionId: authSessionId }, { $unset: { suspendedAt: '' } });
+	return { ok: true, email: dm.email };
+}
+
+/**
+ * Grants or revokes admin access for a DM. Caller (the /admin route action) must already have
+ * verified the requester is the root admin — this function itself doesn't check who's calling.
+ * Refuses to touch the root admin's own account: its admin status is hardcoded, not DB-backed,
+ * so there's nothing here to flip either way.
+ */
+export async function setDMAdmin(
+	authSessionId: string,
+	makeAdmin: boolean
+): Promise<{ ok: boolean; email?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+	if (isRootAdminEmail(dm.email)) {
+		return { ok: false, error: 'The root admin already has admin access — nothing to change.' };
+	}
+	if (makeAdmin) {
+		await c.updateOne({ sessionId: authSessionId }, { $set: { isAdmin: true } });
+	} else {
+		await c.updateOne({ sessionId: authSessionId }, { $unset: { isAdmin: '' } });
+	}
 	return { ok: true, email: dm.email };
 }
 
@@ -814,6 +849,8 @@ export type AdminAuditAction =
 	| 'impersonate-stop'
 	| 'suspend'
 	| 'unsuspend'
+	| 'promote-admin'
+	| 'demote-admin'
 	| 'password-reset'
 	| 'export-data'
 	| 'delete-account';

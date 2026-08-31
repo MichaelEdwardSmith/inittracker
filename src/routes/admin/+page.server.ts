@@ -17,6 +17,7 @@ import {
 	deleteDM,
 	suspendDM,
 	unsuspendDM,
+	setDMAdmin,
 	resetDMPassword,
 	logAdminAction
 } from '$lib/server/dmModel';
@@ -28,6 +29,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
 		realSessionId: locals.realSessionId,
+		isRootAdmin: locals.isRootAdmin,
 		dms,
 		auditLog
 	};
@@ -128,6 +130,47 @@ export const actions: Actions = {
 		});
 
 		return { unsuspended: true };
+	},
+
+	promote: async ({ request, locals }) => {
+		// Only the root admin can hand out admin access — a promoted admin can't mint further ones.
+		if (!locals.isRootAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await setDMAdmin(targetSessionId, true);
+		if (!result.ok) return fail(400, { error: result.error ?? 'Could not grant admin access.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'promote-admin',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { promoted: true };
+	},
+
+	demote: async ({ request, locals }) => {
+		if (!locals.isRootAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await setDMAdmin(targetSessionId, false);
+		if (!result.ok) return fail(400, { error: result.error ?? 'Could not revoke admin access.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'demote-admin',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { demoted: true };
 	},
 
 	resetPassword: async ({ request, locals }) => {

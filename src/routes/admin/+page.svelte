@@ -8,9 +8,11 @@
        Suspend/Restore — blocks/restores login + dashboard access without touching their data.
        Delete          — permanently removes the account and everything embedded in it.
 
-     Everything else (usage stats, the read-only Inspect link, password reset, JSON export, and
-     this user's slice of the audit log) lives behind a per-row "Details" toggle — collapsed by
-     default so the table stays scannable as the account list grows. -->
+     Everything else (usage stats, the read-only Inspect link, password reset, JSON export,
+     Make/Remove admin, and this user's slice of the audit log) lives behind a per-row "Details"
+     toggle — collapsed by default so the table stays scannable as the account list grows.
+     Make/Remove admin only appears for the root admin — a promoted admin can't mint further
+     admins (see $lib/server/admin.ts). -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { AdminAuditAction } from '$lib/server/dmModel';
@@ -71,11 +73,30 @@
 		};
 	}
 
+	function confirmPromote(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (
+				!confirm(
+					`Make ${name} an admin? They'll get full access to this panel — impersonating, suspending, and deleting any account.`
+				)
+			)
+				cancel();
+		};
+	}
+
+	function confirmDemote(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (!confirm(`Remove admin access from ${name}?`)) cancel();
+		};
+	}
+
 	const actionLabels: Record<AdminAuditAction, string> = {
 		'impersonate-start': 'Started impersonating',
 		'impersonate-stop': 'Stopped impersonating',
 		suspend: 'Suspended account',
 		unsuspend: 'Restored account',
+		'promote-admin': 'Granted admin access',
+		'demote-admin': 'Revoked admin access',
 		'password-reset': 'Reset password',
 		'export-data': 'Exported data',
 		'delete-account': 'Deleted account'
@@ -233,6 +254,14 @@
 								{dm.firstName}
 								{dm.lastName}
 								{#if isSelf}<span class="ml-1 text-xs font-normal text-gray-600">(you)</span>{/if}
+								{#if dm.isAdmin}
+									<span
+										class="ml-1 rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-300 uppercase"
+										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
+									>
+										{dm.isRootAdmin ? '★ Root Admin' : 'Admin'}
+									</span>
+								{/if}
 							</td>
 							<td class="px-4 py-3 text-gray-400">{dm.email}</td>
 							<td class="px-4 py-3">
@@ -380,6 +409,37 @@
 													>
 														Export JSON ↓
 													</a>
+													{#if data.isRootAdmin && !dm.isRootAdmin}
+														{#if dm.isAdmin}
+															<form
+																method="POST"
+																action="?/demote"
+																use:enhance={confirmDemote(`${dm.firstName} ${dm.lastName}`)}
+															>
+																<input type="hidden" name="sessionId" value={dm.sessionId} />
+																<button
+																	type="submit"
+																	class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
+																>
+																	Remove admin
+																</button>
+															</form>
+														{:else}
+															<form
+																method="POST"
+																action="?/promote"
+																use:enhance={confirmPromote(`${dm.firstName} ${dm.lastName}`)}
+															>
+																<input type="hidden" name="sessionId" value={dm.sessionId} />
+																<button
+																	type="submit"
+																	class="rounded border border-amber-700/60 bg-amber-900/20 px-2.5 py-1 text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
+																>
+																	Make admin
+																</button>
+															</form>
+														{/if}
+													{/if}
 												</div>
 											</div>
 										{/if}
