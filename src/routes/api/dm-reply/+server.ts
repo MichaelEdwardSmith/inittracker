@@ -2,6 +2,7 @@
 // Requires dm_auth cookie. Broadcasts a 'dmMessage' SSE event to all viewers
 // in the session so the targeted player(s) can receive it in real time.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { getActiveGameSessionPublicId } from '$lib/server/dmModel';
 import { authToGameSession } from '$lib/server/sessionCache';
 import { broadcastEventToSession } from '$lib/server/sseState';
@@ -18,7 +19,7 @@ async function resolveGameSessionId(authSessionId: string): Promise<string | nul
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const gameSessionId = await resolveGameSessionId(authSessionId);
@@ -51,7 +52,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 };
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const gameSessionId = await resolveGameSessionId(authSessionId);

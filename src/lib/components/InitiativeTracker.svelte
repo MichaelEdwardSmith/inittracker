@@ -224,7 +224,7 @@
 						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
-						▶ Start Combat
+						Start Combat
 					</button>
 				{:else}
 					<button
@@ -273,7 +273,7 @@
 			<button
 				onclick={() => combat.undo()}
 				disabled={!combat.canUndo}
-				title="Undo the last damage/heal, condition/effect, or turn change"
+				title="Undo the last damage/heal, condition/effect, or turn change (up to 5 steps)"
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
 			>
 				↺ Undo
@@ -283,7 +283,7 @@
 				title="Apply damage, healing, a condition, or a spell effect to multiple combatants"
 				class="rounded bg-orange-900/60 px-2 py-1 text-xs text-orange-300 transition hover:bg-orange-800 hover:text-white"
 			>
-				AoE
+				Area of Effect
 			</button>
 			<button
 				onclick={() => combat.resetInitiatives()}
@@ -629,10 +629,10 @@
 									class="relative flex flex-col items-center leading-none"
 									style="margin-top:2px;"
 								>
-									<span class="text-[9px] font-bold tracking-widest text-gray-400 uppercase"
+									<span class="text-[9px] font-bold tracking-widest text-slate-400 uppercase"
 										>AC</span
 									>
-									<span class="text-lg leading-none font-bold text-gray-100">{c.ac}</span>
+									<span class="text-lg leading-none font-bold text-slate-100">{c.ac}</span>
 								</div>
 							</div>
 						</div>

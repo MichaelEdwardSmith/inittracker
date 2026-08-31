@@ -2,6 +2,7 @@
 // GET  /api/messages  — DM polls for messages for their active game session.
 // DELETE /api/messages — DM clears all messages for their active game session.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 import { addMessage, getMessages, clearMessages } from '$lib/server/messageStore';
 import { authToGameSession } from '$lib/server/sessionCache';
@@ -29,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 // GET — DM fetches their messages (auth via dm_auth cookie)
 export const GET: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 	const gameSessionId = await resolveGameSessionId(authSessionId);
 	if (!gameSessionId) return new Response('No active session', { status: 400 });
@@ -38,7 +39,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
 // DELETE — DM clears all messages
 export const DELETE: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 	const gameSessionId = await resolveGameSessionId(authSessionId);
 	if (!gameSessionId) return new Response('No active session', { status: 400 });

@@ -2,11 +2,12 @@
 // Skips entries with missing/invalid fields and entries whose name already exists in the library.
 // Returns { imported, skipped } counts.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import type { CustomMonster, MonsterDetail } from '$lib/types';
 import { getCustomMonsters, addCustomMonster } from '$lib/server/dmModel';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) return new Response('Unauthorized', { status: 401 });
 
 	const body = await request.json().catch(() => null);

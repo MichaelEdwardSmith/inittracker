@@ -5,6 +5,7 @@
 //   'delete'  — deletes a session; refuses if it would be the last one.
 //   'switch'  — makes a session active and updates the shared auth→session cache.
 import type { RequestHandler } from '@sveltejs/kit';
+import { resolveActingSessionId } from '$lib/server/auth';
 import {
 	listGameSessions,
 	createGameSession,
@@ -21,7 +22,7 @@ import { sessionStates, sessionClients, guestHistory } from '$lib/server/sseStat
 // GET /api/sessions — list all game sessions for the authenticated DM
 // ---------------------------------------------------------------------------
 export const GET: RequestHandler = async ({ cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const sessions = await listGameSessions(authSessionId);
@@ -37,7 +38,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 // Body: { action: 'create' | 'rename' | 'delete' | 'switch', id?, name? }
 // ---------------------------------------------------------------------------
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	let body: { action: string; id?: string; name?: string; ruleset?: '2014' | '2024' };

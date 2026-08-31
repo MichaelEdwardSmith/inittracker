@@ -25,6 +25,7 @@
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
 	import { setContext } from 'svelte';
+	import { enhance } from '$app/forms';
 	import type { GameSession } from '$lib/types';
 
 	let { data } = $props();
@@ -439,6 +440,25 @@
 		<div class="bg-orb orb-4"></div>
 	</div>
 
+	{#if data.isImpersonating}
+		<div
+			class="relative z-10 flex shrink-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-600 px-4 py-1.5 text-center text-xs font-semibold text-black sm:text-sm"
+		>
+			<span>
+				🛡️ Admin view — viewing <strong>{data.dmFirstName}</strong>{#if data.dmEmail}
+					({data.dmEmail}){/if}'s account as {data.impersonatingAdminEmail}
+			</span>
+			<form method="POST" action="/admin?/stop" use:enhance>
+				<button
+					type="submit"
+					class="rounded border border-black/30 bg-black/10 px-2 py-0.5 text-xs font-bold tracking-wide uppercase transition hover:bg-black/20"
+				>
+					Exit
+				</button>
+			</form>
+		</div>
+	{/if}
+
 	<!-- App header -->
 	<header class="flex shrink-0 items-center border-b border-gray-800 bg-gray-900 px-6 py-3">
 		<span class="text-xl">⚔️</span>
@@ -608,6 +628,29 @@
 			</svg>
 			Guide
 		</a>
+		{#if data.isAdmin && !data.isImpersonating}
+			<a
+				href="/admin"
+				onclick={() => (showMobileMenu = false)}
+				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
+				</svg>
+				Admin
+			</a>
+		{/if}
 		{#if !data.isGuest}
 			<button
 				onclick={() => {

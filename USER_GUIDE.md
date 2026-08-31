@@ -11,6 +11,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 3. [The DM Dashboard](#3-the-dm-dashboard)
 4. [Managing Your Party (Players)](#4-managing-your-party-players)
    - [Importing from D&D Beyond](#importing-from-dd-beyond)
+   - [Leveling Up a Player](#leveling-up-a-player)
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
    - [Undo](#undo)
@@ -141,13 +142,14 @@ The header runs across the top of every screen. Its actions include:
 
 ### Adding a Player
 
-The Player Panel offers two ways to add a player: **Manual** entry or **D&D Beyond** import. Click the tab at the top of the add-player form to switch between them.
+Click **+ Add Player** to open the add-player popup. It offers two ways to add a player: **Manual** entry or **D&D Beyond** import. Click the tab at the top of the popup to switch between them. The popup stays open after each add, so you can add your whole party in one go — close it with the **✕**, **Escape**, or by clicking outside it.
 
 **Manual:**
 
 Fill in:
 
 - **Name**
+- **Level** (default 1, range 1–20)
 - **AC** (Armor Class, default 10, range 1–30)
 - **Max HP** (default 10)
 
@@ -159,11 +161,12 @@ If your players have characters on D&D Beyond, you can import them directly inst
 
 > **Requirement:** The character sheet must be set to **Public** on D&D Beyond (Character Settings → Privacy → Public).
 
-1. Click the **D&D Beyond** tab at the top of the add-player form
+1. Click the **D&D Beyond** tab at the top of the add-player popup
 2. Paste a character URL (e.g. `https://www.dndbeyond.com/characters/39615915`) or just the numeric character ID
 3. Click **Fetch** — the tracker contacts D&D Beyond and parses the character sheet
 4. A preview card appears showing the imported values:
    - **Name**
+   - **Level** — total character level across all classes
    - **Max HP** — calculated from hit dice, CON modifier, and any bonuses
    - **AC** — derived from equipped armor, shield, class features, feats, and magic items
    - **DEX mod** — includes 2024 initiative proficiency if the character uses 2024 rules
@@ -183,6 +186,10 @@ On the initiative order (the DM's center panel), clicking a player's avatar open
 ### Editing a Player
 
 Double-click a player card, or click the **pencil icon**, to enter inline edit mode. You can change the name, AC, and max HP. Saving resets the player's HP to their new max HP. Click **Save** or **Cancel**.
+
+### Leveling Up a Player
+
+Click **⬆ Level Up** below the add-player form to open a wizard that steps through the party one player at a time. Each step shows that player's current stats and lets you enter their new **Level**, **AC**, **Max HP**, **DEX modifier**, and **Passive Perception**. Raising Max HP carries the gain over to current HP rather than fully healing the player. Click **Save & Next** to move on — changes save as you go, so closing partway through keeps whatever you've already stepped past. Use **← Back** to revisit the previous player.
 
 ### Benching a Player
 
@@ -290,9 +297,9 @@ Click **End** to conclude the current combat. The encounter is automatically sav
 
 ### Undo
 
-The **↺ Undo** button in the initiative order toolbar reverts the single most recent action from this list: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save update, or a turn advance/rewind. It's greyed out when there's nothing to undo.
+The **↺ Undo** button in the initiative order toolbar reverts the most recent action from this list: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save update, or a turn advance/rewind. It's greyed out when there's nothing to undo.
 
-Undo is **single-level** — taking any other action after the one you want to undo clears the undo slot, so you can't chain multiple undos. The button stays available across the DM dashboard's own live-update echo of your last change (so it doesn't flicker unavailable a moment after you act), but it does clear if a genuinely different external change comes in first — e.g. a player rolling their own initiative on the viewer screen.
+Undo keeps the last **5** actions — clicking it repeatedly walks back through each one in turn. Taking any other action clears the whole undo history, so you can't reach further back than your most recent unbroken streak of undoable actions. The button stays available across the DM dashboard's own live-update echo of your last change (so it doesn't flicker unavailable a moment after you act), but it does clear if a genuinely different external change comes in first — e.g. a player rolling their own initiative on the viewer screen.
 
 ### Bulk Actions (AoE)
 

@@ -2,6 +2,7 @@
 // Fetches on first request, caches in module-level memory for subsequent requests.
 // Requires a valid dm_auth cookie (DM-only endpoint).
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import type { Spell5e } from '$lib/types';
 
 let cache: Spell5e[] | null = null;
@@ -14,7 +15,7 @@ const SOURCES = [
 
 export const GET: RequestHandler = async ({ cookies }) => {
 	// Require DM auth
-	const sessionId = cookies.get('dm_auth');
+	const sessionId = await resolveActingSessionId(cookies);
 	if (!sessionId) {
 		return new Response('Unauthorized', { status: 401 });
 	}

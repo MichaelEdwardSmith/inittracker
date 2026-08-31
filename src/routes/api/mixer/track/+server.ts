@@ -2,6 +2,7 @@
 // GET  /api/mixer/track  — Viewer downloads a track by session + track ID.
 // DELETE /api/mixer/track — DM removes a track and broadcasts the removal to viewers.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { isValidSessionId } from '$lib/server/validate';
 import { authToGameSession } from '$lib/server/sessionCache';
 import { getActiveGameSessionPublicId } from '$lib/server/dmModel';
@@ -23,7 +24,7 @@ async function resolveGameSessionId(authSessionId: string): Promise<string | nul
 // POST /api/mixer/track — DM uploads a track binary
 // ---------------------------------------------------------------------------
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });
@@ -100,7 +101,7 @@ export const GET: RequestHandler = async ({ url }) => {
 // DELETE /api/mixer/track?id=<trackId> — DM removes a track
 // ---------------------------------------------------------------------------
 export const DELETE: RequestHandler = async ({ url, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	const guestSessionId = cookies.get('dm_guest');
 
 	if (!authSessionId && !guestSessionId) return new Response('Unauthorized', { status: 401 });

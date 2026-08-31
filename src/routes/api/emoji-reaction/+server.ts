@@ -1,6 +1,7 @@
 // POST /api/emoji-reaction — viewer sends an emoji to the DM.
 // GET  /api/emoji-reaction?since=<ts> — DM polls for new reactions.
 import type { RequestHandler } from './$types';
+import { resolveActingSessionId } from '$lib/server/auth';
 import { getActiveGameSessionPublicId } from '$lib/server/dmModel';
 import { authToGameSession } from '$lib/server/sessionCache';
 import { addEmojiReaction, getEmojiReactionsSince } from '$lib/server/emojiStore';
@@ -68,7 +69,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-	const authSessionId = cookies.get('dm_auth');
+	const authSessionId = await resolveActingSessionId(cookies);
 	if (!authSessionId) return new Response('Unauthorized', { status: 401 });
 
 	const gameSessionId = await resolveGameSessionId(authSessionId);

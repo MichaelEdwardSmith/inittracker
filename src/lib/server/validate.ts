@@ -62,6 +62,9 @@ function validateCombatant(c: unknown): c is Combatant {
 	// Optional boolean fields
 	if (o.inCombat !== undefined && typeof o.inCombat !== 'boolean') return false;
 
+	// Optional level (players only, via the Level Up wizard)
+	if (o.level !== undefined && !isInt(o.level, 1, 20)) return false;
+
 	// Optional loot array
 	if (o.loot !== undefined) {
 		if (!Array.isArray(o.loot)) return false;
