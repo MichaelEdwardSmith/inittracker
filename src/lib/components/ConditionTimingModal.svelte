@@ -74,8 +74,9 @@
 				>
 				<button
 					onclick={oncancel}
+					aria-label="Cancel"
 					class="rounded bg-gray-800/50 px-3 py-2 text-sm text-gray-500 transition hover:text-gray-300"
-					>✕</button
+					><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 		</div>

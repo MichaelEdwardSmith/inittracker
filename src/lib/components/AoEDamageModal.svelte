@@ -156,7 +156,8 @@
 				class="flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[9px] transition
 				       {allSelected
 					? 'border-amber-500 bg-amber-500 text-black'
-					: 'border-gray-600 text-transparent'}">✓</button
+					: 'border-gray-600 text-transparent'}"
+				><i class="fa-solid fa-check" aria-hidden="true"></i></button
 			>
 			<span class="flex-1">Combatant</span>
 			<span class="w-20 text-right">HP</span>
@@ -183,7 +184,7 @@
 							? 'border-amber-500 bg-amber-500 text-black'
 							: 'border-gray-600 text-transparent'}"
 					>
-						✓
+						<i class="fa-solid fa-check" aria-hidden="true"></i>
 					</div>
 
 					<!-- Name + mini HP bar -->
@@ -224,7 +225,7 @@
 							? 'border-blue-400 bg-blue-500 text-white'
 							: 'border-gray-600 text-transparent'}"
 					>
-						✓
+						<i class="fa-solid fa-check" aria-hidden="true"></i>
 					</div>
 				</div>
 			{/each}

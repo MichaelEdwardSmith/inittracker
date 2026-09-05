@@ -330,8 +330,9 @@
 					>
 					or <strong class="font-semibold text-white">Enemies</strong> in the bottom action bar to
 					open them full-screen. Tap the
-					<strong class="font-semibold text-white">✕ close button</strong> or press back to return to
-					the main tracker.
+					<strong class="font-semibold text-white"
+						><i class="fa-solid fa-xmark" aria-hidden="true"></i> close button</strong
+					> or press back to return to the main tracker.
 				</p>
 				<p class="mt-0 mb-6 text-sm leading-relaxed">
 					On desktop, the <strong class="font-semibold text-white">Enemy panel</strong> is resizable
@@ -509,14 +510,18 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Click a player's circular avatar to upload a photo (JPEG/PNG). It is automatically cropped
 					to a square and resized to 256×256. To remove an avatar, hover over it and click the <strong
-						class="font-semibold text-white">✕</strong
+						class="font-semibold text-white"
+						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
 					> that appears.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					On the initiative order, clicking a player's avatar opens it full-size in a lightbox
 					preview — click outside the image, press <strong class="font-semibold text-white"
 						>Escape</strong
-					>, or click the <strong class="font-semibold text-white">✕</strong> to close it.
+					>, or click the
+					<strong class="font-semibold text-white"
+						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+					> to close it.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -822,9 +827,9 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Every combatant row has a <strong class="font-semibold text-white">pencil icon</strong>
-					beside the remove (✕) button. Click it to open a notes modal where you can type any freeform
-					text — spell concentration reminders, loot notes, roleplay hooks, etc. When a note has been
-					saved the icon glows
+					beside the remove (<i class="fa-solid fa-xmark" aria-hidden="true"></i>) button. Click it
+					to open a notes modal where you can type any freeform text — spell concentration
+					reminders, loot notes, roleplay hooks, etc. When a note has been saved the icon glows
 					<strong class="font-semibold text-amber-300">amber</strong>
 					as a visual reminder. Notes persist with the rest of the combat state.
 				</p>
@@ -951,9 +956,11 @@
 					For <strong class="font-semibold text-white">players</strong>, a Temp HP section appears
 					on each row. Type an amount and click
 					<strong class="font-semibold text-yellow-400">Set Temp HP</strong>
-					to assign temporary hit points. Click <strong class="font-semibold text-white">✕</strong> to
-					clear them. Temp HP shows as a yellow badge and a yellow bar extension on the HP meter. Damage
-					reduces temp HP before current HP; healing does not restore temp HP.
+					to assign temporary hit points. Click
+					<strong class="font-semibold text-white"
+						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+					> to clear them. Temp HP shows as a yellow badge and a yellow bar extension on the HP meter.
+					Damage reduces temp HP before current HP; healing does not restore temp HP.
 				</p>
 
 				<h3 class="mt-5 mb-3 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1137,8 +1144,9 @@
 						removed from combat, its lair card is automatically removed as well.
 					</li>
 					<li>
-						Click the <strong class="font-semibold text-white">✕ button</strong> on the lair card to dismiss
-						it manually at any time.
+						Click the <strong class="font-semibold text-white"
+							><i class="fa-solid fa-xmark" aria-hidden="true"></i> button</strong
+						> on the lair card to dismiss it manually at any time.
 					</li>
 				</ul>
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
@@ -1724,8 +1732,9 @@
 						list; adding the same monster again merges the quantities
 					</li>
 					<li>
-						Remove any staged entry with the <strong class="font-semibold text-white">✕</strong> button
-						on its row
+						Remove any staged entry with the <strong class="font-semibold text-white"
+							><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+						> button on its row
 					</li>
 					<li>
 						The <strong class="font-semibold text-amber-300">live preview</strong> below the list shows
@@ -2620,10 +2629,16 @@
 							'Click to pick an audio file from your device (see File Persistence below)'
 						],
 						['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
-						['▶ / ■ button', 'Start or stop playback on this channel'],
+						[
+							'<i class="fa-solid fa-play" aria-hidden="true"></i> / <i class="fa-solid fa-stop" aria-hidden="true"></i> button',
+							'Start or stop playback on this channel'
+						],
 						['S (Solo)', 'Solo this channel — mutes all others while active'],
 						['M (Mute)', 'Mute this channel without stopping playback'],
-						['✕', 'Remove the channel and delete its saved file reference']
+						[
+							'<i class="fa-solid fa-xmark" aria-hidden="true"></i>',
+							'Remove the channel and delete its saved file reference'
+						]
 					]
 				)}
 

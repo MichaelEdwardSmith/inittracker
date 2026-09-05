@@ -966,7 +966,7 @@
 								<button
 									onclick={() => deleteSavedDen(s.id)}
 									class="shrink-0 text-[11px] leading-none text-gray-600 hover:text-red-400"
-									aria-label="Delete">✕</button
+									aria-label="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 								>
 							</div>
 						{/each}

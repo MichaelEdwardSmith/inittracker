@@ -684,7 +684,8 @@
 				>
 					<span
 						class="block w-full truncate text-[10px] leading-tight text-amber-400/80"
-						title={ch.fileName ?? ''}>🔒 {ch.fileName}</span
+						title={ch.fileName ?? ''}
+						><i class="fa-solid fa-lock" aria-hidden="true"></i> {ch.fileName}</span
 					>
 				</button>
 			{:else}
@@ -724,7 +725,7 @@
 					class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400"
 					title="File too large for browser storage — plays this session only"
 				>
-					⚠ won't persist
+					<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> won't persist
 				</div>
 			{/if}
 		{/if}

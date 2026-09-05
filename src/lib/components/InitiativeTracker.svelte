@@ -516,7 +516,8 @@
 											<button
 												onclick={() => combat.setTempHp(c.id, 0)}
 												class="ml-0.5 opacity-50 transition hover:opacity-100"
-												title="Clear temp HP">✕</button
+												title="Clear temp HP"
+												><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 											>
 										</span>
 									{/if}

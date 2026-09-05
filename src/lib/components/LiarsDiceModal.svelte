@@ -244,7 +244,9 @@
 		</div>
 		<button
 			onclick={onclose}
-			class="rounded-lg p-2 text-gray-500 hover:bg-gray-800 hover:text-white">✕</button
+			aria-label="Close"
+			class="rounded-lg p-2 text-gray-500 hover:bg-gray-800 hover:text-white"
+			><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 		>
 	</div>
 
