@@ -150,7 +150,7 @@
 					<a
 						href="#{item.id}"
 						class="block truncate rounded py-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 {item.label.startsWith(
-							'↳'
+							'->'
 						)
 							? 'pr-2 pl-6'
 							: 'px-2'}"
@@ -547,9 +547,9 @@
 					Leveling Up a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">⬆ Level Up</strong> below the add-player
-					form to open a wizard that steps through the party one player at a time. Each step shows
-					that player's current stats and lets you enter their new
+					Click <strong class="font-semibold text-white">Level Up</strong> below the add-player form
+					to open a wizard that steps through the party one player at a time. Each step shows that
+					player's current stats and lets you enter their new
 					<strong class="font-semibold text-white">Level</strong>,
 					<strong class="font-semibold text-white">AC</strong>,
 					<strong class="font-semibold text-white">Max HP</strong>,
@@ -710,7 +710,7 @@
 						>)
 					</li>
 					<li>
-						In the Enemy Panel, click the <strong class="font-semibold text-white">⬆ Import</strong> button
+						In the Enemy Panel, click the <strong class="font-semibold text-white">^ Import</strong> button
 						next to the Custom button
 					</li>
 					<li>
@@ -2576,6 +2576,16 @@
 							Virtual dice can be disabled via the <strong class="font-semibold text-white"
 								>Disable virtual dice</strong
 							> checkbox in the Dice Roller modal — voice rolls will then return instant results
+						</li>
+						<li>
+							If a player's name keeps getting misheard (fantasy names are hard for speech
+							recognition), give them a <strong class="font-semibold text-white"
+								>Voice Nickname</strong
+							>
+							— set when adding the player, or edit anytime via
+							<strong class="font-semibold text-white">Level Up</strong>. List whatever it's
+							actually being heard as (e.g. "Kalstag" heard as "Call Stag") and voice commands will
+							match on that too
 						</li>
 					</ul>
 				</section>

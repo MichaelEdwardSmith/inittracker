@@ -16,6 +16,7 @@
 	let hp = $state(10);
 	let dexMod = $state(0);
 	let passivePerception = $state(10);
+	let voiceAliases = $state('');
 
 	// D&D Beyond import
 	let activeTab = $state<'manual' | 'ddb'>('manual');
@@ -80,6 +81,10 @@
 
 	function addPlayer() {
 		if (!name.trim()) return;
+		const aliases = voiceAliases
+			.split(',')
+			.map((a) => a.trim())
+			.filter(Boolean);
 		combat.addPlayer(
 			name.trim(),
 			ac,
@@ -87,7 +92,8 @@
 			dexMod || undefined,
 			passivePerception || undefined,
 			undefined,
-			level || undefined
+			level || undefined,
+			aliases.length > 0 ? aliases : undefined
 		);
 		name = '';
 		level = 1;
@@ -95,6 +101,7 @@
 		hp = 10;
 		dexMod = 0;
 		passivePerception = 10;
+		voiceAliases = '';
 	}
 </script>
 
@@ -235,6 +242,31 @@
 						placeholder="Player name"
 						class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
 					/>
+					<label class="flex flex-col gap-1">
+						<span class="flex items-center gap-1 text-xs text-gray-400">
+							Voice Nicknames (optional)
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5 shrink-0 cursor-help text-gray-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<title
+									>Alternate spellings/pronunciations for Voice Commands to also match against this
+									player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional.</title
+								>
+								<circle cx="12" cy="12" r="9" />
+								<path stroke-linecap="round" d="M12 16v-4.5M12 8h.01" />
+							</svg>
+						</span>
+						<input
+							bind:value={voiceAliases}
+							placeholder="e.g. Call Stag, Kal Stag"
+							class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+						/>
+					</label>
 					<label class="flex w-20 flex-col gap-1">
 						<span
 							class="cursor-help text-xs text-gray-400"

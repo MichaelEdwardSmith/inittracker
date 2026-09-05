@@ -1,5 +1,5 @@
 <!-- Voice command listener for the DM dashboard.
-     Uses @huggingface/transformers (Whisper) running in a Web Worker for
+     Uses @huggingface/transformers (Moonshine) running in a Web Worker for
      offline, API-free speech recognition. Audio is captured via MediaRecorder,
      silence-gated by a VAD loop, resampled to 16 kHz via OfflineAudioContext,
      then transcribed in the worker. Recognised commands call combat store
@@ -9,13 +9,13 @@
 	import { browser } from '$app/environment';
 	import { combat } from '$lib/store.svelte';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
+	import { CONDITIONS, SPELL_EFFECTS } from '$lib/enemies';
 	import VoiceCommandsHelpModal from './VoiceCommandsHelpModal.svelte';
 
 	// ── Props ─────────────────────────────────────────────────────────────────
 	const { mobile = false }: { mobile?: boolean } = $props();
 
-	// ── Help modal (shown once per session on first activation) ───────────────
-	const HELP_SEEN_KEY = 'voice-commands-help-seen';
+	// ── Help modal (shown every time voice commands are turned on) ────────────
 	let showHelp = $state(false);
 
 	// ── Status ───────────────────────────────────────────────────────────────
@@ -91,14 +91,19 @@
 		hundred: 100
 	};
 
-	function parseRollCommand(lower: string): (() => void) | null {
-		if (!/\broll\b/.test(lower)) return null;
-
-		// Convert number words → digits so "two D20" → "2 d20".
-		const normalized = lower.replace(
+	/** Converts spoken number words to digits, e.g. "two D20" → "2 d20" or
+	 *  "three rounds" → "3 rounds". Shared by any parser that needs a spoken count. */
+	function wordsToDigits(text: string): string {
+		return text.replace(
 			/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|hundred)\b/g,
 			(w) => String(WORD_NUMS[w])
 		);
+	}
+
+	function parseRollCommand(lower: string): (() => void) | null {
+		if (!/\broll\b/.test(lower)) return null;
+
+		const normalized = wordsToDigits(lower);
 
 		// Optional leading "a/an", optional count, then d/dee/the, then sides,
 		// then optional plus/minus modifier.
@@ -156,37 +161,59 @@
 		return row[n];
 	}
 
+	function escapeRegex(text: string): string {
+		return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
 	function findCombatantByName(lower: string) {
 		const candidates = combat.combatants.filter((c) => c.type === 'player' || c.type === 'enemy');
 
-		// Pass 1: exact substring match (longest name wins).
+		// Every name this candidate can be recognized by: its real name plus any
+		// DM-defined voice nicknames (set on the player at creation or via Level
+		// Up) — e.g. "Kalstag" with alias "Call Stag" for names Moonshine
+		// reliably mishears. Aliases are checked exactly like the real name.
+		const searchTerms = candidates.flatMap((c) => [
+			{ c, name: c.name },
+			...(c.voiceAliases ?? []).map((alias) => ({ c, name: alias }))
+		]);
+
+		// Pass 1: exact whole-word match (longest name wins). Word-bounded so a
+		// short name (e.g. "Cal") can't match as a fragment inside an unrelated
+		// word (e.g. "Call") — that would otherwise win here before pass 2's
+		// fuzzy match, which is specifically what "Kalstag" heard as "Call Stag"
+		// needs, ever gets a chance to run.
 		let best: (typeof candidates)[0] | null = null;
 		let bestLen = 0;
-		for (const c of candidates) {
-			const name = c.name.toLowerCase();
-			if (lower.includes(name) && name.length > bestLen) {
+		for (const { c, name: rawName } of searchTerms) {
+			const name = rawName.toLowerCase();
+			if (new RegExp(`\\b${escapeRegex(name)}\\b`).test(lower) && name.length > bestLen) {
 				best = c;
 				bestLen = name.length;
 			}
 		}
 		if (best) return best;
 
-		// Pass 2: fuzzy match — Whisper may split or slightly misspell fantasy names
-		// (e.g. "Kalstag" → "Cal Stag" or "Kalstack"). Try every consecutive word
+		// Pass 2: fuzzy match — Moonshine may split or slightly misspell fantasy names
+		// (e.g. "Kalstag" → "Call Stag" or "Kalstack"). Try every consecutive word
 		// combination in the transcript and accept the closest name within ~25% edit
-		// distance.
+		// distance. Scored by RATIO (distance / name length), not raw distance — a
+		// short unrelated name (e.g. "Cal") can have a smaller raw edit distance
+		// than a longer correct one (e.g. "Kalstag") purely by being shorter, so
+		// comparing raw distances across candidates of different lengths would let
+		// short names hijack matches meant for longer ones.
 		const words = lower.split(/\s+/);
-		let bestScore = Infinity;
-		for (const c of candidates) {
-			const name = c.name.toLowerCase().replace(/\s+/g, '');
+		let bestRatio = Infinity;
+		for (const { c, name: rawName } of searchTerms) {
+			const name = rawName.toLowerCase().replace(/\s+/g, '');
 			const threshold = Math.max(2, Math.floor(name.length * 0.25));
 			for (let start = 0; start < words.length; start++) {
 				let phrase = '';
 				for (let end = start; end < words.length && phrase.length <= name.length * 1.5; end++) {
 					phrase += words[end];
 					const dist = editDist(phrase, name);
-					if (dist <= threshold && dist < bestScore) {
-						bestScore = dist;
+					const ratio = dist / name.length;
+					if (dist <= threshold && ratio < bestRatio) {
+						bestRatio = ratio;
 						best = c;
 					}
 				}
@@ -240,6 +267,80 @@
 		};
 	}
 
+	// ── Condition / spell effect command parsing ──────────────────────────────
+	// Note: handleTranscript strips apostrophes to spaces before this runs, so
+	// "isn't" arrives as "isn t" — avoid contraction-based patterns here.
+	const REMOVE_CONDITION_WORDS = /\b(remove|clear|cure|no longer|not\s+\w+\s+anymore)\b/;
+
+	// Conditions + spell effects, longest name first so a multi-word effect
+	// (e.g. "Shield of Faith") matches before any shorter word inside it could.
+	const STATUSES = [...CONDITIONS, ...SPELL_EFFECTS].sort((a, b) => b.length - a.length);
+
+	/** Finds the first status name (condition or spell effect) mentioned in the
+	 *  transcript. Matched against the same lists the DM's own dropdowns use,
+	 *  so voice stays in sync with manual tagging. Names are normalized the
+	 *  same way handleTranscript normalizes the transcript (apostrophes and
+	 *  punctuation → spaces), so "Hunter's Mark" matches spoken "hunter s mark". */
+	function findStatusInText(lower: string): string | null {
+		for (const status of STATUSES) {
+			const normalized = status
+				.toLowerCase()
+				.replace(/[',.\-]/g, ' ')
+				.replace(/\s+/g, ' ');
+			if (new RegExp(`\\b${normalized}\\b`).test(lower)) return status;
+		}
+
+		// Fallback — Moonshine sometimes splits an uncommon compound name into
+		// separate words (e.g. "Barkskin" heard as "bark skin"). Compare
+		// consecutive-word combinations from the transcript, spaces stripped,
+		// against each status name, spaces stripped, and accept a near-exact
+		// match. Only single-word names of meaningful length are worth this —
+		// short/common words (e.g. "Aid", "Hex") are already ASR-reliable and
+		// fuzzy-matching them risks false positives on ordinary speech.
+		const words = lower.split(/\s+/);
+		for (const status of STATUSES) {
+			const target = status.toLowerCase().replace(/[',.\-\s]/g, '');
+			if (/\s/.test(status) || target.length < 6) continue;
+			const threshold = Math.max(1, Math.floor(target.length * 0.2));
+			for (let start = 0; start < words.length; start++) {
+				let phrase = '';
+				for (let end = start; end < words.length && phrase.length <= target.length * 1.5; end++) {
+					phrase += words[end];
+					if (editDist(phrase, target) <= threshold) return status;
+				}
+			}
+		}
+		return null;
+	}
+
+	function parseConditionCommand(lower: string): (() => void) | null {
+		const status = findStatusInText(lower);
+		if (!status) return null;
+
+		const target = findCombatantByName(lower);
+		if (!target) return null;
+
+		const removing = REMOVE_CONDITION_WORDS.test(lower);
+		const has = target.statuses.includes(status);
+		// Adding an already-present status (or removing an absent one) is a
+		// no-op — toggleStatus would otherwise flip it the wrong way.
+		if (removing === has) {
+			// Optional "for N rounds" duration — only meaningful when adding.
+			// Convert spoken numbers ("three rounds") to digits before matching.
+			const roundsMatch = !removing && wordsToDigits(lower).match(/\bfor\s+(\d+)\s+rounds?\b/);
+			const rounds = roundsMatch ? parseInt(roundsMatch[1]) : undefined;
+			return () => {
+				combat.toggleStatus(target.id, status, rounds);
+				showToast(
+					removing
+						? `🏷 ${target.name} no longer ${status}`
+						: `🏷 ${target.name} is now ${status}${rounds ? ` (${rounds} rd)` : ''}`
+				);
+			};
+		}
+		return null;
+	}
+
 	// ── AI fallback — fuzzy name matching via /api/voice-command ───────────
 	async function callAiFallback(transcript: string): Promise<boolean> {
 		try {
@@ -279,9 +380,9 @@
 	function handleTranscript(text: string) {
 		const transcript = text.trim();
 		if (!transcript) return;
-		console.log('[Whisper] heard:', transcript);
+		console.log('[Moonshine] heard:', transcript);
 
-		// Strip punctuation and collapse spaces early — Whisper often inserts
+		// Strip punctuation and collapse spaces early — Moonshine often inserts
 		// commas/periods (e.g. "Tracker, start combat.") that break word-boundary matches.
 		const lower = transcript
 			.toLowerCase()
@@ -313,17 +414,23 @@
 			return;
 		}
 
+		const conditionAction = parseConditionCommand(lower);
+		if (conditionAction) {
+			conditionAction();
+			return;
+		}
+
 		// Fall back to AI for fuzzy name matching and phrasing variations.
 		callAiFallback(transcript).then((handled) => {
 			if (!handled) showToast('❓ Command not understood');
 		});
 	}
 
-	// ── Whisper worker ────────────────────────────────────────────────────────
+	// ── Moonshine worker ────────────────────────────────────────────────────────
 	let worker: Worker | null = null;
 
 	function initWorker() {
-		worker = new Worker(new URL('../whisper.worker.ts', import.meta.url), { type: 'module' });
+		worker = new Worker(new URL('../moonshine.worker.ts', import.meta.url), { type: 'module' });
 		worker.addEventListener('message', (e: MessageEvent<Record<string, unknown>>) => {
 			const msg = e.data;
 			if (msg.type === 'loading') {
@@ -331,7 +438,7 @@
 				loadPct = (msg.pct as number) ?? 0;
 			} else if (msg.type === 'ready') {
 				status = 'ready';
-				showToast('🎤 Whisper ready — listening', 2500);
+				showToast('🎤 Moonshine ready — listening', 2500);
 				startListening();
 			} else if (msg.type === 'transcript') {
 				handleTranscript(String(msg.text ?? ''));
@@ -484,37 +591,25 @@
 		const resampled = await offCtx.startRendering();
 		const float32 = new Float32Array(resampled.getChannelData(0));
 
-		// Build a domain-specific prompt so Whisper biases toward combatant names and D&D terms.
-		// Including a name inside example sentences gives Whisper contextual exposure,
-		// which significantly improves recognition of unusual/fantasy names.
-		const names = combat.combatants
-			.filter((c) => c.type === 'player' || c.type === 'enemy')
-			.map((c) => c.name)
-			.join(', ');
-		const example =
-			combat.combatants.find((c) => c.type === 'player' || c.type === 'enemy')?.name ?? 'Aragorn';
-		const initial_prompt = `D&D combat tracker. Combatants: ${names}. Wake word: tracker. Commands: "tracker next", "tracker start combat", "tracker end combat", "tracker roll d20", "${example} takes 8 damage", "${example} heals 4 HP".`;
-		worker.postMessage({ type: 'transcribe', audio: float32, initial_prompt }, [float32.buffer]);
+		// Unlike Whisper, Moonshine has no prompt-biasing option — domain vocabulary
+		// (combatant names) is handled entirely by the fuzzy match in findCombatantByName().
+		worker.postMessage({ type: 'transcribe', audio: float32 }, [float32.buffer]);
 	}
 
 	// ── Toggle ────────────────────────────────────────────────────────────────
 	function toggle() {
 		if (!browser) return;
 
-		// Show the help modal the first time per browser session.
-		if (!sessionStorage.getItem(HELP_SEEN_KEY)) {
-			sessionStorage.setItem(HELP_SEEN_KEY, '1');
-			showHelp = true;
-			// Proceed with activation so the model starts loading behind the modal.
-		}
-
 		if (status === 'idle') {
 			// First click: load the model then auto-start listening.
+			showHelp = true;
 			initWorker();
 			status = 'loading';
-			showToast('⏳ Downloading Whisper model (first-time only)…', 120_000);
+			showToast('⏳ Downloading Moonshine model (first-time only)…', 120_000);
 			worker!.postMessage({ type: 'load' });
 		} else if (status === 'ready') {
+			// Turning voice commands back on — show the popover every time.
+			showHelp = true;
 			startListening();
 		} else if (status === 'listening' || status === 'processing') {
 			stopListening();
@@ -536,6 +631,7 @@
 		<button
 			onclick={toggle}
 			disabled={status === 'loading'}
+			title="Control combat with voice commands"
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm transition
 				{status === 'listening' || status === 'processing'
 				? 'text-amber-400 hover:bg-gray-700'
@@ -595,9 +691,9 @@
 			onclick={toggle}
 			disabled={status === 'loading'}
 			title={status === 'idle'
-				? 'Enable voice commands (Whisper AI, runs locally)'
+				? 'Enable voice commands (Moonshine AI, runs locally)'
 				: status === 'loading'
-					? `Downloading Whisper model… ${loadPct}%`
+					? `Downloading Moonshine model… ${loadPct}%`
 					: status === 'listening'
 						? 'Voice listening — click to stop'
 						: status === 'processing'

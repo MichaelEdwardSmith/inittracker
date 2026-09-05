@@ -43,6 +43,10 @@ export interface Combatant {
 	conditionRounds?: Record<string, number>;
 	// DM-only freeform notes
 	note?: string;
+	// Alternate names/spellings for voice command recognition to match against
+	// in addition to the real name — e.g. "Call Stag" as a nickname for a
+	// player named "Kalstag" that speech recognition consistently mishears.
+	voiceAliases?: string[];
 	// Enemies only — legendary actions spent this round (resets at start of their turn)
 	legendaryActionsSpent?: number;
 	// Players only — death saving throw tracker (present when currentHp === 0)

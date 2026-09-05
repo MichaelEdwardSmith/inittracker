@@ -235,9 +235,9 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 						title="Previous turn"
 					>
-						<span class="hidden md:inline">◀ Prev</span>
+						<span class="hidden md:inline">&lt; Prev</span>
 						<span class="flex flex-col items-center md:hidden">
-							<span>◀</span>
+							<span>&lt;</span>
 							<span>Prev</span>
 						</span>
 					</button>
@@ -248,9 +248,9 @@
 						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
-						<span class="hidden md:inline">Next ▶</span>
+						<span class="hidden md:inline">Next &gt;</span>
 						<span class="flex flex-col items-center md:hidden">
-							<span>▶</span>
+							<span>&gt;</span>
 							<span>Next</span>
 						</span>
 					</button>

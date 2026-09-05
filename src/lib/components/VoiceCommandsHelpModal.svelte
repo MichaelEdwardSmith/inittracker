@@ -26,6 +26,15 @@
 			]
 		},
 		{
+			label: 'Conditions & Spell Effects',
+			commands: [
+				{ phrase: '"[Name] is prone"', desc: 'Apply a condition' },
+				{ phrase: '"[Name] is poisoned for 3 rounds"', desc: 'Apply with a duration' },
+				{ phrase: '"[Name] has bless"', desc: 'Apply a spell effect' },
+				{ phrase: '"Remove prone from [Name]"', desc: 'Clear a condition or effect' }
+			]
+		},
+		{
 			label: 'Dice Rolling',
 			commands: [
 				{ phrase: 'Tracker, roll a d20', desc: 'Roll a single die' },
@@ -115,7 +124,7 @@
 			</svg>
 			<p class="text-xs leading-relaxed text-amber-300/90">
 				Voice commands are a <strong>beta feature</strong> and may not always behave as expected. Speech
-				recognition runs locally via Whisper AI and accuracy can vary based on microphone quality, background
+				recognition runs locally via Moonshine AI and accuracy can vary based on microphone quality, background
 				noise, and combatant names.
 			</p>
 		</div>

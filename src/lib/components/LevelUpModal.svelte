@@ -21,6 +21,7 @@
 	let maxHp = $state(10);
 	let dexMod = $state(0);
 	let passivePerception = $state(10);
+	let voiceAliases = $state('');
 
 	function playerAt(i: number) {
 		return combat.players.find((p) => p.id === rosterIds[i]) ?? null;
@@ -34,6 +35,7 @@
 		maxHp = p.maxHp;
 		dexMod = p.dexMod ?? 0;
 		passivePerception = p.passivePerception ?? 10;
+		voiceAliases = (p.voiceAliases ?? []).join(', ');
 	}
 	loadStep(0);
 
@@ -47,13 +49,18 @@
 		const p = playerAt(index);
 		if (!p) return;
 		const hpGain = Math.max(0, maxHp - p.maxHp);
+		const aliases = voiceAliases
+			.split(',')
+			.map((a) => a.trim())
+			.filter(Boolean);
 		combat.update(p.id, {
 			level,
 			ac,
 			maxHp,
 			currentHp: Math.min(maxHp, p.currentHp + hpGain),
 			dexMod: dexMod || undefined,
-			passivePerception: passivePerception || undefined
+			passivePerception: passivePerception || undefined,
+			voiceAliases: aliases.length > 0 ? aliases : undefined
 		});
 	}
 
@@ -100,7 +107,7 @@
 			<!-- Header -->
 			<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 				<div>
-					<h3 class="font-bold tracking-wide text-violet-300">⬆ Level Up</h3>
+					<h3 class="font-bold tracking-wide text-violet-300">Level Up</h3>
 					<p class="text-xs text-gray-500">
 						{current.name} &bull; Player {index + 1} of {rosterIds.length}
 					</p>
@@ -202,6 +209,32 @@
 						/>
 					</label>
 				</div>
+
+				<label class="flex flex-col gap-1">
+					<span class="flex items-center gap-1 text-xs text-gray-400">
+						Voice Nicknames (optional)
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-3.5 w-3.5 shrink-0 cursor-help text-gray-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<title
+								>Alternate spellings/pronunciations for Voice Commands to also match against this
+								player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional.</title
+							>
+							<circle cx="12" cy="12" r="9" />
+							<path stroke-linecap="round" d="M12 16v-4.5M12 8h.01" />
+						</svg>
+					</span>
+					<input
+						bind:value={voiceAliases}
+						placeholder="e.g. Call Stag, Kal Stag"
+						class="w-full rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-violet-500 focus:outline-none"
+					/>
+				</label>
 			</div>
 
 			<!-- Footer -->
