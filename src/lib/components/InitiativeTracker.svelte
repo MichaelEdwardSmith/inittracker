@@ -235,9 +235,11 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 						title="Previous turn"
 					>
-						<span class="hidden md:inline">&lt; Prev</span>
+						<span class="hidden md:inline"
+							><i class="fa-duotone fa-light fa-arrow-left-from-line" aria-hidden="true"></i> Prev</span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>&lt;</span>
+							<i class="fa-duotone fa-light fa-arrow-left-from-line" aria-hidden="true"></i>
 							<span>Prev</span>
 						</span>
 					</button>
@@ -248,9 +250,12 @@
 						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
-						<span class="hidden md:inline">Next &gt;</span>
+						<span class="hidden md:inline"
+							>Next
+							<i class="fa-duotone fa-light fa-arrow-right-from-line" aria-hidden="true"></i></span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>&gt;</span>
+							<i class="fa-duotone fa-light fa-arrow-right-from-line" aria-hidden="true"></i>
 							<span>Next</span>
 						</span>
 					</button>
