@@ -236,10 +236,10 @@
 						title="Previous turn"
 					>
 						<span class="hidden md:inline"
-							><i class="fa-duotone fa-light fa-arrow-left-from-line" aria-hidden="true"></i> Prev</span
+							><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Prev</span
 						>
 						<span class="flex flex-col items-center md:hidden">
-							<i class="fa-duotone fa-light fa-arrow-left-from-line" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i>
 							<span>Prev</span>
 						</span>
 					</button>
@@ -252,10 +252,10 @@
 					>
 						<span class="hidden md:inline"
 							>Next
-							<i class="fa-duotone fa-light fa-arrow-right-from-line" aria-hidden="true"></i></span
+							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i></span
 						>
 						<span class="flex flex-col items-center md:hidden">
-							<i class="fa-duotone fa-light fa-arrow-right-from-line" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 							<span>Next</span>
 						</span>
 					</button>
