@@ -68,7 +68,7 @@
 	>
 		<!-- Header -->
 		<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-			<span class="text-amber-500">⬡</span>
+			<i class="fa-solid fa-gem text-amber-500" aria-hidden="true"></i>
 			<span class="flex-1 text-sm font-bold tracking-widest text-amber-300 uppercase">
 				Loot — {combatant.name}
 			</span>

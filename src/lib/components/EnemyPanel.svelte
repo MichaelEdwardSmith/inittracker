@@ -379,7 +379,11 @@
 										<img src={enemy.imgUrl} alt={enemy.name} class="h-full w-full object-cover" />
 									</div>
 								{:else}
-									<span class="shrink-0 text-xs text-amber-400" title="Custom monster">✦</span>
+									<i
+										class="fa-solid fa-star shrink-0 text-xs text-amber-400"
+										title="Custom monster"
+										aria-hidden="true"
+									></i>
 								{/if}
 							{/if}
 							<span class="truncate text-sm font-medium">{enemy.name}</span>
@@ -442,7 +446,7 @@
 			<div class="mb-2 flex items-center justify-between gap-1.5">
 				<span class="flex items-center gap-1.5 text-sm font-semibold text-red-300">
 					{#if selectedEnemy.isCustom}
-						<span class="text-xs text-amber-400">✦</span>
+						<i class="fa-solid fa-star text-xs text-amber-400" aria-hidden="true"></i>
 					{/if}
 					{selectedEnemy.name}
 				</span>
@@ -681,7 +685,7 @@
 								>
 									<div class="min-w-0 flex-1">
 										<div class="flex items-center gap-1.5">
-											<span class="text-xs text-amber-400">✦</span>
+											<i class="fa-solid fa-star text-xs text-amber-400" aria-hidden="true"></i>
 											<span class="truncate text-sm font-medium text-white">{m.name}</span>
 										</div>
 										<div class="text-xs text-gray-500">

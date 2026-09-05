@@ -234,7 +234,7 @@
 		<div
 			class="flex items-center gap-2 border-b border-gray-800/60 bg-gradient-to-r from-amber-950/70 to-gray-950 px-4 py-2.5"
 		>
-			<span class="text-base">🎲</span>
+			<i class="fa-solid fa-dice text-base" aria-hidden="true"></i>
 			<span class="flex-1 text-sm font-black tracking-wider text-amber-300 uppercase">
 				{#if !game}
 					Liar's Dice
@@ -243,7 +243,9 @@
 				{:else if game.status === 'game_over'}
 					Liar's Dice — Game Over
 				{:else}
-					Liar's Dice — Round {game.roundNumber}{game.isPalifico ? ' ⚠️' : ''}
+					Liar's Dice — Round {game.roundNumber}{#if game.isPalifico}
+						<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+					{/if}
 				{/if}
 			</span>
 			{#if !game && onclose}
@@ -252,7 +254,7 @@
 					class="rounded p-1 text-gray-500 transition hover:text-red-400"
 					aria-label="Close"
 				>
-					✕
+					<i class="fa-solid fa-xmark" aria-hidden="true"></i>
 				</button>
 			{:else}
 				<button
@@ -270,7 +272,7 @@
 				<!-- ── NO GAME YET (manually opened) ─────────────────────────────────── -->
 				{#if !game}
 					<div class="flex flex-col items-center gap-3 py-4 text-center">
-						<span class="text-4xl opacity-50">🎲</span>
+						<i class="fa-solid fa-dice text-4xl opacity-50" aria-hidden="true"></i>
 						<p class="text-sm font-semibold text-gray-300">No game in progress</p>
 						<p class="text-xs text-gray-500">Waiting for the DM to open a Liar's Dice lobby…</p>
 					</div>
@@ -285,7 +287,7 @@
 						<div class="flex flex-col gap-1">
 							{#each game.players as p}
 								<div class="flex items-center gap-2 text-xs">
-									<span class="text-amber-500">🎲</span>
+									<i class="fa-solid fa-dice text-amber-500" aria-hidden="true"></i>
 									<span class={p.id === playerId ? 'font-bold text-amber-300' : 'text-gray-300'}
 										>{p.name}{p.id === playerId ? ' (You)' : ''}</span
 									>
@@ -302,7 +304,7 @@
 							</button>
 						{:else if joined}
 							<p class="text-center text-xs text-emerald-400 italic">
-								✓ You're in! Waiting for DM to start…
+								<i class="fa-solid fa-check" aria-hidden="true"></i> You're in! Waiting for DM to start…
 							</p>
 						{:else}
 							<p class="text-center text-xs text-gray-500 italic">Log in to join the game.</p>
@@ -319,7 +321,9 @@
 									class="flex items-center gap-1.5 rounded-lg border border-gray-700/60 bg-gray-800/40 px-2 py-1 text-xs"
 								>
 									<span class="font-medium text-gray-300">{p.name}</span>
-									<span class="text-amber-500">{p.diceCount}🎲</span>
+									<span class="text-amber-500"
+										>{p.diceCount} <i class="fa-solid fa-dice" aria-hidden="true"></i></span
+									>
 								</div>
 							{/if}
 						{/each}
@@ -373,7 +377,7 @@
 							</div>
 							{#if !game.isPalifico && game.currentBid?.face !== 1}
 								<p class="mt-1 text-[10px] text-amber-700/80">
-									★ Gold-highlighted dice are wild (ones)
+									<i class="fa-solid fa-star" aria-hidden="true"></i> Gold-highlighted dice are wild (ones)
 								</p>
 							{/if}
 						</div>
@@ -411,7 +415,9 @@
 					<!-- Turn indicator -->
 					{#if isMyTurn}
 						<div class="rounded-xl border border-blue-600/60 bg-blue-950/30 px-3 py-2 text-center">
-							<p class="text-sm font-black text-blue-300">⚡ YOUR TURN</p>
+							<p class="text-sm font-black text-blue-300">
+								<i class="fa-solid fa-bolt" aria-hidden="true"></i> YOUR TURN
+							</p>
 						</div>
 					{:else}
 						<p class="text-center text-xs text-gray-500">
@@ -478,14 +484,14 @@
 										onclick={() => post({ action: 'dudo', playerId })}
 										class="flex-1 rounded-xl bg-red-700 py-2 text-sm font-black text-white uppercase transition hover:bg-red-600 active:scale-95"
 									>
-										🎲 Liar!
+										<i class="fa-solid fa-dice" aria-hidden="true"></i> Liar!
 									</button>
 									<button
 										onclick={() => post({ action: 'calza', playerId })}
 										class="rounded-xl bg-emerald-700 px-3 py-2 text-sm font-black text-white uppercase transition hover:bg-emerald-600 active:scale-95"
 										title="Claim exact count"
 									>
-										✓
+										<i class="fa-solid fa-check" aria-hidden="true"></i>
 									</button>
 								{/if}
 							</div>
@@ -507,11 +513,13 @@
 									? 'text-emerald-400'
 									: 'text-red-400'}"
 							>
-								{rev.callerAction === 'dudo'
-									? '🎲 LIAR!'
-									: rev.calzaSuccess
-										? '✅ CALZA!'
-										: '❌ CALZA MISSED!'}
+								{#if rev.callerAction === 'dudo'}
+									<i class="fa-solid fa-dice" aria-hidden="true"></i> LIAR!
+								{:else if rev.calzaSuccess}
+									<i class="fa-solid fa-circle-check" aria-hidden="true"></i> CALZA!
+								{:else}
+									<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> CALZA MISSED!
+								{/if}
 							</p>
 							<p class="mt-0.5 text-xs text-gray-300">
 								Bid: {rev.bid.quantity} × {faceName(rev.bid.face)}s · Actual:
@@ -538,7 +546,9 @@
 											: isLoser
 												? 'text-red-400'
 												: 'text-gray-400'}"
-										>{isMe ? 'You' : row.playerName}{isLoser ? ' 💸' : ''}</span
+										>{isMe ? 'You' : row.playerName}{#if isLoser}
+											<i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i>
+										{/if}</span
 									>
 									<div class="flex flex-wrap gap-1">
 										{#each row.dice as face}
@@ -579,7 +589,7 @@
 					<!-- ── GAME OVER ───────────────────────────────────────────────────────── -->
 				{:else if game.status === 'game_over'}
 					<div class="flex flex-col items-center gap-2 py-2">
-						<span class="text-4xl">🏆</span>
+						<i class="fa-solid fa-trophy text-4xl" aria-hidden="true"></i>
 						<p class="text-lg font-black text-amber-300">{game.winnerName ?? '?'} Wins!</p>
 						<p class="text-xs text-gray-500">
 							{game.roundNumber} round{game.roundNumber !== 1 ? 's' : ''}

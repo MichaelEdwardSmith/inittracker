@@ -1460,7 +1460,7 @@
 		class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900/80 px-5 py-3"
 	>
 		<div class="flex items-center gap-3">
-			<span class="text-xl">🗺️</span>
+			<i class="fa-solid fa-map text-xl" aria-hidden="true"></i>
 			<h2 class="text-lg font-bold tracking-wide text-amber-300">Dungeon Generator</h2>
 			{#if dungeon}
 				<span class="text-xs text-gray-500">
@@ -1615,13 +1615,13 @@
 					disabled={!dungeon}
 					class="flex-1 rounded-lg border border-blue-700 bg-blue-900/40 py-1.5 text-xs font-bold text-blue-300 transition hover:bg-blue-800/60 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					💾 Save
+					<i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save
 				</button>
 				<button
 					onclick={openLoadModal}
 					class="flex-1 rounded-lg border border-gray-700 bg-gray-800/60 py-1.5 text-xs font-bold text-gray-300 transition hover:bg-gray-700 active:scale-95"
 				>
-					📂 Load
+					<i class="fa-solid fa-folder-open" aria-hidden="true"></i> Load
 				</button>
 			</div>
 
@@ -1642,7 +1642,7 @@
 									class="inline-block h-3 w-4 rounded-sm"
 									style="background:#300e0e;border:1px solid #f87171"
 								></span>
-								Boss ☠
+								Boss <i class="fa-solid fa-skull" aria-hidden="true"></i>
 							</div>
 						{/if}
 						<div class="flex items-center gap-2">
@@ -1678,11 +1678,11 @@
 							</div>
 						{/if}
 						<div class="flex items-center gap-2">
-							<span class="text-sm leading-none">⚔</span>
+							<i class="fa-solid fa-swords text-sm leading-none" aria-hidden="true"></i>
 							Has encounter
 						</div>
 						<div class="flex items-center gap-2">
-							<span class="text-sm leading-none">💰</span>
+							<i class="fa-solid fa-sack-dollar text-sm leading-none" aria-hidden="true"></i>
 							Has loot
 						</div>
 						<div class="mt-1 text-[10px] text-gray-600">Click a room to select it</div>
@@ -1761,7 +1761,7 @@
 			{#if !dungeon}
 				<div class="flex flex-1 items-center justify-center">
 					<div class="text-center">
-						<div class="mb-3 text-5xl opacity-20">🗺️</div>
+						<i class="fa-solid fa-map mb-3 text-5xl opacity-20" aria-hidden="true"></i>
 						<p class="text-sm text-gray-600">Configure options and click Generate.</p>
 					</div>
 				</div>
@@ -1824,7 +1824,7 @@
 										onclick={() => (activeLoot = selectedRoom!.loot!)}
 										class="mt-2 flex w-full items-center gap-1.5 rounded border border-yellow-900/40 bg-yellow-950/20 px-2 py-1.5 text-left transition hover:bg-yellow-900/30"
 									>
-										<span class="text-sm">💰</span>
+										<i class="fa-solid fa-sack-dollar text-sm" aria-hidden="true"></i>
 										<span class="text-xs text-yellow-300">
 											{selectedRoom.loot.coins}{selectedRoom.loot.items.length > 0
 												? ` + ${selectedRoom.loot.items.length} item${selectedRoom.loot.items.length > 1 ? 's' : ''}`
@@ -1891,7 +1891,7 @@
 										{room.name}
 									</span>
 									{#if room.isBoss}
-										<span class="ml-auto text-xs">☠</span>
+										<i class="fa-solid fa-skull ml-auto text-xs" aria-hidden="true"></i>
 									{/if}
 								</button>
 
@@ -1930,7 +1930,7 @@
 										onclick={() => (activeLoot = room.loot!)}
 										class="mt-1.5 ml-7 flex items-center gap-1.5 text-[10px] text-yellow-500 transition hover:text-yellow-300"
 									>
-										<span>💰</span>
+										<i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
 										<span
 											>{room.loot.coins}{room.loot.items.length > 0
 												? ` + ${room.loot.items.length} item${room.loot.items.length > 1 ? 's' : ''}`
@@ -1962,7 +1962,7 @@
 			class="flex flex-1 flex-col items-center gap-1 py-3 text-xs transition
 				{mobilePanel === 'controls' ? 'text-amber-300' : 'text-gray-500 hover:text-gray-300'}"
 		>
-			<span class="text-lg leading-none">🗺️</span>
+			<i class="fa-solid fa-map text-lg leading-none" aria-hidden="true"></i>
 			Generate Map
 		</button>
 		<button
@@ -1975,7 +1975,7 @@
 					: 'cursor-not-allowed text-gray-700'}"
 			disabled={!dungeon}
 		>
-			<span class="text-lg leading-none">⚔️</span>
+			<i class="fa-solid fa-swords text-lg leading-none" aria-hidden="true"></i>
 			Encounters
 		</button>
 	</div>
@@ -1998,7 +1998,7 @@
 				class="flex items-center justify-between rounded-t-xl border-b border-blue-900/40 bg-blue-950/30 px-4 py-3"
 			>
 				<div class="flex items-center gap-2">
-					<span class="text-base">💾</span>
+					<i class="fa-solid fa-floppy-disk text-base" aria-hidden="true"></i>
 					<h3 class="text-sm font-bold tracking-wide text-blue-300">Save Dungeon</h3>
 				</div>
 				<button
@@ -2046,7 +2046,7 @@
 				class="flex items-center justify-between rounded-t-xl border-b border-gray-800 bg-gray-900/60 px-4 py-3"
 			>
 				<div class="flex items-center gap-2">
-					<span class="text-base">📂</span>
+					<i class="fa-solid fa-folder-open text-base" aria-hidden="true"></i>
 					<h3 class="text-sm font-bold tracking-wide text-gray-200">Load Dungeon</h3>
 				</div>
 				<button
@@ -2087,7 +2087,7 @@
 									class="shrink-0 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-500 transition hover:border-red-700 hover:text-red-400"
 									aria-label="Delete"
 								>
-									✕
+									<i class="fa-solid fa-xmark" aria-hidden="true"></i>
 								</button>
 							</div>
 						{/each}
@@ -2225,7 +2225,7 @@
 				class="flex items-center justify-between rounded-t-xl border-b border-yellow-900/40 bg-yellow-950/20 px-4 py-3"
 			>
 				<div class="flex items-center gap-2">
-					<span class="text-base">💰</span>
+					<i class="fa-solid fa-sack-dollar text-base" aria-hidden="true"></i>
 					<h3 class="text-sm font-bold tracking-wide text-yellow-300">Loot Found!</h3>
 				</div>
 				<button

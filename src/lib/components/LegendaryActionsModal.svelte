@@ -98,7 +98,7 @@
 		<div class="mx-4 w-full max-w-lg rounded-xl border border-amber-700/50 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-amber-900/40 px-5 py-3">
 				<div class="flex items-center gap-2">
-					<span class="text-amber-400">★</span>
+					<i class="fa-solid fa-star text-amber-400" aria-hidden="true"></i>
 					<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 						>Legendary Actions</span
 					>
@@ -136,7 +136,10 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
-				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<h4 class="font-black tracking-wide text-amber-400">
+					<i class="fa-solid fa-dice" aria-hidden="true"></i>
+					{r.expr}
+				</h4>
 				<button
 					onclick={() => (diceResult = null)}
 					aria-label="Close"

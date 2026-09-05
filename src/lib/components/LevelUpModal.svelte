@@ -130,7 +130,7 @@
 						{#if current.avatarUrl}
 							<img src={current.avatarUrl} alt={current.name} class="h-full w-full object-cover" />
 						{:else}
-							<span class="text-base leading-none">🛡️</span>
+							<i class="fa-solid fa-shield-halved text-base leading-none" aria-hidden="true"></i>
 						{/if}
 					</div>
 					<div class="min-w-0 flex-1">

@@ -223,7 +223,7 @@
 		class="flex shrink-0 items-center justify-between border-b border-gray-700/60 bg-gradient-to-r from-amber-950/60 to-gray-900 px-6 py-4"
 	>
 		<div class="flex items-center gap-3">
-			<span class="text-2xl">🎲</span>
+			<i class="fa-solid fa-dice text-2xl" aria-hidden="true"></i>
 			<div>
 				<h2 class="text-lg font-black tracking-wider text-amber-300 uppercase">Liar's Dice</h2>
 				{#if game}
@@ -231,8 +231,9 @@
 						{#if game.status === 'lobby'}
 							Lobby — {game.players.length} joined
 						{:else if game.status === 'bidding'}
-							Round {game.roundNumber}{game.isPalifico ? ' · ⚠️ PALIFICO' : ''} — {totalDice} dice in
-							play
+							Round {game.roundNumber}{#if game.isPalifico}
+								· <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> PALIFICO
+							{/if} — {totalDice} dice in play
 						{:else if game.status === 'reveal'}
 							Reveal — next round in {countdown}s
 						{:else if game.status === 'game_over'}
@@ -267,7 +268,7 @@
 							? 'border-amber-500 bg-amber-950/40 text-amber-300'
 							: 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600 hover:text-gray-200'}"
 					>
-						<span class="text-3xl">👁️</span>
+						<i class="fa-solid fa-eye text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Observe</span>
 						<span class="text-center text-xs opacity-70">See all dice, manage the game</span>
 					</button>
@@ -278,7 +279,7 @@
 							? 'border-amber-500 bg-amber-950/40 text-amber-300'
 							: 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600 hover:text-gray-200'}"
 					>
-						<span class="text-3xl">🎲</span>
+						<i class="fa-solid fa-dice text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Play</span>
 						<span class="text-center text-xs opacity-70">Join the game as a player</span>
 					</button>
@@ -307,7 +308,7 @@
 								<li class="flex items-center gap-3">
 									<span
 										class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-900/40 text-xs font-black text-amber-400"
-										>🎲</span
+										><i class="fa-solid fa-dice" aria-hidden="true"></i></span
 									>
 									<span class="font-semibold text-gray-200">{player.name}</span>
 									{#if player.id === 'dm'}
@@ -362,7 +363,9 @@
 						{#if !game.isPalifico}
 							<p class="text-xs text-gray-500">Ones are wild</p>
 						{:else}
-							<p class="text-xs text-amber-600">⚠️ No wilds</p>
+							<p class="text-xs text-amber-600">
+								<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> No wilds
+							</p>
 						{/if}
 					</div>
 				{:else}
@@ -384,11 +387,13 @@
 								? 'text-emerald-400'
 								: 'text-red-400'}"
 						>
-							{rev.callerAction === 'dudo'
-								? '🎲 LIAR!'
-								: rev.calzaSuccess
-									? '✅ CALZA!'
-									: '❌ CALZA MISSED!'}
+							{#if rev.callerAction === 'dudo'}
+								<i class="fa-solid fa-dice" aria-hidden="true"></i> LIAR!
+							{:else if rev.calzaSuccess}
+								<i class="fa-solid fa-circle-check" aria-hidden="true"></i> CALZA!
+							{:else}
+								<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> CALZA MISSED!
+							{/if}
 						</p>
 						<p class="text-xs text-gray-300">
 							Bid: {rev.bid.quantity} × {faceName(rev.bid.face)}s · Actual:
@@ -430,10 +435,15 @@
 											? 'text-gray-600'
 											: 'text-gray-200'}"
 								>
-									{player.id === 'dm' ? '👑 ' : ''}{player.name}
+									{#if player.id === 'dm'}<i class="fa-solid fa-crown" aria-hidden="true"></i>
+									{/if}{player.name}
 								</p>
 								<p class="text-[10px] text-gray-500">
-									{player.eliminated ? 'eliminated' : `${player.diceCount} 🎲`}
+									{#if player.eliminated}
+										eliminated
+									{:else}
+										{player.diceCount} <i class="fa-solid fa-dice" aria-hidden="true"></i>
+									{/if}
 								</p>
 							</div>
 
@@ -553,13 +563,13 @@
 										onclick={() => post({ action: 'dudo', playerId: 'dm' })}
 										class="rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white uppercase transition hover:bg-red-600 active:scale-95"
 									>
-										🎲 Liar!
+										<i class="fa-solid fa-dice" aria-hidden="true"></i> Liar!
 									</button>
 									<button
 										onclick={() => post({ action: 'calza', playerId: 'dm' })}
 										class="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white uppercase transition hover:bg-emerald-600 active:scale-95"
 									>
-										✓ Calza
+										<i class="fa-solid fa-check" aria-hidden="true"></i> Calza
 									</button>
 								{/if}
 							</div>
@@ -603,7 +613,7 @@
 			<!-- ── Game over ───────────────────────────────────────────────────────── -->
 		{:else if game?.status === 'game_over'}
 			<div class="flex flex-col items-center gap-4 py-6">
-				<span class="text-6xl">🏆</span>
+				<i class="fa-solid fa-trophy text-6xl" aria-hidden="true"></i>
 				<h3 class="text-2xl font-black text-amber-300">{game.winnerName ?? 'Someone'} Wins!</h3>
 				<p class="text-sm text-gray-400">
 					Game lasted {game.roundNumber} round{game.roundNumber !== 1 ? 's' : ''}.

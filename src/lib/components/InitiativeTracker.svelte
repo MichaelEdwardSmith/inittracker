@@ -616,7 +616,7 @@
 							<div class="rounded border border-gray-700 bg-gray-900/60 px-2 py-2 text-xs">
 								<div class="mb-1.5 flex items-center gap-2">
 									<span class="font-bold tracking-widest text-gray-400 uppercase"
-										>☠ Death Saves</span
+										><i class="fa-solid fa-skull" aria-hidden="true"></i> Death Saves</span
 									>
 									<button
 										onclick={() =>
@@ -629,13 +629,13 @@
 									<div
 										class="flex items-center gap-2 rounded bg-red-950/60 px-2 py-1.5 text-sm font-bold text-red-400"
 									>
-										<span>☠</span><span>Dead</span>
+										<i class="fa-solid fa-skull" aria-hidden="true"></i><span>Dead</span>
 									</div>
 								{:else if isStable}
 									<div
 										class="flex items-center gap-2 rounded bg-green-950/60 px-2 py-1.5 text-sm font-bold text-green-400"
 									>
-										<span>♥</span><span>Stable</span>
+										<i class="fa-solid fa-heart" aria-hidden="true"></i><span>Stable</span>
 									</div>
 								{:else}
 									<div class="flex items-center gap-4">
@@ -868,7 +868,8 @@
 								title={c.loot?.length ? 'Edit loot' : 'Roll loot'}
 								class="flex items-center gap-1.5 rounded border border-amber-800/50 bg-amber-950/30 px-2 py-1 text-xs text-amber-500 transition hover:border-amber-600 hover:text-amber-300"
 							>
-								⬡ {c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
+								<i class="fa-solid fa-gem" aria-hidden="true"></i>
+								{c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
 							</button>
 						{/if}
 					{/if}
@@ -939,7 +940,7 @@
 	>
 		<div class="mx-4 w-full max-w-sm rounded-xl border border-amber-700/60 bg-gray-900 shadow-2xl">
 			<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-				<span class="text-amber-400">⚠</span>
+				<i class="fa-solid fa-triangle-exclamation text-amber-400" aria-hidden="true"></i>
 				<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 					>Change Initiative Mid-Combat?</span
 				>

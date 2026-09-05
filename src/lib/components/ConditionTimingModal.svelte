@@ -31,7 +31,7 @@
 	>
 		<div class="mx-4 w-full max-w-sm rounded-xl border border-violet-700/60 bg-gray-900 shadow-2xl">
 			<div class="flex items-center gap-2 border-b border-violet-900/40 px-5 py-3">
-				<span class="text-violet-400">⏱</span>
+				<i class="fa-solid fa-stopwatch text-violet-400" aria-hidden="true"></i>
 				<span class="text-sm font-bold tracking-widest text-violet-300 uppercase"
 					>Add {pending.kind === 'spell' ? 'Spell Effect' : 'Condition'}</span
 				>

@@ -54,7 +54,7 @@
 	<div class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<!-- Header -->
 		<div class="border-b border-gray-700 px-6 py-5 text-center">
-			<div class="mb-2 text-4xl">⚔️</div>
+			<i class="fa-solid fa-swords mb-2 text-4xl" aria-hidden="true"></i>
 			<h2
 				id="edition-modal-title"
 				class="text-xl font-black tracking-widest text-amber-400 uppercase"
