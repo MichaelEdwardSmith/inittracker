@@ -335,7 +335,7 @@
 			<footer class="up-next-bar">
 				<div class="un-label-group">
 					<span class="un-label">Up Next</span>
-					<span class="un-arrow">▶</span>
+					<i class="fa-duotone fa-light fa-square-arrow-right un-arrow" aria-hidden="true"></i>
 				</div>
 
 				<div class="un-cards">

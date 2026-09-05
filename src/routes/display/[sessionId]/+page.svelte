@@ -1367,7 +1367,10 @@
 				<div class="flex items-center gap-6">
 					<div class="shrink-0">
 						<span class="text-xs font-black tracking-[0.3em] text-gray-500 uppercase">Up Next</span>
-						<span class="ml-2 text-gray-600">▶</span>
+						<i
+							class="fa-duotone fa-light fa-square-arrow-right ml-2 text-gray-600"
+							aria-hidden="true"
+						></i>
 					</div>
 
 					<div class="flex flex-1 items-center gap-3 overflow-hidden">
