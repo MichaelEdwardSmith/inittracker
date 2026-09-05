@@ -62,20 +62,7 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 			<div class="flex items-center gap-3">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5 text-amber-400"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-					/>
-				</svg>
+				<i class="fa-solid fa-microphone text-lg text-amber-400" aria-hidden="true"></i>
 				<span class="font-bold text-white">Voice Commands</span>
 				<span
 					class="rounded-full border border-amber-600/50 bg-amber-900/40 px-2 py-0.5 text-xs font-semibold text-amber-400"
@@ -87,20 +74,7 @@
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -108,20 +82,10 @@
 		<div
 			class="mx-5 mt-4 flex items-start gap-2.5 rounded-lg border border-amber-700/40 bg-amber-950/40 px-4 py-3"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-				/>
-			</svg>
+			<i
+				class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-base text-amber-400"
+				aria-hidden="true"
+			></i>
 			<p class="text-xs leading-relaxed text-amber-300/90">
 				Voice commands are a <strong>beta feature</strong> and may not always behave as expected. Speech
 				recognition runs locally via Moonshine AI and accuracy can vary based on microphone quality, background

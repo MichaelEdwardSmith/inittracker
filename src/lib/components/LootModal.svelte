@@ -84,20 +84,7 @@
 				class="rounded p-1 text-gray-600 transition hover:text-gray-300"
 				title="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -128,20 +115,7 @@
 						title="Remove"
 						class="rounded p-1 text-gray-700 transition hover:text-red-400"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-3.5 w-3.5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
 					</button>
 				</div>
 			{/each}

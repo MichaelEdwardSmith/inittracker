@@ -2,7 +2,7 @@
      via SSE, renders the initiative order with HP bars and conditions (ADV_CONDITIONS hidden),
      and provides a form for players to send messages to the DM. No auth required. -->
 <script lang="ts">
-	import { conditionColors, sortCombatants, hpPercent, hpBarColor } from '$lib/utils';
+	import { conditionColors, sortCombatants, hpPercent, hpBarColor, batteryIcon } from '$lib/utils';
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
 	import { getMonsterDetail } from '$lib/enemies';
 	import type { StorageState, Combatant } from '$lib/types';
@@ -768,20 +768,8 @@
 					class="pointer-events-auto flex w-full max-w-sm flex-col gap-1.5 rounded-2xl border border-purple-500/50 bg-gray-950/95 px-5 py-4 text-left shadow-2xl shadow-purple-900/30 backdrop-blur-md"
 				>
 					<div class="flex items-center gap-2">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 shrink-0 text-purple-400"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-							/>
-						</svg>
+						<i class="fa-solid fa-envelope shrink-0 text-base text-purple-400" aria-hidden="true"
+						></i>
 						<span class="text-xs font-bold tracking-widest text-purple-400 uppercase"
 							>Message from DM</span
 						>
@@ -870,26 +858,10 @@
 									? 'text-green-400'
 									: ''}"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="1.8"
-							>
-								<rect x="2" y="7" width="17" height="10" rx="1.5" />
-								<path d="M19 10v4" stroke-width="2.5" stroke-linecap="round" />
-								<rect
-									x="3.5"
-									y="8.5"
-									width={Math.round((batteryLevel / 100) * 14)}
-									height="7"
-									rx="0.75"
-									fill="currentColor"
-									stroke="none"
-								/>
-							</svg>
+							<i
+								class="fa-solid {batteryIcon(batteryLevel, batteryCharging)} text-sm"
+								aria-hidden="true"
+							></i>
 							<span>{batteryLevel}%</span>
 						</span>
 					{/if}
@@ -903,27 +875,9 @@
 					class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
 				>
 					{#if showMobileMenu}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-						</svg>
+						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 					{:else}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-						</svg>
+						<i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
 					{/if}
 				</button>
 				{#if dmUnread > 0}
@@ -954,39 +908,10 @@
 					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 			>
 				{#if audioEnabled}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4 shrink-0"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M15.536 8.464a5 5 0 010 7.072"
-						/>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M18.364 5.636a9 9 0 010 12.728"
-						/>
-					</svg>
+					<i class="fa-solid fa-volume-high shrink-0 text-base" aria-hidden="true"></i>
 					Sound On
 				{:else}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4 shrink-0"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
-						<path stroke-linecap="round" stroke-linejoin="round" d="M23 9l-6 6M17 9l6 6" />
-					</svg>
+					<i class="fa-solid fa-volume-xmark shrink-0 text-base" aria-hidden="true"></i>
 					Sound Off
 				{/if}
 			</button>
@@ -998,19 +923,7 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<circle cx="12" cy="12" r="10" />
-				<path stroke-linecap="round" d="M8 14s1.5 2 4 2 4-2 4-2" />
-				<line x1="9" y1="9" x2="9.01" y2="9" stroke-linecap="round" stroke-width="3" />
-				<line x1="15" y1="9" x2="15.01" y2="9" stroke-linecap="round" stroke-width="3" />
-			</svg>
+			<i class="fa-solid fa-face-smile shrink-0 text-base" aria-hidden="true"></i>
 			React to DM
 		</button>
 		<button
@@ -1055,18 +968,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke-linejoin="round" />
-					<line x1="8" y1="2" x2="8" y2="18" />
-					<line x1="16" y1="6" x2="16" y2="22" />
-				</svg>
+				<i class="fa-solid fa-map shrink-0 text-base" aria-hidden="true"></i>
 				View Map
 			</button>
 		{/if}
@@ -1085,20 +987,7 @@
 						class="h-4 w-4 shrink-0 rounded-full object-cover"
 					/>
 				{:else}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4 shrink-0"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-						/>
-					</svg>
+					<i class="fa-solid fa-user shrink-0 text-base" aria-hidden="true"></i>
 				{/if}
 				{myCharacter ? myCharacter.name : 'Choose Character'}
 			</button>
@@ -1111,20 +1000,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-					/>
-				</svg>
+				<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 				Message DM
 			</button>
 			<button
@@ -1134,20 +1010,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-					/>
-				</svg>
+				<i class="fa-solid fa-cube shrink-0 text-base" aria-hidden="true"></i>
 				Roll Initiative
 			</button>
 		{/if}
@@ -1159,20 +1022,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-					/>
-				</svg>
+				<i class="fa-solid fa-pen-to-square shrink-0 text-base" aria-hidden="true"></i>
 				My Notes
 			</button>
 		{/if}
@@ -1187,20 +1037,7 @@
 				? 'text-purple-400 hover:bg-purple-900/30'
 				: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-				/>
-			</svg>
+			<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 			DM Messages
 			{#if dmUnread > 0}
 				<span
@@ -1215,20 +1052,7 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-				/>
-			</svg>
+			<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 			Contact
 		</a>
 		<a
@@ -1236,20 +1060,7 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-				/>
-			</svg>
+			<i class="fa-solid fa-circle-question shrink-0 text-base" aria-hidden="true"></i>
 			Player Guide
 		</a>
 		<button
@@ -1260,36 +1071,10 @@
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			{#if isFullscreen}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-					/>
-				</svg>
+				<i class="fa-solid fa-compress shrink-0 text-base" aria-hidden="true"></i>
 				Exit Full Screen
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-					/>
-				</svg>
+				<i class="fa-solid fa-expand shrink-0 text-base" aria-hidden="true"></i>
 				Full Screen
 			{/if}
 		</button>
@@ -1298,20 +1083,7 @@
 				href="/player/logout"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-red-400 transition hover:bg-red-900/30 hover:text-red-300"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-					/>
-				</svg>
+				<i class="fa-solid fa-right-from-bracket shrink-0 text-base" aria-hidden="true"></i>
 				Sign Out
 			</a>
 		{/if}
@@ -1574,20 +1346,7 @@
 										title="What is {status}?"
 										class="py-1 pr-2 opacity-50 transition hover:opacity-100"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-4 w-4"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
+										<i class="fa-solid fa-circle-info text-base" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/each}
@@ -1747,20 +1506,7 @@
 														title="What is {s}?"
 														class="py-0.5 pr-0.5 opacity-50 transition hover:opacity-100"
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															class="h-2.5 w-2.5"
-															fill="none"
-															viewBox="0 0 24 24"
-															stroke="currentColor"
-														>
-															<path
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="2"
-																d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-															/>
-														</svg>
+														<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
 													</button>
 												</div>
 											{/each}

@@ -55,18 +55,7 @@
 					<span
 						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-3 w-3 text-black"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<i class="fa-solid fa-check text-xs text-black" aria-hidden="true"></i>
 					</span>
 				{/if}
 				<span class="text-xs font-bold tracking-widest text-amber-400 uppercase">D&D 5e</span>
@@ -103,18 +92,7 @@
 					<span
 						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-3 w-3 text-white"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<i class="fa-solid fa-check text-xs text-white" aria-hidden="true"></i>
 					</span>
 				{/if}
 				<span
@@ -150,18 +128,10 @@
 		<div
 			class="mx-6 flex items-start gap-3 rounded-lg bg-orange-950/40 px-4 py-3 ring-1 ring-orange-800/50"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="mt-0.5 h-4 w-4 shrink-0 text-orange-400"
-				viewBox="0 0 20 20"
-				fill="currentColor"
-			>
-				<path
-					fill-rule="evenodd"
-					d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-					clip-rule="evenodd"
-				/>
-			</svg>
+			<i
+				class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-base text-orange-400"
+				aria-hidden="true"
+			></i>
 			<p class="text-xs leading-relaxed text-orange-300">
 				<strong class="font-semibold text-orange-200">This choice is permanent.</strong> The ruleset cannot
 				be changed after the session is created. Choose carefully.

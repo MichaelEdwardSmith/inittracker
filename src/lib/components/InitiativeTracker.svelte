@@ -379,20 +379,7 @@
 								title="Remove lair actions"
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 						<div class="flex items-center gap-3 px-1">
@@ -467,20 +454,7 @@
 									title="View stat block"
 									class="rounded p-2 text-gray-600 transition hover:text-blue-400"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-4 w-4"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
+									<i class="fa-solid fa-circle-info text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							{#if c.type === 'enemy' && !combat.sorted.some((x) => x.type === 'lair' && x.templateName === c.templateName)}
@@ -489,20 +463,7 @@
 									title="Add Lair Actions to initiative"
 									class="rounded p-2 text-gray-600 transition hover:text-purple-400"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-4 w-4"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-										/>
-									</svg>
+									<i class="fa-solid fa-building text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							<button
@@ -512,20 +473,7 @@
 									? 'text-amber-300 [filter:drop-shadow(0_0_5px_theme(colors.amber.400))] hover:text-amber-200'
 									: 'text-gray-600 hover:text-gray-400'}"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/>
-								</svg>
+								<i class="fa-solid fa-pen-to-square text-base" aria-hidden="true"></i>
 							</button>
 							<button
 								onclick={() => combat.removeFromCombat(c.id)}
@@ -534,20 +482,7 @@
 									: 'Remove from combat'}
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 
@@ -780,20 +715,7 @@
 										title="What is {status}?"
 										class="border-l border-white/10 px-1.5 py-1.5 opacity-40 transition hover:opacity-100"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3 w-3"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
+										<i class="fa-solid fa-circle-info text-xs" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/each}
@@ -934,20 +856,7 @@
 										title="View legendary actions"
 										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
+										<i class="fa-solid fa-circle-info text-sm" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/if}

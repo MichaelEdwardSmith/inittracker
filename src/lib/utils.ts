@@ -144,6 +144,16 @@ export function sortCombatants(list: Combatant[]): Combatant[] {
 	});
 }
 
+/** Font Awesome icon name for the device battery indicator, given level (0-100) and charging state. */
+export function batteryIcon(level: number, charging: boolean): string {
+	if (charging) return 'fa-battery-bolt';
+	if (level <= 10) return 'fa-battery-empty';
+	if (level <= 35) return 'fa-battery-quarter';
+	if (level <= 60) return 'fa-battery-half';
+	if (level <= 85) return 'fa-battery-three-quarters';
+	return 'fa-battery-full';
+}
+
 export function hpPercent(c: Combatant): number {
 	if (c.maxHp === 0) return 0;
 	return Math.max(0, Math.min(100, (c.currentHp / c.maxHp) * 100));

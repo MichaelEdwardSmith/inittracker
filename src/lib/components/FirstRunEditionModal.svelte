@@ -88,18 +88,7 @@
 				</ul>
 				{#if selected === '2014'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-amber-400">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<i class="fa-solid fa-check text-base" aria-hidden="true"></i>
 						Selected
 					</div>
 				{/if}
@@ -124,18 +113,7 @@
 				</ul>
 				{#if selected === '2024'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-blue-400">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<i class="fa-solid fa-check text-base" aria-hidden="true"></i>
 						Selected
 					</div>
 				{/if}

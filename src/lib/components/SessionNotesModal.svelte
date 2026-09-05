@@ -163,35 +163,9 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingNote}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5 animate-spin"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-									/>
-								</svg>
+								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
 							{:else}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-									/>
-								</svg>
+								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
 							{/if}
 							Note
 						</button>
@@ -205,35 +179,9 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingAll}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5 animate-spin"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-									/>
-								</svg>
+								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
 							{:else}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-									/>
-								</svg>
+								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
 							{/if}
 							All
 						</button>
@@ -243,39 +191,16 @@
 						class="text-gray-500 transition hover:text-white"
 						aria-label="Close"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
 			<!-- Search bar -->
 			<div class="relative mt-3">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-					/>
-				</svg>
+				<i
+					class="fa-solid fa-magnifying-glass pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-500"
+					aria-hidden="true"
+				></i>
 				<input
 					type="text"
 					bind:value={search}
@@ -295,20 +220,7 @@
 						onclick={createNew}
 						class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-amber-600 px-3 py-2 text-sm font-semibold text-amber-500 transition hover:border-amber-400 hover:text-amber-400"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4v16m8-8H4"
-							/>
-						</svg>
+						<i class="fa-solid fa-plus text-base" aria-hidden="true"></i>
 						New Notes
 					</button>
 				</div>
@@ -341,20 +253,7 @@
 										aria-label="Delete note"
 										title="Delete"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M6 18L18 6M6 6l12 12"
-											/>
-										</svg>
+										<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
 									</button>
 								{/if}
 							</div>

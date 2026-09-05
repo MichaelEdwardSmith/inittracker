@@ -109,16 +109,7 @@
 					aria-label="Close"
 					class="text-gray-600 transition hover:text-gray-300"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -151,20 +142,7 @@
 					aria-label="Close"
 					class="text-gray-500 transition hover:text-white"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="mb-4 flex flex-wrap gap-2">

@@ -1475,16 +1475,7 @@
 			class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 			aria-label="Close"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-			</svg>
+			<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 		</button>
 	</div>
 
@@ -1504,15 +1495,7 @@
 						aria-label="Close panel"
 						class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-							><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
-						>
+						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 					</button>
 				</div>
 			{/if}
@@ -1874,19 +1857,7 @@
 							aria-label="Close panel"
 							class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 hover:border-red-700 hover:text-red-400 sm:hidden"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M6 18L18 6M6 6l12 12"
-								/></svg
-							>
+							<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 						</button>
 					{/if}
 				</div>
@@ -2035,15 +2006,7 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
-					>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="space-y-3 p-4">
@@ -2091,15 +2054,7 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
-					>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="max-h-96 overflow-y-auto">
@@ -2173,16 +2128,7 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<!-- Modal body -->
@@ -2236,16 +2182,7 @@
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 					aria-label="Close"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
+					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="space-y-3 p-4">
@@ -2294,16 +2231,7 @@
 				<button
 					onclick={() => (activeLoot = null)}
 					class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
-					aria-label="Close"
-					><svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-						><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg
-					></button
+					aria-label="Close"><i class="fa-solid fa-xmark text-base" aria-hidden="true"></i></button
 				>
 			</div>
 			<div class="space-y-3 p-4">

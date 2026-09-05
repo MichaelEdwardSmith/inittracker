@@ -64,20 +64,7 @@
 				aria-label="Close"
 				class="text-gray-600 transition hover:text-gray-300"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -85,20 +72,7 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if messages.length === 0}
 				<div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-10 w-10 text-gray-700"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-						/>
-					</svg>
+					<i class="fa-solid fa-envelope text-3xl text-gray-700" aria-hidden="true"></i>
 					<p class="text-sm text-gray-600">No messages from the DM yet</p>
 				</div>
 			{:else}

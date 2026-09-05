@@ -238,16 +238,12 @@
 									title={isExpanded ? 'Hide details' : 'Show details'}
 									aria-expanded={isExpanded}
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-3.5 w-3.5 transition-transform {isExpanded ? 'rotate-90' : ''}"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										stroke-width="2.5"
-									>
-										<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-									</svg>
+									<i
+										class="fa-solid fa-chevron-right text-sm transition-transform {isExpanded
+											? 'rotate-90'
+											: ''}"
+										aria-hidden="true"
+									></i>
 								</button>
 							</td>
 							<td class="px-4 py-3 font-semibold text-gray-100">
