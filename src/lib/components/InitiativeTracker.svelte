@@ -655,16 +655,11 @@
 															? 'border-red-600 bg-red-700 text-red-200 hover:bg-red-800'
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-red-700 hover:bg-red-950'}"
 													>
-														<i
-															class="fa-solid fa-skull"
-															class:hidden={!(ds.failures > i)}
-															aria-hidden="true"
-														></i>
-														<i
-															class="fa-regular fa-circle"
-															class:hidden={ds.failures > i}
-															aria-hidden="true"
-														></i>
+														{#if ds.failures > i}
+															<i class="fa-solid fa-skull" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</button>
 												{/each}
 											</div>
@@ -686,16 +681,11 @@
 															? 'border-green-600 bg-green-700 text-green-200 hover:bg-green-800'
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-green-700 hover:bg-green-950'}"
 													>
-														<i
-															class="fa-solid fa-heart"
-															class:hidden={!(ds.successes > i)}
-															aria-hidden="true"
-														></i>
-														<i
-															class="fa-regular fa-circle"
-															class:hidden={ds.successes > i}
-															aria-hidden="true"
-														></i>
+														{#if ds.successes > i}
+															<i class="fa-solid fa-heart" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</button>
 												{/each}
 											</div>

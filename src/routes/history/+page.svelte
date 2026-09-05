@@ -502,16 +502,11 @@
 											title="Export to PDF"
 											class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-amber-400 disabled:opacity-40"
 										>
-											<i
-												class="fa-solid fa-spinner fa-spin text-base"
-												class:hidden={exportingId !== record.id}
-												aria-hidden="true"
-											></i>
-											<i
-												class="fa-solid fa-download text-base"
-												class:hidden={exportingId === record.id}
-												aria-hidden="true"
-											></i>
+											{#if exportingId === record.id}
+												<i class="fa-solid fa-spinner fa-spin text-base" aria-hidden="true"></i>
+											{:else}
+												<i class="fa-solid fa-download text-base" aria-hidden="true"></i>
+											{/if}
 										</button>
 										<!-- Delete button -->
 										{#if confirmDeleteId === record.id}
@@ -544,20 +539,17 @@
 										{players.length}
 										{players.length === 1 ? 'player' : 'players'}
 									</span>
-									<span
-										class="flex items-center gap-1 text-red-500"
-										class:hidden={slain.length === 0}
-									>
-										<i class="fa-solid fa-skull" aria-hidden="true"></i>
-										{slain.length} slain
-									</span>
-									<span
-										class="flex items-center gap-1 text-green-600"
-										class:hidden={slain.length > 0}
-									>
-										<i class="fa-solid fa-check" aria-hidden="true"></i>
-										No casualties
-									</span>
+									{#if slain.length > 0}
+										<span class="flex items-center gap-1 text-red-500">
+											<i class="fa-solid fa-skull" aria-hidden="true"></i>
+											{slain.length} slain
+										</span>
+									{:else}
+										<span class="flex items-center gap-1 text-green-600">
+											<i class="fa-solid fa-check" aria-hidden="true"></i>
+											No casualties
+										</span>
+									{/if}
 									<span class="flex items-center gap-1">
 										<i class="fa-solid fa-scroll" aria-hidden="true"></i>
 										{record.events.filter((e) => e.type !== 'round_advance').length} events

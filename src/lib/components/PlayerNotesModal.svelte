@@ -148,10 +148,13 @@
 					<p class="text-xs text-gray-500 italic">{playerName}</p>
 				</div>
 				<div class="flex items-center gap-3">
-					<span class="text-xs text-gray-500" class:hidden={saveStatus !== 'saving'}>Saving…</span>
-					<span class="text-xs text-green-500" class:hidden={saveStatus !== 'saved'}
-						>Saved <i class="fa-solid fa-check" aria-hidden="true"></i></span
-					>
+					{#if saveStatus === 'saving'}
+						<span class="text-xs text-gray-500">Saving…</span>
+					{:else if saveStatus === 'saved'}
+						<span class="text-xs text-green-500"
+							>Saved <i class="fa-solid fa-check" aria-hidden="true"></i></span
+						>
+					{/if}
 					<!-- Export this note -->
 					{#if selectedNote}
 						<button
@@ -161,16 +164,11 @@
 							aria-label="Export this note as PDF"
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-blue-300 disabled:opacity-40"
 						>
-							<i
-								class="fa-solid fa-spinner fa-spin text-sm"
-								class:hidden={!exportingNote}
-								aria-hidden="true"
-							></i>
-							<i
-								class="fa-solid fa-download text-sm"
-								class:hidden={exportingNote}
-								aria-hidden="true"
-							></i>
+							{#if exportingNote}
+								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+							{:else}
+								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
+							{/if}
 							Note
 						</button>
 					{/if}
@@ -183,13 +181,11 @@
 							aria-label="Export all notes as PDF"
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-blue-300 disabled:opacity-40"
 						>
-							<i
-								class="fa-solid fa-spinner fa-spin text-sm"
-								class:hidden={!exportingAll}
-								aria-hidden="true"
-							></i>
-							<i class="fa-solid fa-download text-sm" class:hidden={exportingAll} aria-hidden="true"
-							></i>
+							{#if exportingAll}
+								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+							{:else}
+								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
+							{/if}
 							All
 						</button>
 					{/if}

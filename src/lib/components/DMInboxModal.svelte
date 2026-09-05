@@ -144,16 +144,11 @@
 						disabled={composeSending || !composeText.trim()}
 						class="flex items-center gap-1.5 rounded-lg bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-40"
 					>
-						<i
-							class="fa-solid fa-spinner fa-spin text-sm"
-							class:hidden={!composeSending}
-							aria-hidden="true"
-						></i>
-						<i
-							class="fa-solid fa-paper-plane text-sm"
-							class:hidden={composeSending}
-							aria-hidden="true"
-						></i>
+						{#if composeSending}
+							<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+						{:else}
+							<i class="fa-solid fa-paper-plane text-sm" aria-hidden="true"></i>
+						{/if}
 						Send
 					</button>
 				</div>

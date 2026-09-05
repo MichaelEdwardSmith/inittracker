@@ -501,12 +501,11 @@
 				title="Copy session ID"
 				class="ml-1 rounded p-0.5 text-gray-500 transition hover:text-amber-400"
 			>
-				<i
-					class="fa-solid fa-check text-sm text-green-400"
-					class:hidden={!copied}
-					aria-hidden="true"
-				></i>
-				<i class="fa-solid fa-copy text-sm" class:hidden={copied} aria-hidden="true"></i>
+				{#if copied}
+					<i class="fa-solid fa-check text-sm text-green-400" aria-hidden="true"></i>
+				{:else}
+					<i class="fa-solid fa-copy text-sm" aria-hidden="true"></i>
+				{/if}
 			</button>
 		</div>
 
@@ -540,10 +539,11 @@
 					aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
 					class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 				>
-					<i class="fa-solid fa-xmark text-base" class:hidden={!showMobileMenu} aria-hidden="true"
-					></i>
-					<i class="fa-solid fa-bars text-base" class:hidden={showMobileMenu} aria-hidden="true"
-					></i>
+					{#if showMobileMenu}
+						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					{:else}
+						<i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
+					{/if}
 				</button>
 				{#if unreadCount > 0 && !data.isGuest}
 					<span
@@ -803,19 +803,11 @@
 				title="Toggle full screen mode"
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i
-					class="fa-solid fa-compress shrink-0 text-base"
-					class:hidden={!isFullscreen}
-					aria-hidden="true"
-				></i>
-				<i
-					class="fa-solid fa-expand shrink-0 text-base"
-					class:hidden={isFullscreen}
-					aria-hidden="true"
-				></i>
 				{#if isFullscreen}
+					<i class="fa-solid fa-compress shrink-0 text-base" aria-hidden="true"></i>
 					Exit Full Screen
 				{:else}
+					<i class="fa-solid fa-expand shrink-0 text-base" aria-hidden="true"></i>
 					Full Screen
 				{/if}
 			</button>
@@ -827,19 +819,11 @@
 				title="Switch between light and dark theme"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i
-					class="fa-solid fa-sun shrink-0 text-base"
-					class:hidden={!theme.isDark}
-					aria-hidden="true"
-				></i>
-				<i
-					class="fa-solid fa-moon shrink-0 text-base"
-					class:hidden={theme.isDark}
-					aria-hidden="true"
-				></i>
 				{#if theme.isDark}
+					<i class="fa-solid fa-sun shrink-0 text-base" aria-hidden="true"></i>
 					Light Mode
 				{:else}
+					<i class="fa-solid fa-moon shrink-0 text-base" aria-hidden="true"></i>
 					Dark Mode
 				{/if}
 			</button>
