@@ -478,11 +478,17 @@
 
 							<!-- Current turn / loser indicator -->
 							{#if isCurrent}
-								<span class="ml-auto text-xs font-bold text-amber-400">← TURN</span>
+								<span class="ml-auto text-xs font-bold text-amber-400"
+									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> TURN</span
+								>
 							{:else if isLoser && game.reveal && !game.reveal.calzaSuccess}
-								<span class="ml-auto text-xs font-bold text-red-400">← LOSES</span>
+								<span class="ml-auto text-xs font-bold text-red-400"
+									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> LOSES</span
+								>
 							{:else if isLoser && game.reveal?.calzaSuccess}
-								<span class="ml-auto text-xs font-bold text-emerald-400">← GAINS</span>
+								<span class="ml-auto text-xs font-bold text-emerald-400"
+									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> GAINS</span
+								>
 							{/if}
 						</div>
 					{/each}
@@ -626,7 +632,7 @@
 					onclick={() => post({ action: 'next_round' })}
 					class="rounded-lg bg-amber-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
 				>
-					Next Round →
+					Next Round <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
 				</button>
 			{:else}
 				<span class="text-xs text-gray-600">Round {game.roundNumber}</span>

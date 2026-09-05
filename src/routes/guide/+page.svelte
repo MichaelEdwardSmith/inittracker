@@ -89,7 +89,7 @@
 					<tr class="transition hover:bg-gray-800/30">
 						{#each row as cell, i}
 							<td class="px-4 py-2.5 {i === 0 ? 'font-semibold text-white' : 'text-gray-400'}"
-								>{cell}</td
+								>{@html cell}</td
 							>
 						{/each}
 					</tr>
@@ -835,7 +835,10 @@
 				{@render dataTable(
 					['Button', 'What it does'],
 					[
-						['↺ Undo', 'Reverts the most recent damage/heal, condition/effect, or turn change'],
+						[
+							'<i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo',
+							'Reverts the most recent damage/heal, condition/effect, or turn change'
+						],
 						[
 							'AoE',
 							'Opens the bulk-action modal for damage, healing, conditions, or spell effects'
@@ -854,9 +857,11 @@
 					Undo
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					The <strong class="font-semibold text-white">↺ Undo</strong> button reverts the most recent
-					action: a damage/heal, a condition/spell-effect change, a temp HP change, a death-save update,
-					or a turn advance/rewind. It's greyed out when there's nothing to undo.
+					The <strong class="font-semibold text-white"
+						><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo</strong
+					> button reverts the most recent action: a damage/heal, a condition/spell-effect change, a temp
+					HP change, a death-save update, or a turn advance/rewind. It's greyed out when there's nothing
+					to undo.
 				</p>
 				<p class="mb-6 text-sm leading-relaxed">
 					Undo keeps the last <strong class="font-semibold text-white">5</strong> actions — clicking it
@@ -1938,7 +1943,7 @@
 					[
 						[
 							'Ability Check DCs',
-							'Difficulty-to-DC table (Very Easy 5 → Nearly Impossible 30), contested checks, passive checks, group checks'
+							'Difficulty-to-DC table (Very Easy 5 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Nearly Impossible 30), contested checks, passive checks, group checks'
 						],
 						[
 							'Actions in Combat',
@@ -2039,7 +2044,10 @@
 					<strong class="font-semibold text-white">Difficulty</strong> (Easy/Medium/Hard/Deadly),
 					then click <strong class="font-semibold text-white">Generate</strong> for a fully
 					XP-budgeted combat encounter: title, scene flavor text, archetype description, a monster
-					list with individual XP values, an XP breakdown strip (raw → multiplier → adjusted →
+					list with individual XP values, an XP breakdown strip (raw
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+					multiplier <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> adjusted
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
 					per-player), an actual difficulty badge, a tactics note, and a terrain feature.
 					<strong class="font-semibold text-white">Roll Again</strong> re-generates with the same
 					settings;
@@ -2093,9 +2101,11 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Set a <strong class="font-semibold text-white">Town Name</strong> (auto-filled, freely
-					editable), <strong class="font-semibold text-white">Settlement Size</strong> (Thorp →
-					Metropolis), <strong class="font-semibold text-white">Wealth</strong> (Poor → Wealthy),
-					and whether it <strong class="font-semibold text-white">Has Keep</strong>, then click
+					editable), <strong class="font-semibold text-white">Settlement Size</strong> (Thorp
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Metropolis),
+					<strong class="font-semibold text-white">Wealth</strong> (Poor
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Wealthy), and whether it
+					<strong class="font-semibold text-white">Has Keep</strong>, then click
 					<strong class="font-semibold text-white">Randomize</strong> for a new town (or just edit the
 					fields — the town regenerates live). The output includes a prose "About [Town]" description,
 					an optional Keep section, and grouped building sections (Civic &amp; Religious, Inns &amp; Taverns,
@@ -2111,7 +2121,10 @@
 					button that opens an embedded third-party floor-plan generator (seeded to that building) with
 					its own
 					<strong class="font-semibold text-white">New Layout</strong> reroll and an
-					<strong class="font-semibold text-white">Open ↗</strong> link to view it full-page. Click
+					<strong class="font-semibold text-white"
+						>Open <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></strong
+					>
+					link to view it full-page. Click
 					<strong class="font-semibold text-white">Save Town</strong> to keep it in a "Saved Towns" list.
 				</p>
 
@@ -2124,7 +2137,8 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic
 					Shop, Jeweler, Tavern &amp; Inn, Bookshop, Herbalist, Fletcher &amp; Bowyer, Stable) and
-					town affluence (6 tiers: Impoverished → Opulent), then click
+					town affluence (6 tiers: Impoverished
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Opulent), then click
 					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named shop
 					with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items
 					appropriate to affluence are included. Click any item for a detail modal.
@@ -2145,7 +2159,8 @@
 					Inn Generator
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Pick an <strong class="font-semibold text-white">Inn Quality</strong> (Poor → Legendary),
+					Pick an <strong class="font-semibold text-white">Inn Quality</strong> (Poor
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Legendary),
 					<strong class="font-semibold text-white">Party Size</strong>, and
 					<strong class="font-semibold text-white">Party Level</strong>, then click
 					<strong class="font-semibold text-white">Randomize</strong>. You get a named inn with an
@@ -2268,10 +2283,11 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">Generate New Caravan</strong> for a
-					merchant caravan on the road: a route (origin → destination), size badge, caravan master,
-					a stat strip (wagons, days out/remaining, guard quality), a cargo manifest (with a 35%
-					chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a complication, and
-					an overheard rumor. Click
+					merchant caravan on the road: a route (origin
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> destination), size badge,
+					caravan master, a stat strip (wagons, days out/remaining, guard quality), a cargo manifest
+					(with a 35% chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a
+					complication, and an overheard rumor. Click
 					<strong class="font-semibold text-white">Save Caravan</strong> to keep it in a "Saved Caravans"
 					list.
 				</p>
@@ -2425,8 +2441,10 @@
 					<li>A player who reaches 0 dice is eliminated and drops out of future rounds.</li>
 					<li>
 						The reveal screen shows everyone's dice and highlights matches, then auto-advances after
-						8 seconds (or click <strong class="font-semibold text-white">Next Round →</strong> to advance
-						immediately).
+						8 seconds (or click
+						<strong class="font-semibold text-white"
+							>Next Round <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></strong
+						> to advance immediately).
 					</li>
 					<li>
 						The game ends when one player remains — they're declared the winner. An

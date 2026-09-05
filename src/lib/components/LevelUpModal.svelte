@@ -221,13 +221,17 @@
 					disabled={index === 0}
 					class="rounded bg-gray-700 px-3 py-1.5 text-sm text-gray-300 transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-30"
 				>
-					&larr; Back
+					<i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back
 				</button>
 				<button
 					onclick={next}
 					class="rounded bg-violet-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-violet-500 active:bg-violet-700"
 				>
-					{isLast ? 'Finish' : 'Save & Next →'}
+					{#if isLast}
+						Finish
+					{:else}
+						Save & Next <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+					{/if}
 				</button>
 			</div>
 		</div>

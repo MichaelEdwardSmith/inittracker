@@ -610,7 +610,9 @@
 													<span class="font-bold text-red-500">☠ Slain</span>
 												{:else}
 													<span class="text-gray-500">{p.startHp}</span>
-													<span class="text-gray-700"> → </span>
+													<span class="text-gray-700">
+														<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+													</span>
 													<span class={hpTextColor(p.finalHp, p.maxHp)}>{p.finalHp}</span>
 													<span class="text-gray-700"> / {p.maxHp}</span>
 												{/if}

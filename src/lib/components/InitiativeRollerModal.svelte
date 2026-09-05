@@ -184,7 +184,8 @@
 							{/if}
 							{#if dex !== 0}
 								<div class="text-sm text-gray-400">
-									{dex > 0 ? '+' : ''}{dex} DEX →
+									{dex > 0 ? '+' : ''}{dex} DEX
+									<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
 									<span class="font-bold text-white">{initResult}</span>
 								</div>
 							{/if}

@@ -798,7 +798,9 @@
 			<div class="flex items-center gap-3">
 				<h2 class="text-lg font-bold tracking-wide text-amber-300">Trade Caravan Generator</h2>
 				{#if caravanData}
-					<span class="text-xs text-gray-500">{caravanData.origin} → {caravanData.destination}</span
+					<span class="text-xs text-gray-500"
+						>{caravanData.origin} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+						{caravanData.destination}</span
 					>
 				{/if}
 			</div>
@@ -869,7 +871,9 @@
 							<div class="flex flex-wrap items-baseline gap-3">
 								<h2 class="text-2xl font-bold text-white">
 									{caravanData.origin}
-									<span class="text-gray-500">→</span>
+									<span class="text-gray-500"
+										><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span
+									>
 									{caravanData.destination}
 								</h2>
 								<span

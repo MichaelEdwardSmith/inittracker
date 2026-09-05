@@ -382,7 +382,9 @@
 															rel="noopener noreferrer"
 															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-blue-500 hover:text-blue-300"
 														>
-															Inspect (read-only) ↗
+															Inspect (read-only)
+															<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"
+															></i>
 														</a>
 													{/if}
 													<form

@@ -140,7 +140,9 @@
 				<a href="/player/login" class="text-gray-400 transition hover:text-white">Sign in</a>
 			</p>
 			<p>
-				<a href="/join" class="text-gray-500 transition hover:text-gray-400">← Continue as Guest</a>
+				<a href="/join" class="text-gray-500 transition hover:text-gray-400"
+					><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Continue as Guest</a
+				>
 			</p>
 		</div>
 	</div>

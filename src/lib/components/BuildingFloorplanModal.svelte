@@ -75,7 +75,7 @@
 					class="rounded bg-slate-700/50 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-600/60"
 					title="Open in new tab"
 				>
-					Open ↗
+					Open <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
 				</a>
 				<button
 					onclick={onclose}

@@ -43,7 +43,11 @@
 						<p>minimum DC 10</p>
 					</div>
 				</div>
-				<p class="text-xs text-gray-500">Fail → concentration ends. Success → spell continues.</p>
+				<p class="text-xs text-gray-500">
+					Fail <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> concentration ends.
+					Success
+					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> spell continues.
+				</p>
 			</div>
 			<div class="flex gap-2 border-t border-gray-800 px-5 py-3">
 				<button

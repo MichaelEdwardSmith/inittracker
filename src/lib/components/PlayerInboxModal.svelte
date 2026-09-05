@@ -83,9 +83,11 @@
 								<span class="text-xs font-bold text-purple-400">
 									Dungeon Master
 									{#if msg.to !== 'all'}
-										→ <span class="text-gray-400">{msg.to}</span>
+										<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+										<span class="text-gray-400">{msg.to}</span>
 									{:else}
-										→ <span class="text-gray-500">Everyone</span>
+										<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+										<span class="text-gray-500">Everyone</span>
 									{/if}
 								</span>
 								<span class="text-xs text-gray-600"

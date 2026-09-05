@@ -276,7 +276,7 @@
 				title="Undo the last damage/heal, condition/effect, or turn change (up to 5 steps)"
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
 			>
-				↺ Undo
+				<i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo
 			</button>
 			<button
 				onclick={() => (showAoE = true)}

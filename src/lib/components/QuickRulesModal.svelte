@@ -4758,11 +4758,15 @@
 											Reaction · 60 ft · Trigger: a creature within range begins casting a spell.
 										</div>
 										<div>
-											<strong class="text-white">3rd level or lower</strong> → automatic counter, no check.
+											<strong class="text-white">3rd level or lower</strong>
+											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> automatic counter, no
+											check.
 										</div>
 										<div>
-											<strong class="text-white">4th level+</strong> → Spellcasting Ability check, DC
-											= 10 + spell level. Upcast to match or exceed the spell level for an automatic counter.
+											<strong class="text-white">4th level+</strong>
+											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Spellcasting Ability
+											check, DC = 10 + spell level. Upcast to match or exceed the spell level for an automatic
+											counter.
 										</div>
 									</td>
 								</tr>
@@ -4771,12 +4775,15 @@
 									<td class="space-y-0.5 py-2 text-gray-300">
 										<div>Action · 120 ft · Target one creature, object, or magical effect.</div>
 										<div>
-											<strong class="text-white">3rd level or lower</strong> → automatically ends, no
+											<strong class="text-white">3rd level or lower</strong>
+											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> automatically ends, no
 											check.
 										</div>
 										<div>
-											<strong class="text-white">4th level+</strong> → Spellcasting Ability check, DC
-											= 10 + spell level. Upcast to match or exceed the spell level for an automatic end.
+											<strong class="text-white">4th level+</strong>
+											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Spellcasting Ability
+											check, DC = 10 + spell level. Upcast to match or exceed the spell level for an automatic
+											end.
 										</div>
 									</td>
 								</tr>
@@ -4792,9 +4799,9 @@
 								spells add together while both are active.
 							</li>
 							<li>
-								• <strong class="text-white">Same spell does not stack</strong> — if cast multiple times
-								on the same target, only the most potent effect applies (e.g. two Bless spells → one set
-								of bonus dice).
+								• <strong class="text-white">Same spell does not stack</strong> — if cast multiple
+								times on the same target, only the most potent effect applies (e.g. two Bless spells
+								<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> one set of bonus dice).
 							</li>
 							<li>
 								• A spell bonus may still stack with a non-spell bonus from a class feature or item
