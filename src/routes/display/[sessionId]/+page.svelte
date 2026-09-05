@@ -934,21 +934,7 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<rect x="2" y="2" width="20" height="20" rx="3" ry="3" />
-				<circle cx="7" cy="7" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="17" cy="7" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="7" cy="17" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="17" cy="17" r="1.2" fill="currentColor" stroke="none" />
-			</svg>
+			<i class="fa-solid fa-dice-five shrink-0 text-base" aria-hidden="true"></i>
 			Dice Roller
 		</button>
 		<button
