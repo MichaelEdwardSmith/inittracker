@@ -82,21 +82,23 @@
 		return map;
 	}
 
+	// Returns Font Awesome markup for the event's icon — always one of the fixed cases
+	// below (never derived from event/player data), so rendering it via {@html} is safe.
 	function eventIcon(e: CombatEvent): string {
-		if (e.causedDown) return '☠';
+		if (e.causedDown) return '<i class="fa-solid fa-skull"></i>';
 		switch (e.type) {
 			case 'damage':
-				return '⚔';
+				return '<i class="fa-solid fa-swords"></i>';
 			case 'heal':
-				return '♥';
+				return '<i class="fa-solid fa-heart"></i>';
 			case 'down':
-				return '☠';
+				return '<i class="fa-solid fa-skull"></i>';
 			case 'condition_add':
-				return '✦';
+				return '<i class="fa-solid fa-star"></i>';
 			case 'condition_remove':
-				return '✧';
+				return '<i class="fa-regular fa-star"></i>';
 			default:
-				return '·';
+				return '&middot;';
 		}
 	}
 
@@ -284,7 +286,7 @@
 		class="sticky top-0 z-10 flex items-center border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<span class="text-amber-500">⚔</span>
+			<i class="fa-solid fa-swords text-amber-500" aria-hidden="true"></i>
 			<h1 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Combat Chronicles</h1>
 		</div>
 		<span class="ml-3 rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-500">
@@ -529,32 +531,32 @@
 								<!-- Stats row -->
 								<div class="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
 									<span class="flex items-center gap-1">
-										<span class="text-amber-600">◈</span>
+										<i class="fa-solid fa-hourglass-half text-amber-600" aria-hidden="true"></i>
 										{roundsLabel}
 									</span>
 									<span class="flex items-center gap-1">
-										<span class="text-blue-600">🛡</span>
+										<i class="fa-solid fa-shield-halved text-blue-600" aria-hidden="true"></i>
 										{players.length}
 										{players.length === 1 ? 'player' : 'players'}
 									</span>
 									{#if slain.length > 0}
 										<span class="flex items-center gap-1 text-red-500">
-											<span>☠</span>
+											<i class="fa-solid fa-skull" aria-hidden="true"></i>
 											{slain.length} slain
 										</span>
 									{:else}
 										<span class="flex items-center gap-1 text-green-600">
-											<span>✓</span>
+											<i class="fa-solid fa-check" aria-hidden="true"></i>
 											No casualties
 										</span>
 									{/if}
 									<span class="flex items-center gap-1">
-										<span>📜</span>
+										<i class="fa-solid fa-scroll" aria-hidden="true"></i>
 										{record.events.filter((e) => e.type !== 'round_advance').length} events
 									</span>
 									{#if record.totalXp !== undefined}
 										<span class="flex items-center gap-1 text-amber-500">
-											<span>✦</span>
+											<i class="fa-solid fa-star" aria-hidden="true"></i>
 											{record.totalXp.toLocaleString()} XP
 										</span>
 									{/if}
@@ -607,7 +609,9 @@
 											<!-- HP numbers -->
 											<div class="w-24 shrink-0 text-right text-xs">
 												{#if p.wasSlain}
-													<span class="font-bold text-red-500">☠ Slain</span>
+													<span class="font-bold text-red-500"
+														><i class="fa-solid fa-skull" aria-hidden="true"></i> Slain</span
+													>
 												{:else}
 													<span class="text-gray-500">{p.startHp}</span>
 													<span class="text-gray-700">
@@ -662,7 +666,10 @@
 														{#each slainWithLoot as p}
 															<div>
 																<div class="mb-1 flex items-center gap-2 text-xs">
-																	<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+																	<i
+																		class="fa-solid fa-skull w-4 shrink-0 text-center text-red-400"
+																		aria-hidden="true"
+																	></i>
 																	<span class="font-semibold text-gray-300">{p.name}</span>
 																</div>
 																<div class="flex flex-col gap-0.5 pl-6">
@@ -691,7 +698,10 @@
 													<div class="flex flex-col gap-1 pl-2">
 														{#each slainWithCr as p}
 															<div class="flex items-center gap-2 text-xs">
-																<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+																<i
+																	class="fa-solid fa-skull w-4 shrink-0 text-center text-red-400"
+																	aria-hidden="true"
+																></i>
 																<span class="flex-1 text-gray-400">{p.name}</span>
 																<span class="text-gray-600">CR {p.cr}</span>
 																<span class="w-20 text-right font-mono text-amber-500/80"
@@ -736,7 +746,7 @@
 														{#each events as e}
 															<div class="flex items-start gap-2 text-xs">
 																<span class="mt-0.5 w-4 shrink-0 text-center {eventColor(e)}">
-																	{eventIcon(e)}
+																	{@html eventIcon(e)}
 																</span>
 																<span
 																	class="{eventColor(e)} {e.causedDown || e.type === 'down'

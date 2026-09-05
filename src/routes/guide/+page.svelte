@@ -116,7 +116,7 @@
 		class="sticky top-0 z-20 flex items-center gap-4 border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<span class="text-lg">⚔️</span>
+			<i class="fa-solid fa-swords text-lg" aria-hidden="true"></i>
 			<h1 class="text-sm font-black tracking-[0.25em] text-amber-400 uppercase">User Guide</h1>
 		</div>
 		<a
@@ -345,7 +345,9 @@
 				</h3>
 				<ul class="ml-4 list-disc space-y-2 text-sm leading-relaxed">
 					<li>
-						<strong class="font-semibold text-white">⚔️ Initiative Tracker</strong> — app title
+						<strong class="font-semibold text-white"
+							><i class="fa-solid fa-swords" aria-hidden="true"></i> Initiative Tracker</strong
+						> — app title
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Session display</strong> — active session name
@@ -618,7 +620,7 @@
 				<div
 					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
 				>
-					<span class="mt-0.5 shrink-0">💡</span>
+					<i class="fa-solid fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
 					<span
 						>Double-click any monster to instantly add one copy without going through the quantity
 						selector.</span
@@ -737,7 +739,7 @@
 				<div
 					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
 				>
-					<span class="mt-0.5 shrink-0">💡</span>
+					<i class="fa-solid fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
 					<span
 						>Entries that rely on another monster’s stat block (<code
 							class="rounded bg-amber-900/40 px-1 font-mono text-xs">_copy</code
@@ -1352,8 +1354,10 @@
 					]
 				)}
 				<p class="mt-4 text-sm leading-relaxed">
-					The <strong class="font-semibold text-white">🔊 / 🔇</strong> button in the viewer header toggles
-					all sounds on or off.
+					The <strong class="font-semibold text-white"
+						><i class="fa-solid fa-volume-high" aria-hidden="true"></i> /
+						<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></strong
+					> button in the viewer header toggles all sounds on or off.
 				</p>
 
 				<h3 class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1473,7 +1477,9 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white">participants grid</strong> shows every
 					combatant with a dual-layer HP bar (ghost starting HP + current HP) and a
-					<strong class="font-semibold text-white">☠ Slain</strong> label if they died.
+					<strong class="font-semibold text-white"
+						><i class="fa-solid fa-skull" aria-hidden="true"></i> Slain</strong
+					> label if they died.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1499,11 +1505,26 @@
 				{@render dataTable(
 					['Icon', 'Event type'],
 					[
-						['⚔', 'Damage — who dealt it, to whom, amount, before/after HP'],
-						['♥', 'Heal — who healed whom, amount, before/after HP'],
-						['✦', 'Condition added — who inflicted which condition on whom'],
-						['✧', 'Condition removed — which condition was lifted'],
-						['☠', 'Death — when a combatant was knocked out or slain']
+						[
+							'<i class="fa-solid fa-swords" aria-hidden="true"></i>',
+							'Damage — who dealt it, to whom, amount, before/after HP'
+						],
+						[
+							'<i class="fa-solid fa-heart" aria-hidden="true"></i>',
+							'Heal — who healed whom, amount, before/after HP'
+						],
+						[
+							'<i class="fa-solid fa-star" aria-hidden="true"></i>',
+							'Condition added — who inflicted which condition on whom'
+						],
+						[
+							'<i class="fa-regular fa-star" aria-hidden="true"></i>',
+							'Condition removed — which condition was lifted'
+						],
+						[
+							'<i class="fa-solid fa-skull" aria-hidden="true"></i>',
+							'Death — when a combatant was knocked out or slain'
+						]
 					]
 				)}
 
@@ -1886,8 +1907,9 @@
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
-						Click the <strong class="font-semibold text-white">✉ Message DM</strong> button in the viewer
-						header
+						Click the <strong class="font-semibold text-white"
+							><i class="fa-solid fa-envelope" aria-hidden="true"></i> Message DM</strong
+						> button in the viewer header
 					</li>
 					<li>
 						Choose which <strong class="font-semibold text-white">party member</strong> you are sending
@@ -2148,9 +2170,14 @@
 					Shop, Jeweler, Tavern &amp; Inn, Bookshop, Herbalist, Fletcher &amp; Bowyer, Stable) and
 					town affluence (6 tiers: Impoverished
 					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Opulent), then click
-					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named shop
-					with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items
-					appropriate to affluence are included. Click any item for a detail modal.
+					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named
+					shop with items priced at three tiers (<i
+						class="fa-solid fa-face-smile"
+						aria-hidden="true"
+					></i>
+					Friendly −15%, <i class="fa-solid fa-face-meh" aria-hidden="true"></i> Neutral,
+					<i class="fa-solid fa-face-angry" aria-hidden="true"></i> Hostile +25%); magic items appropriate
+					to affluence are included. Click any item for a detail modal.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">Save to Notes</strong> to open a small
@@ -2194,8 +2221,8 @@
 					<strong class="font-semibold text-white">Rows/Cols</strong> (grid size),
 					<strong class="font-semibold text-white">Corridors</strong> (Labyrinth/Bent/Straight),
 					<strong class="font-semibold text-white">Floors</strong> (1–9), a
-					<strong class="font-semibold text-white">Theme</strong> (⚰️ Crypt, Sewer, Cave, 🏰
-					Fortress, 🔮 Arcane, 🍄 Fungal), an optional
+					<strong class="font-semibold text-white">Theme</strong> (Crypt, Sewer, Cave, Fortress,
+					Arcane, Fungal), an optional
 					<strong class="font-semibold text-white">Boss Room</strong>, and Party
 					Size/Level/Difficulty (recorded for reference), then click
 					<strong class="font-semibold text-white">Generate</strong>.
@@ -2215,9 +2242,11 @@
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via
-					floor tabs. Toggle <strong class="font-semibold text-white">🗺️ Map Live</strong> to push
-					the current floor to players and manually reveal corridors/doors/rooms as you explore (a
-					fog-of-war system, not an instant full reveal).
+					floor tabs. Toggle <strong class="font-semibold text-white"
+						><i class="fa-solid fa-map" aria-hidden="true"></i> Map Live</strong
+					>
+					to push the current floor to players and manually reveal corridors/doors/rooms as you
+					explore (a fog-of-war system, not an instant full reveal).
 					<strong class="font-semibold text-white">Save</strong>/<strong
 						class="font-semibold text-white">Load</strong
 					>
@@ -2422,16 +2451,26 @@
 							'Bid!',
 							'Must raise the face value, or keep the same face with a strictly higher quantity'
 						],
-						['Challenge the bid', '🎲 Liar!', 'Calls "Dudo" — forces an immediate reveal'],
-						['Claim it’s exact', '✓', 'Calls "Calza" — bets the current bid is exactly right']
+						[
+							'Challenge the bid',
+							'<i class="fa-solid fa-dice" aria-hidden="true"></i> Liar!',
+							'Calls "Dudo" — forces an immediate reveal'
+						],
+						[
+							'Claim it’s exact',
+							'<i class="fa-solid fa-check" aria-hidden="true"></i>',
+							'Calls "Calza" — bets the current bid is exactly right'
+						]
 					]
 				)}
 				<p class="mt-4 mb-6 text-sm leading-relaxed">
 					<strong class="font-semibold text-white">Ones are wild</strong> (count toward any face) by
 					default. If any active player is down to their last die, that round automatically becomes
 					a
-					<strong class="font-semibold text-amber-300">⚠️ Palifico</strong> round: wilds are disabled,
-					and the face of the first bid that round locks all further bids to that same face.
+					<strong class="font-semibold text-amber-300"
+						><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Palifico</strong
+					> round: wilds are disabled, and the face of the first bid that round locks all further bids
+					to that same face.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -2516,16 +2555,18 @@
 					<div
 						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
 					>
-						⚠️ <strong>Beta feature — still in testing.</strong> Voice commands use the browser's
-						built-in Speech Recognition API, currently supported in
+						<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+						<strong>Beta feature — still in testing.</strong>
+						Voice commands use the browser's built-in Speech Recognition API, currently supported in
 						<strong class="text-white">Chrome and Edge</strong>
 						only. Results may vary based on microphone quality, accent, and ambient noise.
 					</div>
 
 					<p class="mb-4 text-sm leading-relaxed">
-						Click the <strong class="font-semibold text-white">🎤 Voice</strong> button in the dashboard
-						header to control the tracker hands-free. The button only appears when your browser supports
-						speech recognition.
+						Click the <strong class="font-semibold text-white"
+							><i class="fa-solid fa-microphone" aria-hidden="true"></i> Voice</strong
+						> button in the dashboard header to control the tracker hands-free. The button only appears
+						when your browser supports speech recognition.
 					</p>
 
 					<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -2610,10 +2651,11 @@
 				{@render h2('22', 'Audio Mixer')}
 
 				<p class="mb-4 text-sm leading-relaxed">
-					Click the <strong class="font-semibold text-white">🎚 Mixer</strong> button in the dashboard
-					header to open a full-screen ambient audio board. Layer music, atmosphere, and sound effects
-					across as many channels as you need — audio keeps playing in the background when the mixer is
-					closed.
+					Click the <strong class="font-semibold text-white"
+						><i class="fa-solid fa-sliders" aria-hidden="true"></i> Mixer</strong
+					> button in the dashboard header to open a full-screen ambient audio board. Layer music, atmosphere,
+					and sound effects across as many channels as you need — audio keeps playing in the background
+					when the mixer is closed.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -2688,8 +2730,10 @@
 				<p class="mb-2 text-sm font-semibold text-gray-200">After a browser restart</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					The browser clears file permissions on exit. Channels that need re-authorization show a
-					<strong class="font-semibold text-amber-300">🔒 [filename]</strong> button in amber. Click it
-					once — the browser shows a one-time permission prompt — and the file reloads automatically.
+					<strong class="font-semibold text-amber-300"
+						><i class="fa-solid fa-lock" aria-hidden="true"></i> [filename]</strong
+					> button in amber. Click it once — the browser shows a one-time permission prompt — and the
+					file reloads automatically.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tips</h3>
@@ -2725,8 +2769,10 @@
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
 						>dm@inittracker.com</a
 					>
-					— or click the <strong class="font-semibold text-white">✉ Contact</strong> link found on the
-					login page, the join page, and in both the DM and viewer headers.
+					— or click the
+					<strong class="font-semibold text-white"
+						><i class="fa-solid fa-envelope" aria-hidden="true"></i> Contact</strong
+					> link found on the login page, the join page, and in both the DM and viewer headers.
 				</p>
 			</section>
 		</main>
