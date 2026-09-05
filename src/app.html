@@ -12,11 +12,10 @@
 			})();
 		</script>
 		%sveltekit.head%
-		<!-- Font Awesome Pro Kit — web-font/CSS mode only (no SVG+JS DOM auto-replace,
-		     which fights Svelte's own DOM diffing on re-render) -->
-		<script>
-			window.FontAwesomeConfig = { autoReplaceSvg: false, observeMutations: false };
-		</script>
+		<!-- Font Awesome Pro Kit — default SVG+JS technology. Its MutationObserver
+		     (observeMutations, on by default) is what makes icons rendered later by
+		     Svelte (modals, toasts, conditional blocks) show up at all, so it must
+		     stay enabled. -->
 		<script src="https://kit.fontawesome.com/71db2b1704.js" crossorigin="anonymous"></script>
 		<!-- Matomo -->
 		<script>
