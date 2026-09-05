@@ -143,7 +143,9 @@
 	<div class="mx-auto max-w-6xl">
 		<header class="mb-6 flex flex-wrap items-center justify-between gap-3">
 			<div>
-				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">⚔️ System Admin</h1>
+				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">
+					<i class="fa-solid fa-swords" aria-hidden="true"></i> System Admin
+				</h1>
 				<p class="mt-1 text-sm text-gray-500">
 					Logged in as {data.dmFirstName} · every DM account that has accessed this system.
 				</p>

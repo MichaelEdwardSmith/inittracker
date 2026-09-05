@@ -151,7 +151,9 @@
 					{#if saveStatus === 'saving'}
 						<span class="text-xs text-gray-500">Saving…</span>
 					{:else if saveStatus === 'saved'}
-						<span class="text-xs text-green-500">Saved ✓</span>
+						<span class="text-xs text-green-500"
+							>Saved <i class="fa-solid fa-check" aria-hidden="true"></i></span
+						>
 					{/if}
 					<!-- Export this note -->
 					{#if selectedNote}

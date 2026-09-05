@@ -1867,7 +1867,7 @@
 			class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900/80 px-5 py-3"
 		>
 			<div class="flex items-center gap-3">
-				<span class="text-xl">🏘️</span>
+				<i class="fa-solid fa-city text-xl" aria-hidden="true"></i>
 				<h2 class="text-lg font-bold tracking-wide text-amber-300">Town Generator</h2>
 				{#if townData}
 					<span class="text-xs text-gray-500">

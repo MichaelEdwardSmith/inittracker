@@ -659,7 +659,7 @@
 			class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm"
 		>
 			<div class="flex flex-col items-center gap-8 px-8 text-center">
-				<div class="text-7xl opacity-60">⚔️</div>
+				<i class="fa-solid fa-swords text-7xl opacity-60" aria-hidden="true"></i>
 				<div>
 					<p class="text-3xl font-black tracking-[0.25em] text-amber-400 uppercase">
 						Battle Awaits
@@ -799,7 +799,7 @@
 						: 'border-blue-500/60 bg-gray-950/90 shadow-blue-500/20'}"
 				>
 					{#if turnNotif === 'yours'}
-						<div class="animate-bounce text-5xl">⚔️</div>
+						<i class="fa-solid fa-swords animate-bounce text-5xl" aria-hidden="true"></i>
 						<p class="text-2xl font-black tracking-widest text-amber-400 uppercase">
 							It's Your Turn!
 						</p>
@@ -807,7 +807,7 @@
 							<p class="text-sm font-semibold text-amber-300/70">{myCharacter.name}</p>
 						{/if}
 					{:else}
-						<div class="text-5xl">🎲</div>
+						<i class="fa-solid fa-dice text-5xl" aria-hidden="true"></i>
 						<p class="text-2xl font-black tracking-widest text-blue-400 uppercase">
 							You're Up Next!
 						</p>
@@ -826,7 +826,7 @@
 		class="relative z-10 flex shrink-0 items-center justify-between border-b border-gray-800/60 bg-gray-900/80 px-4 py-3 backdrop-blur-sm sm:px-8"
 	>
 		<div class="flex items-center gap-3">
-			<span class="text-lg">⚔️</span>
+			<i class="fa-solid fa-swords text-lg" aria-hidden="true"></i>
 			<span class="text-sm font-bold tracking-[0.3em] text-amber-400 uppercase"
 				>Initiative Tracker</span
 			>
@@ -957,7 +957,10 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<span class="h-4 w-4 shrink-0 text-center text-base leading-none">🎲</span>
+			<i
+				class="fa-solid fa-dice h-4 w-4 shrink-0 text-center text-base leading-none"
+				aria-hidden="true"
+			></i>
 			Liar's Dice
 		</button>
 		{#if combatState.dungeonMapState}
@@ -1092,7 +1095,7 @@
 	{#if !current}
 		<!-- Waiting for combat -->
 		<div class="relative z-10 flex flex-1 flex-col items-center justify-center gap-6">
-			<div class="text-6xl opacity-20">⚔️</div>
+			<i class="fa-solid fa-swords text-6xl opacity-20" aria-hidden="true"></i>
 			<div class="text-center">
 				<p class="text-4xl font-black tracking-[0.2em] text-gray-700 uppercase">Awaiting Combat</p>
 				<p class="mt-3 text-sm tracking-widest text-gray-600 uppercase">
@@ -1166,7 +1169,7 @@
 						<div
 							class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1"
 						>
-							<span class="text-base leading-none">🩸</span>
+							<i class="fa-solid fa-droplet text-base leading-none" aria-hidden="true"></i>
 							<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase"
 								>Bloodied</span
 							>
@@ -1263,7 +1266,7 @@
 								<div class="mb-3 flex items-center gap-4">
 									<div class="h-px flex-1 bg-gray-700"></div>
 									<span class="text-xs font-black tracking-[0.25em] text-gray-500 uppercase"
-										>☠ Death Saving Throws</span
+										><i class="fa-solid fa-skull" aria-hidden="true"></i> Death Saving Throws</span
 									>
 									<div class="h-px flex-1 bg-gray-700"></div>
 								</div>
@@ -1271,7 +1274,7 @@
 									<div
 										class="flex flex-col items-center gap-2 rounded-xl border border-red-800/60 bg-red-950/50 px-6 py-5"
 									>
-										<span class="text-5xl">☠</span>
+										<i class="fa-solid fa-skull text-5xl" aria-hidden="true"></i>
 										<span class="text-2xl font-black tracking-[0.3em] text-red-400 uppercase"
 											>Dead</span
 										>
@@ -1280,7 +1283,7 @@
 									<div
 										class="flex flex-col items-center gap-2 rounded-xl border border-green-800/60 bg-green-950/50 px-6 py-5"
 									>
-										<span class="text-5xl">♥</span>
+										<i class="fa-solid fa-heart text-5xl" aria-hidden="true"></i>
 										<span class="text-2xl font-black tracking-[0.3em] text-green-400 uppercase"
 											>Stabilized</span
 										>
@@ -1301,7 +1304,11 @@
 															? 'border-red-600 bg-red-800/60 text-red-300'
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
-														{ds.failures > i ? '☠' : '○'}
+														{#if ds.failures > i}
+															<i class="fa-solid fa-skull" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</div>
 												{/each}
 											</div>
@@ -1320,7 +1327,11 @@
 															? 'border-green-600 bg-green-800/60 text-green-300'
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
-														{ds.successes > i ? '♥' : '○'}
+														{#if ds.successes > i}
+															<i class="fa-solid fa-heart" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</div>
 												{/each}
 											</div>
@@ -1423,7 +1434,10 @@
 									<div
 										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 ring-2 ring-blue-700"
 									>
-										<span class="text-xl leading-none select-none">🛡️</span>
+										<i
+											class="fa-solid fa-shield-halved text-xl leading-none select-none"
+											aria-hidden="true"
+										></i>
 									</div>
 								{/if}
 
@@ -1441,7 +1455,11 @@
 										</span>
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
 										{#if c.type === 'enemy' && hpPercent(c) > 0 && hpPercent(c) <= 50}
-											<span class="shrink-0 text-sm leading-none" title="Bloodied">🩸</span>
+											<i
+												class="fa-solid fa-droplet shrink-0 text-sm leading-none"
+												title="Bloodied"
+												aria-hidden="true"
+											></i>
 										{/if}
 										{#if c.initiative !== null}
 											<span class="ml-auto hidden shrink-0 text-xs text-amber-500 sm:inline"

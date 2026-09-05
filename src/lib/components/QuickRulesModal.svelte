@@ -3884,7 +3884,7 @@
 	</div>
 	<!-- Header -->
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<span class="text-xl">📖</span>
+		<i class="fa-solid fa-book-open text-xl" aria-hidden="true"></i>
 		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Quick Reference</h2>
 		<p class="ml-2 hidden text-xs text-gray-500 sm:block">
 			{ruleset === '2024' ? 'D&D 2024 combat reference' : 'D&D 5e combat reference'}

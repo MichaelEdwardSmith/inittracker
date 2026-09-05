@@ -376,7 +376,10 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
-				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<h4 class="font-black tracking-wide text-amber-400">
+					<i class="fa-solid fa-dice" aria-hidden="true"></i>
+					{r.expr}
+				</h4>
 				<button
 					onclick={() => (diceRollResult = null)}
 					class="text-gray-500 transition hover:text-white"

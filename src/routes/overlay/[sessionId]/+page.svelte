@@ -128,7 +128,7 @@
 			events.push({
 				id: `round-${next.round}-${ts}`,
 				text: `Round ${next.round}`,
-				icon: '⚔',
+				icon: '<i class="fa-solid fa-swords"></i>',
 				color: '#fbbf24',
 				timestamp: ts
 			});
@@ -145,7 +145,7 @@
 					events.push({
 						id: `down-${c.id}-${ts}`,
 						text: `${c.name} downed`,
-						icon: '✕',
+						icon: '<i class="fa-solid fa-xmark"></i>',
 						color: '#9ca3af',
 						timestamp: ts
 					});
@@ -153,7 +153,7 @@
 					events.push({
 						id: `dmg-${c.id}-${ts}`,
 						text: `${c.name}  ${Math.abs(delta)} dmg`,
-						icon: '▼',
+						icon: '<i class="fa-solid fa-arrow-down"></i>',
 						color: '#f87171',
 						timestamp: ts
 					});
@@ -162,7 +162,7 @@
 				events.push({
 					id: `heal-${c.id}-${ts}`,
 					text: `${c.name}  +${delta} HP`,
-					icon: '▲',
+					icon: '<i class="fa-solid fa-arrow-up"></i>',
 					color: '#4ade80',
 					timestamp: ts
 				});
@@ -173,7 +173,7 @@
 					events.push({
 						id: `con-on-${c.id}-${s}-${ts}`,
 						text: `${c.name} — ${conditionAbbrev[s] ?? s}`,
-						icon: '+',
+						icon: '<i class="fa-solid fa-plus"></i>',
 						color: '#e2e8f0',
 						timestamp: ts
 					});
@@ -184,7 +184,7 @@
 					events.push({
 						id: `con-off-${c.id}-${s}-${ts}`,
 						text: `${c.name} — ${conditionAbbrev[s] ?? s} cleared`,
-						icon: '−',
+						icon: '<i class="fa-solid fa-minus"></i>',
 						color: '#6b7280',
 						timestamp: ts
 					});
@@ -249,7 +249,7 @@
 					{@const pct = hpPercent(current)}
 					<aside class="side-panel">
 						<div class="header">
-							<span class="sword">⚔</span>
+							<i class="fa-solid fa-swords sword" aria-hidden="true"></i>
 							<span class="round-label">ROUND {combatState.round}</span>
 							<span class="type-badge {current.type === 'player' ? 'badge-pc' : 'badge-npc'}">
 								{current.type === 'player' ? 'PC' : 'NPC'}
@@ -322,7 +322,7 @@
 				<div class="ticker-panel">
 					{#each tickerEvents as event (event.id)}
 						<div class="ticker-row" style="--event-color:{event.color}">
-							<span class="ticker-icon">{event.icon}</span>
+							<span class="ticker-icon">{@html event.icon}</span>
 							<span class="ticker-text">{event.text}</span>
 						</div>
 					{/each}
@@ -355,7 +355,7 @@
 								>
 								<span class="un-name">{c.name}</span>
 								{#if c.type === 'enemy' && pct <= 50 && pct > 0}
-									<span title="Bloodied">🩸</span>
+									<i class="fa-solid fa-droplet" title="Bloodied" aria-hidden="true"></i>
 								{/if}
 								{#if c.initiative !== null}
 									<span class="un-init">{c.initiative}</span>

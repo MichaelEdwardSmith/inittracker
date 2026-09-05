@@ -465,7 +465,8 @@
 			class="relative z-10 flex shrink-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-600 px-4 py-1.5 text-center text-xs font-semibold text-black sm:text-sm"
 		>
 			<span>
-				🛡️ Admin view — viewing <strong>{data.dmFirstName}</strong>{#if data.dmEmail}
+				<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Admin view — viewing
+				<strong>{data.dmFirstName}</strong>{#if data.dmEmail}
 					({data.dmEmail}){/if}'s account as {data.impersonatingAdminEmail}
 			</span>
 			<form method="POST" action="/admin?/stop" use:enhance>
@@ -481,7 +482,7 @@
 
 	<!-- App header -->
 	<header class="flex shrink-0 items-center border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<span class="text-xl">⚔️</span>
+		<i class="fa-solid fa-swords text-xl" aria-hidden="true"></i>
 		<h1 class="ml-3 hidden text-xl font-bold tracking-widest text-amber-400 uppercase md:block">
 			Initiative Tracker
 		</h1>
@@ -908,7 +909,7 @@
 				? 'bg-amber-600/20 text-amber-300'
 				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 		>
-			<span>🛡️</span>
+			<i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
 			Party
 		</button>
 		<button
@@ -918,7 +919,7 @@
 				? 'bg-red-600/20 text-red-300'
 				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 		>
-			<span>💀</span>
+			<i class="fa-solid fa-skull" aria-hidden="true"></i>
 			Enemies
 		</button>
 	</div>

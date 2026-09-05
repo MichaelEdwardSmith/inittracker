@@ -240,7 +240,7 @@
 							{#if player.avatarUrl}
 								<img src={player.avatarUrl} alt={player.name} class="h-full w-full object-cover" />
 							{:else}
-								<span class="text-base leading-none">🛡️</span>
+								<i class="fa-solid fa-shield-halved text-base leading-none" aria-hidden="true"></i>
 							{/if}
 						</button>
 						<!-- Remove button (shown on hover when avatar exists) -->
