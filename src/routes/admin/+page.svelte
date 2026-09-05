@@ -177,7 +177,7 @@
 						class="shrink-0 rounded p-1 text-gray-500 transition hover:text-gray-300"
 						aria-label="Dismiss"
 					>
-						✕
+						<i class="fa-solid fa-xmark" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
@@ -259,7 +259,7 @@
 										class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
 										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
 									>
-										{dm.isRootAdmin ? '★ Root Admin' : 'Admin'}
+										{#if dm.isRootAdmin}<i class="fa-solid fa-star" aria-hidden="true"></i> Root Admin{:else}Admin{/if}
 									</span>
 								{/if}
 							</td>

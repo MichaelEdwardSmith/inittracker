@@ -249,7 +249,7 @@
 			</p>
 			<p>
 				<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400"
-					>✉ Contact us</a
+					><i class="fa-solid fa-envelope" aria-hidden="true"></i> Contact us</a
 				>
 				<span class="mx-1 text-gray-800">·</span>
 				<a href="/privacy" class="text-gray-600 transition hover:text-gray-400">Privacy Policy</a>

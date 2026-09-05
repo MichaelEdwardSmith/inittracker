@@ -575,12 +575,13 @@
 				class="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
 			>
 				<span class="text-sm font-semibold text-gray-200">
-					🗺️ {ms.dungeonName || 'Dungeon Map'}
+					<i class="fa-solid fa-map" aria-hidden="true"></i>
+					{ms.dungeonName || 'Dungeon Map'}
 				</span>
 				<button
 					onclick={() => (fogMapExpanded = false)}
 					class="rounded p-1 text-gray-500 hover:bg-white/10 hover:text-white"
-					aria-label="Close map">✕</button
+					aria-label="Close map"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<!-- canvas — fills remaining space, letterboxed to preserve aspect ratio -->

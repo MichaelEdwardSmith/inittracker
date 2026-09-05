@@ -114,7 +114,9 @@
 	<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
-			<h3 class="font-black tracking-wide text-amber-400">🎲 Dice Roller</h3>
+			<h3 class="font-black tracking-wide text-amber-400">
+				<i class="fa-solid fa-dice" aria-hidden="true"></i> Dice Roller
+			</h3>
 			<button
 				onclick={onclose}
 				class="text-gray-500 transition hover:text-white"

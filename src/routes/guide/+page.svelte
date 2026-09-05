@@ -2245,8 +2245,8 @@
 					floor tabs. Toggle <strong class="font-semibold text-white"
 						><i class="fa-solid fa-map" aria-hidden="true"></i> Map Live</strong
 					>
-					to push the current floor to players and manually reveal corridors/doors/rooms as you
-					explore (a fog-of-war system, not an instant full reveal).
+					to push the current floor to players and manually reveal corridors/doors/rooms as you explore
+					(a fog-of-war system, not an instant full reveal).
 					<strong class="font-semibold text-white">Save</strong>/<strong
 						class="font-semibold text-white">Load</strong
 					>

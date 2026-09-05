@@ -3242,7 +3242,7 @@
 				class="ml-3 shrink-0 rounded p-1 text-gray-400 hover:bg-white/10 hover:text-white"
 				aria-label="Close"
 			>
-				✕
+				<i class="fa-solid fa-xmark" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -3388,7 +3388,8 @@
 				? 'bg-green-700 text-white hover:bg-green-600'
 				: 'bg-gray-700 text-gray-200 hover:bg-gray-600'}"
 		>
-			{mapPushed ? '🗺️ Map Live' : '🗺️ Share Map'}
+			<i class="fa-solid fa-map" aria-hidden="true"></i>
+			{mapPushed ? 'Map Live' : 'Share Map'}
 		</button>
 
 		{#if roomCount > 0}
@@ -3700,7 +3701,7 @@
 					<button
 						onclick={() => (showMobileOptions = false)}
 						class="text-gray-500 hover:text-white"
-						aria-label="Close">✕</button
+						aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				<div class="flex-1 overflow-y-auto p-3">
@@ -3726,7 +3727,7 @@
 					<button
 						onclick={() => (showMobileEncounters = false)}
 						class="text-gray-500 hover:text-white"
-						aria-label="Close">✕</button
+						aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				<div class="min-h-0 flex-1 text-xs text-gray-300">
@@ -3779,7 +3780,7 @@
 				<button
 					onclick={closeRoomPopover}
 					class="shrink-0 text-gray-500 hover:text-white"
-					aria-label="Close">✕</button
+					aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<p class="text-xs leading-relaxed text-gray-300 italic">
@@ -3825,7 +3826,7 @@
 				<button
 					onclick={() => (activeTrap = null)}
 					class="shrink-0 text-gray-500 hover:text-white"
-					aria-label="Close">✕</button
+					aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<span
@@ -3898,8 +3899,10 @@
 			<div class="w-96 rounded-lg border border-white/10 bg-gray-900 shadow-2xl">
 				<div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
 					<h3 class="font-bold text-white">Load Dungeon</h3>
-					<button onclick={() => (showLoadDialog = false)} class="text-gray-500 hover:text-white"
-						>✕</button
+					<button
+						onclick={() => (showLoadDialog = false)}
+						class="text-gray-500 hover:text-white"
+						aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				{#if saves.length === 0}
@@ -3926,7 +3929,7 @@
 								<button
 									onclick={() => deleteSave(i)}
 									class="shrink-0 text-gray-600 hover:text-red-400"
-									aria-label="Delete">✕</button
+									aria-label="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
 								>
 							</li>
 						{/each}

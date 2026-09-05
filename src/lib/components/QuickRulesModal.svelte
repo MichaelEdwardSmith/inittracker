@@ -15,22 +15,32 @@
 		icon: string;
 	};
 
+	// Icons are Font Awesome markup rendered via {@html} below — this data is entirely
+	// developer-authored (no user input), so that's safe.
 	const categories: Category[] = [
-		{ id: 'checks', label: 'Ability Check DCs', icon: '🎲' },
-		{ id: 'actions', label: 'Actions in Combat', icon: '⚔️' },
-		{ id: 'bonus', label: 'Bonus Actions', icon: '⚡' },
-		{ id: 'saves', label: 'Common Save DCs', icon: '💀' },
-		{ id: 'concentration', label: 'Concentration', icon: '🧠' },
-		{ id: 'conditions', label: 'Conditions', icon: '🩸' },
-		{ id: 'cover', label: 'Cover', icon: '🛡️' },
-		{ id: 'death', label: 'Death Saving Throws', icon: '☠' },
-		{ id: 'xp', label: 'Encounter Difficulty', icon: '⚖️' },
-		{ id: 'exhaustion', label: 'Exhaustion', icon: '😓' },
-		{ id: 'light', label: 'Light & Vision', icon: '👁️' },
-		{ id: 'magic', label: 'Magic & Casting', icon: '✨' },
-		{ id: 'items', label: 'Magic Items List', icon: '🔮' },
-		{ id: 'movement', label: 'Movement & Position', icon: '👣' },
-		{ id: 'resting', label: 'Resting', icon: '🌙' }
+		{ id: 'checks', label: 'Ability Check DCs', icon: '<i class="fa-solid fa-dice"></i>' },
+		{ id: 'actions', label: 'Actions in Combat', icon: '<i class="fa-solid fa-swords"></i>' },
+		{ id: 'bonus', label: 'Bonus Actions', icon: '<i class="fa-solid fa-bolt"></i>' },
+		{ id: 'saves', label: 'Common Save DCs', icon: '<i class="fa-solid fa-skull"></i>' },
+		{ id: 'concentration', label: 'Concentration', icon: '<i class="fa-solid fa-brain"></i>' },
+		{ id: 'conditions', label: 'Conditions', icon: '<i class="fa-solid fa-droplet"></i>' },
+		{ id: 'cover', label: 'Cover', icon: '<i class="fa-solid fa-shield-halved"></i>' },
+		{ id: 'death', label: 'Death Saving Throws', icon: '<i class="fa-solid fa-skull"></i>' },
+		{ id: 'xp', label: 'Encounter Difficulty', icon: '<i class="fa-solid fa-scale-balanced"></i>' },
+		{ id: 'exhaustion', label: 'Exhaustion', icon: '<i class="fa-solid fa-face-tired"></i>' },
+		{ id: 'light', label: 'Light & Vision', icon: '<i class="fa-solid fa-eye"></i>' },
+		{
+			id: 'magic',
+			label: 'Magic & Casting',
+			icon: '<i class="fa-solid fa-wand-magic-sparkles"></i>'
+		},
+		{ id: 'items', label: 'Magic Items List', icon: '<i class="fa-solid fa-gem"></i>' },
+		{
+			id: 'movement',
+			label: 'Movement & Position',
+			icon: '<i class="fa-solid fa-shoe-prints"></i>'
+		},
+		{ id: 'resting', label: 'Resting', icon: '<i class="fa-solid fa-moon"></i>' }
 	];
 
 	let selected = $state('actions');
@@ -3910,7 +3920,7 @@
 						? 'bg-amber-900/30 font-semibold text-amber-300'
 						: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 				>
-					<span class="text-base leading-none">{cat.icon}</span>
+					<span class="text-base leading-none">{@html cat.icon}</span>
 					{cat.label}
 				</button>
 			{/each}
