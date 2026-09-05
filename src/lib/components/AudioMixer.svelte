@@ -655,16 +655,7 @@
 				title="Remove channel"
 				class="shrink-0 rounded p-0.5 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3.5 w-3.5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2.5"
-				>
-					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -693,7 +684,8 @@
 				>
 					<span
 						class="block w-full truncate text-[10px] leading-tight text-amber-400/80"
-						title={ch.fileName ?? ''}>🔒 {ch.fileName}</span
+						title={ch.fileName ?? ''}
+						><i class="fa-duotone fa-light fa-lock" aria-hidden="true"></i> {ch.fileName}</span
 					>
 				</button>
 			{:else}
@@ -733,7 +725,7 @@
 					class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400"
 					title="File too large for browser storage — plays this session only"
 				>
-					⚠ won't persist
+					<i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i> won't persist
 				</div>
 			{/if}
 		{/if}
@@ -772,8 +764,9 @@
 				<div class="flex items-center gap-1">
 					<button
 						onclick={() => setChannelVol(i, Math.max(0, ch.volume - 0.01))}
+						aria-label="Decrease volume"
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>−</button
+						><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 					>
 					<input
 						type="number"
@@ -791,8 +784,9 @@
 					/>
 					<button
 						onclick={() => setChannelVol(i, Math.min(1, ch.volume + 0.01))}
+						aria-label="Increase volume"
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>+</button
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 					>
 				</div>
 			</div>
@@ -842,24 +836,10 @@
 				: 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500 hover:text-white'}"
 		>
 			{#if ch.playing}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-				>
-					<rect x="6" y="6" width="12" height="12" rx="1.5" />
-				</svg>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-				>
-					<path d="M8 5v14l11-7z" />
-				</svg>
+				<i class="fa-duotone fa-light fa-play text-xs" aria-hidden="true"></i>
 				Play
 			{/if}
 		</button>
@@ -899,38 +879,10 @@
 				: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-orange-700 hover:text-orange-400'}"
 		>
 			{#if ch.muteLocal}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="inline h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-					/><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
-					/></svg
-				>
+				<i class="fa-duotone fa-light fa-volume-xmark inline text-xs" aria-hidden="true"></i>
 				DM muted
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="inline h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-4.5-4.5M12 18l4.5-4.5"
-					/></svg
-				>
+				<i class="fa-duotone fa-light fa-volume-high inline text-xs" aria-hidden="true"></i>
 				Mute DM
 			{/if}
 		</button>
@@ -957,8 +909,9 @@
 			<div class="flex flex-1 items-center gap-1">
 				<button
 					onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
+					aria-label="Decrease master volume"
 					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>−</button
+					><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 				>
 				<input
 					type="number"
@@ -974,8 +927,9 @@
 				/>
 				<button
 					onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
+					aria-label="Increase master volume"
 					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>+</button
+					><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 				>
 			</div>
 			<button
@@ -983,12 +937,7 @@
 				title="Fade out and stop all playing channels"
 				class="flex shrink-0 items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 px-2 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg
-				>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop All
 			</button>
 		</div>
@@ -1034,12 +983,7 @@
 				title="Fade out and stop all playing channels"
 				class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3 w-3"
-					viewBox="0 0 24 24"
-					fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg
-				>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop All
 			</button>
 		</div>
@@ -1054,16 +998,7 @@
 			? 'min-h-[80px] w-[calc(50%-6px)] min-w-0'
 			: 'w-[118px] shrink-0'} flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
 	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			class="h-7 w-7"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke="currentColor"
-			stroke-width="1.5"
-		>
-			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-		</svg>
+		<i class="fa-duotone fa-light fa-plus text-2xl" aria-hidden="true"></i>
 		<span class="text-center text-xs leading-tight font-semibold">Add a<br />Channel</span>
 	</button>
 {/snippet}
@@ -1084,20 +1019,7 @@
 		class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3"
 	>
 		<div class="flex items-center gap-3">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 text-amber-400"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-				/>
-			</svg>
+			<i class="fa-duotone fa-light fa-sliders text-lg text-amber-400" aria-hidden="true"></i>
 			<h2 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Audio Mixer</h2>
 		</div>
 
@@ -1106,16 +1028,7 @@
 			title="Close mixer (Esc)"
 			class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-			</svg>
+			<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 		</button>
 	</header>
 

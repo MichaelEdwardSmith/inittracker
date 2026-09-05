@@ -68,7 +68,7 @@
 	>
 		<!-- Header -->
 		<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-			<span class="text-amber-500">⬡</span>
+			<i class="fa-duotone fa-light fa-gem text-amber-500" aria-hidden="true"></i>
 			<span class="flex-1 text-sm font-bold tracking-widest text-amber-300 uppercase">
 				Loot — {combatant.name}
 			</span>
@@ -84,20 +84,7 @@
 				class="rounded p-1 text-gray-600 transition hover:text-gray-300"
 				title="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -128,20 +115,7 @@
 						title="Remove"
 						class="rounded p-1 text-gray-700 transition hover:text-red-400"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-3.5 w-3.5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 					</button>
 				</div>
 			{/each}
@@ -149,7 +123,7 @@
 				onclick={addItem}
 				class="mt-1 rounded border border-dashed border-gray-700 px-3 py-1.5 text-xs text-gray-600 transition hover:border-amber-700 hover:text-amber-600"
 			>
-				+ Add Item
+				<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Item
 			</button>
 		</div>
 

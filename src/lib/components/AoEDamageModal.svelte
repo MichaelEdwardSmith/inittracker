@@ -124,20 +124,7 @@
 				class="rounded p-1 text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -169,7 +156,8 @@
 				class="flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[9px] transition
 				       {allSelected
 					? 'border-amber-500 bg-amber-500 text-black'
-					: 'border-gray-600 text-transparent'}">✓</button
+					: 'border-gray-600 text-transparent'}"
+				><i class="fa-duotone fa-light fa-check" aria-hidden="true"></i></button
 			>
 			<span class="flex-1">Combatant</span>
 			<span class="w-20 text-right">HP</span>
@@ -196,7 +184,7 @@
 							? 'border-amber-500 bg-amber-500 text-black'
 							: 'border-gray-600 text-transparent'}"
 					>
-						✓
+						<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 					</div>
 
 					<!-- Name + mini HP bar -->
@@ -237,7 +225,7 @@
 							? 'border-blue-400 bg-blue-500 text-white'
 							: 'border-gray-600 text-transparent'}"
 					>
-						✓
+						<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 					</div>
 				</div>
 			{/each}
@@ -267,14 +255,14 @@
 					disabled={!damageValid}
 					class="flex-1 rounded bg-red-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					− Damage
+					<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i> Damage
 				</button>
 				<button
 					onclick={applyHeal}
 					disabled={!damageValid}
 					class="flex-1 rounded bg-green-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					+ Heal
+					<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Heal
 				</button>
 				<button
 					onclick={onclose}

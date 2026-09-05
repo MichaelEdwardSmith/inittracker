@@ -23,23 +23,69 @@
 		icon: string;
 	};
 
+	// Icons are Font Awesome markup rendered via {@html} in the button below — this
+	// data is entirely developer-authored (no user input), so that's safe.
 	const categories: Category[] = [
-		{ id: 'weather', label: 'Weather & Travel', icon: '🌦️' },
-		{ id: 'encounter', label: 'Random Encounter', icon: '🎲' },
-		{ id: 'wilderness', label: 'Wilderness Encounter', icon: '🌲' },
-		{ id: 'names', label: 'Name Generator', icon: '📛' },
-		{ id: 'town', label: 'Town Generator', icon: '🏘️' },
-		{ id: 'shop', label: 'Shop Generator', icon: '🛒' },
-		{ id: 'inn', label: 'Inn Generator', icon: '🍺' },
-		{ id: 'dungeon', label: 'Dungeon Generator', icon: '🗺️' },
-		{ id: 'wizard', label: "Wizard's Tower", icon: '🔮' },
-		{ id: 'cult', label: 'Cult / Secret Society', icon: '🕯️' },
-		{ id: 'guild', label: "Thieves' Guild", icon: '🗡️' },
-		{ id: 'caravan', label: 'Trade Caravan', icon: '🐎' },
-		{ id: 'blackmarket', label: 'Black Market', icon: '🪙' },
-		{ id: 'noble', label: 'Noble House', icon: '🏰' },
-		{ id: 'graveyard', label: 'Graveyard / Crypt', icon: '⚰️' },
-		{ id: 'npc', label: 'NPC Generator', icon: '🧙' }
+		{
+			id: 'weather',
+			label: 'Weather & Travel',
+			icon: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i>'
+		},
+		{
+			id: 'encounter',
+			label: 'Random Encounter',
+			icon: '<i class="fa-duotone fa-light fa-dice"></i>'
+		},
+		{
+			id: 'wilderness',
+			label: 'Wilderness Encounter',
+			icon: '<i class="fa-duotone fa-light fa-tree"></i>'
+		},
+		{
+			id: 'names',
+			label: 'Name Generator',
+			icon: '<i class="fa-duotone fa-light fa-id-badge"></i>'
+		},
+		{ id: 'town', label: 'Town Generator', icon: '<i class="fa-duotone fa-light fa-city"></i>' },
+		{
+			id: 'shop',
+			label: 'Shop Generator',
+			icon: '<i class="fa-duotone fa-light fa-cart-shopping"></i>'
+		},
+		{
+			id: 'inn',
+			label: 'Inn Generator',
+			icon: '<i class="fa-duotone fa-light fa-beer-mug-empty"></i>'
+		},
+		{
+			id: 'dungeon',
+			label: 'Dungeon Generator',
+			icon: '<i class="fa-duotone fa-light fa-map"></i>'
+		},
+		{
+			id: 'wizard',
+			label: "Wizard's Tower",
+			icon: '<i class="fa-duotone fa-light fa-hat-wizard"></i>'
+		},
+		{
+			id: 'cult',
+			label: 'Cult / Secret Society',
+			icon: '<i class="fa-duotone fa-light fa-user-secret"></i>'
+		},
+		{ id: 'guild', label: "Thieves' Guild", icon: '<i class="fa-duotone fa-light fa-dagger"></i>' },
+		{ id: 'caravan', label: 'Trade Caravan', icon: '<i class="fa-duotone fa-light fa-horse"></i>' },
+		{
+			id: 'blackmarket',
+			label: 'Black Market',
+			icon: '<i class="fa-duotone fa-light fa-coins"></i>'
+		},
+		{ id: 'noble', label: 'Noble House', icon: '<i class="fa-duotone fa-light fa-crown"></i>' },
+		{
+			id: 'graveyard',
+			label: 'Graveyard / Crypt',
+			icon: '<i class="fa-duotone fa-light fa-coffin"></i>'
+		},
+		{ id: 'npc', label: 'NPC Generator', icon: '<i class="fa-duotone fa-light fa-user"></i>' }
 	];
 
 	let selected = $state('weather');
@@ -1381,116 +1427,116 @@
 	};
 	const conditionSlots: Record<string, SlotTexts> = {
 		clear: {
-			dawn: '☀️ Clear, stars fading',
-			morning: '☀️ Bright sunshine',
-			midday: '☀️ Clear blue skies',
-			evening: '☀️ Golden hour',
-			night: '✨ Clear, starry sky'
+			dawn: '<i class="fa-duotone fa-light fa-sun"></i> Clear, stars fading',
+			morning: '<i class="fa-duotone fa-light fa-sun"></i> Bright sunshine',
+			midday: '<i class="fa-duotone fa-light fa-sun"></i> Clear blue skies',
+			evening: '<i class="fa-duotone fa-light fa-sun"></i> Golden hour',
+			night: '<i class="fa-duotone fa-light fa-star"></i> Clear, starry sky'
 		},
 		partly_cloudy: {
-			dawn: '⛅ Thin clouds at sunrise',
-			morning: '⛅ Partly cloudy',
-			midday: '⛅ Partly cloudy',
-			evening: '⛅ Drifting clouds',
-			night: '⛅ Patchy clouds'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Thin clouds at sunrise',
+			morning: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Partly cloudy',
+			midday: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Partly cloudy',
+			evening: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Drifting clouds',
+			night: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Patchy clouds'
 		},
 		overcast: {
-			dawn: '☁️ Leaden skies',
-			morning: '☁️ Overcast',
-			midday: '☁️ Heavy cloud cover',
-			evening: '☁️ Dark and overcast',
-			night: '☁️ No stars visible'
+			dawn: '<i class="fa-duotone fa-light fa-cloud"></i> Leaden skies',
+			morning: '<i class="fa-duotone fa-light fa-cloud"></i> Overcast',
+			midday: '<i class="fa-duotone fa-light fa-cloud"></i> Heavy cloud cover',
+			evening: '<i class="fa-duotone fa-light fa-cloud"></i> Dark and overcast',
+			night: '<i class="fa-duotone fa-light fa-cloud"></i> No stars visible'
 		},
 		light_rain: {
-			dawn: '🌦 Light drizzle',
-			morning: '🌦 Patchy showers',
-			midday: '🌦 Steady drizzle',
-			evening: '🌧 Light rain',
-			night: '🌧 Drizzle overnight'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i> Light drizzle',
+			morning: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i> Patchy showers',
+			midday: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i> Steady drizzle',
+			evening: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Light rain',
+			night: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Drizzle overnight'
 		},
 		heavy_rain: {
-			dawn: '🌧 Heavy rain',
-			morning: '🌧 Downpour',
-			midday: '🌧 Persistent heavy rain',
-			evening: '🌧 Sheets of rain',
-			night: '🌧 Relentless rain'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Heavy rain',
+			morning: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Downpour',
+			midday: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Persistent heavy rain',
+			evening: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Sheets of rain',
+			night: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Relentless rain'
 		},
 		thunderstorm: {
-			dawn: '⛈ Distant thunder',
-			morning: '⛈ Storm building',
-			midday: '⛈ Thunderstorm',
-			evening: '⛈ Violent storm',
-			night: '⛈ Thunder and lightning'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Distant thunder',
+			morning: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Storm building',
+			midday: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Thunderstorm',
+			evening: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Violent storm',
+			night: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Thunder and lightning'
 		},
 		fog: {
-			dawn: '🌫 Dense fog',
-			morning: '🌫 Fog lifting slowly',
-			midday: '🌫 Patchy fog',
-			evening: '🌫 Mist rolling in',
-			night: '🌫 Thick fog'
+			dawn: '<i class="fa-duotone fa-light fa-smog"></i> Dense fog',
+			morning: '<i class="fa-duotone fa-light fa-smog"></i> Fog lifting slowly',
+			midday: '<i class="fa-duotone fa-light fa-smog"></i> Patchy fog',
+			evening: '<i class="fa-duotone fa-light fa-smog"></i> Mist rolling in',
+			night: '<i class="fa-duotone fa-light fa-smog"></i> Thick fog'
 		},
 		light_snow: {
-			dawn: '🌨 Dusting of snow',
-			morning: '🌨 Light flurries',
-			midday: '🌨 Light snowfall',
-			evening: '🌨 Snowflakes drifting',
-			night: '❄️ Light snow overnight'
+			dawn: '<i class="fa-duotone fa-light fa-snowflake"></i> Dusting of snow',
+			morning: '<i class="fa-duotone fa-light fa-snowflake"></i> Light flurries',
+			midday: '<i class="fa-duotone fa-light fa-snowflake"></i> Light snowfall',
+			evening: '<i class="fa-duotone fa-light fa-snowflake"></i> Snowflakes drifting',
+			night: '<i class="fa-duotone fa-light fa-snowflake"></i> Light snow overnight'
 		},
 		heavy_snow: {
-			dawn: '❄️ Heavy snow',
-			morning: '❄️ Thick snowfall',
-			midday: '❄️ Heavy snowstorm',
-			evening: '❄️ Blinding snow',
-			night: '❄️ Deep snow falling'
+			dawn: '<i class="fa-duotone fa-light fa-snowflake"></i> Heavy snow',
+			morning: '<i class="fa-duotone fa-light fa-snowflake"></i> Thick snowfall',
+			midday: '<i class="fa-duotone fa-light fa-snowflake"></i> Heavy snowstorm',
+			evening: '<i class="fa-duotone fa-light fa-snowflake"></i> Blinding snow',
+			night: '<i class="fa-duotone fa-light fa-snowflake"></i> Deep snow falling'
 		},
 		blizzard: {
-			dawn: '❄️ Blizzard conditions',
-			morning: '❄️ Whiteout',
-			midday: '❄️ Blizzard, zero vis.',
-			evening: '❄️ Raging blizzard',
-			night: '❄️ Blizzard raging'
+			dawn: '<i class="fa-duotone fa-light fa-snowflake"></i> Blizzard conditions',
+			morning: '<i class="fa-duotone fa-light fa-snowflake"></i> Whiteout',
+			midday: '<i class="fa-duotone fa-light fa-snowflake"></i> Blizzard, zero vis.',
+			evening: '<i class="fa-duotone fa-light fa-snowflake"></i> Raging blizzard',
+			night: '<i class="fa-duotone fa-light fa-snowflake"></i> Blizzard raging'
 		},
 		sleet: {
-			dawn: '🌧 Icy sleet',
-			morning: '🌧 Sleet and rain',
-			midday: '🌧 Sleet',
-			evening: '❄️ Sleet turning to snow',
-			night: '❄️ Frozen sleet'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Icy sleet',
+			morning: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Sleet and rain',
+			midday: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Sleet',
+			evening: '<i class="fa-duotone fa-light fa-snowflake"></i> Sleet turning to snow',
+			night: '<i class="fa-duotone fa-light fa-snowflake"></i> Frozen sleet'
 		},
 		sandstorm: {
-			dawn: '🏜️ Dust rising',
-			morning: '🏜️ Sandstorm building',
-			midday: '🏜️ Full sandstorm',
-			evening: '🏜️ Sand gusts',
-			night: '🏜️ Gritty winds'
+			dawn: '<i class="fa-duotone fa-light fa-wind"></i> Dust rising',
+			morning: '<i class="fa-duotone fa-light fa-wind"></i> Sandstorm building',
+			midday: '<i class="fa-duotone fa-light fa-wind"></i> Full sandstorm',
+			evening: '<i class="fa-duotone fa-light fa-wind"></i> Sand gusts',
+			night: '<i class="fa-duotone fa-light fa-wind"></i> Gritty winds'
 		},
 		haze: {
-			dawn: '🌅 Hazy dawn',
-			morning: '☀️ Hazy sunshine',
-			midday: '☀️ Scorching haze',
-			evening: '🌅 Hazy sunset',
-			night: '⛅ Hazy night sky'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Hazy dawn',
+			morning: '<i class="fa-duotone fa-light fa-sun"></i> Hazy sunshine',
+			midday: '<i class="fa-duotone fa-light fa-sun"></i> Scorching haze',
+			evening: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Hazy sunset',
+			night: '<i class="fa-duotone fa-light fa-cloud-sun"></i> Hazy night sky'
 		},
 		muggy: {
-			dawn: '💧 Muggy and damp',
-			morning: '💧 Humid, oppressive',
-			midday: '💧 Stifling heat',
-			evening: '⛈ Muggy, storms brewing',
-			night: '💧 Hot and humid'
+			dawn: '<i class="fa-duotone fa-light fa-droplet"></i> Muggy and damp',
+			morning: '<i class="fa-duotone fa-light fa-droplet"></i> Humid, oppressive',
+			midday: '<i class="fa-duotone fa-light fa-droplet"></i> Stifling heat',
+			evening: '<i class="fa-duotone fa-light fa-cloud-bolt"></i> Muggy, storms brewing',
+			night: '<i class="fa-duotone fa-light fa-droplet"></i> Hot and humid'
 		},
 		strong_wind: {
-			dawn: '💨 Gusty winds',
-			morning: '💨 Strong coastal winds',
-			midday: '💨 Powerful gusts',
-			evening: '💨 Howling wind',
-			night: '💨 Gale-force winds'
+			dawn: '<i class="fa-duotone fa-light fa-wind"></i> Gusty winds',
+			morning: '<i class="fa-duotone fa-light fa-wind"></i> Strong coastal winds',
+			midday: '<i class="fa-duotone fa-light fa-wind"></i> Powerful gusts',
+			evening: '<i class="fa-duotone fa-light fa-wind"></i> Howling wind',
+			night: '<i class="fa-duotone fa-light fa-wind"></i> Gale-force winds'
 		},
 		cold_rain: {
-			dawn: '🌧 Cold grey rain',
-			morning: '🌧 Frigid drizzle',
-			midday: '🌧 Cold steady rain',
-			evening: '🌧 Bone-chilling rain',
-			night: '🌧 Cold rain'
+			dawn: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Cold grey rain',
+			morning: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Frigid drizzle',
+			midday: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Cold steady rain',
+			evening: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Bone-chilling rain',
+			night: '<i class="fa-duotone fa-light fa-cloud-rain"></i> Cold rain'
 		}
 	};
 
@@ -5225,7 +5271,7 @@
 	</div>
 	<!-- Header -->
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<span class="text-xl">⚙️</span>
+		<i class="fa-duotone fa-light fa-gear text-xl" aria-hidden="true"></i>
 		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Generators</h2>
 		<p class="ml-2 hidden text-xs text-gray-500 sm:block">D&amp;D 5e content generators</p>
 		<button
@@ -5233,16 +5279,7 @@
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 			title="Close"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-			</svg>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</button>
 	</div>
 
@@ -5258,7 +5295,7 @@
 						? 'bg-amber-900/30 font-semibold text-amber-300'
 						: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 				>
-					<span class="text-base leading-none">{cat.icon}</span>
+					<span class="text-base leading-none">{@html cat.icon}</span>
 					{cat.label}
 				</button>
 			{/each}
@@ -5467,7 +5504,7 @@
 														'bg-gray-800/30'}"
 												>
 													<div class="leading-snug font-medium whitespace-nowrap text-white">
-														{slot.sky}
+														{@html slot.sky}
 													</div>
 													<div class="mt-0.5 text-[10px] whitespace-nowrap text-gray-400">
 														{slot.temp} · {slot.wind}
@@ -5727,10 +5764,15 @@
 								<thead>
 									<tr class="border-b border-gray-700 bg-gray-800/60">
 										<th class="px-4 py-2.5 text-left font-semibold text-gray-300">Item</th>
-										<th class="px-4 py-2.5 text-center font-semibold text-green-400">😊 Friendly</th
+										<th class="px-4 py-2.5 text-center font-semibold text-green-400"
+											><i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly</th
 										>
-										<th class="px-4 py-2.5 text-center font-semibold text-gray-300">😐 Neutral</th>
-										<th class="px-4 py-2.5 text-center font-semibold text-red-400">😠 Hostile</th>
+										<th class="px-4 py-2.5 text-center font-semibold text-gray-300"
+											><i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral</th
+										>
+										<th class="px-4 py-2.5 text-center font-semibold text-red-400"
+											><i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile</th
+										>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-800">
@@ -5811,26 +5853,14 @@
 										aria-label="Close item detail"
 										class="rounded-lg border border-gray-700 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-4 w-4"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											stroke-width="2"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												d="M6 18L18 6M6 6l12 12"
-											/></svg
-										>
+										<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 									</button>
 								</div>
 								<!-- Prices -->
 								<div class="mb-4 flex gap-5 rounded-lg bg-gray-800/60 px-4 py-3">
 									<div class="text-center">
 										<p class="text-[10px] font-bold tracking-widest text-green-400 uppercase">
-											😊 Friendly
+											<i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly
 										</p>
 										<p class="mt-0.5 font-semibold text-green-300 tabular-nums">
 											{selectedShopItem.liked}
@@ -5838,13 +5868,13 @@
 									</div>
 									<div class="text-center">
 										<p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-											😐 Neutral
+											<i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral
 										</p>
 										<p class="mt-0.5 text-gray-300 tabular-nums">{selectedShopItem.neutral}</p>
 									</div>
 									<div class="text-center">
 										<p class="text-[10px] font-bold tracking-widest text-red-400 uppercase">
-											😠 Hostile
+											<i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile
 										</p>
 										<p class="mt-0.5 font-semibold text-red-300 tabular-nums">
 											{selectedShopItem.disliked}

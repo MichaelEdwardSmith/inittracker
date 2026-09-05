@@ -98,7 +98,7 @@
 		<div class="mx-4 w-full max-w-lg rounded-xl border border-amber-700/50 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-amber-900/40 px-5 py-3">
 				<div class="flex items-center gap-2">
-					<span class="text-amber-400">★</span>
+					<i class="fa-duotone fa-light fa-star text-amber-400" aria-hidden="true"></i>
 					<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 						>Legendary Actions</span
 					>
@@ -109,16 +109,7 @@
 					aria-label="Close"
 					class="text-gray-600 transition hover:text-gray-300"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-					</svg>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -145,26 +136,16 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
-				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<h4 class="font-black tracking-wide text-amber-400">
+					<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
+					{r.expr}
+				</h4>
 				<button
 					onclick={() => (diceResult = null)}
 					aria-label="Close"
 					class="text-gray-500 transition hover:text-white"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="mb-4 flex flex-wrap gap-2">

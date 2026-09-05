@@ -82,21 +82,23 @@
 		return map;
 	}
 
+	// Returns Font Awesome markup for the event's icon — always one of the fixed cases
+	// below (never derived from event/player data), so rendering it via {@html} is safe.
 	function eventIcon(e: CombatEvent): string {
-		if (e.causedDown) return '☠';
+		if (e.causedDown) return '<i class="fa-duotone fa-light fa-skull"></i>';
 		switch (e.type) {
 			case 'damage':
-				return '⚔';
+				return '<i class="fa-duotone fa-light fa-swords"></i>';
 			case 'heal':
-				return '♥';
+				return '<i class="fa-duotone fa-light fa-heart"></i>';
 			case 'down':
-				return '☠';
+				return '<i class="fa-duotone fa-light fa-skull"></i>';
 			case 'condition_add':
-				return '✦';
+				return '<i class="fa-duotone fa-light fa-star"></i>';
 			case 'condition_remove':
-				return '✧';
+				return '<i class="fa-regular fa-star"></i>';
 			default:
-				return '·';
+				return '&middot;';
 		}
 	}
 
@@ -284,7 +286,7 @@
 		class="sticky top-0 z-10 flex items-center border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<span class="text-amber-500">⚔</span>
+			<i class="fa-duotone fa-light fa-swords text-amber-500" aria-hidden="true"></i>
 			<h1 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Combat Chronicles</h1>
 		</div>
 		<span class="ml-3 rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-500">
@@ -296,20 +298,7 @@
 			aria-label="Back to Dashboard"
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M6 18L18 6M6 6l12 12"
-				/>
-			</svg>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</a>
 	</header>
 
@@ -317,20 +306,7 @@
 		{#if records.length === 0}
 			<!-- Empty state -->
 			<div class="flex flex-col items-center justify-center py-24 text-center">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="mb-4 h-16 w-16 text-gray-800"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="1"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-book-open mb-4 text-gray-800" aria-hidden="true"></i>
 				<p class="text-xl font-semibold text-gray-700">No battles recorded yet</p>
 				<p class="mt-2 text-sm text-gray-600">
 					End a combat or save to chronicle to begin your history.
@@ -399,20 +375,10 @@
 			<div class="mb-6 flex flex-col gap-3">
 				<!-- Search input -->
 				<div class="relative">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-600"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"
-						/>
-					</svg>
+					<i
+						class="fa-duotone fa-light fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-600"
+						aria-hidden="true"
+					></i>
 					<input
 						type="text"
 						bind:value={searchQuery}
@@ -425,20 +391,7 @@
 							title="Clear search"
 							class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-gray-400"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
+							<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 						</button>
 					{/if}
 				</div>
@@ -550,35 +503,12 @@
 											class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-amber-400 disabled:opacity-40"
 										>
 											{#if exportingId === record.id}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="h-4 w-4 animate-spin"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 12a8 8 0 018-8V4"
-													/>
-												</svg>
+												<i
+													class="fa-duotone fa-light fa-spinner fa-spin text-base"
+													aria-hidden="true"
+												></i>
 											{:else}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="h-4 w-4"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-													/>
-												</svg>
+												<i class="fa-duotone fa-light fa-download text-base" aria-hidden="true"></i>
 											{/if}
 										</button>
 										<!-- Delete button -->
@@ -595,20 +525,7 @@
 												title="Delete this encounter"
 												class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-red-400"
 											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="h-4 w-4"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-													/>
-												</svg>
+												<i class="fa-duotone fa-light fa-trash text-base" aria-hidden="true"></i>
 											</button>
 										{/if}
 									</div>
@@ -617,32 +534,36 @@
 								<!-- Stats row -->
 								<div class="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
 									<span class="flex items-center gap-1">
-										<span class="text-amber-600">◈</span>
+										<i
+											class="fa-duotone fa-light fa-hourglass-half text-amber-600"
+											aria-hidden="true"
+										></i>
 										{roundsLabel}
 									</span>
 									<span class="flex items-center gap-1">
-										<span class="text-blue-600">🛡</span>
+										<i class="fa-duotone fa-light fa-shield-halved text-blue-600" aria-hidden="true"
+										></i>
 										{players.length}
 										{players.length === 1 ? 'player' : 'players'}
 									</span>
 									{#if slain.length > 0}
 										<span class="flex items-center gap-1 text-red-500">
-											<span>☠</span>
+											<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
 											{slain.length} slain
 										</span>
 									{:else}
 										<span class="flex items-center gap-1 text-green-600">
-											<span>✓</span>
+											<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 											No casualties
 										</span>
 									{/if}
 									<span class="flex items-center gap-1">
-										<span>📜</span>
+										<i class="fa-duotone fa-light fa-scroll" aria-hidden="true"></i>
 										{record.events.filter((e) => e.type !== 'round_advance').length} events
 									</span>
 									{#if record.totalXp !== undefined}
 										<span class="flex items-center gap-1 text-amber-500">
-											<span>✦</span>
+											<i class="fa-duotone fa-light fa-star" aria-hidden="true"></i>
 											{record.totalXp.toLocaleString()} XP
 										</span>
 									{/if}
@@ -695,10 +616,14 @@
 											<!-- HP numbers -->
 											<div class="w-24 shrink-0 text-right text-xs">
 												{#if p.wasSlain}
-													<span class="font-bold text-red-500">☠ Slain</span>
+													<span class="font-bold text-red-500"
+														><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Slain</span
+													>
 												{:else}
 													<span class="text-gray-500">{p.startHp}</span>
-													<span class="text-gray-700"> → </span>
+													<span class="text-gray-700">
+														<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
+													</span>
 													<span class={hpTextColor(p.finalHp, p.maxHp)}>{p.finalHp}</span>
 													<span class="text-gray-700"> / {p.maxHp}</span>
 												{/if}
@@ -718,20 +643,12 @@
 										<span class="font-semibold tracking-wider uppercase">
 											{isExpanded ? 'Hide Chronicle' : 'Show Chronicle'}
 										</span>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-4 w-4 transition-transform {isExpanded ? 'rotate-180' : ''}"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M19 9l-7 7-7-7"
-											/>
-										</svg>
+										<i
+											class="fa-duotone fa-light fa-chevron-down text-base transition-transform {isExpanded
+												? 'rotate-180'
+												: ''}"
+											aria-hidden="true"
+										></i>
 									</button>
 
 									{#if isExpanded}
@@ -756,7 +673,10 @@
 														{#each slainWithLoot as p}
 															<div>
 																<div class="mb-1 flex items-center gap-2 text-xs">
-																	<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+																	<i
+																		class="fa-duotone fa-light fa-skull w-4 shrink-0 text-center text-red-400"
+																		aria-hidden="true"
+																	></i>
 																	<span class="font-semibold text-gray-300">{p.name}</span>
 																</div>
 																<div class="flex flex-col gap-0.5 pl-6">
@@ -785,7 +705,10 @@
 													<div class="flex flex-col gap-1 pl-2">
 														{#each slainWithCr as p}
 															<div class="flex items-center gap-2 text-xs">
-																<span class="w-4 shrink-0 text-center text-red-400">☠</span>
+																<i
+																	class="fa-duotone fa-light fa-skull w-4 shrink-0 text-center text-red-400"
+																	aria-hidden="true"
+																></i>
 																<span class="flex-1 text-gray-400">{p.name}</span>
 																<span class="text-gray-600">CR {p.cr}</span>
 																<span class="w-20 text-right font-mono text-amber-500/80"
@@ -830,7 +753,7 @@
 														{#each events as e}
 															<div class="flex items-start gap-2 text-xs">
 																<span class="mt-0.5 w-4 shrink-0 text-center {eventColor(e)}">
-																	{eventIcon(e)}
+																	{@html eventIcon(e)}
 																</span>
 																<span
 																	class="{eventColor(e)} {e.causedDown || e.type === 'down'

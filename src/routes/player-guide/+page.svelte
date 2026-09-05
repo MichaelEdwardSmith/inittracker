@@ -42,7 +42,7 @@
 		class="sticky top-0 z-20 flex items-center gap-4 border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<span class="text-lg">⚔️</span>
+			<i class="fa-duotone fa-light fa-swords text-lg" aria-hidden="true"></i>
 			<h1 class="text-sm font-black tracking-[0.25em] text-amber-400 uppercase">Player Guide</h1>
 		</div>
 		<a
@@ -50,20 +50,7 @@
 			aria-label="Back"
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M6 18L18 6M6 6l12 12"
-				/>
-			</svg>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</a>
 	</header>
 
@@ -99,7 +86,10 @@
 					Toggling Sound
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Open the <strong class="text-amber-300">☰ menu</strong> in the top-right corner and tap
+					Open the <strong class="text-amber-300"
+						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+					>
+					in the top-right corner and tap
 					<strong class="text-white">Sound On</strong> or
 					<strong class="text-white">Sound Off</strong>. The button shows your current state and
 					changes color — <span class="font-semibold text-amber-400">amber</span>
@@ -134,7 +124,11 @@
 					Sending a Reaction
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
-					<li>Open the <strong class="text-amber-300">☰ menu</strong></li>
+					<li>
+						Open the <strong class="text-amber-300"
+							><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+						>
+					</li>
 					<li>Tap <strong class="text-white">React to DM</strong></li>
 					<li>Tap any emoji from the picker — it sends immediately</li>
 					<li>
@@ -160,7 +154,10 @@
 					Opening the Roller
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Open the <strong class="text-amber-300">☰ menu</strong> and tap
+					Open the <strong class="text-amber-300"
+						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+					>
+					and tap
 					<strong class="text-white">Dice Roller</strong>.
 				</p>
 
@@ -223,7 +220,11 @@
 					Sending a Message
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
-					<li>Open the <strong class="text-amber-300">☰ menu</strong></li>
+					<li>
+						Open the <strong class="text-amber-300"
+							><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+						>
+					</li>
 					<li>Tap <strong class="text-white">Message DM</strong> — a compose form appears</li>
 					<li>Type your message and tap <strong class="text-white">Send</strong></li>
 				</ol>
@@ -253,7 +254,11 @@
 					Submitting Your Roll
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
-					<li>Open the <strong class="text-amber-300">☰ menu</strong></li>
+					<li>
+						Open the <strong class="text-amber-300"
+							><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+						>
+					</li>
 					<li>Tap <strong class="text-white">Roll Initiative</strong></li>
 					<li>Enter the number you rolled (including your DEX modifier)</li>
 					<li>Tap <strong class="text-white">Submit</strong></li>
@@ -278,7 +283,10 @@
 					Opening Notes
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Open the <strong class="text-amber-300">☰ menu</strong> and tap
+					Open the <strong class="text-amber-300"
+						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+					>
+					and tap
 					<strong class="text-white">My Notes</strong>. This option is only visible when you are
 					logged in as a player (not a guest).
 				</p>
@@ -329,7 +337,10 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					When you have unread messages from the DM, a small
 					<span class="font-semibold text-purple-400">purple dot</span> appears on the
-					<strong class="text-amber-300">☰ menu</strong> button and the
+					<strong class="text-amber-300"
+						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+					>
+					button and the
 					<strong class="text-white">DM Messages</strong> item inside the menu shows a count badge.
 				</p>
 
@@ -337,7 +348,11 @@
 					Reading Messages
 				</h3>
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
-					<li>Open the <strong class="text-amber-300">☰ menu</strong></li>
+					<li>
+						Open the <strong class="text-amber-300"
+							><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+						>
+					</li>
 					<li>
 						Tap <strong class="text-white">DM Messages</strong> — the unread count resets to zero
 					</li>

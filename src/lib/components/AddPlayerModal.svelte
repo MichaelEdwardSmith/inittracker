@@ -123,26 +123,15 @@
 	>
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
-			<h3 class="font-bold tracking-wide text-amber-400">+ Add Player</h3>
+			<h3 class="font-bold tracking-wide text-amber-400">
+				<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
+			</h3>
 			<button
 				onclick={onclose}
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -222,7 +211,7 @@
 							onclick={addDDBPlayer}
 							class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 						>
-							+ Add Player
+							<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 						</button>
 					{/if}
 				</div>
@@ -245,21 +234,11 @@
 					<label class="flex flex-col gap-1">
 						<span class="flex items-center gap-1 text-xs text-gray-400">
 							Voice Nicknames (optional)
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5 shrink-0 cursor-help text-gray-500"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<title
-									>Alternate spellings/pronunciations for Voice Commands to also match against this
-									player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional.</title
-								>
-								<circle cx="12" cy="12" r="9" />
-								<path stroke-linecap="round" d="M12 16v-4.5M12 8h.01" />
-							</svg>
+							<i
+								class="fa-duotone fa-light fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
+								aria-hidden="true"
+								title="Alternate spellings/pronunciations for Voice Commands to also match against this player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional."
+							></i>
 						</span>
 						<input
 							bind:value={voiceAliases}
@@ -336,7 +315,7 @@
 						type="submit"
 						class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 					>
-						+ Add Player
+						<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 					</button>
 				</form>
 			{/if}

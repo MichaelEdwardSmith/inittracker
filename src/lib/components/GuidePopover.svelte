@@ -91,7 +91,9 @@
 
 			<!-- Content -->
 			<div class="p-4">
-				<p class="mb-1 text-sm font-bold text-white">👋 Welcome!</p>
+				<p class="mb-1 text-sm font-bold text-white">
+					<i class="fa-duotone fa-light fa-hand" aria-hidden="true"></i> Welcome!
+				</p>
 				<p class="mb-4 text-sm leading-relaxed text-gray-400">
 					Open the <strong class="text-amber-300">menu</strong> to access the Guide and everything else
 					— combat tools, dice roller, sessions, voice commands, and more.

@@ -7,7 +7,7 @@
 		<!-- Header -->
 		<div class="mb-12">
 			<a href="/" class="mb-8 inline-block text-sm text-gray-500 transition hover:text-gray-400"
-				>← Back to home</a
+				><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Back to home</a
 			>
 			<h1 class="text-3xl font-black tracking-wide text-amber-400">Privacy Policy</h1>
 			<p class="mt-2 text-sm text-gray-500">Last updated: March 14, 2026</p>

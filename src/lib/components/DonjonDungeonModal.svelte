@@ -3234,13 +3234,15 @@
 		<div
 			class="flex shrink-0 items-center justify-between border-b border-white/10 bg-gray-900 px-4 py-3"
 		>
-			<h2 class="text-base font-bold text-white">🗺 Dungeon Generator</h2>
+			<h2 class="text-base font-bold text-white">
+				<i class="fa-duotone fa-light fa-map" aria-hidden="true"></i> Dungeon Generator
+			</h2>
 			<button
 				onclick={onclose}
 				class="ml-3 shrink-0 rounded p-1 text-gray-400 hover:bg-white/10 hover:text-white"
 				aria-label="Close"
 			>
-				✕
+				<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -3386,7 +3388,8 @@
 				? 'bg-green-700 text-white hover:bg-green-600'
 				: 'bg-gray-700 text-gray-200 hover:bg-gray-600'}"
 		>
-			{mapPushed ? '🗺️ Map Live' : '🗺️ Share Map'}
+			<i class="fa-duotone fa-light fa-map" aria-hidden="true"></i>
+			{mapPushed ? 'Map Live' : 'Share Map'}
 		</button>
 
 		{#if roomCount > 0}
@@ -3490,7 +3493,8 @@
 									title={isVisited ? 'Mark unvisited' : 'Mark visited'}
 									class="w-full rounded px-1 py-0.5 text-center text-[11px] font-bold transition {isVisited
 										? 'bg-green-900/50 text-green-400 hover:bg-gray-800 hover:text-gray-500'
-										: 'text-gray-600 hover:bg-green-900/40 hover:text-green-400'}">✓</button
+										: 'text-gray-600 hover:bg-green-900/40 hover:text-green-400'}"
+									><i class="fa-duotone fa-light fa-check" aria-hidden="true"></i></button
 								>
 							</div>
 							<div class="flex flex-col">
@@ -3521,20 +3525,21 @@
 						</div>
 						{#if treasure}
 							<div class="ml-5 flex items-start gap-1 text-[10px] text-amber-400">
-								<span class="shrink-0">💰</span>
+								<i class="fa-duotone fa-light fa-sack-dollar shrink-0" aria-hidden="true"></i>
 								<span class="leading-snug">{treasure}</span>
 							</div>
 						{/if}
 						{#if hazard}
 							<div class="ml-5 flex items-start gap-1 text-[10px] text-orange-400">
-								<span class="shrink-0">⚠</span>
+								<i class="fa-duotone fa-light fa-triangle-exclamation shrink-0" aria-hidden="true"
+								></i>
 								<span class="leading-snug">{hazard}</span>
 							</div>
 						{/if}
 						{#if puzzle}
 							<div class="ml-5 flex flex-col gap-0.5 text-[10px] text-purple-300">
 								<div class="flex items-start gap-1">
-									<span class="shrink-0">🧩</span>
+									<i class="fa-duotone fa-light fa-puzzle-piece shrink-0" aria-hidden="true"></i>
 									<span class="font-semibold text-purple-200">{puzzle.type} Puzzle</span>
 								</div>
 								<p class="ml-5 leading-snug text-purple-300/80 italic">{puzzle.prompt}</p>
@@ -3564,7 +3569,7 @@
 								onclick={() => addToInitiative(enc)}
 								class="ml-7 self-start rounded bg-indigo-700/60 px-2 py-0.5 text-[10px] font-semibold text-indigo-200 hover:bg-indigo-600"
 							>
-								+ Add to Initiative
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add to Initiative
 							</button>
 						{/if}
 					</div>
@@ -3609,7 +3614,8 @@
 						onclick={() => (zoom = Math.max(0.5, zoom - 0.25))}
 						disabled={zoom <= 0.5}
 						class="flex h-6 w-6 items-center justify-center rounded bg-gray-700 text-sm font-bold text-gray-200 hover:bg-gray-600 disabled:opacity-40"
-						aria-label="Zoom out">−</button
+						aria-label="Zoom out"
+						><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 					>
 					<button
 						onclick={() => (zoom = 1)}
@@ -3620,7 +3626,8 @@
 						onclick={() => (zoom = Math.min(4, zoom + 0.25))}
 						disabled={zoom >= 4}
 						class="flex h-6 w-6 items-center justify-center rounded bg-gray-700 text-sm font-bold text-gray-200 hover:bg-gray-600 disabled:opacity-40"
-						aria-label="Zoom in">+</button
+						aria-label="Zoom in"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 					>
 				</div>
 			{/if}
@@ -3660,13 +3667,13 @@
 					onclick={() => (showMobileOptions = !showMobileOptions)}
 					class="flex flex-1 items-center justify-center gap-1.5 rounded bg-gray-700 py-2 text-xs font-semibold text-gray-200 hover:bg-gray-600"
 				>
-					<span>⚙️</span> Options
+					<i class="fa-duotone fa-light fa-gear" aria-hidden="true"></i> Options
 				</button>
 				<button
 					onclick={() => (showMobileEncounters = !showMobileEncounters)}
 					class="flex flex-1 items-center justify-center gap-1.5 rounded bg-gray-700 py-2 text-xs font-semibold text-gray-200 hover:bg-gray-600"
 				>
-					<span>📋</span> Encounters
+					<i class="fa-duotone fa-light fa-clipboard" aria-hidden="true"></i> Encounters
 				</button>
 			</div>
 		</div>
@@ -3697,7 +3704,8 @@
 					<button
 						onclick={() => (showMobileOptions = false)}
 						class="text-gray-500 hover:text-white"
-						aria-label="Close">✕</button
+						aria-label="Close"
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				<div class="flex-1 overflow-y-auto p-3">
@@ -3723,7 +3731,8 @@
 					<button
 						onclick={() => (showMobileEncounters = false)}
 						class="text-gray-500 hover:text-white"
-						aria-label="Close">✕</button
+						aria-label="Close"
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				<div class="min-h-0 flex-1 text-xs text-gray-300">
@@ -3776,7 +3785,7 @@
 				<button
 					onclick={closeRoomPopover}
 					class="shrink-0 text-gray-500 hover:text-white"
-					aria-label="Close">✕</button
+					aria-label="Close"><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<p class="text-xs leading-relaxed text-gray-300 italic">
@@ -3790,7 +3799,7 @@
 			</p>
 			{#if activeRoomPopover && (floorHazards[currentFloor]?.[activeRoomPopover.roomId] ?? '')}
 				<div class="mt-3 flex items-start gap-1 text-[10px] text-orange-400">
-					<span class="shrink-0">⚠</span>
+					<i class="fa-duotone fa-light fa-triangle-exclamation shrink-0" aria-hidden="true"></i>
 					<span class="leading-snug italic"
 						>{floorHazards[currentFloor][activeRoomPopover.roomId]}</span
 					>
@@ -3822,7 +3831,7 @@
 				<button
 					onclick={() => (activeTrap = null)}
 					class="shrink-0 text-gray-500 hover:text-white"
-					aria-label="Close">✕</button
+					aria-label="Close"><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<span
@@ -3895,8 +3904,11 @@
 			<div class="w-96 rounded-lg border border-white/10 bg-gray-900 shadow-2xl">
 				<div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
 					<h3 class="font-bold text-white">Load Dungeon</h3>
-					<button onclick={() => (showLoadDialog = false)} class="text-gray-500 hover:text-white"
-						>✕</button
+					<button
+						onclick={() => (showLoadDialog = false)}
+						class="text-gray-500 hover:text-white"
+						aria-label="Close"
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 					>
 				</div>
 				{#if saves.length === 0}
@@ -3923,7 +3935,8 @@
 								<button
 									onclick={() => deleteSave(i)}
 									class="shrink-0 text-gray-600 hover:text-red-400"
-									aria-label="Delete">✕</button
+									aria-label="Delete"
+									><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 								>
 							</li>
 						{/each}

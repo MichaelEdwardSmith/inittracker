@@ -170,20 +170,7 @@
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -389,26 +376,16 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
-				<h4 class="font-black tracking-wide text-amber-400">🎲 {r.expr}</h4>
+				<h4 class="font-black tracking-wide text-amber-400">
+					<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
+					{r.expr}
+				</h4>
 				<button
 					onclick={() => (diceRollResult = null)}
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="mb-4 flex flex-wrap gap-2">

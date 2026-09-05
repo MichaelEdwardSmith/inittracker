@@ -24,12 +24,16 @@
 	let loadPct = $state(0); // 0-100 while model downloads
 
 	// ── Toast ─────────────────────────────────────────────────────────────────
-	let toast = $state<string | null>(null);
+	// icon/message are kept separate (rather than one HTML string) because message
+	// text often embeds a combatant/enemy name, which the DM controls freely — that
+	// text stays plain and auto-escaped, while icon is always one of the fixed
+	// fa-duotone fa-light names passed at each call site below.
+	let toast = $state<{ icon: string; message: string } | null>(null);
 	let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-	function showToast(msg: string, duration = 2500) {
+	function showToast(icon: string, msg: string, duration = 2500) {
 		if (toastTimer) clearTimeout(toastTimer);
-		toast = msg;
+		toast = { icon, message: msg };
 		toastTimer = setTimeout(() => (toast = null), duration);
 	}
 
@@ -127,7 +131,8 @@
 					const modStr = modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : '';
 					const finalTotal = total + modifier;
 					showToast(
-						`🎲 d100: [${String(tens).padStart(2, '0')}, ${ones}]${modStr} = ${finalTotal}`,
+						'fa-dice',
+						`d100: [${String(tens).padStart(2, '0')}, ${ones}]${modStr} = ${finalTotal}`,
 						6000
 					);
 				});
@@ -137,7 +142,7 @@
 				triggerRoll(`${count}d${sides}`, (rolls) => {
 					const total = rolls.reduce((s, r) => s + r, 0) + modifier;
 					const rollsStr = count > 1 ? ` [${rolls.join(', ')}]` : '';
-					showToast(`🎲 ${expr}:${rollsStr} = ${total}`, 6000);
+					showToast('fa-dice', `${expr}:${rollsStr} = ${total}`, 6000);
 				});
 			}
 		};
@@ -252,18 +257,18 @@
 		if (isTemp) {
 			return () => {
 				combat.setTempHp(target.id, amount);
-				showToast(`🛡 ${target.name} +${amount} temp HP`);
+				showToast('fa-shield-halved', `${target.name} +${amount} temp HP`);
 			};
 		}
 		if (isDamage) {
 			return () => {
 				combat.adjustHp(target.id, -amount);
-				showToast(`⚔ ${target.name} takes ${amount} damage`);
+				showToast('fa-swords', `${target.name} takes ${amount} damage`);
 			};
 		}
 		return () => {
 			combat.adjustHp(target.id, amount);
-			showToast(`💚 ${target.name} healed ${amount} HP`);
+			showToast('fa-heart', `${target.name} healed ${amount} HP`);
 		};
 	}
 
@@ -332,9 +337,10 @@
 			return () => {
 				combat.toggleStatus(target.id, status, rounds);
 				showToast(
+					'fa-tag',
 					removing
-						? `🏷 ${target.name} no longer ${status}`
-						: `🏷 ${target.name} is now ${status}${rounds ? ` (${rounds} rd)` : ''}`
+						? `${target.name} no longer ${status}`
+						: `${target.name} is now ${status}${rounds ? ` (${rounds} rd)` : ''}`
 				);
 			};
 		}
@@ -362,12 +368,12 @@
 			const data = await res.json();
 			if (data.action === 'damage' && data.targetId && data.amount) {
 				combat.adjustHp(data.targetId, -data.amount);
-				showToast(`⚔ ${data.targetName} takes ${data.amount} damage`);
+				showToast('fa-swords', `${data.targetName} takes ${data.amount} damage`);
 				return true;
 			}
 			if (data.action === 'heal' && data.targetId && data.amount) {
 				combat.adjustHp(data.targetId, data.amount);
-				showToast(`💚 ${data.targetName} healed ${data.amount} HP`);
+				showToast('fa-heart', `${data.targetName} healed ${data.amount} HP`);
 				return true;
 			}
 		} catch {
@@ -397,7 +403,7 @@
 		for (const cmd of COMMANDS) {
 			if (cmd.pattern.test(lower)) {
 				cmd.action();
-				showToast(`✓ ${cmd.label}`);
+				showToast('fa-check', `${cmd.label}`);
 				return;
 			}
 		}
@@ -422,7 +428,7 @@
 
 		// Fall back to AI for fuzzy name matching and phrasing variations.
 		callAiFallback(transcript).then((handled) => {
-			if (!handled) showToast('❓ Command not understood');
+			if (!handled) showToast('fa-circle-question', 'Command not understood');
 		});
 	}
 
@@ -438,13 +444,13 @@
 				loadPct = (msg.pct as number) ?? 0;
 			} else if (msg.type === 'ready') {
 				status = 'ready';
-				showToast('🎤 Moonshine ready — listening', 2500);
+				showToast('fa-microphone', 'Moonshine ready — listening', 2500);
 				startListening();
 			} else if (msg.type === 'transcript') {
 				handleTranscript(String(msg.text ?? ''));
 				if (status === 'processing') status = 'listening';
 			} else if (msg.type === 'error') {
-				showToast(`⚠ ${msg.message}`);
+				showToast('fa-triangle-exclamation', `${msg.message}`);
 				if (status === 'processing') status = 'listening';
 			}
 		});
@@ -495,7 +501,7 @@
 		try {
 			micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 		} catch {
-			showToast('⚠ Microphone access denied');
+			showToast('fa-triangle-exclamation', 'Microphone access denied');
 			status = 'ready';
 			return;
 		}
@@ -605,7 +611,7 @@
 			showHelp = true;
 			initWorker();
 			status = 'loading';
-			showToast('⏳ Downloading Moonshine model (first-time only)…', 120_000);
+			showToast('fa-hourglass-half', 'Downloading Moonshine model (first-time only)…', 120_000);
 			worker!.postMessage({ type: 'load' });
 		} else if (status === 'ready') {
 			// Turning voice commands back on — show the popover every time.
@@ -660,20 +666,7 @@
 					></span>
 				</span>
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-microphone shrink-0 text-base" aria-hidden="true"></i>
 			{/if}
 			{#if status === 'loading'}
 				{loadPct > 0 ? `Voice — Loading ${loadPct}%` : 'Voice — Loading…'}
@@ -727,20 +720,7 @@
 					></span>
 				</span>
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-3.5 w-3.5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-microphone text-sm" aria-hidden="true"></i>
 			{/if}
 			{#if status === 'loading'}
 				{loadPct > 0 ? `${loadPct}%` : 'Loading…'}
@@ -763,6 +743,7 @@
 		role="status"
 		aria-live="polite"
 	>
-		{toast}
+		<i class="fa-duotone fa-light {toast.icon}" aria-hidden="true"></i>
+		{toast.message}
 	</div>
 {/if}

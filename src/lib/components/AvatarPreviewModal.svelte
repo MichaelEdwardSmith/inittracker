@@ -37,20 +37,7 @@
 					aria-label="Close"
 					class="absolute -top-3 -right-3 rounded-full bg-gray-900 p-1.5 text-gray-400 shadow-lg ring-1 ring-gray-700 transition hover:text-white"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 			<p class="text-sm font-semibold text-gray-200">{combatant.name}</p>

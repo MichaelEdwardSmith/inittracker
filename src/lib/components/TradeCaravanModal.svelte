@@ -798,7 +798,10 @@
 			<div class="flex items-center gap-3">
 				<h2 class="text-lg font-bold tracking-wide text-amber-300">Trade Caravan Generator</h2>
 				{#if caravanData}
-					<span class="text-xs text-gray-500">{caravanData.origin} → {caravanData.destination}</span
+					<span class="text-xs text-gray-500"
+						>{caravanData.origin}
+						<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
+						{caravanData.destination}</span
 					>
 				{/if}
 			</div>
@@ -807,16 +810,7 @@
 				class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -859,7 +853,8 @@
 								<button
 									onclick={() => deleteSavedCaravan(s.id)}
 									class="shrink-0 text-[11px] leading-none text-gray-600 hover:text-red-400"
-									aria-label="Delete">✕</button
+									aria-label="Delete"
+									><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 								>
 							</div>
 						{/each}
@@ -878,7 +873,9 @@
 							<div class="flex flex-wrap items-baseline gap-3">
 								<h2 class="text-2xl font-bold text-white">
 									{caravanData.origin}
-									<span class="text-gray-500">→</span>
+									<span class="text-gray-500"
+										><i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i></span
+									>
 									{caravanData.destination}
 								</h2>
 								<span

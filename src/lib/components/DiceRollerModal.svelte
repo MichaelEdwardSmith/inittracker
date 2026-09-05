@@ -114,26 +114,15 @@
 	<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
-			<h3 class="font-black tracking-wide text-amber-400">🎲 Dice Roller</h3>
+			<h3 class="font-black tracking-wide text-amber-400">
+				<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i> Dice Roller
+			</h3>
 			<button
 				onclick={onclose}
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -169,7 +158,8 @@
 						<button
 							onclick={() => adjustQuantity(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease quantity">−</button
+							aria-label="Decrease quantity"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
 							type="number"
@@ -182,7 +172,8 @@
 						<button
 							onclick={() => adjustQuantity(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase quantity">+</button
+							aria-label="Increase quantity"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 						>
 					</div>
 				</div>
@@ -196,7 +187,8 @@
 						<button
 							onclick={() => adjustModifier(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease modifier">−</button
+							aria-label="Decrease modifier"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
 							type="number"
@@ -211,7 +203,8 @@
 						<button
 							onclick={() => adjustModifier(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase modifier">+</button
+							aria-label="Increase modifier"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 						>
 					</div>
 				</div>

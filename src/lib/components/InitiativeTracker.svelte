@@ -235,9 +235,11 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 						title="Previous turn"
 					>
-						<span class="hidden md:inline">&lt; Prev</span>
+						<span class="hidden md:inline"
+							><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Prev</span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>&lt;</span>
+							<i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i>
 							<span>Prev</span>
 						</span>
 					</button>
@@ -248,9 +250,12 @@
 						}}
 						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
 					>
-						<span class="hidden md:inline">Next &gt;</span>
+						<span class="hidden md:inline"
+							>Next
+							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i></span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>&gt;</span>
+							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 							<span>Next</span>
 						</span>
 					</button>
@@ -259,9 +264,11 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-600 hover:text-gray-300"
 						title="End combat"
 					>
-						<span class="hidden md:inline">■ End</span>
+						<span class="hidden md:inline"
+							><i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i> End</span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>■</span>
+							<i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i>
 							<span>End</span>
 						</span>
 					</button>
@@ -276,7 +283,7 @@
 				title="Undo the last damage/heal, condition/effect, or turn change (up to 5 steps)"
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
 			>
-				↺ Undo
+				<i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i> Undo
 			</button>
 			<button
 				onclick={() => (showAoE = true)}
@@ -357,7 +364,10 @@
 								</div>
 							{/if}
 							{#if isActive}
-								<span class="text-amber-400" title="Active turn">▶</span>
+								<i
+									class="fa-duotone fa-light fa-square-arrow-right text-amber-400"
+									title="Active turn"
+								></i>
 							{/if}
 							<span
 								class="shrink-0 rounded bg-purple-900/60 px-1.5 py-0.5 text-xs font-bold text-purple-300"
@@ -379,20 +389,7 @@
 								title="Remove lair actions"
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 						<div class="flex items-center gap-3 px-1">
@@ -429,7 +426,10 @@
 								</div>
 							{/if}
 							{#if isActive}
-								<span class="text-amber-400" title="Active turn">▶</span>
+								<i
+									class="fa-duotone fa-light fa-square-arrow-right text-amber-400"
+									title="Active turn"
+								></i>
 							{/if}
 							{#if c.type === 'player' && c.avatarUrl}
 								<button
@@ -467,20 +467,7 @@
 									title="View stat block"
 									class="rounded p-2 text-gray-600 transition hover:text-blue-400"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-4 w-4"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
+									<i class="fa-duotone fa-light fa-circle-info text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							{#if c.type === 'enemy' && !combat.sorted.some((x) => x.type === 'lair' && x.templateName === c.templateName)}
@@ -489,20 +476,7 @@
 									title="Add Lair Actions to initiative"
 									class="rounded p-2 text-gray-600 transition hover:text-purple-400"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-4 w-4"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-										/>
-									</svg>
+									<i class="fa-duotone fa-light fa-building text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							<button
@@ -512,20 +486,7 @@
 									? 'text-amber-300 [filter:drop-shadow(0_0_5px_theme(colors.amber.400))] hover:text-amber-200'
 									: 'text-gray-600 hover:text-gray-400'}"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/>
-								</svg>
+								<i class="fa-duotone fa-light fa-pen-to-square text-base" aria-hidden="true"></i>
 							</button>
 							<button
 								onclick={() => combat.removeFromCombat(c.id)}
@@ -534,20 +495,7 @@
 									: 'Remove from combat'}
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 
@@ -581,7 +529,8 @@
 											<button
 												onclick={() => combat.setTempHp(c.id, 0)}
 												class="ml-0.5 opacity-50 transition hover:opacity-100"
-												title="Clear temp HP">✕</button
+												title="Clear temp HP"
+												><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 											>
 										</span>
 									{/if}
@@ -652,14 +601,14 @@
 								title="Deal damage"
 								class="h-11 flex-1 rounded bg-red-900/60 text-sm font-bold text-red-300 hover:bg-red-800"
 							>
-								− Damage
+								<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i> Damage
 							</button>
 							<button
 								onclick={() => commitDamage(c, 1)}
 								title="Heal"
 								class="h-11 flex-1 rounded bg-green-900/60 text-sm font-bold text-green-300 hover:bg-green-800"
 							>
-								+ Heal
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Heal
 							</button>
 							{#if c.type === 'player'}
 								<button
@@ -667,7 +616,7 @@
 									title="Set temp HP"
 									class="h-11 flex-1 rounded bg-yellow-800/50 text-sm font-bold text-yellow-300 hover:bg-yellow-700/60"
 								>
-									+ THP
+									<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> THP
 								</button>
 							{/if}
 						</div>
@@ -680,7 +629,7 @@
 							<div class="rounded border border-gray-700 bg-gray-900/60 px-2 py-2 text-xs">
 								<div class="mb-1.5 flex items-center gap-2">
 									<span class="font-bold tracking-widest text-gray-400 uppercase"
-										>☠ Death Saves</span
+										><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Death Saves</span
 									>
 									<button
 										onclick={() =>
@@ -693,13 +642,15 @@
 									<div
 										class="flex items-center gap-2 rounded bg-red-950/60 px-2 py-1.5 text-sm font-bold text-red-400"
 									>
-										<span>☠</span><span>Dead</span>
+										<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i><span>Dead</span>
 									</div>
 								{:else if isStable}
 									<div
 										class="flex items-center gap-2 rounded bg-green-950/60 px-2 py-1.5 text-sm font-bold text-green-400"
 									>
-										<span>♥</span><span>Stable</span>
+										<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i><span
+											>Stable</span
+										>
 									</div>
 								{:else}
 									<div class="flex items-center gap-4">
@@ -714,11 +665,16 @@
 															const filled = ds.failures > i;
 															combat.setDeathSaves(c.id, { ...ds, failures: filled ? i : i + 1 });
 														}}
+														aria-label="Death save failure {i + 1}"
 														class="h-5 w-5 rounded-full border text-xs transition {ds.failures > i
 															? 'border-red-600 bg-red-700 text-red-200 hover:bg-red-800'
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-red-700 hover:bg-red-950'}"
 													>
-														{ds.failures > i ? '☠' : '○'}
+														{#if ds.failures > i}
+															<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</button>
 												{/each}
 											</div>
@@ -735,11 +691,16 @@
 															const filled = ds.successes > i;
 															combat.setDeathSaves(c.id, { ...ds, successes: filled ? i : i + 1 });
 														}}
+														aria-label="Death save success {i + 1}"
 														class="h-5 w-5 rounded-full border text-xs transition {ds.successes > i
 															? 'border-green-600 bg-green-700 text-green-200 hover:bg-green-800'
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-green-700 hover:bg-green-950'}"
 													>
-														{ds.successes > i ? '♥' : '○'}
+														{#if ds.successes > i}
+															<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i>
+														{:else}
+															<i class="fa-regular fa-circle" aria-hidden="true"></i>
+														{/if}
 													</button>
 												{/each}
 											</div>
@@ -780,20 +741,7 @@
 										title="What is {status}?"
 										class="border-l border-white/10 px-1.5 py-1.5 opacity-40 transition hover:opacity-100"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3 w-3"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
+										<i class="fa-duotone fa-light fa-circle-info text-xs" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/each}
@@ -804,7 +752,7 @@
 								}}
 								class="rounded border border-gray-600 px-2 py-1.5 text-xs text-gray-500 transition hover:border-gray-500 hover:text-gray-300"
 							>
-								+ Condition/Spell Effect
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Condition/Spell Effect
 							</button>
 							{#if openEffectMenuId === c.id}
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -934,20 +882,7 @@
 										title="View legendary actions"
 										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
+										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/if}
@@ -958,7 +893,8 @@
 								title={c.loot?.length ? 'Edit loot' : 'Roll loot'}
 								class="flex items-center gap-1.5 rounded border border-amber-800/50 bg-amber-950/30 px-2 py-1 text-xs text-amber-500 transition hover:border-amber-600 hover:text-amber-300"
 							>
-								⬡ {c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
+								<i class="fa-duotone fa-light fa-gem" aria-hidden="true"></i>
+								{c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
 							</button>
 						{/if}
 					{/if}
@@ -1029,7 +965,8 @@
 	>
 		<div class="mx-4 w-full max-w-sm rounded-xl border border-amber-700/60 bg-gray-900 shadow-2xl">
 			<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-				<span class="text-amber-400">⚠</span>
+				<i class="fa-duotone fa-light fa-triangle-exclamation text-amber-400" aria-hidden="true"
+				></i>
 				<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 					>Change Initiative Mid-Combat?</span
 				>

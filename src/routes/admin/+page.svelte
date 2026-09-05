@@ -143,7 +143,9 @@
 	<div class="mx-auto max-w-6xl">
 		<header class="mb-6 flex flex-wrap items-center justify-between gap-3">
 			<div>
-				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">⚔️ System Admin</h1>
+				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">
+					<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> System Admin
+				</h1>
 				<p class="mt-1 text-sm text-gray-500">
 					Logged in as {data.dmFirstName} · every DM account that has accessed this system.
 				</p>
@@ -175,7 +177,7 @@
 						class="shrink-0 rounded p-1 text-gray-500 transition hover:text-gray-300"
 						aria-label="Dismiss"
 					>
-						✕
+						<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
@@ -238,16 +240,12 @@
 									title={isExpanded ? 'Hide details' : 'Show details'}
 									aria-expanded={isExpanded}
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-3.5 w-3.5 transition-transform {isExpanded ? 'rotate-90' : ''}"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										stroke-width="2.5"
-									>
-										<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-									</svg>
+									<i
+										class="fa-duotone fa-light fa-chevron-right text-sm transition-transform {isExpanded
+											? 'rotate-90'
+											: ''}"
+										aria-hidden="true"
+									></i>
 								</button>
 							</td>
 							<td class="px-4 py-3 font-semibold text-gray-100">
@@ -261,7 +259,8 @@
 										class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
 										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
 									>
-										{dm.isRootAdmin ? '★ Root Admin' : 'Admin'}
+										{#if dm.isRootAdmin}<i class="fa-duotone fa-light fa-star" aria-hidden="true"
+											></i> Root Admin{:else}Admin{/if}
 									</span>
 								{/if}
 							</td>
@@ -386,7 +385,11 @@
 															rel="noopener noreferrer"
 															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-blue-500 hover:text-blue-300"
 														>
-															Inspect (read-only) ↗
+															Inspect (read-only)
+															<i
+																class="fa-duotone fa-light fa-arrow-up-right-from-square"
+																aria-hidden="true"
+															></i>
 														</a>
 													{/if}
 													<form

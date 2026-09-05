@@ -20,105 +20,105 @@
 
 	const features = [
 		{
-			icon: '⚔',
+			icon: '<i class="fa-duotone fa-light fa-swords"></i>',
 			title: 'Initiative Order',
 			desc: 'Automatically sort combatants by roll. Ties broken by dex modifier. Move through turns with a single click or voice command.',
 			color: 'text-amber-400',
 			screenshot: '/screenshots/Initiative.jpg'
 		},
 		{
-			icon: '🛡',
+			icon: '<i class="fa-duotone fa-light fa-shield-halved"></i>',
 			title: 'HP & Conditions',
 			desc: 'Track current, max, and temporary HP for every combatant. Apply all 15 standard conditions plus advantage/disadvantage states.',
 			color: 'text-blue-400',
 			screenshot: '/screenshots/HP&Conditions.jpg'
 		},
 		{
-			icon: '📺',
+			icon: '<i class="fa-duotone fa-light fa-tv"></i>',
 			title: 'Live Viewer Display',
 			desc: 'Share a URL with your players. They see the initiative order and HP bars update in real time — no account or install needed.',
 			color: 'text-green-400',
 			screenshot: '/screenshots/LiveViewerDisplay.jpg'
 		},
 		{
-			icon: '📜',
+			icon: '<i class="fa-duotone fa-light fa-scroll"></i>',
 			title: 'Combat Chronicles',
 			desc: 'Every encounter is recorded automatically. Review event logs, HP arcs, XP earned, and casualties from every past session.',
 			color: 'text-purple-400',
 			screenshot: '/screenshots/CombatChronicles.jpg'
 		},
 		{
-			icon: '🐉',
+			icon: '<i class="fa-duotone fa-light fa-dragon"></i>',
 			title: 'Monster Library',
 			desc: 'Built-in D&D 5e and 5.5e stat blocks with lair actions, legendary actions, and full spell lists. Add custom homebrew monsters too.',
 			color: 'text-red-400',
 			screenshot: '/screenshots/MonsterLibrary.jpg'
 		},
 		{
-			icon: '🎤',
+			icon: '<i class="fa-duotone fa-light fa-microphone"></i>',
 			title: 'Voice Commands',
 			desc: 'Run combat hands-free. Say "tracker next", "Aragorn takes 8 damage", or "roll d20" — powered by on-device Moonshine AI.',
 			color: 'text-cyan-400',
 			screenshot: '/screenshots/VoiceCommands.jpg'
 		},
 		{
-			icon: '📝',
+			icon: '<i class="fa-duotone fa-light fa-note-sticky"></i>',
 			title: 'Session Notes',
 			desc: 'Keep freeform notes tied to each game session — NPCs met, loot found, plot threads. Always one click away during play.',
 			color: 'text-yellow-400',
 			screenshot: '/screenshots/SessionNotes.jpg'
 		},
 		{
-			icon: '🎵',
+			icon: '<i class="fa-duotone fa-light fa-music"></i>',
 			title: 'Audio Mixer',
 			desc: 'Set the mood with built-in ambient soundscapes and music tracks. Mix volume levels for atmosphere without leaving the dashboard.',
 			color: 'text-pink-400',
 			screenshot: '/screenshots/AudioMixer.jpg'
 		},
 		{
-			icon: '📖',
+			icon: '<i class="fa-duotone fa-light fa-book-open"></i>',
 			title: 'Quick Reference',
 			desc: 'Instant access to conditions, actions, cover rules, exhaustion levels, and common DC tables — right inside the tracker.',
 			color: 'text-indigo-400',
 			screenshot: '/screenshots/QuickReference.jpg'
 		},
 		{
-			icon: '🏘️',
+			icon: '<i class="fa-duotone fa-light fa-city"></i>',
 			title: 'Town Generator',
 			desc: 'Generate fully detailed towns with unique NPCs, factions, districts, shops, and local lore — ready to drop into any campaign.',
 			color: 'text-orange-400',
 			screenshot: '/screenshots/TownGenerator.jpg'
 		},
 		{
-			icon: '🗺️',
+			icon: '<i class="fa-duotone fa-light fa-map"></i>',
 			title: 'Dungeon Generator',
 			desc: 'Procedurally generate dungeon maps with interconnected rooms, traps, secret doors, encounters, and treasure hoards.',
 			color: 'text-slate-400',
 			screenshot: '/screenshots/DungeonGenerator.jpg'
 		},
 		{
-			icon: '🍺',
+			icon: '<i class="fa-duotone fa-light fa-beer-mug-empty"></i>',
 			title: 'Inn Generator',
 			desc: "Generate richly detailed inns complete with staff, regulars, today's menu, rumors heard over ale, and adventure hooks.",
 			color: 'text-teal-400',
 			screenshot: '/screenshots/InnGenerator.jpg'
 		},
 		{
-			icon: '🌦️',
+			icon: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i>',
 			title: 'Weather & Travel',
 			desc: 'Generate season- and biome-aware weather, 7-day forecasts, weather events, travel pace, and navigation DCs for any journey.',
 			color: 'text-sky-400',
 			screenshot: '/screenshots/WeatherGenerator.jpg'
 		},
 		{
-			icon: '🎲',
+			icon: '<i class="fa-duotone fa-light fa-dice"></i>',
 			title: 'Random Encounter',
 			desc: 'Build balanced random encounters by difficulty and party size, with monster selections drawn from the full 5e bestiary.',
 			color: 'text-lime-400',
 			screenshot: '/screenshots/EncounterGenerator.jpg'
 		},
 		{
-			icon: '📛',
+			icon: '<i class="fa-duotone fa-light fa-id-badge"></i>',
 			title: 'Name Generator',
 			desc: 'Generate names for any race and gender in seconds — humans, elves, dwarves, halflings, and more, with authentic phonetic patterns.',
 			color: 'text-rose-400',
@@ -171,7 +171,7 @@
 	<nav class="sticky top-0 z-50 border-b border-gray-800/60 bg-gray-950/90 backdrop-blur">
 		<div class="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
 			<a href="/" class="flex items-center gap-2.5">
-				<span class="text-xl">⚔</span>
+				<i class="fa-duotone fa-light fa-swords text-xl" aria-hidden="true"></i>
 				<span class="text-sm font-black tracking-[0.2em] text-amber-400 uppercase"
 					>Initiative Tracker</span
 				>
@@ -333,12 +333,12 @@
 							<div
 								class="mb-5 flex aspect-video w-full items-center justify-center rounded-lg border border-gray-800/80 bg-gray-950/60"
 							>
-								<span class="text-4xl opacity-20 {feature.color}">{feature.icon}</span>
+								<span class="text-4xl opacity-20 {feature.color}">{@html feature.icon}</span>
 							</div>
 						{/if}
 
 						<div class="mb-2 flex items-center gap-2.5">
-							<span class="text-lg {feature.color}">{feature.icon}</span>
+							<span class="text-lg {feature.color}">{@html feature.icon}</span>
 							<h3 class="font-bold text-white">{feature.title}</h3>
 						</div>
 						<p class="text-sm leading-relaxed text-gray-500">{feature.desc}</p>
@@ -368,7 +368,10 @@
 					<ul class="space-y-3 text-sm text-gray-500">
 						{#each ['Updates in real time via server-sent events', 'Shows current turn, round counter, and HP', 'Conditions visible — blinded, stunned, prone, and more', 'Works on any browser, no install needed'] as item}
 							<li class="flex items-start gap-2.5">
-								<span class="mt-0.5 shrink-0 text-green-600">✓</span>
+								<i
+									class="fa-duotone fa-light fa-check mt-0.5 shrink-0 text-green-600"
+									aria-hidden="true"
+								></i>
 								{item}
 							</li>
 						{/each}
@@ -444,7 +447,7 @@
 			>
 				<div class="flex items-center justify-between border-b border-gray-800 px-5 py-3">
 					<div class="flex items-center gap-3">
-						<span class="text-amber-500">⚔</span>
+						<i class="fa-duotone fa-light fa-swords text-amber-500" aria-hidden="true"></i>
 						<span class="text-sm font-bold tracking-widest text-amber-400 uppercase"
 							>Combat Chronicles</span
 						>
@@ -469,7 +472,7 @@
 	<!-- ── CTA ───────────────────────────────────────────────────────────────── -->
 	<section class="relative overflow-hidden border-t border-gray-800/60 px-6 py-28 text-center">
 		<div class="mx-auto max-w-2xl" use:fadeIn>
-			<div class="mb-5 text-4xl">⚔</div>
+			<i class="fa-duotone fa-light fa-swords text-4xl" aria-hidden="true"></i>
 			<h2 class="mb-4 text-3xl font-black tracking-tight text-white sm:text-4xl">
 				Ready to roll initiative?
 			</h2>
@@ -499,7 +502,7 @@
 	<footer class="border-t border-gray-800/60 px-6 py-8">
 		<div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
-				<span class="text-base">⚔</span>
+				<i class="fa-duotone fa-light fa-swords text-base" aria-hidden="true"></i>
 				<span class="text-xs font-bold tracking-[0.2em] text-gray-600 uppercase"
 					>Initiative Tracker</span
 				>

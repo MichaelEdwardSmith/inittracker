@@ -121,7 +121,7 @@
 		onclick={() => (showAddPlayer = true)}
 		class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 	>
-		+ Add Player
+		<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 	</button>
 
 	<button
@@ -146,21 +146,11 @@
 					<label class="flex flex-col gap-1">
 						<span class="flex items-center gap-1 text-xs text-gray-400">
 							Voice Nickname
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5 shrink-0 cursor-help text-gray-500"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<title
-									>Alternate spellings/pronunciations for Voice Commands to also match against this
-									player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional.</title
-								>
-								<circle cx="12" cy="12" r="9" />
-								<path stroke-linecap="round" d="M12 16v-4.5M12 8h.01" />
-							</svg>
+							<i
+								class="fa-duotone fa-light fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
+								aria-hidden="true"
+								title="Alternate spellings/pronunciations for Voice Commands to also match against this player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional."
+							></i>
 						</span>
 						<input
 							bind:value={editVoiceAliases}
@@ -250,7 +240,10 @@
 							{#if player.avatarUrl}
 								<img src={player.avatarUrl} alt={player.name} class="h-full w-full object-cover" />
 							{:else}
-								<span class="text-base leading-none">🛡️</span>
+								<i
+									class="fa-duotone fa-light fa-shield-halved text-base leading-none"
+									aria-hidden="true"
+								></i>
 							{/if}
 						</button>
 						<!-- Remove button (shown on hover when avatar exists) -->
@@ -260,16 +253,7 @@
 								title="Remove avatar"
 								class="absolute -top-1 -right-1 hidden h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-gray-400 ring-1 ring-gray-600 transition group-hover:flex hover:text-red-400"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-2.5 w-2.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									stroke-width="3"
-								>
-									<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-								</svg>
+								<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>
 							</button>
 						{/if}
 					</div>
@@ -294,20 +278,7 @@
 						</div>
 						{#if presences[player.id]}
 							<div class="mt-0.5 flex items-center gap-1 text-xs text-blue-400">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3 w-3 shrink-0"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									stroke-width="2"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-									/>
-								</svg>
+								<i class="fa-duotone fa-light fa-user shrink-0 text-xs" aria-hidden="true"></i>
 								{presences[player.id]}
 							</div>
 						{/if}
@@ -319,16 +290,7 @@
 								title="Add to Combat"
 								class="rounded p-1 text-green-400 transition hover:bg-green-900/40 hover:text-green-300"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									stroke-width="2.5"
-								>
-									<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-								</svg>
+								<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 							</button>
 						{/if}
 						<button
@@ -345,20 +307,7 @@
 							title="Edit"
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-white"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-3.5 w-3.5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-								/>
-							</svg>
+							<i class="fa-duotone fa-light fa-pen-to-square text-sm" aria-hidden="true"></i>
 						</button>
 						{#if confirmDeleteId === player.id}
 							<div class="flex items-center gap-1">
@@ -382,20 +331,7 @@
 								title="Delete"
 								class="rounded p-1 text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-3.5 w-3.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									stroke-width="2"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-									/>
-								</svg>
+								<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 							</button>
 						{/if}
 					</div>
