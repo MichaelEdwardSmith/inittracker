@@ -264,9 +264,11 @@
 						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-600 hover:text-gray-300"
 						title="End combat"
 					>
-						<span class="hidden md:inline">■ End</span>
+						<span class="hidden md:inline"
+							><i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i> End</span
+						>
 						<span class="flex flex-col items-center md:hidden">
-							<span>■</span>
+							<i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i>
 							<span>End</span>
 						</span>
 					</button>
