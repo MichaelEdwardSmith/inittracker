@@ -121,7 +121,7 @@
 		onclick={() => (showAddPlayer = true)}
 		class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 	>
-		+ Add Player
+		<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 	</button>
 
 	<button

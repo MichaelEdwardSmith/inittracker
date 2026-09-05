@@ -588,14 +588,14 @@
 								title="Deal damage"
 								class="h-11 flex-1 rounded bg-red-900/60 text-sm font-bold text-red-300 hover:bg-red-800"
 							>
-								− Damage
+								<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i> Damage
 							</button>
 							<button
 								onclick={() => commitDamage(c, 1)}
 								title="Heal"
 								class="h-11 flex-1 rounded bg-green-900/60 text-sm font-bold text-green-300 hover:bg-green-800"
 							>
-								+ Heal
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Heal
 							</button>
 							{#if c.type === 'player'}
 								<button
@@ -603,7 +603,7 @@
 									title="Set temp HP"
 									class="h-11 flex-1 rounded bg-yellow-800/50 text-sm font-bold text-yellow-300 hover:bg-yellow-700/60"
 								>
-									+ THP
+									<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> THP
 								</button>
 							{/if}
 						</div>
@@ -739,7 +739,7 @@
 								}}
 								class="rounded border border-gray-600 px-2 py-1.5 text-xs text-gray-500 transition hover:border-gray-500 hover:text-gray-300"
 							>
-								+ Condition/Spell Effect
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Condition/Spell Effect
 							</button>
 							{#if openEffectMenuId === c.id}
 								<!-- svelte-ignore a11y_no_static_element_interactions -->

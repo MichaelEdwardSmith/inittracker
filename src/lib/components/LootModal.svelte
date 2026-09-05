@@ -123,7 +123,7 @@
 				onclick={addItem}
 				class="mt-1 rounded border border-dashed border-gray-700 px-3 py-1.5 text-xs text-gray-600 transition hover:border-amber-700 hover:text-amber-600"
 			>
-				+ Add Item
+				<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Item
 			</button>
 		</div>
 

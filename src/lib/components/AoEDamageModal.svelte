@@ -255,14 +255,14 @@
 					disabled={!damageValid}
 					class="flex-1 rounded bg-red-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					− Damage
+					<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i> Damage
 				</button>
 				<button
 					onclick={applyHeal}
 					disabled={!damageValid}
 					class="flex-1 rounded bg-green-800 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					+ Heal
+					<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Heal
 				</button>
 				<button
 					onclick={onclose}

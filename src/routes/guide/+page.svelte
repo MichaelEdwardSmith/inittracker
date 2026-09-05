@@ -446,8 +446,11 @@
 					Adding a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Add Player</strong> to open the
-					add-player popup. It has two tabs:
+					Click
+					<strong class="font-semibold text-white"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player</strong
+					>
+					to open the add-player popup. It has two tabs:
 					<strong class="font-semibold text-white">Manual</strong>
 					and
 					<strong class="font-semibold text-white">D&amp;D Beyond</strong>. Click a tab to switch
@@ -560,8 +563,10 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the bench icon to remove a player from the current initiative order while keeping
 					them in your roster. A <strong class="font-semibold text-white">"Benched"</strong> label
-					appears on their card. Click <strong class="font-semibold text-white">+ Combat</strong> to bring
-					them back into the fight.
+					appears on their card. Click the
+					<strong class="font-semibold text-white"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></strong
+					> button to bring them back into the fight.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -907,9 +912,13 @@
 					</li>
 					<li>
 						Type an <strong class="font-semibold text-white">Amount</strong>, then click
-						<strong class="font-semibold text-red-400">− Damage</strong>
-						or <strong class="font-semibold text-green-400">+ Heal</strong> to apply it to every selected,
-						un-saved combatant at once (saved combatants take half)
+						<strong class="font-semibold text-red-400"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i> Damage</strong
+						>
+						or
+						<strong class="font-semibold text-green-400"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Heal</strong
+						> to apply it to every selected, un-saved combatant at once (saved combatants take half)
 					</li>
 					<li>
 						Any concentration checks triggered by the damage are queued after the modal closes
@@ -1181,9 +1190,13 @@
 					Adding a Condition or Spell Effect
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Condition/Spell Effect</strong> on any
-					combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv markers, a
-					quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more), and a
+					Click
+					<strong class="font-semibold text-white"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Condition/Spell Effect</strong
+					>
+					on any combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv
+					markers, a quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more),
+					and a
 					<strong class="font-semibold text-fuchsia-300">Custom</strong> text field for any other
 					effect name. Click one to apply it — the badge appears immediately on the row, styled grey
 					for standard conditions/markers and
@@ -2243,9 +2256,10 @@
 					<strong class="font-semibold text-white">puzzle</strong>
 					(Riddle/Logic/Environmental) with a Show/Hide Solution toggle. Each room with an encounter has
 					an
-					<strong class="font-semibold text-white">+ Add to Initiative</strong> button. About a quarter
-					of doors (plus some corridor cells) are locked or trapped — click one for a detail popup (name,
-					trigger, detect/pick DC, effect/save).
+					<strong class="font-semibold text-white"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add to Initiative</strong
+					> button. About a quarter of doors (plus some corridor cells) are locked or trapped — click
+					one for a detail popup (name, trigger, detect/pick DC, effect/save).
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via
@@ -2705,8 +2719,11 @@
 					Adding Channels
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
-					Click <strong class="font-semibold text-white">+ Add a Channel</strong> at the right end of
-					the mixer to append a new blank channel. The mixer starts with 5 channels; there is no maximum.
+					Click
+					<strong class="font-semibold text-white"
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add a Channel</strong
+					> at the right end of the mixer to append a new blank channel. The mixer starts with 5 channels;
+					there is no maximum.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">

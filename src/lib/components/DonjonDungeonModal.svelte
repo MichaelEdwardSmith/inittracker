@@ -3569,7 +3569,7 @@
 								onclick={() => addToInitiative(enc)}
 								class="ml-7 self-start rounded bg-indigo-700/60 px-2 py-0.5 text-[10px] font-semibold text-indigo-200 hover:bg-indigo-600"
 							>
-								+ Add to Initiative
+								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add to Initiative
 							</button>
 						{/if}
 					</div>

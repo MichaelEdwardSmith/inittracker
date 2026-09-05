@@ -123,7 +123,9 @@
 	>
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
-			<h3 class="font-bold tracking-wide text-amber-400">+ Add Player</h3>
+			<h3 class="font-bold tracking-wide text-amber-400">
+				<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
+			</h3>
 			<button
 				onclick={onclose}
 				class="text-gray-500 transition hover:text-white"
@@ -209,7 +211,7 @@
 							onclick={addDDBPlayer}
 							class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 						>
-							+ Add Player
+							<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 						</button>
 					{/if}
 				</div>
@@ -313,7 +315,7 @@
 						type="submit"
 						class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 					>
-						+ Add Player
+						<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
 					</button>
 				</form>
 			{/if}
