@@ -223,7 +223,7 @@
 		class="flex shrink-0 items-center justify-between border-b border-gray-700/60 bg-gradient-to-r from-amber-950/60 to-gray-900 px-6 py-4"
 	>
 		<div class="flex items-center gap-3">
-			<i class="fa-solid fa-dice text-2xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-dice text-2xl" aria-hidden="true"></i>
 			<div>
 				<h2 class="text-lg font-black tracking-wider text-amber-300 uppercase">Liar's Dice</h2>
 				{#if game}
@@ -232,7 +232,7 @@
 							Lobby — {game.players.length} joined
 						{:else if game.status === 'bidding'}
 							Round {game.roundNumber}{#if game.isPalifico}
-								· <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> PALIFICO
+								· <i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i> PALIFICO
 							{/if} — {totalDice} dice in play
 						{:else if game.status === 'reveal'}
 							Reveal — next round in {countdown}s
@@ -247,7 +247,7 @@
 			onclick={onclose}
 			aria-label="Close"
 			class="rounded-lg p-2 text-gray-500 hover:bg-gray-800 hover:text-white"
-			><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+			><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 		>
 	</div>
 
@@ -268,7 +268,7 @@
 							? 'border-amber-500 bg-amber-950/40 text-amber-300'
 							: 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600 hover:text-gray-200'}"
 					>
-						<i class="fa-solid fa-eye text-3xl" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-eye text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Observe</span>
 						<span class="text-center text-xs opacity-70">See all dice, manage the game</span>
 					</button>
@@ -279,7 +279,7 @@
 							? 'border-amber-500 bg-amber-950/40 text-amber-300'
 							: 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600 hover:text-gray-200'}"
 					>
-						<i class="fa-solid fa-dice text-3xl" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-dice text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Play</span>
 						<span class="text-center text-xs opacity-70">Join the game as a player</span>
 					</button>
@@ -308,7 +308,7 @@
 								<li class="flex items-center gap-3">
 									<span
 										class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-900/40 text-xs font-black text-amber-400"
-										><i class="fa-solid fa-dice" aria-hidden="true"></i></span
+										><i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i></span
 									>
 									<span class="font-semibold text-gray-200">{player.name}</span>
 									{#if player.id === 'dm'}
@@ -364,7 +364,7 @@
 							<p class="text-xs text-gray-500">Ones are wild</p>
 						{:else}
 							<p class="text-xs text-amber-600">
-								<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> No wilds
+								<i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i> No wilds
 							</p>
 						{/if}
 					</div>
@@ -388,11 +388,11 @@
 								: 'text-red-400'}"
 						>
 							{#if rev.callerAction === 'dudo'}
-								<i class="fa-solid fa-dice" aria-hidden="true"></i> LIAR!
+								<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i> LIAR!
 							{:else if rev.calzaSuccess}
-								<i class="fa-solid fa-circle-check" aria-hidden="true"></i> CALZA!
+								<i class="fa-duotone fa-light fa-circle-check" aria-hidden="true"></i> CALZA!
 							{:else}
-								<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> CALZA MISSED!
+								<i class="fa-duotone fa-light fa-circle-xmark" aria-hidden="true"></i> CALZA MISSED!
 							{/if}
 						</p>
 						<p class="text-xs text-gray-300">
@@ -435,14 +435,16 @@
 											? 'text-gray-600'
 											: 'text-gray-200'}"
 								>
-									{#if player.id === 'dm'}<i class="fa-solid fa-crown" aria-hidden="true"></i>
+									{#if player.id === 'dm'}<i class="fa-duotone fa-light fa-crown" aria-hidden="true"
+										></i>
 									{/if}{player.name}
 								</p>
 								<p class="text-[10px] text-gray-500">
 									{#if player.eliminated}
 										eliminated
 									{:else}
-										{player.diceCount} <i class="fa-solid fa-dice" aria-hidden="true"></i>
+										{player.diceCount}
+										<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
 									{/if}
 								</p>
 							</div>
@@ -491,15 +493,15 @@
 							<!-- Current turn / loser indicator -->
 							{#if isCurrent}
 								<span class="ml-auto text-xs font-bold text-amber-400"
-									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> TURN</span
+									><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> TURN</span
 								>
 							{:else if isLoser && game.reveal && !game.reveal.calzaSuccess}
 								<span class="ml-auto text-xs font-bold text-red-400"
-									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> LOSES</span
+									><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> LOSES</span
 								>
 							{:else if isLoser && game.reveal?.calzaSuccess}
 								<span class="ml-auto text-xs font-bold text-emerald-400"
-									><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> GAINS</span
+									><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> GAINS</span
 								>
 							{/if}
 						</div>
@@ -519,16 +521,18 @@
 								<div class="flex items-center gap-1">
 									<button
 										onclick={() => (bidQty = Math.max(1, bidQty - 1))}
+										aria-label="Decrease quantity"
 										class="h-8 w-8 rounded-lg bg-gray-700 font-bold text-gray-300 hover:bg-gray-600"
-										>−</button
+										><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 									>
 									<span class="min-w-[2rem] text-center text-xl font-black text-white"
 										>{bidQty}</span
 									>
 									<button
 										onclick={() => bidQty++}
+										aria-label="Increase quantity"
 										class="h-8 w-8 rounded-lg bg-gray-700 font-bold text-gray-300 hover:bg-gray-600"
-										>+</button
+										><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 									>
 								</div>
 							</div>
@@ -563,13 +567,13 @@
 										onclick={() => post({ action: 'dudo', playerId: 'dm' })}
 										class="rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white uppercase transition hover:bg-red-600 active:scale-95"
 									>
-										<i class="fa-solid fa-dice" aria-hidden="true"></i> Liar!
+										<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i> Liar!
 									</button>
 									<button
 										onclick={() => post({ action: 'calza', playerId: 'dm' })}
 										class="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white uppercase transition hover:bg-emerald-600 active:scale-95"
 									>
-										<i class="fa-solid fa-check" aria-hidden="true"></i> Calza
+										<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i> Calza
 									</button>
 								{/if}
 							</div>
@@ -613,7 +617,7 @@
 			<!-- ── Game over ───────────────────────────────────────────────────────── -->
 		{:else if game?.status === 'game_over'}
 			<div class="flex flex-col items-center gap-4 py-6">
-				<i class="fa-solid fa-trophy text-6xl" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-trophy text-6xl" aria-hidden="true"></i>
 				<h3 class="text-2xl font-black text-amber-300">{game.winnerName ?? 'Someone'} Wins!</h3>
 				<p class="text-sm text-gray-400">
 					Game lasted {game.roundNumber} round{game.roundNumber !== 1 ? 's' : ''}.
@@ -644,7 +648,7 @@
 					onclick={() => post({ action: 'next_round' })}
 					class="rounded-lg bg-amber-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600"
 				>
-					Next Round <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+					Next Round <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 				</button>
 			{:else}
 				<span class="text-xs text-gray-600">Round {game.roundNumber}</span>

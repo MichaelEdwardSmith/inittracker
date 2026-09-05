@@ -75,14 +75,14 @@
 					class="rounded bg-slate-700/50 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-600/60"
 					title="Open in new tab"
 				>
-					Open <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+					Open <i class="fa-duotone fa-light fa-arrow-up-right-from-square" aria-hidden="true"></i>
 				</a>
 				<button
 					onclick={onclose}
 					class="rounded p-1.5 text-gray-400 transition hover:bg-gray-700 hover:text-gray-100"
 					aria-label="Close"
 				>
-					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 		</div>

@@ -27,7 +27,7 @@
 	// icon/message are kept separate (rather than one HTML string) because message
 	// text often embeds a combatant/enemy name, which the DM controls freely — that
 	// text stays plain and auto-escaped, while icon is always one of the fixed
-	// fa-solid names passed at each call site below.
+	// fa-duotone fa-light names passed at each call site below.
 	let toast = $state<{ icon: string; message: string } | null>(null);
 	let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -666,7 +666,7 @@
 					></span>
 				</span>
 			{:else}
-				<i class="fa-solid fa-microphone shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-microphone shrink-0 text-base" aria-hidden="true"></i>
 			{/if}
 			{#if status === 'loading'}
 				{loadPct > 0 ? `Voice — Loading ${loadPct}%` : 'Voice — Loading…'}
@@ -720,7 +720,7 @@
 					></span>
 				</span>
 			{:else}
-				<i class="fa-solid fa-microphone text-sm" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-microphone text-sm" aria-hidden="true"></i>
 			{/if}
 			{#if status === 'loading'}
 				{loadPct > 0 ? `${loadPct}%` : 'Loading…'}
@@ -743,7 +743,7 @@
 		role="status"
 		aria-live="polite"
 	>
-		<i class="fa-solid {toast.icon}" aria-hidden="true"></i>
+		<i class="fa-duotone fa-light {toast.icon}" aria-hidden="true"></i>
 		{toast.message}
 	</div>
 {/if}

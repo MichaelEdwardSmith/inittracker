@@ -44,9 +44,9 @@
 					</div>
 				</div>
 				<p class="text-xs text-gray-500">
-					Fail <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> concentration ends.
-					Success
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> spell continues.
+					Fail <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> concentration
+					ends. Success
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> spell continues.
 				</p>
 			</div>
 			<div class="flex gap-2 border-t border-gray-800 px-5 py-3">

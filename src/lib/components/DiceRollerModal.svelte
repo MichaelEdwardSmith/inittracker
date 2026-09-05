@@ -115,14 +115,14 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 			<h3 class="font-black tracking-wide text-amber-400">
-				<i class="fa-solid fa-dice" aria-hidden="true"></i> Dice Roller
+				<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i> Dice Roller
 			</h3>
 			<button
 				onclick={onclose}
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -158,7 +158,8 @@
 						<button
 							onclick={() => adjustQuantity(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease quantity">−</button
+							aria-label="Decrease quantity"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
 							type="number"
@@ -171,7 +172,8 @@
 						<button
 							onclick={() => adjustQuantity(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase quantity">+</button
+							aria-label="Increase quantity"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 						>
 					</div>
 				</div>
@@ -185,7 +187,8 @@
 						<button
 							onclick={() => adjustModifier(-1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Decrease modifier">−</button
+							aria-label="Decrease modifier"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
 							type="number"
@@ -200,7 +203,8 @@
 						<button
 							onclick={() => adjustModifier(1)}
 							class="flex h-7 w-7 items-center justify-center rounded bg-gray-800 text-gray-300 transition hover:bg-gray-700 hover:text-white"
-							aria-label="Increase modifier">+</button
+							aria-label="Increase modifier"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 						>
 					</div>
 				</div>

@@ -465,7 +465,7 @@
 			class="relative z-10 flex shrink-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-600 px-4 py-1.5 text-center text-xs font-semibold text-black sm:text-sm"
 		>
 			<span>
-				<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Admin view — viewing
+				<i class="fa-duotone fa-light fa-shield-halved" aria-hidden="true"></i> Admin view — viewing
 				<strong>{data.dmFirstName}</strong>{#if data.dmEmail}
 					({data.dmEmail}){/if}'s account as {data.impersonatingAdminEmail}
 			</span>
@@ -482,7 +482,7 @@
 
 	<!-- App header -->
 	<header class="flex shrink-0 items-center border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<i class="fa-solid fa-swords text-xl" aria-hidden="true"></i>
+		<i class="fa-duotone fa-light fa-swords text-xl" aria-hidden="true"></i>
 		<h1 class="ml-3 hidden text-xl font-bold tracking-widest text-amber-400 uppercase md:block">
 			Initiative Tracker
 		</h1>
@@ -502,9 +502,9 @@
 				class="ml-1 rounded p-0.5 text-gray-500 transition hover:text-amber-400"
 			>
 				{#if copied}
-					<i class="fa-solid fa-check text-sm text-green-400" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-check text-sm text-green-400" aria-hidden="true"></i>
 				{:else}
-					<i class="fa-solid fa-copy text-sm" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-copy text-sm" aria-hidden="true"></i>
 				{/if}
 			</button>
 		</div>
@@ -523,7 +523,7 @@
 									: ''}"
 						>
 							<i
-								class="fa-solid {batteryIcon(batteryLevel, batteryCharging)} text-sm"
+								class="fa-duotone fa-light {batteryIcon(batteryLevel, batteryCharging)} text-sm"
 								aria-hidden="true"
 							></i>
 							<span>{batteryLevel}%</span>
@@ -540,9 +540,9 @@
 					class="flex items-center rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 				>
 					{#if showMobileMenu}
-						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 					{:else}
-						<i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-bars text-base" aria-hidden="true"></i>
 					{/if}
 				</button>
 				{#if unreadCount > 0 && !data.isGuest}
@@ -574,7 +574,7 @@
 		>
 			Session Tools
 			<i
-				class="fa-solid fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.tools
+				class="fa-duotone fa-light fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.tools
 					? '-rotate-90'
 					: ''}"
 				aria-hidden="true"
@@ -589,7 +589,7 @@
 				title="Freeform DM notes for this session"
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-pen-to-square shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-pen-to-square shrink-0 text-base" aria-hidden="true"></i>
 				Notes
 			</button>
 			<button
@@ -600,7 +600,7 @@
 				title="Roll dice with a virtual dice roller"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-cube shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-cube shrink-0 text-base" aria-hidden="true"></i>
 				Dice Roller
 			</button>
 			<button
@@ -611,7 +611,7 @@
 				title="Browse and reference spells"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-book-open shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-book-open shrink-0 text-base" aria-hidden="true"></i>
 				Spells
 			</button>
 			<button
@@ -619,7 +619,7 @@
 				title="Quick-reference tabletop rules"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-file-lines shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-file-lines shrink-0 text-base" aria-hidden="true"></i>
 				Quick Reference
 			</button>
 			<button
@@ -627,7 +627,7 @@
 				title="Play a round of Liar's Dice"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-dice-five shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-dice-five shrink-0 text-base" aria-hidden="true"></i>
 				Liar's Dice
 			</button>
 			<button
@@ -635,7 +635,7 @@
 				title="Random NPC, dungeon, and encounter generators"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-gear shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-gear shrink-0 text-base" aria-hidden="true"></i>
 				Generators
 			</button>
 			<button
@@ -646,7 +646,7 @@
 				title="Ambient audio and sound effect mixer"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-sliders shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-sliders shrink-0 text-base" aria-hidden="true"></i>
 				Mixer
 			</button>
 			{#if data.showVoiceCommands}
@@ -661,7 +661,7 @@
 		>
 			Campaign
 			<i
-				class="fa-solid fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.campaign
+				class="fa-duotone fa-light fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.campaign
 					? '-rotate-90'
 					: ''}"
 				aria-hidden="true"
@@ -676,7 +676,7 @@
 				title="Create, rename, or switch game sessions"
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-bars shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-bars shrink-0 text-base" aria-hidden="true"></i>
 				Sessions
 			</button>
 			<button
@@ -687,7 +687,7 @@
 				title="Build and save encounters"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-clipboard shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-clipboard shrink-0 text-base" aria-hidden="true"></i>
 				Encounters
 			</button>
 			<a
@@ -696,7 +696,7 @@
 				title="View past combat history"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-book-open shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-book-open shrink-0 text-base" aria-hidden="true"></i>
 				Chronicle
 			</a>
 			<a
@@ -707,7 +707,7 @@
 				title="Open the public player display in a new tab"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-display shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-display shrink-0 text-base" aria-hidden="true"></i>
 				Player Display
 			</a>
 		{/if}
@@ -719,7 +719,7 @@
 		>
 			Account
 			<i
-				class="fa-solid fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.account
+				class="fa-duotone fa-light fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.account
 					? '-rotate-90'
 					: ''}"
 				aria-hidden="true"
@@ -738,7 +738,7 @@
 						? 'text-amber-400 hover:bg-amber-900/30'
 						: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 				>
-					<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 					Messages
 					{#if unreadCount > 0}
 						<span
@@ -756,7 +756,7 @@
 				title="Open the user guide"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-circle-question shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-circle-question shrink-0 text-base" aria-hidden="true"></i>
 				Guide
 			</a>
 			{#if data.isAdmin && !data.isImpersonating}
@@ -766,7 +766,7 @@
 					title="Admin panel"
 					class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 				>
-					<i class="fa-solid fa-circle-check shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-circle-check shrink-0 text-base" aria-hidden="true"></i>
 					Admin
 				</a>
 			{/if}
@@ -776,7 +776,7 @@
 				title="Email support"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 				Contact
 			</a>
 		{/if}
@@ -788,7 +788,7 @@
 		>
 			Display
 			<i
-				class="fa-solid fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.display
+				class="fa-duotone fa-light fa-chevron-down shrink-0 text-xs transition-transform {collapsedMenuSections.display
 					? '-rotate-90'
 					: ''}"
 				aria-hidden="true"
@@ -804,10 +804,10 @@
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				{#if isFullscreen}
-					<i class="fa-solid fa-compress shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-compress shrink-0 text-base" aria-hidden="true"></i>
 					Exit Full Screen
 				{:else}
-					<i class="fa-solid fa-expand shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-expand shrink-0 text-base" aria-hidden="true"></i>
 					Full Screen
 				{/if}
 			</button>
@@ -820,10 +820,10 @@
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				{#if theme.isDark}
-					<i class="fa-solid fa-sun shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-sun shrink-0 text-base" aria-hidden="true"></i>
 					Light Mode
 				{:else}
-					<i class="fa-solid fa-moon shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-moon shrink-0 text-base" aria-hidden="true"></i>
 					Dark Mode
 				{/if}
 			</button>
@@ -834,7 +834,8 @@
 				title="Sign out of your DM account"
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-500 transition hover:bg-red-900/30 hover:text-red-400"
 			>
-				<i class="fa-solid fa-right-from-bracket shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-right-from-bracket shrink-0 text-base" aria-hidden="true"
+				></i>
 				Log out
 			</button>
 		</form>
@@ -909,7 +910,7 @@
 				? 'bg-amber-600/20 text-amber-300'
 				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 		>
-			<i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-shield-halved" aria-hidden="true"></i>
 			Party
 		</button>
 		<button
@@ -919,7 +920,7 @@
 				? 'bg-red-600/20 text-red-300'
 				: 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
 		>
-			<i class="fa-solid fa-skull" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
 			Enemies
 		</button>
 	</div>
@@ -937,7 +938,7 @@
 				class="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-white"
 				aria-label="Close panel"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 		<div class="min-h-0 flex-1 overflow-y-auto">

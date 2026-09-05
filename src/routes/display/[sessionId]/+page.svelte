@@ -575,13 +575,14 @@
 				class="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
 			>
 				<span class="text-sm font-semibold text-gray-200">
-					<i class="fa-solid fa-map" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-map" aria-hidden="true"></i>
 					{ms.dungeonName || 'Dungeon Map'}
 				</span>
 				<button
 					onclick={() => (fogMapExpanded = false)}
 					class="rounded p-1 text-gray-500 hover:bg-white/10 hover:text-white"
-					aria-label="Close map"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+					aria-label="Close map"
+					><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 			<!-- canvas — fills remaining space, letterboxed to preserve aspect ratio -->
@@ -660,7 +661,7 @@
 			class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-950/95 backdrop-blur-sm"
 		>
 			<div class="flex flex-col items-center gap-8 px-8 text-center">
-				<i class="fa-solid fa-swords text-7xl opacity-60" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-swords text-7xl opacity-60" aria-hidden="true"></i>
 				<div>
 					<p class="text-3xl font-black tracking-[0.25em] text-amber-400 uppercase">
 						Battle Awaits
@@ -769,7 +770,9 @@
 					class="pointer-events-auto flex w-full max-w-sm flex-col gap-1.5 rounded-2xl border border-purple-500/50 bg-gray-950/95 px-5 py-4 text-left shadow-2xl shadow-purple-900/30 backdrop-blur-md"
 				>
 					<div class="flex items-center gap-2">
-						<i class="fa-solid fa-envelope shrink-0 text-base text-purple-400" aria-hidden="true"
+						<i
+							class="fa-duotone fa-light fa-envelope shrink-0 text-base text-purple-400"
+							aria-hidden="true"
 						></i>
 						<span class="text-xs font-bold tracking-widest text-purple-400 uppercase"
 							>Message from DM</span
@@ -800,7 +803,7 @@
 						: 'border-blue-500/60 bg-gray-950/90 shadow-blue-500/20'}"
 				>
 					{#if turnNotif === 'yours'}
-						<i class="fa-solid fa-swords animate-bounce text-5xl" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-swords animate-bounce text-5xl" aria-hidden="true"></i>
 						<p class="text-2xl font-black tracking-widest text-amber-400 uppercase">
 							It's Your Turn!
 						</p>
@@ -808,7 +811,7 @@
 							<p class="text-sm font-semibold text-amber-300/70">{myCharacter.name}</p>
 						{/if}
 					{:else}
-						<i class="fa-solid fa-dice text-5xl" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-dice text-5xl" aria-hidden="true"></i>
 						<p class="text-2xl font-black tracking-widest text-blue-400 uppercase">
 							You're Up Next!
 						</p>
@@ -827,7 +830,7 @@
 		class="relative z-10 flex shrink-0 items-center justify-between border-b border-gray-800/60 bg-gray-900/80 px-4 py-3 backdrop-blur-sm sm:px-8"
 	>
 		<div class="flex items-center gap-3">
-			<i class="fa-solid fa-swords text-lg" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-lg" aria-hidden="true"></i>
 			<span class="text-sm font-bold tracking-[0.3em] text-amber-400 uppercase"
 				>Initiative Tracker</span
 			>
@@ -860,7 +863,7 @@
 									: ''}"
 						>
 							<i
-								class="fa-solid {batteryIcon(batteryLevel, batteryCharging)} text-sm"
+								class="fa-duotone fa-light {batteryIcon(batteryLevel, batteryCharging)} text-sm"
 								aria-hidden="true"
 							></i>
 							<span>{batteryLevel}%</span>
@@ -876,9 +879,9 @@
 					class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
 				>
 					{#if showMobileMenu}
-						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 					{:else}
-						<i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-bars text-base" aria-hidden="true"></i>
 					{/if}
 				</button>
 				{#if dmUnread > 0}
@@ -909,10 +912,10 @@
 					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 			>
 				{#if audioEnabled}
-					<i class="fa-solid fa-volume-high shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-volume-high shrink-0 text-base" aria-hidden="true"></i>
 					Sound On
 				{:else}
-					<i class="fa-solid fa-volume-xmark shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-volume-xmark shrink-0 text-base" aria-hidden="true"></i>
 					Sound Off
 				{/if}
 			</button>
@@ -924,7 +927,7 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<i class="fa-solid fa-face-smile shrink-0 text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-face-smile shrink-0 text-base" aria-hidden="true"></i>
 			React to DM
 		</button>
 		<button
@@ -934,7 +937,7 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<i class="fa-solid fa-dice-five shrink-0 text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-dice-five shrink-0 text-base" aria-hidden="true"></i>
 			Dice Roller
 		</button>
 		<button
@@ -945,7 +948,7 @@
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			<i
-				class="fa-solid fa-dice h-4 w-4 shrink-0 text-center text-base leading-none"
+				class="fa-duotone fa-light fa-dice h-4 w-4 shrink-0 text-center text-base leading-none"
 				aria-hidden="true"
 			></i>
 			Liar's Dice
@@ -958,7 +961,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-map shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-map shrink-0 text-base" aria-hidden="true"></i>
 				View Map
 			</button>
 		{/if}
@@ -977,7 +980,7 @@
 						class="h-4 w-4 shrink-0 rounded-full object-cover"
 					/>
 				{:else}
-					<i class="fa-solid fa-user shrink-0 text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-user shrink-0 text-base" aria-hidden="true"></i>
 				{/if}
 				{myCharacter ? myCharacter.name : 'Choose Character'}
 			</button>
@@ -990,7 +993,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 				Message DM
 			</button>
 			<button
@@ -1000,7 +1003,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-cube shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-cube shrink-0 text-base" aria-hidden="true"></i>
 				Roll Initiative
 			</button>
 		{/if}
@@ -1012,7 +1015,7 @@
 				}}
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
-				<i class="fa-solid fa-pen-to-square shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-pen-to-square shrink-0 text-base" aria-hidden="true"></i>
 				My Notes
 			</button>
 		{/if}
@@ -1027,7 +1030,7 @@
 				? 'text-purple-400 hover:bg-purple-900/30'
 				: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 		>
-			<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 			DM Messages
 			{#if dmUnread > 0}
 				<span
@@ -1042,7 +1045,7 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<i class="fa-solid fa-envelope shrink-0 text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-envelope shrink-0 text-base" aria-hidden="true"></i>
 			Contact
 		</a>
 		<a
@@ -1050,7 +1053,7 @@
 			onclick={() => (showMobileMenu = false)}
 			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
-			<i class="fa-solid fa-circle-question shrink-0 text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-circle-question shrink-0 text-base" aria-hidden="true"></i>
 			Player Guide
 		</a>
 		<button
@@ -1061,10 +1064,10 @@
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
 			{#if isFullscreen}
-				<i class="fa-solid fa-compress shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-compress shrink-0 text-base" aria-hidden="true"></i>
 				Exit Full Screen
 			{:else}
-				<i class="fa-solid fa-expand shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-expand shrink-0 text-base" aria-hidden="true"></i>
 				Full Screen
 			{/if}
 		</button>
@@ -1073,7 +1076,8 @@
 				href="/player/logout"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-red-400 transition hover:bg-red-900/30 hover:text-red-300"
 			>
-				<i class="fa-solid fa-right-from-bracket shrink-0 text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-right-from-bracket shrink-0 text-base" aria-hidden="true"
+				></i>
 				Sign Out
 			</a>
 		{/if}
@@ -1082,7 +1086,7 @@
 	{#if !current}
 		<!-- Waiting for combat -->
 		<div class="relative z-10 flex flex-1 flex-col items-center justify-center gap-6">
-			<i class="fa-solid fa-swords text-6xl opacity-20" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-6xl opacity-20" aria-hidden="true"></i>
 			<div class="text-center">
 				<p class="text-4xl font-black tracking-[0.2em] text-gray-700 uppercase">Awaiting Combat</p>
 				<p class="mt-3 text-sm tracking-widest text-gray-600 uppercase">
@@ -1156,7 +1160,8 @@
 						<div
 							class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1"
 						>
-							<i class="fa-solid fa-droplet text-base leading-none" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-droplet text-base leading-none" aria-hidden="true"
+							></i>
 							<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase"
 								>Bloodied</span
 							>
@@ -1253,7 +1258,7 @@
 								<div class="mb-3 flex items-center gap-4">
 									<div class="h-px flex-1 bg-gray-700"></div>
 									<span class="text-xs font-black tracking-[0.25em] text-gray-500 uppercase"
-										><i class="fa-solid fa-skull" aria-hidden="true"></i> Death Saving Throws</span
+										><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Death Saving Throws</span
 									>
 									<div class="h-px flex-1 bg-gray-700"></div>
 								</div>
@@ -1261,7 +1266,7 @@
 									<div
 										class="flex flex-col items-center gap-2 rounded-xl border border-red-800/60 bg-red-950/50 px-6 py-5"
 									>
-										<i class="fa-solid fa-skull text-5xl" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-skull text-5xl" aria-hidden="true"></i>
 										<span class="text-2xl font-black tracking-[0.3em] text-red-400 uppercase"
 											>Dead</span
 										>
@@ -1270,7 +1275,7 @@
 									<div
 										class="flex flex-col items-center gap-2 rounded-xl border border-green-800/60 bg-green-950/50 px-6 py-5"
 									>
-										<i class="fa-solid fa-heart text-5xl" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-heart text-5xl" aria-hidden="true"></i>
 										<span class="text-2xl font-black tracking-[0.3em] text-green-400 uppercase"
 											>Stabilized</span
 										>
@@ -1292,7 +1297,7 @@
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
 														{#if ds.failures > i}
-															<i class="fa-solid fa-skull" aria-hidden="true"></i>
+															<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
 														{:else}
 															<i class="fa-regular fa-circle" aria-hidden="true"></i>
 														{/if}
@@ -1315,7 +1320,7 @@
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
 														{#if ds.successes > i}
-															<i class="fa-solid fa-heart" aria-hidden="true"></i>
+															<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i>
 														{:else}
 															<i class="fa-regular fa-circle" aria-hidden="true"></i>
 														{/if}
@@ -1344,7 +1349,7 @@
 										title="What is {status}?"
 										class="py-1 pr-2 opacity-50 transition hover:opacity-100"
 									>
-										<i class="fa-solid fa-circle-info text-base" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-circle-info text-base" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/each}
@@ -1422,7 +1427,7 @@
 										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 ring-2 ring-blue-700"
 									>
 										<i
-											class="fa-solid fa-shield-halved text-xl leading-none select-none"
+											class="fa-duotone fa-light fa-shield-halved text-xl leading-none select-none"
 											aria-hidden="true"
 										></i>
 									</div>
@@ -1443,7 +1448,7 @@
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
 										{#if c.type === 'enemy' && hpPercent(c) > 0 && hpPercent(c) <= 50}
 											<i
-												class="fa-solid fa-droplet shrink-0 text-sm leading-none"
+												class="fa-duotone fa-light fa-droplet shrink-0 text-sm leading-none"
 												title="Bloodied"
 												aria-hidden="true"
 											></i>
@@ -1511,7 +1516,7 @@
 														title="What is {s}?"
 														class="py-0.5 pr-0.5 opacity-50 transition hover:opacity-100"
 													>
-														<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+														<i class="fa-duotone fa-light fa-circle-info" aria-hidden="true"></i>
 													</button>
 												</div>
 											{/each}

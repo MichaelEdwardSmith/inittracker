@@ -85,16 +85,16 @@
 	// Returns Font Awesome markup for the event's icon — always one of the fixed cases
 	// below (never derived from event/player data), so rendering it via {@html} is safe.
 	function eventIcon(e: CombatEvent): string {
-		if (e.causedDown) return '<i class="fa-solid fa-skull"></i>';
+		if (e.causedDown) return '<i class="fa-duotone fa-light fa-skull"></i>';
 		switch (e.type) {
 			case 'damage':
-				return '<i class="fa-solid fa-swords"></i>';
+				return '<i class="fa-duotone fa-light fa-swords"></i>';
 			case 'heal':
-				return '<i class="fa-solid fa-heart"></i>';
+				return '<i class="fa-duotone fa-light fa-heart"></i>';
 			case 'down':
-				return '<i class="fa-solid fa-skull"></i>';
+				return '<i class="fa-duotone fa-light fa-skull"></i>';
 			case 'condition_add':
-				return '<i class="fa-solid fa-star"></i>';
+				return '<i class="fa-duotone fa-light fa-star"></i>';
 			case 'condition_remove':
 				return '<i class="fa-regular fa-star"></i>';
 			default:
@@ -286,7 +286,7 @@
 		class="sticky top-0 z-10 flex items-center border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<i class="fa-solid fa-swords text-amber-500" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-amber-500" aria-hidden="true"></i>
 			<h1 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Combat Chronicles</h1>
 		</div>
 		<span class="ml-3 rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-500">
@@ -298,7 +298,7 @@
 			aria-label="Back to Dashboard"
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 		>
-			<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</a>
 	</header>
 
@@ -306,7 +306,7 @@
 		{#if records.length === 0}
 			<!-- Empty state -->
 			<div class="flex flex-col items-center justify-center py-24 text-center">
-				<i class="fa-solid fa-book-open mb-4 text-gray-800" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-book-open mb-4 text-gray-800" aria-hidden="true"></i>
 				<p class="text-xl font-semibold text-gray-700">No battles recorded yet</p>
 				<p class="mt-2 text-sm text-gray-600">
 					End a combat or save to chronicle to begin your history.
@@ -376,7 +376,7 @@
 				<!-- Search input -->
 				<div class="relative">
 					<i
-						class="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-600"
+						class="fa-duotone fa-light fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-600"
 						aria-hidden="true"
 					></i>
 					<input
@@ -391,7 +391,7 @@
 							title="Clear search"
 							class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600 hover:text-gray-400"
 						>
-							<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 						</button>
 					{/if}
 				</div>
@@ -503,9 +503,12 @@
 											class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-amber-400 disabled:opacity-40"
 										>
 											{#if exportingId === record.id}
-												<i class="fa-solid fa-spinner fa-spin text-base" aria-hidden="true"></i>
+												<i
+													class="fa-duotone fa-light fa-spinner fa-spin text-base"
+													aria-hidden="true"
+												></i>
 											{:else}
-												<i class="fa-solid fa-download text-base" aria-hidden="true"></i>
+												<i class="fa-duotone fa-light fa-download text-base" aria-hidden="true"></i>
 											{/if}
 										</button>
 										<!-- Delete button -->
@@ -522,7 +525,7 @@
 												title="Delete this encounter"
 												class="shrink-0 rounded p-1 text-gray-700 transition hover:bg-gray-800 hover:text-red-400"
 											>
-												<i class="fa-solid fa-trash text-base" aria-hidden="true"></i>
+												<i class="fa-duotone fa-light fa-trash text-base" aria-hidden="true"></i>
 											</button>
 										{/if}
 									</div>
@@ -531,32 +534,36 @@
 								<!-- Stats row -->
 								<div class="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
 									<span class="flex items-center gap-1">
-										<i class="fa-solid fa-hourglass-half text-amber-600" aria-hidden="true"></i>
+										<i
+											class="fa-duotone fa-light fa-hourglass-half text-amber-600"
+											aria-hidden="true"
+										></i>
 										{roundsLabel}
 									</span>
 									<span class="flex items-center gap-1">
-										<i class="fa-solid fa-shield-halved text-blue-600" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-shield-halved text-blue-600" aria-hidden="true"
+										></i>
 										{players.length}
 										{players.length === 1 ? 'player' : 'players'}
 									</span>
 									{#if slain.length > 0}
 										<span class="flex items-center gap-1 text-red-500">
-											<i class="fa-solid fa-skull" aria-hidden="true"></i>
+											<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
 											{slain.length} slain
 										</span>
 									{:else}
 										<span class="flex items-center gap-1 text-green-600">
-											<i class="fa-solid fa-check" aria-hidden="true"></i>
+											<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 											No casualties
 										</span>
 									{/if}
 									<span class="flex items-center gap-1">
-										<i class="fa-solid fa-scroll" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-scroll" aria-hidden="true"></i>
 										{record.events.filter((e) => e.type !== 'round_advance').length} events
 									</span>
 									{#if record.totalXp !== undefined}
 										<span class="flex items-center gap-1 text-amber-500">
-											<i class="fa-solid fa-star" aria-hidden="true"></i>
+											<i class="fa-duotone fa-light fa-star" aria-hidden="true"></i>
 											{record.totalXp.toLocaleString()} XP
 										</span>
 									{/if}
@@ -610,12 +617,12 @@
 											<div class="w-24 shrink-0 text-right text-xs">
 												{#if p.wasSlain}
 													<span class="font-bold text-red-500"
-														><i class="fa-solid fa-skull" aria-hidden="true"></i> Slain</span
+														><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Slain</span
 													>
 												{:else}
 													<span class="text-gray-500">{p.startHp}</span>
 													<span class="text-gray-700">
-														<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+														<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 													</span>
 													<span class={hpTextColor(p.finalHp, p.maxHp)}>{p.finalHp}</span>
 													<span class="text-gray-700"> / {p.maxHp}</span>
@@ -637,7 +644,7 @@
 											{isExpanded ? 'Hide Chronicle' : 'Show Chronicle'}
 										</span>
 										<i
-											class="fa-solid fa-chevron-down text-base transition-transform {isExpanded
+											class="fa-duotone fa-light fa-chevron-down text-base transition-transform {isExpanded
 												? 'rotate-180'
 												: ''}"
 											aria-hidden="true"
@@ -667,7 +674,7 @@
 															<div>
 																<div class="mb-1 flex items-center gap-2 text-xs">
 																	<i
-																		class="fa-solid fa-skull w-4 shrink-0 text-center text-red-400"
+																		class="fa-duotone fa-light fa-skull w-4 shrink-0 text-center text-red-400"
 																		aria-hidden="true"
 																	></i>
 																	<span class="font-semibold text-gray-300">{p.name}</span>
@@ -699,7 +706,7 @@
 														{#each slainWithCr as p}
 															<div class="flex items-center gap-2 text-xs">
 																<i
-																	class="fa-solid fa-skull w-4 shrink-0 text-center text-red-400"
+																	class="fa-duotone fa-light fa-skull w-4 shrink-0 text-center text-red-400"
 																	aria-hidden="true"
 																></i>
 																<span class="flex-1 text-gray-400">{p.name}</span>

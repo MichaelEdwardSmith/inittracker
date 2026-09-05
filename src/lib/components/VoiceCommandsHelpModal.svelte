@@ -62,7 +62,7 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 			<div class="flex items-center gap-3">
-				<i class="fa-solid fa-microphone text-lg text-amber-400" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-microphone text-lg text-amber-400" aria-hidden="true"></i>
 				<span class="font-bold text-white">Voice Commands</span>
 				<span
 					class="rounded-full border border-amber-600/50 bg-amber-900/40 px-2 py-0.5 text-xs font-semibold text-amber-400"
@@ -74,7 +74,7 @@
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -83,7 +83,7 @@
 			class="mx-5 mt-4 flex items-start gap-2.5 rounded-lg border border-amber-700/40 bg-amber-950/40 px-4 py-3"
 		>
 			<i
-				class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-base text-amber-400"
+				class="fa-duotone fa-light fa-triangle-exclamation mt-0.5 shrink-0 text-base text-amber-400"
 				aria-hidden="true"
 			></i>
 			<p class="text-xs leading-relaxed text-amber-300/90">

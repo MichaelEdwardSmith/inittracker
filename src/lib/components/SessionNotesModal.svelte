@@ -153,7 +153,7 @@
 						<span class="text-xs text-gray-500">Saving…</span>
 					{:else if saveStatus === 'saved'}
 						<span class="text-xs text-green-500"
-							>Saved <i class="fa-solid fa-check" aria-hidden="true"></i></span
+							>Saved <i class="fa-duotone fa-light fa-check" aria-hidden="true"></i></span
 						>
 					{/if}
 					{#if selectedNote}
@@ -165,9 +165,9 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingNote}
-								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-spinner fa-spin text-sm" aria-hidden="true"></i>
 							{:else}
-								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-download text-sm" aria-hidden="true"></i>
 							{/if}
 							Note
 						</button>
@@ -181,9 +181,9 @@
 							class="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-800 hover:text-amber-300 disabled:opacity-40"
 						>
 							{#if exportingAll}
-								<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-spinner fa-spin text-sm" aria-hidden="true"></i>
 							{:else}
-								<i class="fa-solid fa-download text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-download text-sm" aria-hidden="true"></i>
 							{/if}
 							All
 						</button>
@@ -193,14 +193,14 @@
 						class="text-gray-500 transition hover:text-white"
 						aria-label="Close"
 					>
-						<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
 			<!-- Search bar -->
 			<div class="relative mt-3">
 				<i
-					class="fa-solid fa-magnifying-glass pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-500"
+					class="fa-duotone fa-light fa-magnifying-glass pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-base text-gray-500"
 					aria-hidden="true"
 				></i>
 				<input
@@ -222,7 +222,7 @@
 						onclick={createNew}
 						class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-amber-600 px-3 py-2 text-sm font-semibold text-amber-500 transition hover:border-amber-400 hover:text-amber-400"
 					>
-						<i class="fa-solid fa-plus text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-plus text-base" aria-hidden="true"></i>
 						New Notes
 					</button>
 				</div>
@@ -255,7 +255,7 @@
 										aria-label="Delete note"
 										title="Delete"
 									>
-										<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 									</button>
 								{/if}
 							</div>

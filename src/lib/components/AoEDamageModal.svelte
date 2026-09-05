@@ -124,7 +124,7 @@
 				class="rounded p-1 text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -157,7 +157,7 @@
 				       {allSelected
 					? 'border-amber-500 bg-amber-500 text-black'
 					: 'border-gray-600 text-transparent'}"
-				><i class="fa-solid fa-check" aria-hidden="true"></i></button
+				><i class="fa-duotone fa-light fa-check" aria-hidden="true"></i></button
 			>
 			<span class="flex-1">Combatant</span>
 			<span class="w-20 text-right">HP</span>
@@ -184,7 +184,7 @@
 							? 'border-amber-500 bg-amber-500 text-black'
 							: 'border-gray-600 text-transparent'}"
 					>
-						<i class="fa-solid fa-check" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 					</div>
 
 					<!-- Name + mini HP bar -->
@@ -225,7 +225,7 @@
 							? 'border-blue-400 bg-blue-500 text-white'
 							: 'border-gray-600 text-transparent'}"
 					>
-						<i class="fa-solid fa-check" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>
 					</div>
 				</div>
 			{/each}

@@ -117,7 +117,7 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 
@@ -130,7 +130,10 @@
 						{#if current.avatarUrl}
 							<img src={current.avatarUrl} alt={current.name} class="h-full w-full object-cover" />
 						{:else}
-							<i class="fa-solid fa-shield-halved text-base leading-none" aria-hidden="true"></i>
+							<i
+								class="fa-duotone fa-light fa-shield-halved text-base leading-none"
+								aria-hidden="true"
+							></i>
 						{/if}
 					</div>
 					<div class="min-w-0 flex-1">
@@ -201,7 +204,7 @@
 					<span class="flex items-center gap-1 text-xs text-gray-400">
 						Voice Nicknames (optional)
 						<i
-							class="fa-solid fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
+							class="fa-duotone fa-light fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
 							aria-hidden="true"
 							title="Alternate spellings/pronunciations for Voice Commands to also match against this player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional."
 						></i>
@@ -221,7 +224,7 @@
 					disabled={index === 0}
 					class="rounded bg-gray-700 px-3 py-1.5 text-sm text-gray-300 transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-30"
 				>
-					<i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back
+					<i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Back
 				</button>
 				<button
 					onclick={next}
@@ -230,7 +233,7 @@
 					{#if isLast}
 						Finish
 					{:else}
-						Save & Next <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+						Save & Next <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 					{/if}
 				</button>
 			</div>

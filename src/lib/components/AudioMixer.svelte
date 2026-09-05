@@ -655,7 +655,7 @@
 				title="Remove channel"
 				class="shrink-0 rounded p-0.5 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 			>
-				<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -685,7 +685,7 @@
 					<span
 						class="block w-full truncate text-[10px] leading-tight text-amber-400/80"
 						title={ch.fileName ?? ''}
-						><i class="fa-solid fa-lock" aria-hidden="true"></i> {ch.fileName}</span
+						><i class="fa-duotone fa-light fa-lock" aria-hidden="true"></i> {ch.fileName}</span
 					>
 				</button>
 			{:else}
@@ -725,7 +725,7 @@
 					class="rounded border border-amber-700/50 bg-amber-950/50 px-1.5 py-0.5 text-center text-[9px] leading-tight text-amber-400"
 					title="File too large for browser storage — plays this session only"
 				>
-					<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> won't persist
+					<i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i> won't persist
 				</div>
 			{/if}
 		{/if}
@@ -764,8 +764,9 @@
 				<div class="flex items-center gap-1">
 					<button
 						onclick={() => setChannelVol(i, Math.max(0, ch.volume - 0.01))}
+						aria-label="Decrease volume"
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>−</button
+						><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 					>
 					<input
 						type="number"
@@ -783,8 +784,9 @@
 					/>
 					<button
 						onclick={() => setChannelVol(i, Math.min(1, ch.volume + 0.01))}
+						aria-label="Increase volume"
 						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-						>+</button
+						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 					>
 				</div>
 			</div>
@@ -834,10 +836,10 @@
 				: 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500 hover:text-white'}"
 		>
 			{#if ch.playing}
-				<i class="fa-solid fa-stop text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop
 			{:else}
-				<i class="fa-solid fa-play text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-play text-xs" aria-hidden="true"></i>
 				Play
 			{/if}
 		</button>
@@ -877,10 +879,10 @@
 				: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-orange-700 hover:text-orange-400'}"
 		>
 			{#if ch.muteLocal}
-				<i class="fa-solid fa-volume-xmark inline text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-volume-xmark inline text-xs" aria-hidden="true"></i>
 				DM muted
 			{:else}
-				<i class="fa-solid fa-volume-high inline text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-volume-high inline text-xs" aria-hidden="true"></i>
 				Mute DM
 			{/if}
 		</button>
@@ -907,8 +909,9 @@
 			<div class="flex flex-1 items-center gap-1">
 				<button
 					onclick={() => setMaster(Math.max(0, masterVolume - 0.01))}
+					aria-label="Decrease master volume"
 					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>−</button
+					><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 				>
 				<input
 					type="number"
@@ -924,8 +927,9 @@
 				/>
 				<button
 					onclick={() => setMaster(Math.min(1, masterVolume + 0.01))}
+					aria-label="Increase master volume"
 					class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-400 transition hover:border-gray-500 hover:text-white active:bg-gray-700"
-					>+</button
+					><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></button
 				>
 			</div>
 			<button
@@ -933,7 +937,7 @@
 				title="Fade out and stop all playing channels"
 				class="flex shrink-0 items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 px-2 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<i class="fa-solid fa-stop text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop All
 			</button>
 		</div>
@@ -979,7 +983,7 @@
 				title="Fade out and stop all playing channels"
 				class="flex items-center justify-center gap-1 rounded border border-red-700/60 bg-red-900/30 py-1.5 text-xs font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-900/50 hover:text-red-300"
 			>
-				<i class="fa-solid fa-stop text-xs" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-stop text-xs" aria-hidden="true"></i>
 				Stop All
 			</button>
 		</div>
@@ -994,7 +998,7 @@
 			? 'min-h-[80px] w-[calc(50%-6px)] min-w-0'
 			: 'w-[118px] shrink-0'} flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-700 bg-transparent text-gray-600 transition hover:border-amber-700/60 hover:text-amber-600"
 	>
-		<i class="fa-solid fa-plus text-2xl" aria-hidden="true"></i>
+		<i class="fa-duotone fa-light fa-plus text-2xl" aria-hidden="true"></i>
 		<span class="text-center text-xs leading-tight font-semibold">Add a<br />Channel</span>
 	</button>
 {/snippet}
@@ -1015,7 +1019,7 @@
 		class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3"
 	>
 		<div class="flex items-center gap-3">
-			<i class="fa-solid fa-sliders text-lg text-amber-400" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-sliders text-lg text-amber-400" aria-hidden="true"></i>
 			<h2 class="text-lg font-bold tracking-widest text-amber-400 uppercase">Audio Mixer</h2>
 		</div>
 
@@ -1024,7 +1028,7 @@
 			title="Close mixer (Esc)"
 			class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 		>
-			<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 		</button>
 	</header>
 

@@ -55,7 +55,7 @@
 					<span
 						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500"
 					>
-						<i class="fa-solid fa-check text-xs text-black" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check text-xs text-black" aria-hidden="true"></i>
 					</span>
 				{/if}
 				<span class="text-xs font-bold tracking-widest text-amber-400 uppercase">D&D 5e</span>
@@ -92,7 +92,7 @@
 					<span
 						class="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500"
 					>
-						<i class="fa-solid fa-check text-xs text-white" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check text-xs text-white" aria-hidden="true"></i>
 					</span>
 				{/if}
 				<span
@@ -129,7 +129,7 @@
 			class="mx-6 flex items-start gap-3 rounded-lg bg-orange-950/40 px-4 py-3 ring-1 ring-orange-800/50"
 		>
 			<i
-				class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-base text-orange-400"
+				class="fa-duotone fa-light fa-triangle-exclamation mt-0.5 shrink-0 text-base text-orange-400"
 				aria-hidden="true"
 			></i>
 			<p class="text-xs leading-relaxed text-orange-300">

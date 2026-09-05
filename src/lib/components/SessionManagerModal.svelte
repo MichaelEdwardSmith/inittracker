@@ -111,7 +111,7 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
 			<div class="flex items-center gap-2">
-				<i class="fa-solid fa-bars text-base text-amber-400" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-bars text-base text-amber-400" aria-hidden="true"></i>
 				<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">Sessions</h2>
 			</div>
 			<button
@@ -119,7 +119,7 @@
 				class="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-white"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -186,7 +186,7 @@
 								title="Rename"
 								class="rounded p-1 text-gray-600 transition hover:bg-gray-700 hover:text-gray-300"
 							>
-								<i class="fa-solid fa-pencil text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-pencil text-sm" aria-hidden="true"></i>
 							</button>
 						{/if}
 						{#if sessions.length > 1}
@@ -202,7 +202,7 @@
 									title="Cancel"
 									class="rounded p-1 text-gray-500 transition hover:text-gray-300"
 								>
-									<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+									<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 								</button>
 							{:else}
 								<button
@@ -210,7 +210,7 @@
 									title="Delete session"
 									class="rounded p-1 text-gray-600 transition hover:bg-gray-700 hover:text-red-400"
 								>
-									<i class="fa-solid fa-trash text-sm" aria-hidden="true"></i>
+									<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 								</button>
 							{/if}
 						{:else}
@@ -218,7 +218,7 @@
 								title="Can't delete last session"
 								class="cursor-not-allowed rounded p-1 text-gray-800"
 							>
-								<i class="fa-solid fa-trash text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 							</span>
 						{/if}
 					</div>
@@ -233,7 +233,7 @@
 				disabled={busy}
 				class="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray-700 py-2 text-xs font-semibold text-gray-500 transition hover:border-amber-600/60 hover:text-amber-400 disabled:opacity-40"
 			>
-				<i class="fa-solid fa-plus text-sm" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 				New Session
 			</button>
 		</div>

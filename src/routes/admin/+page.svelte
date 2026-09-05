@@ -144,7 +144,7 @@
 		<header class="mb-6 flex flex-wrap items-center justify-between gap-3">
 			<div>
 				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">
-					<i class="fa-solid fa-swords" aria-hidden="true"></i> System Admin
+					<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> System Admin
 				</h1>
 				<p class="mt-1 text-sm text-gray-500">
 					Logged in as {data.dmFirstName} · every DM account that has accessed this system.
@@ -177,7 +177,7 @@
 						class="shrink-0 rounded p-1 text-gray-500 transition hover:text-gray-300"
 						aria-label="Dismiss"
 					>
-						<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
@@ -241,7 +241,7 @@
 									aria-expanded={isExpanded}
 								>
 									<i
-										class="fa-solid fa-chevron-right text-sm transition-transform {isExpanded
+										class="fa-duotone fa-light fa-chevron-right text-sm transition-transform {isExpanded
 											? 'rotate-90'
 											: ''}"
 										aria-hidden="true"
@@ -259,7 +259,8 @@
 										class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
 										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
 									>
-										{#if dm.isRootAdmin}<i class="fa-solid fa-star" aria-hidden="true"></i> Root Admin{:else}Admin{/if}
+										{#if dm.isRootAdmin}<i class="fa-duotone fa-light fa-star" aria-hidden="true"
+											></i> Root Admin{:else}Admin{/if}
 									</span>
 								{/if}
 							</td>
@@ -385,7 +386,9 @@
 															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-blue-500 hover:text-blue-300"
 														>
 															Inspect (read-only)
-															<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"
+															<i
+																class="fa-duotone fa-light fa-arrow-up-right-from-square"
+																aria-hidden="true"
 															></i>
 														</a>
 													{/if}

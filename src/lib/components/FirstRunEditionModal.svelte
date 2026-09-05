@@ -54,7 +54,7 @@
 	<div class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<!-- Header -->
 		<div class="border-b border-gray-700 px-6 py-5 text-center">
-			<i class="fa-solid fa-swords mb-2 text-4xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords mb-2 text-4xl" aria-hidden="true"></i>
 			<h2
 				id="edition-modal-title"
 				class="text-xl font-black tracking-widest text-amber-400 uppercase"
@@ -88,7 +88,7 @@
 				</ul>
 				{#if selected === '2014'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-amber-400">
-						<i class="fa-solid fa-check text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check text-base" aria-hidden="true"></i>
 						Selected
 					</div>
 				{/if}
@@ -113,7 +113,7 @@
 				</ul>
 				{#if selected === '2024'}
 					<div class="mt-3 flex items-center gap-1.5 text-xs font-bold text-blue-400">
-						<i class="fa-solid fa-check text-base" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-check text-base" aria-hidden="true"></i>
 						Selected
 					</div>
 				{/if}

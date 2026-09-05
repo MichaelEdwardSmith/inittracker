@@ -147,7 +147,7 @@
 						<span class="flex items-center gap-1 text-xs text-gray-400">
 							Voice Nickname
 							<i
-								class="fa-solid fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
+								class="fa-duotone fa-light fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
 								aria-hidden="true"
 								title="Alternate spellings/pronunciations for Voice Commands to also match against this player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional."
 							></i>
@@ -240,7 +240,10 @@
 							{#if player.avatarUrl}
 								<img src={player.avatarUrl} alt={player.name} class="h-full w-full object-cover" />
 							{:else}
-								<i class="fa-solid fa-shield-halved text-base leading-none" aria-hidden="true"></i>
+								<i
+									class="fa-duotone fa-light fa-shield-halved text-base leading-none"
+									aria-hidden="true"
+								></i>
 							{/if}
 						</button>
 						<!-- Remove button (shown on hover when avatar exists) -->
@@ -250,7 +253,7 @@
 								title="Remove avatar"
 								class="absolute -top-1 -right-1 hidden h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-gray-400 ring-1 ring-gray-600 transition group-hover:flex hover:text-red-400"
 							>
-								<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>
 							</button>
 						{/if}
 					</div>
@@ -275,7 +278,7 @@
 						</div>
 						{#if presences[player.id]}
 							<div class="mt-0.5 flex items-center gap-1 text-xs text-blue-400">
-								<i class="fa-solid fa-user shrink-0 text-xs" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-user shrink-0 text-xs" aria-hidden="true"></i>
 								{presences[player.id]}
 							</div>
 						{/if}
@@ -287,7 +290,7 @@
 								title="Add to Combat"
 								class="rounded p-1 text-green-400 transition hover:bg-green-900/40 hover:text-green-300"
 							>
-								<i class="fa-solid fa-plus text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 							</button>
 						{/if}
 						<button
@@ -304,7 +307,7 @@
 							title="Edit"
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-white"
 						>
-							<i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-pen-to-square text-sm" aria-hidden="true"></i>
 						</button>
 						{#if confirmDeleteId === player.id}
 							<div class="flex items-center gap-1">
@@ -328,7 +331,7 @@
 								title="Delete"
 								class="rounded p-1 text-red-400 transition hover:bg-red-900/40 hover:text-red-300"
 							>
-								<i class="fa-solid fa-trash text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 							</button>
 						{/if}
 					</div>

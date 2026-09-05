@@ -116,7 +116,7 @@
 		class="sticky top-0 z-20 flex items-center gap-4 border-b border-gray-800 bg-gray-900/95 px-6 py-3 backdrop-blur"
 	>
 		<div class="flex items-center gap-2">
-			<i class="fa-solid fa-swords text-lg" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-lg" aria-hidden="true"></i>
 			<h1 class="text-sm font-black tracking-[0.25em] text-amber-400 uppercase">User Guide</h1>
 		</div>
 		<a
@@ -124,7 +124,7 @@
 			aria-label="Close"
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 		>
-			<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</a>
 	</header>
 
@@ -331,7 +331,7 @@
 					or <strong class="font-semibold text-white">Enemies</strong> in the bottom action bar to
 					open them full-screen. Tap the
 					<strong class="font-semibold text-white"
-						><i class="fa-solid fa-xmark" aria-hidden="true"></i> close button</strong
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i> close button</strong
 					> or press back to return to the main tracker.
 				</p>
 				<p class="mt-0 mb-6 text-sm leading-relaxed">
@@ -346,7 +346,7 @@
 				<ul class="ml-4 list-disc space-y-2 text-sm leading-relaxed">
 					<li>
 						<strong class="font-semibold text-white"
-							><i class="fa-solid fa-swords" aria-hidden="true"></i> Initiative Tracker</strong
+							><i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> Initiative Tracker</strong
 						> — app title
 					</li>
 					<li>
@@ -513,7 +513,7 @@
 					Click a player's circular avatar to upload a photo (JPEG/PNG). It is automatically cropped
 					to a square and resized to 256×256. To remove an avatar, hover over it and click the <strong
 						class="font-semibold text-white"
-						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></strong
 					> that appears.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
@@ -522,7 +522,7 @@
 						>Escape</strong
 					>, or click the
 					<strong class="font-semibold text-white"
-						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></strong
 					> to close it.
 				</p>
 
@@ -604,10 +604,14 @@
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>Click a monster in the list to select it — it highlights in red</li>
 					<li>
-						A panel slides out below the list — set the quantity (1–20) with the <strong
-							class="font-semibold text-white">−</strong
+						A panel slides out below the list — set the quantity (1–20) with the
+						<strong class="font-semibold text-white"
+							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></strong
 						>
-						/ <strong class="font-semibold text-white">+</strong> buttons or by typing
+						/
+						<strong class="font-semibold text-white"
+							><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i></strong
+						> buttons or by typing
 					</li>
 					<li>Click <strong class="font-semibold text-white">Add to Encounter</strong></li>
 				</ol>
@@ -620,7 +624,7 @@
 				<div
 					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
 				>
-					<i class="fa-solid fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
 					<span
 						>Double-click any monster to instantly add one copy without going through the quantity
 						selector.</span
@@ -739,7 +743,7 @@
 				<div
 					class="my-4 flex items-start gap-2 rounded-lg border border-amber-800/40 bg-amber-950/30 px-4 py-3 text-sm text-amber-300"
 				>
-					<i class="fa-solid fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-lightbulb mt-0.5 shrink-0" aria-hidden="true"></i>
 					<span
 						>Entries that rely on another monster’s stat block (<code
 							class="rounded bg-amber-900/40 px-1 font-mono text-xs">_copy</code
@@ -829,9 +833,10 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Every combatant row has a <strong class="font-semibold text-white">pencil icon</strong>
-					beside the remove (<i class="fa-solid fa-xmark" aria-hidden="true"></i>) button. Click it
-					to open a notes modal where you can type any freeform text — spell concentration
-					reminders, loot notes, roleplay hooks, etc. When a note has been saved the icon glows
+					beside the remove (<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>)
+					button. Click it to open a notes modal where you can type any freeform text — spell
+					concentration reminders, loot notes, roleplay hooks, etc. When a note has been saved the
+					icon glows
 					<strong class="font-semibold text-amber-300">amber</strong>
 					as a visual reminder. Notes persist with the rest of the combat state.
 				</p>
@@ -843,7 +848,7 @@
 					['Button', 'What it does'],
 					[
 						[
-							'<i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo',
+							'<i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i> Undo',
 							'Reverts the most recent damage/heal, condition/effect, or turn change'
 						],
 						[
@@ -865,7 +870,7 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white"
-						><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo</strong
+						><i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i> Undo</strong
 					> button reverts the most recent action: a damage/heal, a condition/spell-effect change, a temp
 					HP change, a death-save update, or a turn advance/rewind. It's greyed out when there's nothing
 					to undo.
@@ -960,7 +965,7 @@
 					<strong class="font-semibold text-yellow-400">Set Temp HP</strong>
 					to assign temporary hit points. Click
 					<strong class="font-semibold text-white"
-						><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+						><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></strong
 					> to clear them. Temp HP shows as a yellow badge and a yellow bar extension on the HP meter.
 					Damage reduces temp HP before current HP; healing does not restore temp HP.
 				</p>
@@ -1147,7 +1152,7 @@
 					</li>
 					<li>
 						Click the <strong class="font-semibold text-white"
-							><i class="fa-solid fa-xmark" aria-hidden="true"></i> button</strong
+							><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i> button</strong
 						> on the lair card to dismiss it manually at any time.
 					</li>
 				</ul>
@@ -1355,8 +1360,8 @@
 				)}
 				<p class="mt-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white"
-						><i class="fa-solid fa-volume-high" aria-hidden="true"></i> /
-						<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></strong
+						><i class="fa-duotone fa-light fa-volume-high" aria-hidden="true"></i> /
+						<i class="fa-duotone fa-light fa-volume-xmark" aria-hidden="true"></i></strong
 					> button in the viewer header toggles all sounds on or off.
 				</p>
 
@@ -1478,7 +1483,7 @@
 					The <strong class="font-semibold text-white">participants grid</strong> shows every
 					combatant with a dual-layer HP bar (ghost starting HP + current HP) and a
 					<strong class="font-semibold text-white"
-						><i class="fa-solid fa-skull" aria-hidden="true"></i> Slain</strong
+						><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Slain</strong
 					> label if they died.
 				</p>
 
@@ -1506,15 +1511,15 @@
 					['Icon', 'Event type'],
 					[
 						[
-							'<i class="fa-solid fa-swords" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i>',
 							'Damage — who dealt it, to whom, amount, before/after HP'
 						],
 						[
-							'<i class="fa-solid fa-heart" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i>',
 							'Heal — who healed whom, amount, before/after HP'
 						],
 						[
-							'<i class="fa-solid fa-star" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-star" aria-hidden="true"></i>',
 							'Condition added — who inflicted which condition on whom'
 						],
 						[
@@ -1522,7 +1527,7 @@
 							'Condition removed — which condition was lifted'
 						],
 						[
-							'<i class="fa-solid fa-skull" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>',
 							'Death — when a combatant was knocked out or slain'
 						]
 					]
@@ -1754,7 +1759,7 @@
 					</li>
 					<li>
 						Remove any staged entry with the <strong class="font-semibold text-white"
-							><i class="fa-solid fa-xmark" aria-hidden="true"></i></strong
+							><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></strong
 						> button on its row
 					</li>
 					<li>
@@ -1908,7 +1913,7 @@
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
 						Click the <strong class="font-semibold text-white"
-							><i class="fa-solid fa-envelope" aria-hidden="true"></i> Message DM</strong
+							><i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Message DM</strong
 						> button in the viewer header
 					</li>
 					<li>
@@ -1974,7 +1979,7 @@
 					[
 						[
 							'Ability Check DCs',
-							'Difficulty-to-DC table (Very Easy 5 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Nearly Impossible 30), contested checks, passive checks, group checks'
+							'Difficulty-to-DC table (Very Easy 5 <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Nearly Impossible 30), contested checks, passive checks, group checks'
 						],
 						[
 							'Actions in Combat',
@@ -2076,9 +2081,9 @@
 					then click <strong class="font-semibold text-white">Generate</strong> for a fully
 					XP-budgeted combat encounter: title, scene flavor text, archetype description, a monster
 					list with individual XP values, an XP breakdown strip (raw
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-					multiplier <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> adjusted
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
+					multiplier <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> adjusted
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 					per-player), an actual difficulty badge, a tactics note, and a terrain feature.
 					<strong class="font-semibold text-white">Roll Again</strong> re-generates with the same
 					settings;
@@ -2133,9 +2138,10 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Set a <strong class="font-semibold text-white">Town Name</strong> (auto-filled, freely
 					editable), <strong class="font-semibold text-white">Settlement Size</strong> (Thorp
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Metropolis),
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Metropolis),
 					<strong class="font-semibold text-white">Wealth</strong> (Poor
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Wealthy), and whether it
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Wealthy), and
+					whether it
 					<strong class="font-semibold text-white">Has Keep</strong>, then click
 					<strong class="font-semibold text-white">Randomize</strong> for a new town (or just edit the
 					fields — the town regenerates live). The output includes a prose "About [Town]" description,
@@ -2153,7 +2159,8 @@
 					its own
 					<strong class="font-semibold text-white">New Layout</strong> reroll and an
 					<strong class="font-semibold text-white"
-						>Open <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></strong
+						>Open <i class="fa-duotone fa-light fa-arrow-up-right-from-square" aria-hidden="true"
+						></i></strong
 					>
 					link to view it full-page. Click
 					<strong class="font-semibold text-white">Save Town</strong> to keep it in a "Saved Towns" list.
@@ -2169,15 +2176,15 @@
 					Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic
 					Shop, Jeweler, Tavern &amp; Inn, Bookshop, Herbalist, Fletcher &amp; Bowyer, Stable) and
 					town affluence (6 tiers: Impoverished
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Opulent), then click
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Opulent), then click
 					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named
 					shop with items priced at three tiers (<i
-						class="fa-solid fa-face-smile"
+						class="fa-duotone fa-light fa-face-smile"
 						aria-hidden="true"
 					></i>
-					Friendly −15%, <i class="fa-solid fa-face-meh" aria-hidden="true"></i> Neutral,
-					<i class="fa-solid fa-face-angry" aria-hidden="true"></i> Hostile +25%); magic items appropriate
-					to affluence are included. Click any item for a detail modal.
+					Friendly −15%, <i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral,
+					<i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile +25%); magic items
+					appropriate to affluence are included. Click any item for a detail modal.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">Save to Notes</strong> to open a small
@@ -2196,7 +2203,7 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Pick an <strong class="font-semibold text-white">Inn Quality</strong> (Poor
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Legendary),
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Legendary),
 					<strong class="font-semibold text-white">Party Size</strong>, and
 					<strong class="font-semibold text-white">Party Level</strong>, then click
 					<strong class="font-semibold text-white">Randomize</strong>. You get a named inn with an
@@ -2243,7 +2250,7 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via
 					floor tabs. Toggle <strong class="font-semibold text-white"
-						><i class="fa-solid fa-map" aria-hidden="true"></i> Map Live</strong
+						><i class="fa-duotone fa-light fa-map" aria-hidden="true"></i> Map Live</strong
 					>
 					to push the current floor to players and manually reveal corridors/doors/rooms as you explore
 					(a fog-of-war system, not an instant full reveal).
@@ -2322,10 +2329,10 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">Generate New Caravan</strong> for a
 					merchant caravan on the road: a route (origin
-					<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> destination), size badge,
-					caravan master, a stat strip (wagons, days out/remaining, guard quality), a cargo manifest
-					(with a 35% chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a
-					complication, and an overheard rumor. Click
+					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> destination), size
+					badge, caravan master, a stat strip (wagons, days out/remaining, guard quality), a cargo
+					manifest (with a 35% chance of a hidden/illegal "Not on Manifest" entry), a guard roster,
+					a complication, and an overheard rumor. Click
 					<strong class="font-semibold text-white">Save Caravan</strong> to keep it in a "Saved Caravans"
 					list.
 				</p>
@@ -2453,12 +2460,12 @@
 						],
 						[
 							'Challenge the bid',
-							'<i class="fa-solid fa-dice" aria-hidden="true"></i> Liar!',
+							'<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i> Liar!',
 							'Calls "Dudo" — forces an immediate reveal'
 						],
 						[
 							'Claim it’s exact',
-							'<i class="fa-solid fa-check" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-check" aria-hidden="true"></i>',
 							'Calls "Calza" — bets the current bid is exactly right'
 						]
 					]
@@ -2468,7 +2475,7 @@
 					default. If any active player is down to their last die, that round automatically becomes
 					a
 					<strong class="font-semibold text-amber-300"
-						><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Palifico</strong
+						><i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i> Palifico</strong
 					> round: wilds are disabled, and the face of the first bid that round locks all further bids
 					to that same face.
 				</p>
@@ -2491,7 +2498,8 @@
 						The reveal screen shows everyone's dice and highlights matches, then auto-advances after
 						8 seconds (or click
 						<strong class="font-semibold text-white"
-							>Next Round <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></strong
+							>Next Round <i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"
+							></i></strong
 						> to advance immediately).
 					</li>
 					<li>
@@ -2555,7 +2563,7 @@
 					<div
 						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
 					>
-						<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i>
 						<strong>Beta feature — still in testing.</strong>
 						Voice commands use the browser's built-in Speech Recognition API, currently supported in
 						<strong class="text-white">Chrome and Edge</strong>
@@ -2564,7 +2572,7 @@
 
 					<p class="mb-4 text-sm leading-relaxed">
 						Click the <strong class="font-semibold text-white"
-							><i class="fa-solid fa-microphone" aria-hidden="true"></i> Voice</strong
+							><i class="fa-duotone fa-light fa-microphone" aria-hidden="true"></i> Voice</strong
 						> button in the dashboard header to control the tracker hands-free. The button only appears
 						when your browser supports speech recognition.
 					</p>
@@ -2652,7 +2660,7 @@
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white"
-						><i class="fa-solid fa-sliders" aria-hidden="true"></i> Mixer</strong
+						><i class="fa-duotone fa-light fa-sliders" aria-hidden="true"></i> Mixer</strong
 					> button in the dashboard header to open a full-screen ambient audio board. Layer music, atmosphere,
 					and sound effects across as many channels as you need — audio keeps playing in the background
 					when the mixer is closed.
@@ -2672,13 +2680,13 @@
 						],
 						['Volume fader', 'Drag up/down to set channel volume (0–100%)'],
 						[
-							'<i class="fa-solid fa-play" aria-hidden="true"></i> / <i class="fa-solid fa-stop" aria-hidden="true"></i> button',
+							'<i class="fa-duotone fa-light fa-play" aria-hidden="true"></i> / <i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i> button',
 							'Start or stop playback on this channel'
 						],
 						['S (Solo)', 'Solo this channel — mutes all others while active'],
 						['M (Mute)', 'Mute this channel without stopping playback'],
 						[
-							'<i class="fa-solid fa-xmark" aria-hidden="true"></i>',
+							'<i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i>',
 							'Remove the channel and delete its saved file reference'
 						]
 					]
@@ -2731,7 +2739,7 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					The browser clears file permissions on exit. Channels that need re-authorization show a
 					<strong class="font-semibold text-amber-300"
-						><i class="fa-solid fa-lock" aria-hidden="true"></i> [filename]</strong
+						><i class="fa-duotone fa-light fa-lock" aria-hidden="true"></i> [filename]</strong
 					> button in amber. Click it once — the browser shows a one-time permission prompt — and the
 					file reloads automatically.
 				</p>
@@ -2771,7 +2779,7 @@
 					>
 					— or click the
 					<strong class="font-semibold text-white"
-						><i class="fa-solid fa-envelope" aria-hidden="true"></i> Contact</strong
+						><i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Contact</strong
 					> link found on the login page, the join page, and in both the DM and viewer headers.
 				</p>
 			</section>

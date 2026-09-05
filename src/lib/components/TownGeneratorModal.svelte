@@ -1867,7 +1867,7 @@
 			class="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900/80 px-5 py-3"
 		>
 			<div class="flex items-center gap-3">
-				<i class="fa-solid fa-city text-xl" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-city text-xl" aria-hidden="true"></i>
 				<h2 class="text-lg font-bold tracking-wide text-amber-300">Town Generator</h2>
 				{#if townData}
 					<span class="text-xs text-gray-500">
@@ -1880,7 +1880,7 @@
 				class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -2129,7 +2129,7 @@
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-gray-100"
 							aria-label="Close"
 						>
-							<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 						</button>
 					</div>
 				</div>
@@ -2193,7 +2193,7 @@
 							class="text-gray-500 transition hover:text-white"
 							aria-label="Close"
 						>
-							<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 						</button>
 					</div>
 					<div class="mb-3 flex flex-wrap gap-2">

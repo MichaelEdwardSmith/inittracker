@@ -64,7 +64,7 @@
 				aria-label="Close"
 				class="text-gray-600 transition hover:text-gray-300"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -72,7 +72,7 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if messages.length === 0}
 				<div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
-					<i class="fa-solid fa-envelope text-3xl text-gray-700" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-envelope text-3xl text-gray-700" aria-hidden="true"></i>
 					<p class="text-sm text-gray-600">No messages from the DM yet</p>
 				</div>
 			{:else}
@@ -83,10 +83,10 @@
 								<span class="text-xs font-bold text-purple-400">
 									Dungeon Master
 									{#if msg.to !== 'all'}
-										<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 										<span class="text-gray-400">{msg.to}</span>
 									{:else}
-										<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 										<span class="text-gray-500">Everyone</span>
 									{/if}
 								</span>

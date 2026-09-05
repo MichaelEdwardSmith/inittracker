@@ -276,7 +276,7 @@
 				title="Undo the last damage/heal, condition/effect, or turn change (up to 5 steps)"
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
 			>
-				<i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Undo
+				<i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i> Undo
 			</button>
 			<button
 				onclick={() => (showAoE = true)}
@@ -379,7 +379,7 @@
 								title="Remove lair actions"
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 						<div class="flex items-center gap-3 px-1">
@@ -454,7 +454,7 @@
 									title="View stat block"
 									class="rounded p-2 text-gray-600 transition hover:text-blue-400"
 								>
-									<i class="fa-solid fa-circle-info text-base" aria-hidden="true"></i>
+									<i class="fa-duotone fa-light fa-circle-info text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							{#if c.type === 'enemy' && !combat.sorted.some((x) => x.type === 'lair' && x.templateName === c.templateName)}
@@ -463,7 +463,7 @@
 									title="Add Lair Actions to initiative"
 									class="rounded p-2 text-gray-600 transition hover:text-purple-400"
 								>
-									<i class="fa-solid fa-building text-base" aria-hidden="true"></i>
+									<i class="fa-duotone fa-light fa-building text-base" aria-hidden="true"></i>
 								</button>
 							{/if}
 							<button
@@ -473,7 +473,7 @@
 									? 'text-amber-300 [filter:drop-shadow(0_0_5px_theme(colors.amber.400))] hover:text-amber-200'
 									: 'text-gray-600 hover:text-gray-400'}"
 							>
-								<i class="fa-solid fa-pen-to-square text-base" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-pen-to-square text-base" aria-hidden="true"></i>
 							</button>
 							<button
 								onclick={() => combat.removeFromCombat(c.id)}
@@ -482,7 +482,7 @@
 									: 'Remove from combat'}
 								class="rounded p-2 text-gray-600 transition hover:bg-red-900/40 hover:text-red-400"
 							>
-								<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 							</button>
 						</div>
 
@@ -517,7 +517,7 @@
 												onclick={() => combat.setTempHp(c.id, 0)}
 												class="ml-0.5 opacity-50 transition hover:opacity-100"
 												title="Clear temp HP"
-												><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+												><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 											>
 										</span>
 									{/if}
@@ -616,7 +616,7 @@
 							<div class="rounded border border-gray-700 bg-gray-900/60 px-2 py-2 text-xs">
 								<div class="mb-1.5 flex items-center gap-2">
 									<span class="font-bold tracking-widest text-gray-400 uppercase"
-										><i class="fa-solid fa-skull" aria-hidden="true"></i> Death Saves</span
+										><i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i> Death Saves</span
 									>
 									<button
 										onclick={() =>
@@ -629,13 +629,15 @@
 									<div
 										class="flex items-center gap-2 rounded bg-red-950/60 px-2 py-1.5 text-sm font-bold text-red-400"
 									>
-										<i class="fa-solid fa-skull" aria-hidden="true"></i><span>Dead</span>
+										<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i><span>Dead</span>
 									</div>
 								{:else if isStable}
 									<div
 										class="flex items-center gap-2 rounded bg-green-950/60 px-2 py-1.5 text-sm font-bold text-green-400"
 									>
-										<i class="fa-solid fa-heart" aria-hidden="true"></i><span>Stable</span>
+										<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i><span
+											>Stable</span
+										>
 									</div>
 								{:else}
 									<div class="flex items-center gap-4">
@@ -656,7 +658,7 @@
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-red-700 hover:bg-red-950'}"
 													>
 														{#if ds.failures > i}
-															<i class="fa-solid fa-skull" aria-hidden="true"></i>
+															<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
 														{:else}
 															<i class="fa-regular fa-circle" aria-hidden="true"></i>
 														{/if}
@@ -682,7 +684,7 @@
 															: 'border-gray-600 bg-gray-800 text-gray-600 hover:border-green-700 hover:bg-green-950'}"
 													>
 														{#if ds.successes > i}
-															<i class="fa-solid fa-heart" aria-hidden="true"></i>
+															<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i>
 														{:else}
 															<i class="fa-regular fa-circle" aria-hidden="true"></i>
 														{/if}
@@ -726,7 +728,7 @@
 										title="What is {status}?"
 										class="border-l border-white/10 px-1.5 py-1.5 opacity-40 transition hover:opacity-100"
 									>
-										<i class="fa-solid fa-circle-info text-xs" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-circle-info text-xs" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/each}
@@ -867,7 +869,7 @@
 										title="View legendary actions"
 										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
 									>
-										<i class="fa-solid fa-circle-info text-sm" aria-hidden="true"></i>
+										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
 									</button>
 								</div>
 							{/if}
@@ -878,7 +880,7 @@
 								title={c.loot?.length ? 'Edit loot' : 'Roll loot'}
 								class="flex items-center gap-1.5 rounded border border-amber-800/50 bg-amber-950/30 px-2 py-1 text-xs text-amber-500 transition hover:border-amber-600 hover:text-amber-300"
 							>
-								<i class="fa-solid fa-gem" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-gem" aria-hidden="true"></i>
 								{c.loot?.length ? `${c.loot.length} item${c.loot.length > 1 ? 's' : ''}` : 'Loot'}
 							</button>
 						{/if}
@@ -950,7 +952,8 @@
 	>
 		<div class="mx-4 w-full max-w-sm rounded-xl border border-amber-700/60 bg-gray-900 shadow-2xl">
 			<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-				<i class="fa-solid fa-triangle-exclamation text-amber-400" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-triangle-exclamation text-amber-400" aria-hidden="true"
+				></i>
 				<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 					>Change Initiative Mid-Combat?</span
 				>

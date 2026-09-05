@@ -87,7 +87,7 @@
 						? 'bg-blue-900/50 text-blue-300'
 						: 'text-gray-500 hover:bg-gray-800 hover:text-blue-300'}"
 				>
-					<i class="fa-solid fa-plus text-sm" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 					New Message
 				</button>
 				{#if messages.length > 0}
@@ -102,7 +102,7 @@
 					aria-label="Close"
 					class="text-gray-600 transition hover:text-gray-300"
 				>
-					<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 		</div>
@@ -145,9 +145,9 @@
 						class="flex items-center gap-1.5 rounded-lg bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-40"
 					>
 						{#if composeSending}
-							<i class="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-spinner fa-spin text-sm" aria-hidden="true"></i>
 						{:else}
-							<i class="fa-solid fa-paper-plane text-sm" aria-hidden="true"></i>
+							<i class="fa-duotone fa-light fa-paper-plane text-sm" aria-hidden="true"></i>
 						{/if}
 						Send
 					</button>
@@ -159,7 +159,7 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if messages.length === 0}
 				<div class="flex flex-col items-center justify-center gap-2 py-16 text-center">
-					<i class="fa-solid fa-envelope text-3xl text-gray-700" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-envelope text-3xl text-gray-700" aria-hidden="true"></i>
 					<p class="text-sm text-gray-600">No messages yet</p>
 				</div>
 			{:else}
@@ -209,7 +209,8 @@
 											class="flex items-center gap-1.5 rounded bg-blue-700 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-40"
 										>
 											{#if replySending}
-												<i class="fa-solid fa-spinner fa-spin text-xs" aria-hidden="true"></i>
+												<i class="fa-duotone fa-light fa-spinner fa-spin text-xs" aria-hidden="true"
+												></i>
 											{:else}
 												Send
 											{/if}

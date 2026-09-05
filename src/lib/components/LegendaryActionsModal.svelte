@@ -98,7 +98,7 @@
 		<div class="mx-4 w-full max-w-lg rounded-xl border border-amber-700/50 bg-gray-900 shadow-2xl">
 			<div class="flex items-center justify-between border-b border-amber-900/40 px-5 py-3">
 				<div class="flex items-center gap-2">
-					<i class="fa-solid fa-star text-amber-400" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-star text-amber-400" aria-hidden="true"></i>
 					<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
 						>Legendary Actions</span
 					>
@@ -109,7 +109,7 @@
 					aria-label="Close"
 					class="text-gray-600 transition hover:text-gray-300"
 				>
-					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -137,7 +137,7 @@
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h4 class="font-black tracking-wide text-amber-400">
-					<i class="fa-solid fa-dice" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
 					{r.expr}
 				</h4>
 				<button
@@ -145,7 +145,7 @@
 					aria-label="Close"
 					class="text-gray-500 transition hover:text-white"
 				>
-					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="mb-4 flex flex-wrap gap-2">

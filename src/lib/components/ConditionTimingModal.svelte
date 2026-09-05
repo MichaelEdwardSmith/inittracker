@@ -31,7 +31,7 @@
 	>
 		<div class="mx-4 w-full max-w-sm rounded-xl border border-violet-700/60 bg-gray-900 shadow-2xl">
 			<div class="flex items-center gap-2 border-b border-violet-900/40 px-5 py-3">
-				<i class="fa-solid fa-stopwatch text-violet-400" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-stopwatch text-violet-400" aria-hidden="true"></i>
 				<span class="text-sm font-bold tracking-widest text-violet-300 uppercase"
 					>Add {pending.kind === 'spell' ? 'Spell Effect' : 'Condition'}</span
 				>
@@ -76,7 +76,7 @@
 					onclick={oncancel}
 					aria-label="Cancel"
 					class="rounded bg-gray-800/50 px-3 py-2 text-sm text-gray-500 transition hover:text-gray-300"
-					><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+					><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 				>
 			</div>
 		</div>

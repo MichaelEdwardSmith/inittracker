@@ -68,7 +68,7 @@
 	>
 		<!-- Header -->
 		<div class="flex items-center gap-2 border-b border-amber-900/40 px-5 py-3">
-			<i class="fa-solid fa-gem text-amber-500" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-gem text-amber-500" aria-hidden="true"></i>
 			<span class="flex-1 text-sm font-bold tracking-widest text-amber-300 uppercase">
 				Loot — {combatant.name}
 			</span>
@@ -84,7 +84,7 @@
 				class="rounded p-1 text-gray-600 transition hover:text-gray-300"
 				title="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -115,7 +115,7 @@
 						title="Remove"
 						class="rounded p-1 text-gray-700 transition hover:text-red-400"
 					>
-						<i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-xmark text-sm" aria-hidden="true"></i>
 					</button>
 				</div>
 			{/each}

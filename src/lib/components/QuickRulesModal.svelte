@@ -18,29 +18,57 @@
 	// Icons are Font Awesome markup rendered via {@html} below — this data is entirely
 	// developer-authored (no user input), so that's safe.
 	const categories: Category[] = [
-		{ id: 'checks', label: 'Ability Check DCs', icon: '<i class="fa-solid fa-dice"></i>' },
-		{ id: 'actions', label: 'Actions in Combat', icon: '<i class="fa-solid fa-swords"></i>' },
-		{ id: 'bonus', label: 'Bonus Actions', icon: '<i class="fa-solid fa-bolt"></i>' },
-		{ id: 'saves', label: 'Common Save DCs', icon: '<i class="fa-solid fa-skull"></i>' },
-		{ id: 'concentration', label: 'Concentration', icon: '<i class="fa-solid fa-brain"></i>' },
-		{ id: 'conditions', label: 'Conditions', icon: '<i class="fa-solid fa-droplet"></i>' },
-		{ id: 'cover', label: 'Cover', icon: '<i class="fa-solid fa-shield-halved"></i>' },
-		{ id: 'death', label: 'Death Saving Throws', icon: '<i class="fa-solid fa-skull"></i>' },
-		{ id: 'xp', label: 'Encounter Difficulty', icon: '<i class="fa-solid fa-scale-balanced"></i>' },
-		{ id: 'exhaustion', label: 'Exhaustion', icon: '<i class="fa-solid fa-face-tired"></i>' },
-		{ id: 'light', label: 'Light & Vision', icon: '<i class="fa-solid fa-eye"></i>' },
+		{
+			id: 'checks',
+			label: 'Ability Check DCs',
+			icon: '<i class="fa-duotone fa-light fa-dice"></i>'
+		},
+		{
+			id: 'actions',
+			label: 'Actions in Combat',
+			icon: '<i class="fa-duotone fa-light fa-swords"></i>'
+		},
+		{ id: 'bonus', label: 'Bonus Actions', icon: '<i class="fa-duotone fa-light fa-bolt"></i>' },
+		{ id: 'saves', label: 'Common Save DCs', icon: '<i class="fa-duotone fa-light fa-skull"></i>' },
+		{
+			id: 'concentration',
+			label: 'Concentration',
+			icon: '<i class="fa-duotone fa-light fa-brain"></i>'
+		},
+		{
+			id: 'conditions',
+			label: 'Conditions',
+			icon: '<i class="fa-duotone fa-light fa-droplet"></i>'
+		},
+		{ id: 'cover', label: 'Cover', icon: '<i class="fa-duotone fa-light fa-shield-halved"></i>' },
+		{
+			id: 'death',
+			label: 'Death Saving Throws',
+			icon: '<i class="fa-duotone fa-light fa-skull"></i>'
+		},
+		{
+			id: 'xp',
+			label: 'Encounter Difficulty',
+			icon: '<i class="fa-duotone fa-light fa-scale-balanced"></i>'
+		},
+		{
+			id: 'exhaustion',
+			label: 'Exhaustion',
+			icon: '<i class="fa-duotone fa-light fa-face-tired"></i>'
+		},
+		{ id: 'light', label: 'Light & Vision', icon: '<i class="fa-duotone fa-light fa-eye"></i>' },
 		{
 			id: 'magic',
 			label: 'Magic & Casting',
-			icon: '<i class="fa-solid fa-wand-magic-sparkles"></i>'
+			icon: '<i class="fa-duotone fa-light fa-wand-magic-sparkles"></i>'
 		},
-		{ id: 'items', label: 'Magic Items List', icon: '<i class="fa-solid fa-gem"></i>' },
+		{ id: 'items', label: 'Magic Items List', icon: '<i class="fa-duotone fa-light fa-gem"></i>' },
 		{
 			id: 'movement',
 			label: 'Movement & Position',
-			icon: '<i class="fa-solid fa-shoe-prints"></i>'
+			icon: '<i class="fa-duotone fa-light fa-shoe-prints"></i>'
 		},
-		{ id: 'resting', label: 'Resting', icon: '<i class="fa-solid fa-moon"></i>' }
+		{ id: 'resting', label: 'Resting', icon: '<i class="fa-duotone fa-light fa-moon"></i>' }
 	];
 
 	let selected = $state('actions');
@@ -3894,7 +3922,7 @@
 	</div>
 	<!-- Header -->
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<i class="fa-solid fa-book-open text-xl" aria-hidden="true"></i>
+		<i class="fa-duotone fa-light fa-book-open text-xl" aria-hidden="true"></i>
 		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Quick Reference</h2>
 		<p class="ml-2 hidden text-xs text-gray-500 sm:block">
 			{ruleset === '2024' ? 'D&D 2024 combat reference' : 'D&D 5e combat reference'}
@@ -3904,7 +3932,7 @@
 			class="ml-auto rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
 			title="Close"
 		>
-			<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 		</button>
 	</div>
 
@@ -4769,14 +4797,14 @@
 										</div>
 										<div>
 											<strong class="text-white">3rd level or lower</strong>
-											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> automatic counter, no
-											check.
+											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> automatic
+											counter, no check.
 										</div>
 										<div>
 											<strong class="text-white">4th level+</strong>
-											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Spellcasting Ability
-											check, DC = 10 + spell level. Upcast to match or exceed the spell level for an automatic
-											counter.
+											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Spellcasting
+											Ability check, DC = 10 + spell level. Upcast to match or exceed the spell level
+											for an automatic counter.
 										</div>
 									</td>
 								</tr>
@@ -4786,14 +4814,14 @@
 										<div>Action · 120 ft · Target one creature, object, or magical effect.</div>
 										<div>
 											<strong class="text-white">3rd level or lower</strong>
-											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> automatically ends, no
-											check.
+											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> automatically
+											ends, no check.
 										</div>
 										<div>
 											<strong class="text-white">4th level+</strong>
-											<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Spellcasting Ability
-											check, DC = 10 + spell level. Upcast to match or exceed the spell level for an automatic
-											end.
+											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Spellcasting
+											Ability check, DC = 10 + spell level. Upcast to match or exceed the spell level
+											for an automatic end.
 										</div>
 									</td>
 								</tr>
@@ -4811,7 +4839,8 @@
 							<li>
 								• <strong class="text-white">Same spell does not stack</strong> — if cast multiple
 								times on the same target, only the most potent effect applies (e.g. two Bless spells
-								<i class="fa-solid fa-arrow-right" aria-hidden="true"></i> one set of bonus dice).
+								<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> one set of bonus
+								dice).
 							</li>
 							<li>
 								• A spell bonus may still stack with a non-spell bonus from a class feature or item

@@ -1406,7 +1406,7 @@
 				class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -1448,7 +1448,7 @@
 						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
 						aria-label="Decrease party size"
 					>
-						<i class="fa-solid fa-minus text-xs" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-minus text-xs" aria-hidden="true"></i>
 					</button>
 					<span class="min-w-[2rem] text-center text-sm font-bold text-gray-100">{partySize}</span>
 					<button
@@ -1456,7 +1456,7 @@
 						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
 						aria-label="Increase party size"
 					>
-						<i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-plus text-xs" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
@@ -1472,7 +1472,7 @@
 						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
 						aria-label="Decrease party level"
 					>
-						<i class="fa-solid fa-minus text-xs" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-minus text-xs" aria-hidden="true"></i>
 					</button>
 					<span class="min-w-[2rem] text-center text-sm font-bold text-gray-100">{partyLevel}</span>
 					<button
@@ -1480,7 +1480,7 @@
 						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
 						aria-label="Increase party level"
 					>
-						<i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-plus text-xs" aria-hidden="true"></i>
 					</button>
 				</div>
 				<span class="text-[10px] text-gray-600">

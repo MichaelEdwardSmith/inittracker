@@ -249,7 +249,7 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 
@@ -434,7 +434,7 @@
 			<!-- Title row -->
 			<div class="mb-4 flex items-center justify-between">
 				<h4 class="font-black tracking-wide text-amber-400">
-					<i class="fa-solid fa-dice" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
 					{r.expr}
 				</h4>
 				<button
@@ -442,7 +442,7 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 

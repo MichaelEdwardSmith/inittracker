@@ -25,7 +25,7 @@
 	<div class="relative z-10 w-full max-w-sm">
 		<!-- Header -->
 		<div class="mb-8 text-center">
-			<i class="fa-solid fa-dice text-5xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-dice text-5xl" aria-hidden="true"></i>
 			<h1 class="text-2xl font-black tracking-[0.25em] text-blue-400 uppercase">
 				Initiative Tracker
 			</h1>
@@ -124,7 +124,7 @@
 			</p>
 			<p>
 				<a href="/join" class="text-gray-500 transition hover:text-gray-400"
-					><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Continue as Guest</a
+					><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Continue as Guest</a
 				>
 			</p>
 			<p class="pt-1">

@@ -799,7 +799,8 @@
 				<h2 class="text-lg font-bold tracking-wide text-amber-300">Trade Caravan Generator</h2>
 				{#if caravanData}
 					<span class="text-xs text-gray-500"
-						>{caravanData.origin} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+						>{caravanData.origin}
+						<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
 						{caravanData.destination}</span
 					>
 				{/if}
@@ -809,7 +810,7 @@
 				class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -852,7 +853,8 @@
 								<button
 									onclick={() => deleteSavedCaravan(s.id)}
 									class="shrink-0 text-[11px] leading-none text-gray-600 hover:text-red-400"
-									aria-label="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+									aria-label="Delete"
+									><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 								>
 							</div>
 						{/each}
@@ -872,7 +874,7 @@
 								<h2 class="text-2xl font-bold text-white">
 									{caravanData.origin}
 									<span class="text-gray-500"
-										><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span
+										><i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i></span
 									>
 									{caravanData.destination}
 								</h2>

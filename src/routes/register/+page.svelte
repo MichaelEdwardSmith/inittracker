@@ -31,7 +31,7 @@
 	<div class="relative z-10 w-full max-w-sm px-6 py-12">
 		<!-- Header -->
 		<div class="mb-8 text-center">
-			<i class="fa-solid fa-swords text-5xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-5xl" aria-hidden="true"></i>
 			<h1 class="text-2xl font-black tracking-[0.25em] text-amber-400 uppercase">
 				Initiative Tracker
 			</h1>

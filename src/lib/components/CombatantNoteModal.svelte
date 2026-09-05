@@ -48,7 +48,7 @@
 					<p class="text-xs text-gray-500 italic">{combatant.name}</p>
 				</div>
 				<button onclick={save} class="text-gray-500 transition hover:text-white" aria-label="Close">
-					<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 

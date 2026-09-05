@@ -788,7 +788,7 @@
 				class="rounded border border-gray-700 bg-gray-800 p-1.5 text-gray-400 transition hover:border-red-700 hover:text-red-400"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 			</button>
 		</div>
 	{/if}
@@ -830,7 +830,8 @@
 								<button
 									onclick={() => deleteMarket(s.id)}
 									class="shrink-0 text-[11px] leading-none text-gray-600 hover:text-red-400"
-									aria-label="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button
+									aria-label="Delete"
+									><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
 								>
 							</div>
 						{/each}

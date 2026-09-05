@@ -50,12 +50,12 @@
 				aria-label="Close"
 				class="text-gray-600 transition hover:text-gray-300"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 		{#if msgSent}
 			<div class="flex flex-col items-center gap-3 px-5 py-10 text-center">
-				<i class="fa-solid fa-check text-3xl text-green-400" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-check text-3xl text-green-400" aria-hidden="true"></i>
 				<p class="text-sm font-semibold text-green-400">Message sent!</p>
 			</div>
 		{:else}

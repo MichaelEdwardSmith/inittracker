@@ -306,7 +306,7 @@
 				title="Import monsters from a 5etools bestiary JSON"
 				class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-indigo-600 hover:text-indigo-300"
 			>
-				<i class="fa-solid fa-upload text-sm" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-upload text-sm" aria-hidden="true"></i>
 				Import
 			</button>
 			<button
@@ -314,7 +314,7 @@
 				title="Manage custom monsters"
 				class="flex items-center gap-1 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-xs text-gray-400 transition hover:border-amber-600 hover:text-amber-300"
 			>
-				<i class="fa-solid fa-plus text-sm" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 				Custom
 			</button>
 		</div>
@@ -380,7 +380,7 @@
 									</div>
 								{:else}
 									<i
-										class="fa-solid fa-star shrink-0 text-xs text-amber-400"
+										class="fa-duotone fa-light fa-star shrink-0 text-xs text-amber-400"
 										title="Custom monster"
 										aria-hidden="true"
 									></i>
@@ -411,7 +411,7 @@
 						title="View {enemy.name} stat block"
 						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-blue-400"
 					>
-						<i class="fa-solid fa-circle-info text-sm" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
 					</button>
 				{/if}
 				{#if enemy.isCustom && enemy.id && !enemy.source}
@@ -429,7 +429,7 @@
 						title="Edit {enemy.name}"
 						class="shrink-0 px-2 py-2 text-gray-600 transition hover:text-amber-400"
 					>
-						<i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-pen-to-square text-sm" aria-hidden="true"></i>
 					</button>
 				{/if}
 			</div>
@@ -446,7 +446,7 @@
 			<div class="mb-2 flex items-center justify-between gap-1.5">
 				<span class="flex items-center gap-1.5 text-sm font-semibold text-red-300">
 					{#if selectedEnemy.isCustom}
-						<i class="fa-solid fa-star text-xs text-amber-400" aria-hidden="true"></i>
+						<i class="fa-duotone fa-light fa-star text-xs text-amber-400" aria-hidden="true"></i>
 					{/if}
 					{selectedEnemy.name}
 				</span>
@@ -458,16 +458,17 @@
 					aria-label="Dismiss"
 					class="rounded p-0.5 text-red-700 transition hover:bg-red-900/40 hover:text-red-300"
 				>
-					<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
 			<div class="mb-3 flex items-center gap-2">
 				<span class="text-xs text-gray-400">Quantity</span>
 				<button
 					onclick={() => (quantity = Math.max(1, quantity - 1))}
+					aria-label="Decrease quantity"
 					class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-white hover:bg-gray-600"
 				>
-					−
+					<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i>
 				</button>
 				<input
 					type="number"
@@ -478,9 +479,10 @@
 				/>
 				<button
 					onclick={() => (quantity = Math.min(20, quantity + 1))}
+					aria-label="Increase quantity"
 					class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-white hover:bg-gray-600"
 				>
-					+
+					<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i>
 				</button>
 			</div>
 			<button
@@ -521,7 +523,7 @@
 					class="text-gray-500 transition hover:text-white"
 					aria-label="Close"
 				>
-					<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
 
@@ -685,7 +687,10 @@
 								>
 									<div class="min-w-0 flex-1">
 										<div class="flex items-center gap-1.5">
-											<i class="fa-solid fa-star text-xs text-amber-400" aria-hidden="true"></i>
+											<i
+												class="fa-duotone fa-light fa-star text-xs text-amber-400"
+												aria-hidden="true"
+											></i>
 											<span class="truncate text-sm font-medium text-white">{m.name}</span>
 										</div>
 										<div class="text-xs text-gray-500">
@@ -699,7 +704,8 @@
 												title="Edit"
 												class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-amber-400"
 											>
-												<i class="fa-solid fa-pen-to-square text-sm" aria-hidden="true"></i>
+												<i class="fa-duotone fa-light fa-pen-to-square text-sm" aria-hidden="true"
+												></i>
 											</button>
 										{/if}
 										<button
@@ -707,7 +713,7 @@
 											title="Delete"
 											class="rounded p-1.5 text-gray-500 transition hover:bg-gray-700 hover:text-red-400"
 										>
-											<i class="fa-solid fa-trash text-sm" aria-hidden="true"></i>
+											<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 										</button>
 									</div>
 								</div>

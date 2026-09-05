@@ -129,7 +129,7 @@
 				class="text-gray-500 transition hover:text-white"
 				aria-label="Close"
 			>
-				<i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+				<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 			</button>
 		</div>
 
@@ -233,7 +233,7 @@
 						<span class="flex items-center gap-1 text-xs text-gray-400">
 							Voice Nicknames (optional)
 							<i
-								class="fa-solid fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
+								class="fa-duotone fa-light fa-circle-question shrink-0 cursor-help text-sm text-gray-500"
 								aria-hidden="true"
 								title="Alternate spellings/pronunciations for Voice Commands to also match against this player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional."
 							></i>

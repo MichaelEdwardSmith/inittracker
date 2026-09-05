@@ -39,7 +39,7 @@
 	<div class="relative z-10 w-full max-w-sm px-6">
 		<!-- Header -->
 		<div class="mb-8 text-center">
-			<i class="fa-solid fa-swords text-5xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-swords text-5xl" aria-hidden="true"></i>
 			<h1 class="text-2xl font-black tracking-[0.25em] text-amber-400 uppercase">
 				Initiative Tracker
 			</h1>
@@ -171,7 +171,7 @@
 		</p>
 		<p class="mt-3 text-center text-xs text-gray-700">
 			<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400"
-				><i class="fa-solid fa-envelope" aria-hidden="true"></i> Contact us</a
+				><i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Contact us</a
 			>
 			<span class="mx-1 text-gray-800">·</span>
 			<a href="/privacy" class="text-gray-600 transition hover:text-gray-400">Privacy Policy</a>

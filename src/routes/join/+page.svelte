@@ -31,7 +31,7 @@
 	<div class="relative z-10 w-full max-w-sm">
 		<!-- Header -->
 		<div class="mb-8 text-center">
-			<i class="fa-solid fa-dice text-5xl" aria-hidden="true"></i>
+			<i class="fa-duotone fa-light fa-dice text-5xl" aria-hidden="true"></i>
 			<h1 class="text-2xl font-black tracking-[0.25em] text-blue-400 uppercase">
 				Initiative Tracker
 			</h1>
@@ -87,7 +87,7 @@
 										</p>
 									</div>
 									<i
-										class="fa-solid fa-chevron-right shrink-0 text-base text-gray-600"
+										class="fa-duotone fa-light fa-chevron-right shrink-0 text-base text-gray-600"
 										aria-hidden="true"
 									></i>
 								</button>
@@ -102,7 +102,7 @@
 								onclick={() => (newSessionOpen = true)}
 								class="flex w-full items-center justify-center gap-2 text-xs text-gray-500 transition hover:text-gray-300"
 							>
-								<i class="fa-solid fa-plus text-sm" aria-hidden="true"></i>
+								<i class="fa-duotone fa-light fa-plus text-sm" aria-hidden="true"></i>
 								Join a different session
 							</button>
 						</div>
@@ -249,7 +249,7 @@
 			</p>
 			<p>
 				<a href="mailto:dm@inittracker.com" class="text-gray-600 transition hover:text-gray-400"
-					><i class="fa-solid fa-envelope" aria-hidden="true"></i> Contact us</a
+					><i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Contact us</a
 				>
 				<span class="mx-1 text-gray-800">·</span>
 				<a href="/privacy" class="text-gray-600 transition hover:text-gray-400">Privacy Policy</a>
