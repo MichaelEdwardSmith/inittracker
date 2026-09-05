@@ -357,7 +357,10 @@
 								</div>
 							{/if}
 							{#if isActive}
-								<span class="text-amber-400" title="Active turn">▶</span>
+								<i
+									class="fa-duotone fa-light fa-square-arrow-right text-amber-400"
+									title="Active turn"
+								></i>
 							{/if}
 							<span
 								class="shrink-0 rounded bg-purple-900/60 px-1.5 py-0.5 text-xs font-bold text-purple-300"
@@ -416,7 +419,10 @@
 								</div>
 							{/if}
 							{#if isActive}
-								<span class="text-amber-400" title="Active turn">▶</span>
+								<i
+									class="fa-duotone fa-light fa-square-arrow-right text-amber-400"
+									title="Active turn"
+								></i>
 							{/if}
 							{#if c.type === 'player' && c.avatarUrl}
 								<button

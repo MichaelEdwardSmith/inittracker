@@ -1194,9 +1194,8 @@
 					<strong class="font-semibold text-white"
 						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Condition/Spell Effect</strong
 					>
-					on any combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv
-					markers, a quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more),
-					and a
+					on any combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv markers,
+					a quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more), and a
 					<strong class="font-semibold text-fuchsia-300">Custom</strong> text field for any other
 					effect name. Click one to apply it — the badge appears immediately on the row, styled grey
 					for standard conditions/markers and
