@@ -833,11 +833,11 @@
 				? 'border-green-700/70 bg-green-900/30 text-green-400 hover:bg-green-900/50'
 				: 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500 hover:text-white'}"
 		>
+			<i class="fa-solid fa-stop text-xs" class:hidden={!ch.playing} aria-hidden="true"></i>
+			<i class="fa-solid fa-play text-xs" class:hidden={ch.playing} aria-hidden="true"></i>
 			{#if ch.playing}
-				<i class="fa-solid fa-stop text-xs" aria-hidden="true"></i>
 				Stop
 			{:else}
-				<i class="fa-solid fa-play text-xs" aria-hidden="true"></i>
 				Play
 			{/if}
 		</button>
@@ -876,11 +876,19 @@
 				? 'border-orange-600/70 bg-orange-900/30 text-orange-400'
 				: 'border-gray-700 bg-gray-800 text-gray-500 hover:border-orange-700 hover:text-orange-400'}"
 		>
+			<i
+				class="fa-solid fa-volume-xmark inline text-xs"
+				class:hidden={!ch.muteLocal}
+				aria-hidden="true"
+			></i>
+			<i
+				class="fa-solid fa-volume-high inline text-xs"
+				class:hidden={ch.muteLocal}
+				aria-hidden="true"
+			></i>
 			{#if ch.muteLocal}
-				<i class="fa-solid fa-volume-xmark inline text-xs" aria-hidden="true"></i>
 				DM muted
 			{:else}
-				<i class="fa-solid fa-volume-high inline text-xs" aria-hidden="true"></i>
 				Mute DM
 			{/if}
 		</button>

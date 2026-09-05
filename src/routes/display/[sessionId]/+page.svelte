@@ -875,11 +875,10 @@
 					title="Menu"
 					class="flex items-center justify-center rounded border border-gray-800 bg-gray-900/60 p-1.5 text-gray-500 transition hover:border-gray-600 hover:text-gray-300"
 				>
-					{#if showMobileMenu}
-						<i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
-					{:else}
-						<i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
-					{/if}
+					<i class="fa-solid fa-xmark text-base" class:hidden={!showMobileMenu} aria-hidden="true"
+					></i>
+					<i class="fa-solid fa-bars text-base" class:hidden={showMobileMenu} aria-hidden="true"
+					></i>
 				</button>
 				{#if dmUnread > 0}
 					<span
@@ -908,11 +907,19 @@
 					? 'text-amber-400 hover:bg-amber-900/30'
 					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
 			>
+				<i
+					class="fa-solid fa-volume-high shrink-0 text-base"
+					class:hidden={!audioEnabled}
+					aria-hidden="true"
+				></i>
+				<i
+					class="fa-solid fa-volume-xmark shrink-0 text-base"
+					class:hidden={audioEnabled}
+					aria-hidden="true"
+				></i>
 				{#if audioEnabled}
-					<i class="fa-solid fa-volume-high shrink-0 text-base" aria-hidden="true"></i>
 					Sound On
 				{:else}
-					<i class="fa-solid fa-volume-xmark shrink-0 text-base" aria-hidden="true"></i>
 					Sound Off
 				{/if}
 			</button>
@@ -1060,11 +1067,19 @@
 			}}
 			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 		>
+			<i
+				class="fa-solid fa-compress shrink-0 text-base"
+				class:hidden={!isFullscreen}
+				aria-hidden="true"
+			></i>
+			<i
+				class="fa-solid fa-expand shrink-0 text-base"
+				class:hidden={isFullscreen}
+				aria-hidden="true"
+			></i>
 			{#if isFullscreen}
-				<i class="fa-solid fa-compress shrink-0 text-base" aria-hidden="true"></i>
 				Exit Full Screen
 			{:else}
-				<i class="fa-solid fa-expand shrink-0 text-base" aria-hidden="true"></i>
 				Full Screen
 			{/if}
 		</button>
@@ -1291,11 +1306,16 @@
 															? 'border-red-600 bg-red-800/60 text-red-300'
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
-														{#if ds.failures > i}
-															<i class="fa-solid fa-skull" aria-hidden="true"></i>
-														{:else}
-															<i class="fa-regular fa-circle" aria-hidden="true"></i>
-														{/if}
+														<i
+															class="fa-solid fa-skull"
+															class:hidden={!(ds.failures > i)}
+															aria-hidden="true"
+														></i>
+														<i
+															class="fa-regular fa-circle"
+															class:hidden={ds.failures > i}
+															aria-hidden="true"
+														></i>
 													</div>
 												{/each}
 											</div>
@@ -1314,11 +1334,16 @@
 															? 'border-green-600 bg-green-800/60 text-green-300'
 															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
 													>
-														{#if ds.successes > i}
-															<i class="fa-solid fa-heart" aria-hidden="true"></i>
-														{:else}
-															<i class="fa-regular fa-circle" aria-hidden="true"></i>
-														{/if}
+														<i
+															class="fa-solid fa-heart"
+															class:hidden={!(ds.successes > i)}
+															aria-hidden="true"
+														></i>
+														<i
+															class="fa-regular fa-circle"
+															class:hidden={ds.successes > i}
+															aria-hidden="true"
+														></i>
 													</div>
 												{/each}
 											</div>
