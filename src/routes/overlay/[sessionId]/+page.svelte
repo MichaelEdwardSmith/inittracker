@@ -38,10 +38,10 @@
 		Restrained: 'Rstr',
 		Stunned: 'Stun',
 		Unconscious: 'Uncon',
-		'Advantage For': 'Adv↑',
-		'Advantage Against': 'Adv↓',
-		'Disadvantage For': 'Dis↑',
-		'Disadvantage Against': 'Dis↓'
+		'Advantage For': 'Adv ^',
+		'Advantage Against': 'Adv v',
+		'Disadvantage For': 'Dis ^',
+		'Disadvantage Against': 'Dis v'
 	};
 
 	const conditionBg: Record<string, string> = {

@@ -232,6 +232,25 @@
 	let sessions = $state<GameSession[]>(untrack(() => data.sessions));
 	let activeSession = $state<GameSession>(untrack(() => data.activeSession));
 	let showMobileMenu = $state(false);
+	const MENU_SECTIONS_DEFAULT_COLLAPSED = {
+		tools: true,
+		campaign: true,
+		account: true,
+		display: true
+	};
+	let collapsedMenuSections = $state<Record<string, boolean>>(
+		browser
+			? {
+					...MENU_SECTIONS_DEFAULT_COLLAPSED,
+					...JSON.parse(localStorage.getItem('collapsed-menu-sections') ?? '{}')
+				}
+			: MENU_SECTIONS_DEFAULT_COLLAPSED
+	);
+	function toggleMenuSection(key: string) {
+		collapsedMenuSections[key] = !collapsedMenuSections[key];
+		if (browser)
+			localStorage.setItem('collapsed-menu-sections', JSON.stringify(collapsedMenuSections));
+	}
 	let guestEditionPicked = $state(false);
 	let isFullscreen = $state(false);
 	let presences = $state<Record<string, string>>({});
@@ -602,36 +621,269 @@
 		<div class="fixed inset-0 z-40" onclick={() => (showMobileMenu = false)}></div>
 	{/if}
 	<div
-		class="fixed top-14 right-2 z-50 w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu
+		class="fixed top-14 right-2 z-50 max-h-[calc(100vh-4rem)] w-52 overflow-y-auto rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu
 			? ''
 			: 'hidden'}"
 	>
-		<a
-			id="guide-link"
-			href="/guide"
-			onclick={() => (showMobileMenu = false)}
-			class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		<button
+			onclick={() => toggleMenuSection('tools')}
+			title="Expand or collapse this section"
+			class="flex w-full items-center justify-between px-4 pt-2.5 pb-1 text-left text-[10px] font-bold tracking-wider text-gray-500 uppercase transition hover:text-gray-300"
 		>
+			Session Tools
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
+				class="h-3 w-3 shrink-0 transition-transform {collapsedMenuSections.tools
+					? '-rotate-90'
+					: ''}"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
-				stroke-width="2"
+				stroke-width="3"
 			>
-				<path
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+			</svg>
+		</button>
+		{#if !collapsedMenuSections.tools}
+			<button
+				onclick={() => {
+					showNotes = true;
+					showMobileMenu = false;
+				}}
+				title="Freeform DM notes for this session"
+				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+					/>
+				</svg>
+				Notes
+			</button>
+			<button
+				onclick={() => {
+					showDiceRoller = true;
+					showMobileMenu = false;
+				}}
+				title="Roll dice with a virtual dice roller"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+					/>
+				</svg>
+				Dice Roller
+			</button>
+			<button
+				onclick={() => {
+					showSpells = true;
+					showMobileMenu = false;
+				}}
+				title="Browse and reference spells"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+					/>
+				</svg>
+				Spells
+			</button>
+			<button
+				onclick={openQuickRules}
+				title="Quick-reference tabletop rules"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+					/>
+				</svg>
+				Quick Reference
+			</button>
+			<button
+				onclick={openLiarsDice}
+				title="Play a round of Liar's Dice"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					class="h-4 w-4 shrink-0"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.8"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-				/>
+				>
+					<rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
+					<circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+					<circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+					<circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+					<circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+					<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+				</svg>
+				Liar's Dice
+			</button>
+			<button
+				onclick={openGenerators}
+				title="Random NPC, dungeon, and encounter generators"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+					/>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+					/>
+				</svg>
+				Generators
+			</button>
+			<button
+				onclick={() => {
+					openMixer();
+					showMobileMenu = false;
+				}}
+				title="Ambient audio and sound effect mixer"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+					/>
+				</svg>
+				Mixer
+			</button>
+			{#if data.showVoiceCommands}
+				<VoiceCommands mobile={true} />
+			{/if}
+		{/if}
+
+		<button
+			onclick={() => toggleMenuSection('campaign')}
+			title="Expand or collapse this section"
+			class="flex w-full items-center justify-between border-t border-gray-700 px-4 pt-2.5 pb-1 text-left text-[10px] font-bold tracking-wider text-gray-500 uppercase transition hover:text-gray-300"
+		>
+			Campaign
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-3 w-3 shrink-0 transition-transform {collapsedMenuSections.campaign
+					? '-rotate-90'
+					: ''}"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="3"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 			</svg>
-			Guide
-		</a>
-		{#if data.isAdmin && !data.isImpersonating}
+		</button>
+		{#if !collapsedMenuSections.campaign}
+			<button
+				onclick={() => {
+					showSessionManager = true;
+					showMobileMenu = false;
+				}}
+				title="Create, rename, or switch game sessions"
+				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5" />
+				</svg>
+				Sessions
+			</button>
+			<button
+				onclick={() => {
+					showEncounters = true;
+					showMobileMenu = false;
+				}}
+				title="Build and save encounters"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+					/>
+				</svg>
+				Encounters
+			</button>
 			<a
-				href="/admin"
+				href="/history"
 				onclick={() => (showMobileMenu = false)}
+				title="View past combat history"
 				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				<svg
@@ -645,22 +897,18 @@
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
-						d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+						d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
 					/>
 				</svg>
-				Admin
+				Chronicle
 			</a>
-		{/if}
-		{#if !data.isGuest}
-			<button
-				onclick={() => {
-					openInbox();
-					showMobileMenu = false;
-				}}
-				class="relative flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm transition
-				       {unreadCount > 0
-					? 'text-amber-400 hover:bg-amber-900/30'
-					: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+			<a
+				href="/display/{activeSession.sessionId}"
+				target="_blank"
+				rel="noopener"
+				onclick={() => (showMobileMenu = false)}
+				title="Open the public player display in a new tab"
+				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -668,374 +916,254 @@
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
+					stroke-width="2"
 				>
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
+						d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
+				</svg>
+				Player Display
+			</a>
+		{/if}
+
+		<button
+			onclick={() => toggleMenuSection('account')}
+			title="Expand or collapse this section"
+			class="flex w-full items-center justify-between border-t border-gray-700 px-4 pt-2.5 pb-1 text-left text-[10px] font-bold tracking-wider text-gray-500 uppercase transition hover:text-gray-300"
+		>
+			Account
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-3 w-3 shrink-0 transition-transform {collapsedMenuSections.account
+					? '-rotate-90'
+					: ''}"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="3"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+			</svg>
+		</button>
+		{#if !collapsedMenuSections.account}
+			{#if !data.isGuest}
+				<button
+					onclick={() => {
+						openInbox();
+						showMobileMenu = false;
+					}}
+					title="Messages from your players"
+					class="relative flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition
+				       {unreadCount > 0
+						? 'text-amber-400 hover:bg-amber-900/30'
+						: 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+						/>
+					</svg>
+					Messages
+					{#if unreadCount > 0}
+						<span
+							class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black"
+						>
+							{unreadCount}
+						</span>
+					{/if}
+				</button>
+			{/if}
+			<a
+				id="guide-link"
+				href="/guide"
+				onclick={() => (showMobileMenu = false)}
+				title="Open the user guide"
+				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
+				</svg>
+				Guide
+			</a>
+			{#if data.isAdmin && !data.isImpersonating}
+				<a
+					href="/admin"
+					onclick={() => (showMobileMenu = false)}
+					title="Admin panel"
+					class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
 						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+					Admin
+				</a>
+			{/if}
+			<a
+				href="mailto:dm@inittracker.com"
+				onclick={() => (showMobileMenu = false)}
+				title="Email support"
+				class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 shrink-0"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
 						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 					/>
 				</svg>
-				Messages
-				{#if unreadCount > 0}
-					<span
-						class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-black"
+				Contact
+			</a>
+		{/if}
+
+		<button
+			onclick={() => toggleMenuSection('display')}
+			title="Expand or collapse this section"
+			class="flex w-full items-center justify-between border-t border-gray-700 px-4 pt-2.5 pb-1 text-left text-[10px] font-bold tracking-wider text-gray-500 uppercase transition hover:text-gray-300"
+		>
+			Display
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-3 w-3 shrink-0 transition-transform {collapsedMenuSections.display
+					? '-rotate-90'
+					: ''}"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="3"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+			</svg>
+		</button>
+		{#if !collapsedMenuSections.display}
+			<button
+				onclick={() => {
+					toggleFullscreen();
+					showMobileMenu = false;
+				}}
+				title="Toggle full screen mode"
+				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				{#if isFullscreen}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
 					>
-						{unreadCount}
-					</span>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+						/>
+					</svg>
+					Exit Full Screen
+				{:else}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+						/>
+					</svg>
+					Full Screen
+				{/if}
+			</button>
+			<button
+				onclick={() => {
+					theme.toggle();
+					showMobileMenu = false;
+				}}
+				title="Switch between light and dark theme"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				{#if theme.isDark}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<circle cx="12" cy="12" r="5" />
+						<path
+							stroke-linecap="round"
+							d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+						/>
+					</svg>
+					Light Mode
+				{:else}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4 shrink-0"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+						/>
+					</svg>
+					Dark Mode
 				{/if}
 			</button>
 		{/if}
-		<button
-			onclick={() => {
-				showNotes = true;
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-				/>
-			</svg>
-			Notes
-		</button>
-		<button
-			onclick={() => {
-				showDiceRoller = true;
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-				/>
-			</svg>
-			Dice Roller
-		</button>
-		<button
-			onclick={openLiarsDice}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				class="h-4 w-4 shrink-0"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.8"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
-				<circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
-				<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-			</svg>
-			Liar's Dice
-		</button>
-		<button
-			onclick={() => {
-				showSpells = true;
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-				/>
-			</svg>
-			Spells
-		</button>
-		{#if data.showVoiceCommands}
-			<VoiceCommands mobile={true} />
-		{/if}
-		<button
-			onclick={() => {
-				openMixer();
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-				/>
-			</svg>
-			Mixer
-		</button>
-		<button
-			onclick={openQuickRules}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-				/>
-			</svg>
-			Quick Reference
-		</button>
-		<button
-			onclick={openGenerators}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-				/>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-			</svg>
-			Generators
-		</button>
-		<button
-			onclick={() => {
-				showEncounters = true;
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-				/>
-			</svg>
-			Encounters
-		</button>
-		<button
-			onclick={() => {
-				showSessionManager = true;
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14-7H5m14 14H5" />
-			</svg>
-			Sessions
-		</button>
-		<a
-			href="/history"
-			onclick={() => (showMobileMenu = false)}
-			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-				/>
-			</svg>
-			Chronicle
-		</a>
-		<a
-			href="/display/{activeSession.sessionId}"
-			target="_blank"
-			rel="noopener"
-			onclick={() => (showMobileMenu = false)}
-			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-				/>
-			</svg>
-			Player Display
-		</a>
-		<a
-			href="mailto:dm@inittracker.com"
-			onclick={() => (showMobileMenu = false)}
-			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 shrink-0"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-				/>
-			</svg>
-			Contact
-		</a>
-		<button
-			onclick={() => {
-				toggleFullscreen();
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			{#if isFullscreen}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-					/>
-				</svg>
-				Exit Full Screen
-			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-					/>
-				</svg>
-				Full Screen
-			{/if}
-		</button>
-		<button
-			onclick={() => {
-				theme.toggle();
-				showMobileMenu = false;
-			}}
-			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
-		>
-			{#if theme.isDark}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<circle cx="12" cy="12" r="5" />
-					<path
-						stroke-linecap="round"
-						d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-					/>
-				</svg>
-				Light Mode
-			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 shrink-0"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					stroke-width="2"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-					/>
-				</svg>
-				Dark Mode
-			{/if}
-		</button>
 		<form method="POST" action="/logout" class="border-t border-gray-700">
 			<button
 				type="submit"
+				title="Sign out of your DM account"
 				class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-500 transition hover:bg-red-900/30 hover:text-red-400"
 			>
 				<svg

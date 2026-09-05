@@ -388,7 +388,8 @@ function createCombatStore() {
 			dexMod?: number,
 			passivePerception?: number,
 			avatarUrl?: string,
-			level?: number
+			level?: number,
+			voiceAliases?: string[]
 		) {
 			const c: Combatant = {
 				id: crypto.randomUUID(),
@@ -404,7 +405,8 @@ function createCombatStore() {
 				...(dexMod ? { dexMod } : {}),
 				...(passivePerception ? { passivePerception } : {}),
 				...(avatarUrl ? { avatarUrl } : {}),
-				...(level && level !== 1 ? { level } : {})
+				...(level && level !== 1 ? { level } : {}),
+				...(voiceAliases && voiceAliases.length > 0 ? { voiceAliases } : {})
 			};
 			combatants = [...combatants, c];
 			if (combatStartedAt !== null) snapshotCombatant(c);

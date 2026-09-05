@@ -20,6 +20,7 @@
 	let editAc = $state(0);
 	let editHp = $state(0);
 	let editName = $state('');
+	let editVoiceAliases = $state('');
 
 	// Avatar upload state
 	let fileInput: HTMLInputElement;
@@ -31,7 +32,8 @@
 		playerAc: number,
 		playerMaxHp: number,
 		playerDexMod: number,
-		playerPassivePerception: number
+		playerPassivePerception: number,
+		playerVoiceAliases: string[]
 	) {
 		editingId = id;
 		editName = playerName;
@@ -39,17 +41,23 @@
 		editHp = playerMaxHp;
 		editDexMod = playerDexMod;
 		editPassivePerception = playerPassivePerception;
+		editVoiceAliases = playerVoiceAliases.join(', ');
 	}
 
 	function saveEdit(id: string) {
 		if (!editName.trim()) return;
+		const aliases = editVoiceAliases
+			.split(',')
+			.map((a) => a.trim())
+			.filter(Boolean);
 		combat.update(id, {
 			name: editName.trim(),
 			ac: editAc,
 			maxHp: editHp,
 			currentHp: editHp,
 			dexMod: editDexMod || undefined,
-			passivePerception: editPassivePerception || undefined
+			passivePerception: editPassivePerception || undefined,
+			voiceAliases: aliases.length > 0 ? aliases : undefined
 		});
 		editingId = null;
 	}
@@ -123,7 +131,7 @@
 		title="Step through the party and update each player's level, AC, HP, DEX, and Passive Perception"
 		class="rounded bg-violet-700 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-violet-600 active:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-40"
 	>
-		⬆ Level Up
+		Level Up
 	</button>
 
 	<!-- Player list -->
@@ -135,6 +143,31 @@
 						bind:value={editName}
 						class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 					/>
+					<label class="flex flex-col gap-1">
+						<span class="flex items-center gap-1 text-xs text-gray-400">
+							Voice Nickname
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-3.5 w-3.5 shrink-0 cursor-help text-gray-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<title
+									>Alternate spellings/pronunciations for Voice Commands to also match against this
+									player's name (e.g. Kalstag -&gt; Call Stag). Comma-separated, optional.</title
+								>
+								<circle cx="12" cy="12" r="9" />
+								<path stroke-linecap="round" d="M12 16v-4.5M12 8h.01" />
+							</svg>
+						</span>
+						<input
+							bind:value={editVoiceAliases}
+							placeholder="e.g. Call Stag, Kal Stag"
+							class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+						/>
+					</label>
 					<div class="flex gap-2">
 						<label class="flex flex-1 flex-col gap-1">
 							<span
@@ -306,7 +339,8 @@
 									player.ac,
 									player.maxHp,
 									player.dexMod ?? 0,
-									player.passivePerception ?? 10
+									player.passivePerception ?? 10,
+									player.voiceAliases ?? []
 								)}
 							title="Edit"
 							class="rounded p-1 text-gray-400 transition hover:bg-gray-700 hover:text-white"

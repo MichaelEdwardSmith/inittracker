@@ -1,5 +1,5 @@
 /**
- * Whisper speech-recognition worker.
+ * Moonshine speech-recognition worker.
  * Runs @huggingface/transformers in a Web Worker so the heavy ONNX inference
  * never blocks the main thread.
  *
@@ -24,9 +24,17 @@ import { pipeline, env } from '@huggingface/transformers';
 env.allowLocalModels = false;
 
 // ── Model ────────────────────────────────────────────────────────────────
-// whisper-tiny.en  ~75 MB  — fast first load, good enough for short commands
-// whisper-base.en  ~145 MB — noticeably better accuracy if load time is acceptable
-const MODEL_ID = 'Xenova/whisper-base.en';
+// Moonshine replaces the whisper-base.en model this worker used previously.
+// It's purpose-built for short, real-time voice commands (vs. Whisper's
+// general-purpose long-form transcription) and Hugging Face benchmarks it as
+// both faster and more accurate than Whisper on exactly that kind of audio.
+const MODEL_ID = 'onnx-community/moonshine-base-ONNX';
+
+// fp32 encoder + q8 decoder mirrors Hugging Face's official WASM config for
+// this model (see the transformers.js-examples/moonshine-web reference
+// implementation) — q4 is reserved for their WebGPU path, which this project
+// doesn't use (no COOP/COEP headers set, so only single-threaded WASM works).
+const DTYPE = { encoder_model: 'fp32', decoder_model_merged: 'q8' } as const;
 
 // Typed as any to avoid the overly complex union type the generic produces.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,13 +43,14 @@ let asr: any = null;
 // ── Message handler ───────────────────────────────────────────────────────
 self.addEventListener(
 	'message',
-	async (e: MessageEvent<{ type: string; audio?: Float32Array; initial_prompt?: string }>) => {
+	async (e: MessageEvent<{ type: string; audio?: Float32Array }>) => {
 		const msg = e.data;
 
 		if (msg.type === 'load') {
 			try {
 				asr = await pipeline('automatic-speech-recognition', MODEL_ID, {
-					dtype: 'fp32', // fp32 is most reliable in browser WASM (fp16 needs WebGPU)
+					device: 'wasm',
+					dtype: DTYPE,
 					progress_callback: (p: Record<string, unknown>) => {
 						if (typeof p.progress === 'number') {
 							self.postMessage({ type: 'loading', pct: Math.round(p.progress) });
@@ -63,11 +72,10 @@ self.addEventListener(
 			try {
 				// sampling_rate is not in the TS types but the model expects 16 kHz PCM —
 				// we enforce that in the main thread via OfflineAudioContext before sending.
-				// .en models are English-only — don't pass language/task (multilingual-only options).
-				// initial_prompt biases the decoder toward domain vocab (combatant names, D&D terms).
-				const opts: Record<string, unknown> = {};
-				if (msg.initial_prompt) opts.initial_prompt = msg.initial_prompt;
-				const result = await asr(msg.audio, opts);
+				// Unlike Whisper, Moonshine has no prompt-biasing option, so domain
+				// vocabulary (combatant names) relies entirely on the fuzzy name match in
+				// VoiceCommands.svelte's findCombatantByName() rather than on this model.
+				const result = await asr(msg.audio);
 				const text = (result as { text: string }).text.trim();
 				self.postMessage({ type: 'transcript', text });
 			} catch (err) {

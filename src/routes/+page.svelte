@@ -57,7 +57,7 @@
 		{
 			icon: '🎤',
 			title: 'Voice Commands',
-			desc: 'Run combat hands-free. Say "tracker next", "Aragorn takes 8 damage", or "roll d20" — powered by on-device Whisper AI.',
+			desc: 'Run combat hands-free. Say "tracker next", "Aragorn takes 8 damage", or "roll d20" — powered by on-device Moonshine AI.',
 			color: 'text-cyan-400',
 			screenshot: '/screenshots/VoiceCommands.jpg'
 		},

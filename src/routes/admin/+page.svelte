@@ -409,7 +409,7 @@
 														href="/admin/export/{dm.sessionId}"
 														class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
 													>
-														Export JSON ↓
+														Export JSON v
 													</a>
 													{#if data.isRootAdmin && !dm.isRootAdmin}
 														{#if dm.isAdmin}
