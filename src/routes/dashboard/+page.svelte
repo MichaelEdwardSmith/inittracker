@@ -15,6 +15,7 @@
 	import DMInboxModal from '$lib/components/DMInboxModal.svelte';
 	import SpellsModal from '$lib/components/SpellsModal.svelte';
 	import SpellsModal2024 from '$lib/components/SpellsModal2024.svelte';
+	import ItemsModal from '$lib/components/ItemsModal.svelte';
 	import EncounterBuilderModal from '$lib/components/EncounterBuilderModal.svelte';
 	import VoiceCommands from '$lib/components/VoiceCommands.svelte';
 	import AudioMixer from '$lib/components/AudioMixer.svelte';
@@ -158,6 +159,7 @@
 	let showEncounters = $state(false);
 	let showSpells = $state(false);
 	let spellToOpen = $state<string | null>(null);
+	let showItems = $state(false);
 
 	setContext('openSpell', (name: string) => {
 		spellToOpen = name;
@@ -615,6 +617,17 @@
 				Spells
 			</button>
 			<button
+				onclick={() => {
+					showItems = true;
+					showMobileMenu = false;
+				}}
+				title="Browse and reference items"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-treasure-chest shrink-0 text-base" aria-hidden="true"></i>
+				Items
+			</button>
+			<button
 				onclick={openQuickRules}
 				title="Quick-reference tabletop rules"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
@@ -1020,6 +1033,10 @@
 			}}
 		/>
 	{/if}
+{/if}
+
+{#if showItems}
+	<ItemsModal onclose={() => (showItems = false)} />
 {/if}
 
 <DiceOverlay />
