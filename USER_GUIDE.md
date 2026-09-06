@@ -7,10 +7,12 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 ## Table of Contents
 
 1. [Getting Started (DM)](#1-getting-started-dm)
+   - [Choosing an Edition](#choosing-an-edition)
 2. [Getting Started (Players)](#2-getting-started-players)
 3. [The DM Dashboard](#3-the-dm-dashboard)
 4. [Managing Your Party (Players)](#4-managing-your-party-players)
    - [Importing from D&D Beyond](#importing-from-dd-beyond)
+   - [Importing a MorePurpleMoreBetter PDF](#importing-a-morepurplemorebetter-pdf)
    - [Leveling Up a Player](#leveling-up-a-player)
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
@@ -19,6 +21,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
    - [Death Saving Throws](#death-saving-throws)
    - [Legendary Actions](#legendary-actions)
+   - [Legendary Resistance](#legendary-resistance)
    - [Lair Actions](#lair-actions)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
@@ -27,30 +30,31 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 12. [Dice Roller](#12-dice-roller)
 13. [Encounter Builder](#13-encounter-builder)
 14. [Spell Reference](#14-spell-reference)
-15. [Player Messaging](#15-player-messaging)
-16. [Quick Reference](#16-quick-reference)
-17. [Generators](#17-generators)
-    - [Weather & Travel](#171-weather--travel)
-    - [Random Encounter](#172-random-encounter)
-    - [Wilderness Encounter](#173-wilderness-encounter)
-    - [Name Generator](#174-name-generator)
-    - [Town Generator](#175-town-generator)
-    - [Shop Generator](#176-shop-generator)
-    - [Inn Generator](#177-inn-generator)
-    - [Dungeon Generator](#178-dungeon-generator)
-    - [Wizard's Tower](#179-wizards-tower)
-    - [Cult / Secret Society](#1710-cult--secret-society)
-    - [Thieves' Guild](#1711-thieves-guild)
-    - [Trade Caravan](#1712-trade-caravan)
-    - [Black Market](#1713-black-market)
-    - [Noble House](#1714-noble-house)
-    - [Graveyard / Crypt](#1715-graveyard--crypt)
-    - [NPC Generator](#1716-npc-generator)
-18. [Liar's Dice](#18-liars-dice)
-19. [Stream Overlay](#19-stream-overlay)
-20. [Voice Commands _(Beta)_](#20-voice-commands-beta)
-21. [Audio Mixer](#21-audio-mixer)
-22. [Contact & Support](#22-contact--support)
+15. [Item Reference](#15-item-reference)
+16. [Player Messaging](#16-player-messaging)
+17. [Quick Reference](#17-quick-reference)
+18. [Generators](#18-generators)
+    - [Weather & Travel](#181-weather--travel)
+    - [Random Encounter](#182-random-encounter)
+    - [Wilderness Encounter](#183-wilderness-encounter)
+    - [Name Generator](#184-name-generator)
+    - [Town Generator](#185-town-generator)
+    - [Shop Generator](#186-shop-generator)
+    - [Inn Generator](#187-inn-generator)
+    - [Dungeon Generator](#188-dungeon-generator)
+    - [Wizard's Tower](#189-wizards-tower)
+    - [Cult / Secret Society](#1810-cult--secret-society)
+    - [Thieves' Guild](#1811-thieves-guild)
+    - [Trade Caravan](#1812-trade-caravan)
+    - [Black Market](#1813-black-market)
+    - [Noble House](#1814-noble-house)
+    - [Graveyard / Crypt](#1815-graveyard--crypt)
+    - [NPC Generator](#1816-npc-generator)
+19. [Liar's Dice](#19-liars-dice)
+20. [Stream Overlay](#20-stream-overlay)
+21. [Voice Commands _(Beta)_](#21-voice-commands-beta)
+22. [Audio Mixer](#22-audio-mixer)
+23. [Contact & Support](#23-contact--support)
 
 ---
 
@@ -69,6 +73,15 @@ Go to `/login` and sign in one of three ways:
 - **Continue with Discord**
 
 All three land you on your DM dashboard with your last active combat state restored. If you just want to try the app, click **Enter as Guest** on the login page — you'll get a temporary DM account with no email/password required.
+
+### Choosing an Edition
+
+The first time you (or a guest) reach the dashboard, a **"Choose Your Edition"** modal appears and can't be dismissed until you pick one:
+
+- **D&D 5e (2014)** — the original Monster Manual bestiary, classic spell list, 6-tier Exhaustion, and standard action economy
+- **D&D 2024** — the revised Monster Manual bestiary, the 2024 spell list, stacking −1 Exhaustion, and the 2024 action economy (a dedicated Bonus Actions section in stat blocks)
+
+This choice applies to a single game session — see [Creating a New Session](#10-game-sessions) for how to pick an edition again whenever you start a new one.
 
 ### Logging Out
 
@@ -123,12 +136,13 @@ The header runs across the top of every screen. Its actions include:
 - **Messages** — shows unread player messages; opens the DM inbox
 - **Notes** — opens the current session's DM notes
 - **Dice Roller** — opens the Dice Roller modal (see [Dice Roller](#12-dice-roller))
-- **Liar's Dice** — starts or joins a Liar's Dice game (see [Liar's Dice](#18-liars-dice))
+- **Liar's Dice** — starts or joins a Liar's Dice game (see [Liar's Dice](#19-liars-dice))
 - **Spells** — opens the Spell Reference (see [Spell Reference](#14-spell-reference))
-- **Voice** _(Chrome/Edge only)_ — enables hands-free voice commands (see [Voice Commands](#20-voice-commands-beta))
-- **Mixer** — opens the Audio Mixer (see [Audio Mixer](#21-audio-mixer))
-- **Quick Reference** — opens the rules-lookup panel (see [Quick Reference](#16-quick-reference))
-- **Generators** — opens the content-generator hub (see [Generators](#17-generators))
+- **Items** — opens the Item Reference (see [Item Reference](#15-item-reference))
+- **Voice** _(Chrome/Edge only)_ — enables hands-free voice commands (see [Voice Commands](#21-voice-commands-beta))
+- **Mixer** — opens the Audio Mixer (see [Audio Mixer](#22-audio-mixer))
+- **Quick Reference** — opens the rules-lookup panel (see [Quick Reference](#17-quick-reference))
+- **Generators** — opens the content-generator hub (see [Generators](#18-generators))
 - **Encounters** — opens the Encounter Builder (see [Encounter Builder](#13-encounter-builder))
 - **Sessions** — opens the Session Manager modal (see [Game Sessions](#10-game-sessions))
 - **History** — opens the Combat Chronicle page
@@ -142,7 +156,7 @@ The header runs across the top of every screen. Its actions include:
 
 ### Adding a Player
 
-Click **+ Add Player** to open the add-player popup. It offers two ways to add a player: **Manual** entry or **D&D Beyond** import. Click the tab at the top of the popup to switch between them. The popup stays open after each add, so you can add your whole party in one go — close it with the **✕**, **Escape**, or by clicking outside it.
+Click **+ Add Player** to open the add-player popup. It offers three ways to add a player: **Manual** entry, **D&D Beyond** import, or **MPMB PDF** import. Click the tab at the top of the popup to switch between them. The popup stays open after each add, so you can add your whole party in one go — close it with the **✕**, **Escape**, or by clicking outside it.
 
 **Manual:**
 
@@ -176,6 +190,17 @@ If your players have characters on D&D Beyond, you can import them directly inst
 The character's **D&D Beyond portrait** is imported automatically and set as their avatar.
 
 > **Tip:** If Fetch returns an error, check that the character's privacy is set to Public in D&D Beyond's Character Settings.
+
+### Importing a MorePurpleMoreBetter PDF
+
+If your players use [MorePurpleMoreBetter](https://www.flapkan.com/other#RecordSheet) (MPMB) fillable character sheets, you can import one directly from the PDF file — no upload to a server required, it's all read in your browser.
+
+1. Click the **MPMB PDF** tab at the top of the add-player popup
+2. Click the file picker and choose the player's `.pdf` character sheet
+3. A preview card appears showing the imported values: **Name**, **Race/Class**, **Level**, **Max HP**, **AC**, **DEX mod**, and **Passive Perception**
+4. Click **Add Player** on the preview card to add them to the roster
+
+> **Note:** This reads the sheet's fillable form fields directly, so it only works with the original fillable PDF — not a flattened, printed, or scanned copy. If a value can't be read from the sheet, the preview flags which one so you can double-check it before adding.
 
 ### Player Avatars
 
@@ -424,6 +449,19 @@ Click the **ℹ️ icon** beside the dots to open a modal showing the full text 
 
 ---
 
+### Legendary Resistance
+
+Enemies whose stat block includes a **Legendary Resistance** trait (e.g. dragons, liches, and other apex monsters) automatically show a **Legendary Resistance** row on their initiative card, using the same dot-tracker interaction as Legendary Actions above — but in sky blue instead of amber, so the two rows are easy to tell apart at a glance.
+
+- The number of dots matches that specific creature's daily uses (most are 3/day, but this is read from the stat block rather than assumed)
+- Click any filled dot to spend down to that point; click any hollow dot to restore from that point onward
+- **Unlike Legendary Actions, these do _not_ refill automatically** — legendary resistance is a per-day resource, not a per-round one, so the dots stay however you left them until you manually restore them (e.g. after the creature finishes a long rest)
+- Click the **ℹ️ icon** beside the dots to view the trait's exact text
+
+> **Note:** Same availability rule as Legendary Actions — only enemies with a full stat block that lists this trait will show the row.
+
+---
+
 ### Lair Actions
 
 Some powerful creatures (dragons, beholders, and other legendary monsters) can take **lair actions** — special effects that occur on initiative count 20. You can add a dedicated **Lair Actions** card to the initiative order for any enemy.
@@ -614,8 +652,10 @@ Click any session in the list to switch to it. The dashboard reloads with that s
 ### Creating a New Session
 
 1. Click **New Session** at the bottom of the modal
-2. Type a name (or leave blank for a default like "Session 2")
-3. Click **Create**
+2. In the **Choose Your Edition** dialog that opens, pick **D&D 5e (2014)** or **D&D 2024** for this session (see [Choosing an Edition](#choosing-an-edition)), and optionally type a name in the field at the bottom (leave it blank for a default like "Session 2")
+3. Click **Create Session**
+
+> **This choice is permanent.** A session's ruleset can't be changed after it's created.
 
 ### Renaming a Session
 
@@ -766,7 +806,7 @@ Click **New Encounter** to expand the builder form.
    - **Difficulty badge** — based on the party size and level inputs at the top of the modal
 7. Click **Save Encounter** to persist it to your account
 
-> **Tip:** Encounters are stored at the account level and are available in every game session — build your library once and reuse it across campaigns. You can also generate a ready-made encounter with the [Random Encounter](#172-random-encounter) or [Wilderness Encounter](#173-wilderness-encounter) generators and send it straight to the tracker with **Add to Initiative**.
+> **Tip:** Encounters are stored at the account level and are available in every game session — build your library once and reuse it across campaigns. You can also generate a ready-made encounter with the [Random Encounter](#182-random-encounter) or [Wilderness Encounter](#183-wilderness-encounter) generators and send it straight to the tracker with **Add to Initiative**.
 
 ### Difficulty Calculation
 
@@ -831,7 +871,46 @@ When viewing a monster's stat block, any spell name in a spell list (e.g. in the
 
 ---
 
-## 15. Player Messaging
+## 15. Item Reference
+
+Click the **Items** button in the dashboard header (or the tools menu on mobile) to open the Item Reference modal. It is available at any time — in or out of combat. The list is sourced from the D&D 5e SRD: the full player's-handbook equipment list plus the DMG's magic item roster.
+
+### Layout
+
+The modal is split into two panels:
+
+| Panel     | Contents                                          |
+| --------- | ------------------------------------------------- |
+| **Left**  | Search bar, filters, and the scrollable item list |
+| **Right** | Full item card for the selected item              |
+
+### Searching and Filtering
+
+- **Search bar** — filters the list by name in real time
+- **Category dropdown** — Weapon, Armor, Adventuring Gear, Tool, Equipment Pack, Mount, Vehicle, or Magic Item
+- **Rarity dropdown** — shown when the category filter is "Magic Item" (or unset); filters by Common, Uncommon, Rare, Very Rare, Legendary, or Artifact
+
+Each item in the list shows its name plus, on the right, either a rarity badge (magic items) or its cost (everything else). Click any item to open its card in the right panel.
+
+### Item Card
+
+The right panel shows:
+
+- **Name** — in amber
+- **Subtitle** — item type/category, sub-category (e.g. "Martial Melee", "Heavy"), a rarity badge, and an attunement badge, as applicable
+- **Info grid** — whichever of Cost, Weight, Damage, Range, Armor Class, Str Required, Stealth, Speed, and Carrying Capacity apply to that item
+- **Properties** — weapon properties (e.g. Finesse, Versatile, Thrown), when applicable
+- **Contents** — the itemized gear list, for equipment packs
+- **Description** — full item text, including any tables (e.g. the Potions of Healing table)
+- **Source** — the book the item comes from (PHB or DMG)
+
+### Clickable Dice
+
+Dice expressions in an item's damage or description (e.g. `2d6` or `d100`) appear in amber with a dotted underline. Click one to roll it — the same result popup used in stat blocks and spells appears, showing individual die values and the total.
+
+---
+
+## 16. Player Messaging
 
 Players on the viewer screen can send a private message directly to the DM — useful for asking questions, flagging something, or communicating without leaving the display. Messages are visible only to the DM and are not persisted between server restarts.
 
@@ -856,9 +935,9 @@ Click **Clear all** in the inbox header to delete all messages for the current s
 
 ---
 
-## 16. Quick Reference
+## 17. Quick Reference
 
-Click the **Quick Reference** button (document icon) in the dashboard header to open a full-screen rules-lookup panel — pure D&D 5e reference material, no randomization or content generation (for that, see [Generators](#17-generators)).
+Click the **Quick Reference** button (document icon) in the dashboard header to open a full-screen rules-lookup panel — pure D&D 5e reference material, no randomization or content generation (for that, see [Generators](#18-generators)).
 
 ### Layout
 
@@ -888,7 +967,7 @@ A left sidebar lists every rules category; the right panel shows the selected on
 
 ---
 
-## 17. Generators
+## 18. Generators
 
 Click the **Generators** button (gear/flower icon) in the dashboard header to open a full-screen hub of 16 D&D 5e content generators — names, settlements, factions, dungeons, and more. Unlike Quick Reference, everything here is randomized and can be regenerated, tweaked, and (for most tools) saved for later.
 
@@ -896,41 +975,41 @@ Click the **Generators** button (gear/flower icon) in the dashboard header to op
 
 A left sidebar lists all 16 generators by icon and name; click one to load it into the right-hand content panel. Most tools regenerate their output **live** as you change any control — there's often no separate "Generate" button beyond a **Randomize** action that rerolls the random seed. Tools that support saving keep a small "Saved [Things]" list in their left panel, backed by your browser's local storage (not your DM account, so saved items are per-browser).
 
-### 17.1 Weather & Travel
+### 18.1 Weather & Travel
 
 Pick a **Season** and **Biome** (4 seasons × 8 biomes), then click **Generate Week** to produce a 7-day weather table across five time slots (Dawn, Morning, Midday, Evening, Night). A **Travel Pace** table dynamically adjusts movement rates by the combined biome × season multiplier, with a badge showing the active modifier, plus a **Navigation DC** table.
 
 A **Generate Weather Event** button produces a standalone dramatic weather event card (intensity: minor/moderate/severe/extreme) with a name, duration, onset, description, a "Mechanics" bullet list, and an "Aftermath" note — driven by your current Season/Biome selection.
 
-### 17.2 Random Encounter
+### 18.2 Random Encounter
 
 Select a biome/terrain (12 options), **Party Size** (1–8), **Party Level** (1–20), and **Difficulty** (Easy/Medium/Hard/Deadly), then click **Generate** to produce a fully XP-budgeted combat encounter: title, scene flavor text, archetype description, a monster list with individual XP values, an XP breakdown strip (raw → multiplier → adjusted → per-player), an actual difficulty badge, a tactics note, and a terrain feature. **Roll Again** re-generates with the same settings; **Add to Initiative** clears current enemies and loads the generated monsters directly into the initiative tracker, then closes the panel.
 
-### 17.3 Wilderness Encounter
+### 18.3 Wilderness Encounter
 
-A narrative-first counterpart to Random Encounter: pick a **Terrain** (10 options), **Time of Day** (Dawn/Morning/Afternoon/Dusk/Night), and **Party Level**, then click **Roll Encounter**. The result is one of six encounter types — Combat, Hazard, Discovery, Flora & Fauna, Travelers, or Mystery (weighted toward the non-combat types) — with a headline, a time-of-day-flavored scene line, a terrain-specific detail paragraph, a Complication/Opportunity pair, and 2–3 relevant skills. There's no difficulty control or monster stat block here — use [Random Encounter](#172-random-encounter) when you need an XP-budgeted fight, and Wilderness Encounter when you want an evocative road/travel moment instead.
+A narrative-first counterpart to Random Encounter: pick a **Terrain** (10 options), **Time of Day** (Dawn/Morning/Afternoon/Dusk/Night), and **Party Level**, then click **Roll Encounter**. The result is one of six encounter types — Combat, Hazard, Discovery, Flora & Fauna, Travelers, or Mystery (weighted toward the non-combat types) — with a headline, a time-of-day-flavored scene line, a terrain-specific detail paragraph, a Complication/Opportunity pair, and 2–3 relevant skills. There's no difficulty control or monster stat block here — use [Random Encounter](#182-random-encounter) when you need an XP-budgeted fight, and Wilderness Encounter when you want an evocative road/travel moment instead.
 
-### 17.4 Name Generator
+### 18.4 Name Generator
 
 Select a race/type — 11 options: Human (Male), Human (Female), Elf, Dwarf, Halfling, Gnome, Orc/Half-Orc, Tiefling, Dragonborn, Tavern Name, Town/Village — then click **First Names** and/or **Surnames** to generate 10 of each. Click any name to select it (amber highlight); a preview strip shows "Party met **Firstname Lastname**, a Dwarf," and **Save to Notes** appends the entry to the current session's DM notes (creating a note if none exists).
 
-### 17.5 Town Generator
+### 18.5 Town Generator
 
 Set a **Town Name** (auto-filled, freely editable), **Settlement Size** (Thorp → Metropolis), **Wealth** (Poor → Wealthy), and whether it **Has Keep**, then click **Randomize** for a new town (or just edit the fields — the town regenerates live). The output includes a prose "About [Town]" description, an optional Keep section (Great Hall, Barracks, Armory, and size-dependent Chapel/Dungeon/Lord's Chambers), and grouped building sections (Civic & Religious, Inns & Taverns, Trades & Services, Farms & Outbuildings, Residences) — each building has a name, description, and NPC roster.
 
 Buildings with an inventory (shops, smithies, stables, inns, taverns, temples) have a **View Inventory/Menu/Services** button showing 7–10 priced items with a **Restock** option. Every building also has a **Floor Plan** button that opens an embedded third-party floor-plan generator (seeded to that building) with its own **New Layout** reroll and an **Open ↗** link to view it full-page. Click **Save Town** to keep it in a "Saved Towns" list.
 
-### 17.6 Shop Generator
+### 18.6 Shop Generator
 
 Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic Shop, Jeweler, Tavern & Inn, Bookshop, Herbalist, Fletcher & Bowyer, Stable) and town affluence (6 tiers: Impoverished → Opulent), then click **Stock Shop** to generate a random named shop with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items appropriate to affluence are included. Click any item for a detail modal.
 
 Click **Save to Notes** to open a small prompt for which city/town the shop is in (optional), then save — the note records the shop, its city, affluence, and type, plus a full itemized inventory list. A **"Previously Visited Shops"** section with **Load from Notes** lets you pull any shop you've saved back out of your DM notes to view or reload later.
 
-### 17.7 Inn Generator
+### 18.7 Inn Generator
 
 Pick an **Inn Quality** (Poor → Legendary), **Party Size**, and **Party Level**, then click **Randomize**. You get a named inn with an italic tagline, an owner (with race and backstory), a staff roster, a Food/Drink menu with prices, room types/rates, a set of 3–6 level-scaled **Guests and Quests** (each with a Hook/Complication/Goal/Reward and a difficulty badge), and a **Rumor Mill** of 3–4 overheard rumors (each secretly flagged True or False for the DM's reference). Click **Save Inn** to keep it in a "Saved Inns" list.
 
-### 17.8 Dungeon Generator
+### 18.8 Dungeon Generator
 
 A from-scratch port of the classic Donjon dungeon algorithm, wrapped in this app's encounter/treasure/hazard/puzzle systems. Configure **Rows/Cols** (grid size), **Corridors** (Labyrinth/Bent/Straight), **Floors** (1–9), a **Theme** (⚰️ Crypt, Sewer, Cave, 🏰 Fortress, 🔮 Arcane, 🍄 Fungal), an optional **Boss Room**, and **Party Size/Level**/**Difficulty** (recorded for reference), then click **Generate**.
 
@@ -938,41 +1017,41 @@ The map renders on a zoomable canvas with a room/corridor/door/trap/loot/stairs 
 
 Multi-floor dungeons link automatically via ▼/▲ stairs between levels, switchable via floor tabs. Toggle **🗺️ Map Live** to push the current floor to players and manually reveal corridors/doors/rooms as you explore (a fog-of-war system, not an instant full reveal). **Save**/**Load** persist dungeons to your browser; **PDF** exports a print-ready, per-floor GM handout with the map and a full room table.
 
-### 17.9 Wizard's Tower
+### 18.9 Wizard's Tower
 
 Set **Party Size**, **Party Level** (shown as a Tier, which affects apprentice frequency/tier), and **Number of Floors** (2–8), then click **Randomize**. You get a named tower with a school-of-magic badge, an exterior description, and a Wizard Status (Present, Absent, Deceased, or Transformed, with a specific reason). Each floor has a themed room (Laboratory, Library, Summoning Chamber, etc.), and may include a **Magical Anomaly** (a weird localized physics quirk), an **Apprentice** (with a disposition and interaction note), and/or a dangerous **Experiment** (with a danger-level badge). Click **Save Tower** to keep it in a "Saved Towers" list.
 
-### 17.10 Cult / Secret Society
+### 18.10 Cult / Secret Society
 
 Set **Party Size** and **Party Level** (higher levels skew the organization toward more advanced/dangerous stages), then click **Randomize**. You get a cult name, type badge, symbol, public cover, doctrine, a goal with an operational **Stage** (cell/established/ascendant/critical), three named rituals, a leadership structure, and two covert recognition signs. Click **Save Cult** to keep it in a "Saved Cults" list.
 
-### 17.11 Thieves' Guild
+### 18.11 Thieves' Guild
 
 Click **Generate New Den** for a criminal organization: guild name and internal alias, a **Heat** badge (Cold/Warm/Hot/Burning), district, cover business, secret entrance, a 5-room den layout, a 4-member leadership hierarchy, a 5-item fence inventory, and a **Current Job Board** of 3–4 expandable jobs (type, risk, payout, and — when expanded — target, details, and a twist). Also includes a house rule and a current rumor. Click **Save Den** to keep it in a "Saved Dens" list.
 
-### 17.12 Trade Caravan
+### 18.12 Trade Caravan
 
 Click **Generate New Caravan** for a merchant caravan on the road: a route (origin → destination), size badge, caravan master, a stat strip (wagons, days out/remaining, guard quality), a cargo manifest (with a 35% chance of a hidden/illegal "Not on Manifest" entry), a guard roster, a complication, and an overheard rumor. Click **Save Caravan** to keep it in a "Saved Caravans" list.
 
-### 17.13 Black Market
+### 18.13 Black Market
 
 Click **Generate New Market** for an illicit marketplace: market name, location, **Heat** badge, cover business, access method, a broker NPC, a "Today's Condition" situational event, and 5–7 inventory items each with a legal-status badge, risk badge, and a legal-vs-street price comparison. Also includes a house rule and a "Word on the Street" rumor. Click **Save Market** to keep it in a "Saved Markets" list.
 
-### 17.14 Noble House
+### 18.14 Noble House
 
 Click **Generate New House** for a noble family: a heraldically-accurate shield/motto/rank banner (field and charge tinctures follow the real rule of contrast), holdings (seat, territory, resource, military strength, income tier), political alliances, a rival house with a feud cause, current scandals (type + severity + description), a succession note, and a public-reputation summary. Click **Save House** to keep it in a "Saved Houses" list.
 
-### 17.15 Graveyard / Crypt
+### 18.15 Graveyard / Crypt
 
 Set **Party Size** and **Party Level** (which sets a Tier that skews site type and scales content), then click **Generate New Site**. You get a burial site (Graveyard/Crypt/Catacomb/Barrow/Ossuary) with a condition badge, an optional keeper NPC, a layout of 4–5 sections, several notable graves with epitaphs and plot hooks, expandable **Haunts** (trigger + manifestation + resolution), expandable **Buried Treasure Hooks** (location + contents + complication), a recent event, and a local rumor. Click **Save Site** to keep it in a "Saved Sites" list.
 
-### 17.16 NPC Generator
+### 18.16 NPC Generator
 
 Choose a **Role** (10 options: Commoner, Merchant, Guard, Innkeeper, Noble, Criminal, Retired Adventurer, Sage, Clergy, Soldier), **Gender**, and cosmetic **Disposition** badge, then let it regenerate (or set a specific **Seed**). You get a full NPC — appearance, personality trait/flaw/voice, motivation and secret, a plot hook, and a complete D&D 5e stat block (AC, HP, speed, ability scores, saves, skills, CR/XP, traits, and actions). Click **Save NPC** to keep it in a "Saved NPCs" list, or **Export PDF** to download the NPC as a handout.
 
 ---
 
-## 18. Liar's Dice
+## 19. Liar's Dice
 
 Liar's Dice is a built-in bluffing dice minigame you can run with your players as a side activity, separate from combat — useful for a tavern scene, a break between encounters, or just a fun diversion. It runs over the same live session connection as combat, so it updates instantly on the DM dashboard and every player's viewer screen.
 
@@ -1013,7 +1092,7 @@ An Observing DM sees every player's dice face-up at all times, the current bid, 
 
 ---
 
-## 19. Stream Overlay
+## 20. Stream Overlay
 
 `/overlay/[sessionId]` is a separate, transparent view designed to be added as an **OBS (or similar) browser source** for streaming your combat sessions — it is not part of the normal DM/player workflow and has no Liar's Dice content.
 
@@ -1027,7 +1106,7 @@ The background is fully transparent and the overlay ignores mouse/click input, s
 
 ---
 
-## 20. Voice Commands _(Beta)_
+## 21. Voice Commands _(Beta)_
 
 > ⚠️ **Beta feature — still in testing.** Voice commands rely on the browser's built-in Speech Recognition API, which is currently supported in **Chrome and Edge** only. Behaviour may vary depending on your microphone, accent, and ambient noise. Please report any issues.
 
@@ -1064,7 +1143,7 @@ A small **confirmation toast** appears at the bottom of the screen whenever a co
 
 ---
 
-## 21. Audio Mixer
+## 22. Audio Mixer
 
 Click the **🎚 Mixer** button in the DM dashboard header to open the full-screen audio mixer. Use it to layer ambient sounds — dungeon ambience, tavern noise, battle music — that play in the background while you run your session.
 
@@ -1124,6 +1203,6 @@ When you pick a file on Chrome or Edge, the mixer saves a lightweight **referenc
 
 ---
 
-## 22. Contact & Support
+## 23. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
