@@ -1,8 +1,9 @@
-<!-- Legendary actions modal — shows a monster's legendary action text with clickable
-     dice/attack buttons. Contains its own dice-result overlay. -->
+<!-- Legendary actions / legendary resistance modal — shows a monster's legendary action
+     (or legendary resistance) text with clickable dice/attack buttons. Contains its own
+     dice-result overlay. -->
 <script lang="ts">
 	interface Props {
-		modal: { name: string; text: string } | null;
+		modal: { name: string; text: string; title?: string } | null;
 		onclose: () => void;
 	}
 
@@ -100,7 +101,7 @@
 				<div class="flex items-center gap-2">
 					<i class="fa-duotone fa-light fa-star text-amber-400" aria-hidden="true"></i>
 					<span class="text-sm font-bold tracking-widest text-amber-300 uppercase"
-						>Legendary Actions</span
+						>{modal.title ?? 'Legendary Actions'}</span
 					>
 					<span class="text-xs text-gray-500">— {modal.name}</span>
 				</div>

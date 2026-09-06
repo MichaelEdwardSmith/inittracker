@@ -129,6 +129,7 @@ function createCombatStore() {
 				statuses: c.statuses,
 				rounds: c.conditionRounds ?? {},
 				legendary: c.legendaryActionsSpent ?? null,
+				legendaryRes: c.legendaryResistancesUsed ?? null,
 				death: c.deathSaves ?? null
 			}))
 		});
@@ -789,6 +790,13 @@ function createCombatStore() {
 		setLegendaryActionsSpent(id: string, spent: number) {
 			combatants = combatants.map((c) =>
 				c.id === id ? { ...c, legendaryActionsSpent: spent } : c
+			);
+			sync();
+		},
+
+		setLegendaryResistancesUsed(id: string, used: number) {
+			combatants = combatants.map((c) =>
+				c.id === id ? { ...c, legendaryResistancesUsed: used } : c
 			);
 			sync();
 		},

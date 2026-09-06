@@ -4,7 +4,13 @@
      end-combat flow that writes a CombatRecord to history. DM-only. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { CONDITIONS, ADV_CONDITIONS, SPELL_EFFECTS, getMonsterDetail } from '$lib/enemies';
+	import {
+		CONDITIONS,
+		ADV_CONDITIONS,
+		SPELL_EFFECTS,
+		getMonsterDetail,
+		getLegendaryResistanceInfo
+	} from '$lib/enemies';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
@@ -140,7 +146,7 @@
 	}
 
 	// ── Condition state ──────────────────────────────────────────────────────
-	let legendaryInfoModal = $state<{ name: string; text: string } | null>(null);
+	let legendaryInfoModal = $state<{ name: string; text: string; title?: string } | null>(null);
 
 	let pendingCondition = $state<{
 		id: string;
@@ -880,6 +886,44 @@
 												text: legendaryDetail.legendaryActions!
 											})}
 										title="View legendary actions"
+										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
+									>
+										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
+									</button>
+								</div>
+							{/if}
+							{@const legendaryResistance = getLegendaryResistanceInfo(legendaryDetail?.traits)}
+							{#if legendaryResistance}
+								{@const used = Math.min(c.legendaryResistancesUsed ?? 0, legendaryResistance.max)}
+								<div class="flex items-center gap-2">
+									<span class="shrink-0 text-xs font-semibold text-sky-200/70"
+										>Legendary Resistance:</span
+									>
+									<div class="flex items-center gap-1">
+										{#each Array(legendaryResistance.max) as _, dotIdx}
+											{@const max = legendaryResistance.max}
+											{@const isSpent = dotIdx >= max - used}
+											<button
+												onclick={() =>
+													combat.setLegendaryResistancesUsed(
+														c.id,
+														isSpent ? max - 1 - dotIdx : max - dotIdx
+													)}
+												title={isSpent ? 'Mark as available' : 'Spend a legendary resistance'}
+												class="h-4 w-4 rounded-full border-2 transition {isSpent
+													? 'border-sky-600 bg-transparent hover:bg-sky-900/30'
+													: 'border-sky-400 bg-sky-400 hover:bg-sky-300'}"
+											></button>
+										{/each}
+									</div>
+									<button
+										onclick={() =>
+											(legendaryInfoModal = {
+												name: c.name,
+												text: legendaryResistance.text,
+												title: 'Legendary Resistance'
+											})}
+										title="View legendary resistance"
 										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
 									>
 										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
