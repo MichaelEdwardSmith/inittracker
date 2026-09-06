@@ -2846,7 +2846,7 @@
 		magic: {
 			label: 'Magic Shop',
 			items: [
-				{ name: 'Spell Scroll (cantrip)', price: 25 },
+				{ name: 'Spell Scroll (cantrip)', price: 50 },
 				{ name: 'Spell Scroll (1st level)', price: 75 },
 				{ name: 'Spell Scroll (2nd level)', price: 150 },
 				{ name: 'Spell Scroll (3rd level)', price: 300 },
@@ -2861,7 +2861,7 @@
 				{ name: 'Druidic focus (staff)', price: 5 },
 				{ name: 'Pearl (spell component)', price: 100 },
 				{ name: 'Diamond dust (per oz)', price: 300 },
-				{ name: 'Identify (service)', price: 20 }
+				{ name: 'Identify (service)', price: 150 }
 			]
 		},
 		jeweler: {
@@ -2871,17 +2871,17 @@
 				{ name: 'Silver ring', price: 10 },
 				{ name: 'Silver necklace', price: 15 },
 				{ name: 'Gold ring', price: 25 },
-				{ name: 'Onyx pendant', price: 30 },
-				{ name: 'Pearl earrings', price: 50 },
-				{ name: 'Garnet brooch', price: 60 },
-				{ name: 'Jade bracelet', price: 75 },
-				{ name: 'Amethyst ring', price: 80 },
-				{ name: 'Topaz earrings', price: 90 },
-				{ name: 'Sapphire pendant', price: 100 },
-				{ name: 'Opal amulet', price: 120 },
-				{ name: 'Ruby brooch', price: 150 },
-				{ name: 'Emerald necklace', price: 200 },
-				{ name: 'Diamond stud', price: 200 }
+				{ name: 'Onyx pendant', price: 65 },
+				{ name: 'Amethyst ring', price: 115 },
+				{ name: 'Garnet brooch', price: 125 },
+				{ name: 'Jade bracelet', price: 130 },
+				{ name: 'Pearl earrings', price: 140 },
+				{ name: 'Topaz earrings', price: 550 },
+				{ name: 'Sapphire pendant', price: 1100 },
+				{ name: 'Opal amulet', price: 1150 },
+				{ name: 'Emerald necklace', price: 1200 },
+				{ name: 'Ruby brooch', price: 5200 },
+				{ name: 'Diamond stud', price: 5500 }
 			]
 		},
 		tavern: {
@@ -2892,12 +2892,12 @@
 				{ name: 'Wine, common (pitcher)', price: 0.2 },
 				{ name: 'Wine, fine (bottle)', price: 10 },
 				{ name: 'Mead (mug)', price: 0.05 },
-				{ name: 'Meal, poor', price: 0.03 },
+				{ name: 'Meal, poor', price: 0.06 },
 				{ name: 'Meal, modest', price: 0.3 },
-				{ name: 'Meal, fine', price: 5 },
+				{ name: 'Meal, fine', price: 2 },
 				{ name: 'Room, poor (per night)', price: 0.1 },
 				{ name: 'Room, modest (per night)', price: 0.5 },
-				{ name: 'Room, comfortable (per night)', price: 2 },
+				{ name: 'Room, comfortable (per night)', price: 0.8 },
 				{ name: 'Stabling (per night)', price: 0.5 },
 				{ name: 'Bread, loaf', price: 0.02 },
 				{ name: 'Meat, chunk', price: 0.03 },
@@ -2913,13 +2913,13 @@
 				{ name: 'Blank journal', price: 10 },
 				{ name: 'Ink (1 oz)', price: 10 },
 				{ name: 'Ink pen', price: 0.02 },
-				{ name: 'Paper (sheet)', price: 0.02 },
-				{ name: 'Parchment (sheet)', price: 0.01 },
+				{ name: 'Paper (sheet)', price: 0.2 },
+				{ name: 'Parchment (sheet)', price: 0.1 },
 				{ name: 'Scroll case', price: 1 },
 				{ name: 'Map, local area', price: 5 },
 				{ name: 'Map, regional', price: 20 },
 				{ name: 'Spellbook (blank)', price: 50 },
-				{ name: 'Sealing wax', price: 0.05 },
+				{ name: 'Sealing wax', price: 0.5 },
 				{ name: 'Star chart', price: 30 }
 			]
 		},
@@ -2958,7 +2958,7 @@
 				{ name: 'Net', price: 1 },
 				{ name: 'Sling', price: 0.1 },
 				{ name: 'Sling bullets (20)', price: 0.04 },
-				{ name: 'Arrow (silvered)', price: 25 },
+				{ name: 'Arrow (silvered)', price: 2 },
 				{ name: 'Bowstring (replacement)', price: 0.5 }
 			]
 		},
@@ -3300,7 +3300,7 @@
 			{ name: 'Sword of Life Stealing', price: 2500, rarity: 'rare' },
 			{ name: 'Sword of Wounding', price: 2500, rarity: 'rare' },
 			{ name: 'Flame Tongue', price: 3000, rarity: 'rare' },
-			{ name: 'Frost Brand', price: 3500, rarity: 'rare' },
+			{ name: 'Frost Brand', price: 10000, rarity: 'very_rare' },
 			{ name: '+2 Longsword', price: 4000, rarity: 'rare' },
 			{ name: '+3 Longsword', price: 20000, rarity: 'very_rare' },
 			{ name: 'Sword of Sharpness', price: 25000, rarity: 'very_rare' },
@@ -3322,60 +3322,60 @@
 		alchemist: [
 			{ name: 'Potion of Healing (Greater)', price: 150, rarity: 'uncommon' },
 			{ name: 'Potion of Fire Breath', price: 150, rarity: 'uncommon' },
-			{ name: 'Potion of Invisibility', price: 180, rarity: 'uncommon' },
 			{ name: 'Potion of Resistance', price: 200, rarity: 'uncommon' },
 			{ name: 'Potion of Water Breathing', price: 200, rarity: 'uncommon' },
-			{ name: 'Potion of Healing (Superior)', price: 500, rarity: 'rare' },
+			{ name: 'Potion of Healing (Superior)', price: 600, rarity: 'rare' },
 			{ name: 'Potion of Invulnerability', price: 1000, rarity: 'rare' },
 			{ name: 'Potion of Mind Control', price: 1500, rarity: 'rare' },
-			{ name: 'Potion of Healing (Supreme)', price: 5000, rarity: 'very_rare' },
-			{ name: 'Potion of Storm Giant Strength', price: 25000, rarity: 'legendary' }
+			{ name: 'Potion of Invisibility', price: 8000, rarity: 'very_rare' },
+			{ name: 'Potion of Healing (Supreme)', price: 6000, rarity: 'very_rare' },
+			{ name: 'Potion of Storm Giant Strength', price: 25000, rarity: 'very_rare' }
 		],
 		magic: [
 			{ name: 'Clockwork Amulet', price: 75, rarity: 'common' },
-			{ name: 'Hat of Disguise', price: 75, rarity: 'common' },
 			{ name: 'Wand of Spark', price: 75, rarity: 'common' },
+			{ name: 'Hat of Disguise', price: 150, rarity: 'uncommon' },
 			{ name: 'Bag of Holding', price: 450, rarity: 'uncommon' },
 			{ name: 'Boots of Elvenkind', price: 300, rarity: 'uncommon' },
 			{ name: 'Cloak of Elvenkind', price: 300, rarity: 'uncommon' },
 			{ name: 'Helm of Comprehending Languages', price: 300, rarity: 'uncommon' },
 			{ name: 'Pearl of Power', price: 400, rarity: 'uncommon' },
-			{ name: 'Ring of Feather Falling', price: 350, rarity: 'uncommon' },
 			{ name: 'Wand of Magic Missiles', price: 350, rarity: 'uncommon' },
 			{ name: 'Wand of Web', price: 300, rarity: 'uncommon' },
 			{ name: 'Winged Boots', price: 450, rarity: 'uncommon' },
-			{ name: 'Bag of Tricks (Grey)', price: 750, rarity: 'uncommon' },
+			{ name: 'Bag of Tricks (Grey)', price: 350, rarity: 'uncommon' },
 			{ name: 'Necklace of Fireballs', price: 1500, rarity: 'rare' },
+			{ name: 'Ring of Feather Falling', price: 1200, rarity: 'rare' },
 			{ name: 'Ring of Evasion', price: 2000, rarity: 'rare' },
 			{ name: 'Ring of Protection', price: 2000, rarity: 'rare' },
 			{ name: 'Ring of the Ram', price: 2500, rarity: 'rare' },
+			{ name: 'Robe of Eyes', price: 4000, rarity: 'rare' },
 			{ name: 'Staff of Healing', price: 3000, rarity: 'rare' },
-			{ name: 'Staff of Fire', price: 4000, rarity: 'rare' },
 			{ name: 'Wand of Fireballs', price: 3000, rarity: 'rare' },
 			{ name: 'Wand of Lightning Bolts', price: 3000, rarity: 'rare' },
 			{ name: 'Portable Hole', price: 4000, rarity: 'rare' },
 			{ name: 'Amulet of the Planes', price: 10000, rarity: 'very_rare' },
 			{ name: 'Carpet of Flying', price: 15000, rarity: 'very_rare' },
 			{ name: 'Crystal Ball', price: 25000, rarity: 'very_rare' },
-			{ name: 'Robe of Eyes', price: 20000, rarity: 'very_rare' },
-			{ name: 'Staff of the Magi', price: 40000, rarity: 'very_rare' },
+			{ name: 'Staff of Fire', price: 9000, rarity: 'very_rare' },
 			{ name: 'Wand of Polymorph', price: 30000, rarity: 'very_rare' },
 			{ name: 'Deck of Many Things', price: 75000, rarity: 'legendary' },
 			{ name: 'Ring of Three Wishes', price: 75000, rarity: 'legendary' },
-			{ name: 'Sphere of Annihilation', price: 75000, rarity: 'legendary' }
+			{ name: 'Sphere of Annihilation', price: 75000, rarity: 'legendary' },
+			{ name: 'Staff of the Magi', price: 90000, rarity: 'legendary' }
 		],
 		jeweler: [
 			{ name: 'Amulet of Proof vs. Detection', price: 300, rarity: 'uncommon' },
 			{ name: 'Periapt of Health', price: 300, rarity: 'uncommon' },
+			{ name: 'Periapt of Wound Closure', price: 400, rarity: 'uncommon' },
 			{ name: 'Ring of Mind Shielding', price: 350, rarity: 'uncommon' },
 			{ name: 'Ring of Swimming', price: 300, rarity: 'uncommon' },
 			{ name: 'Necklace of Adaptation', price: 400, rarity: 'uncommon' },
 			{ name: 'Ring of Evasion', price: 2000, rarity: 'rare' },
 			{ name: 'Ring of Protection', price: 2000, rarity: 'rare' },
-			{ name: 'Periapt of Wound Closure', price: 2500, rarity: 'uncommon' },
+			{ name: 'Ring of Spell Storing', price: 4000, rarity: 'rare' },
 			{ name: 'Amulet of Health', price: 2500, rarity: 'rare' },
-			{ name: 'Ring of Regeneration', price: 20000, rarity: 'very_rare' },
-			{ name: 'Ring of Spell Storing', price: 25000, rarity: 'very_rare' }
+			{ name: 'Ring of Regeneration', price: 20000, rarity: 'very_rare' }
 		],
 		tavern: [
 			{ name: 'Tankard of Sobriety', price: 75, rarity: 'common' },
@@ -3384,7 +3384,7 @@
 			{ name: 'Sending Stones (pair)', price: 250, rarity: 'uncommon' }
 		],
 		book: [
-			{ name: 'Spell Scroll (4th level)', price: 500, rarity: 'rare' },
+			{ name: 'Spell Scroll (4th level)', price: 600, rarity: 'rare' },
 			{ name: 'Spell Scroll (5th level)', price: 1000, rarity: 'rare' },
 			{ name: 'Manual of Bodily Health', price: 20000, rarity: 'very_rare' },
 			{ name: 'Manual of Gainful Exercise', price: 20000, rarity: 'very_rare' },
@@ -3406,11 +3406,11 @@
 			{ name: 'Bracers of Archery', price: 300, rarity: 'uncommon' },
 			{ name: '+1 Longbow', price: 350, rarity: 'uncommon' },
 			{ name: '+2 Longbow', price: 3000, rarity: 'rare' },
-			{ name: 'Arrow of Slaying', price: 2000, rarity: 'very_rare' }
+			{ name: 'Arrow of Slaying', price: 9000, rarity: 'very_rare' }
 		],
 		stable: [
 			{ name: 'Horseshoes of Speed', price: 1500, rarity: 'rare' },
-			{ name: 'Horseshoes of a Zephyr', price: 3000, rarity: 'very_rare' }
+			{ name: 'Horseshoes of a Zephyr', price: 7000, rarity: 'very_rare' }
 		]
 	};
 	// Rarity slots available per affluence
@@ -5271,7 +5271,7 @@
 	</div>
 	<!-- Header -->
 	<div class="flex shrink-0 items-center gap-3 border-b border-gray-800 bg-gray-900 px-6 py-3">
-		<i class="fa-duotone fa-light fa-gear text-xl" aria-hidden="true"></i>
+		<i class="fa-duotone fa-light fa-gear text-xl text-white" aria-hidden="true"></i>
 		<h2 class="text-lg font-black tracking-widest text-amber-400 uppercase">Generators</h2>
 		<p class="ml-2 hidden text-xs text-gray-500 sm:block">D&amp;D 5e content generators</p>
 		<button
