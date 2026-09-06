@@ -1,9 +1,11 @@
-<!-- Add Player popup — lets the DM add a party member either by hand (Manual tab) or by
-     importing a public D&D Beyond character sheet (D&D Beyond tab). Stays open after each
+<!-- Add Player popup — lets the DM add a party member either by hand (Manual tab), by
+     importing a public D&D Beyond character sheet (D&D Beyond tab), or by uploading a
+     MorePurpleMoreBetter fillable PDF character sheet (MPMB tab). Stays open after each
      add so multiple players can be added in a row; closes via the ✕, Escape, or backdrop
      click. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
+	import { parseMpmbSheet, type MpmbCharacter } from '$lib/mpmbImport';
 
 	interface Props {
 		onclose: () => void;
@@ -19,7 +21,7 @@
 	let voiceAliases = $state('');
 
 	// D&D Beyond import
-	let activeTab = $state<'manual' | 'ddb'>('manual');
+	let activeTab = $state<'manual' | 'ddb' | 'mpmb'>('manual');
 	let ddbUrl = $state('');
 	let ddbFetching = $state(false);
 	let ddbError = $state('');
@@ -77,6 +79,47 @@
 		ddbUrl = '';
 		ddbPreview = null;
 		ddbError = '';
+	}
+
+	// MorePurpleMoreBetter PDF import
+	let mpmbFileName = $state('');
+	let mpmbParsing = $state(false);
+	let mpmbError = $state('');
+	let mpmbPreview = $state<MpmbCharacter | null>(null);
+
+	async function handleMpmbFile(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file) return;
+		mpmbFileName = file.name;
+		mpmbError = '';
+		mpmbPreview = null;
+		mpmbParsing = true;
+		try {
+			const bytes = await file.arrayBuffer();
+			mpmbPreview = await parseMpmbSheet(bytes);
+		} catch (err) {
+			mpmbError = err instanceof Error ? err.message : 'Failed to read that PDF.';
+		} finally {
+			mpmbParsing = false;
+			input.value = '';
+		}
+	}
+
+	function addMpmbPlayer() {
+		if (!mpmbPreview) return;
+		combat.addPlayer(
+			mpmbPreview.name,
+			mpmbPreview.ac,
+			mpmbPreview.maxHp,
+			mpmbPreview.dexMod || undefined,
+			mpmbPreview.passivePerception || undefined,
+			undefined,
+			mpmbPreview.level || undefined
+		);
+		mpmbFileName = '';
+		mpmbPreview = null;
+		mpmbError = '';
 	}
 
 	function addPlayer() {
@@ -161,6 +204,19 @@
 				>
 					D&amp;D Beyond
 				</button>
+				<button
+					type="button"
+					onclick={() => {
+						activeTab = 'mpmb';
+						mpmbError = '';
+						mpmbPreview = null;
+					}}
+					class="flex-1 rounded-md py-1 transition {activeTab === 'mpmb'
+						? 'bg-amber-600 text-white'
+						: 'text-gray-400 hover:text-gray-200'}"
+				>
+					MPMB PDF
+				</button>
 			</div>
 
 			<!-- D&D Beyond import form -->
@@ -209,6 +265,73 @@
 						<button
 							type="button"
 							onclick={addDDBPlayer}
+							class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
+						>
+							<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
+						</button>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- MorePurpleMoreBetter PDF import form -->
+			{#if activeTab === 'mpmb'}
+				<div class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3">
+					<p class="text-xs text-gray-400">
+						Upload a filled-in
+						<a
+							href="https://www.flapkan.com/other#RecordSheet"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-amber-400 underline decoration-dotted hover:text-amber-300"
+							>MorePurpleMoreBetter</a
+						> fillable character sheet PDF.
+					</p>
+					<label
+						class="flex cursor-pointer items-center justify-center gap-2 rounded border border-dashed border-gray-600 bg-gray-900 px-3 py-4 text-xs text-gray-400 transition hover:border-amber-500 hover:text-gray-200"
+					>
+						<i class="fa-duotone fa-light fa-file-pdf text-base" aria-hidden="true"></i>
+						{mpmbFileName || 'Choose a PDF file…'}
+						<input type="file" accept="application/pdf" class="hidden" onchange={handleMpmbFile} />
+					</label>
+					{#if mpmbParsing}
+						<p class="text-xs text-gray-400">Reading sheet…</p>
+					{/if}
+					{#if mpmbError}
+						<p class="text-xs text-red-400">{mpmbError}</p>
+					{/if}
+					{#if mpmbPreview}
+						<div class="rounded-md border border-blue-800/60 bg-gray-900 p-2.5">
+							<div class="mb-1.5 text-sm font-semibold text-white">
+								{mpmbPreview.name}
+								{#if mpmbPreview.race || mpmbPreview.classes}
+									<span class="font-normal text-gray-500">
+										— {[mpmbPreview.race, mpmbPreview.classes].filter(Boolean).join(', ')}</span
+									>
+								{/if}
+							</div>
+							<div class="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-gray-400">
+								<span>Level: <span class="text-white">{mpmbPreview.level}</span></span>
+								<span>Max HP: <span class="text-white">{mpmbPreview.maxHp}</span></span>
+								<span>AC: <span class="text-white">{mpmbPreview.ac}</span></span>
+								<span
+									>DEX: <span class="text-white"
+										>{mpmbPreview.dexMod >= 0 ? '+' : ''}{mpmbPreview.dexMod}</span
+									></span
+								>
+								<span>Passive: <span class="text-white">{mpmbPreview.passivePerception}</span></span
+								>
+							</div>
+						</div>
+						{#if mpmbPreview.missingFields.length > 0}
+							<p class="text-xs text-amber-500">
+								<i class="fa-duotone fa-light fa-triangle-exclamation" aria-hidden="true"></i>
+								Couldn't read {mpmbPreview.missingFields.join(', ')} from this sheet — defaulted above,
+								double-check before adding.
+							</p>
+						{/if}
+						<button
+							type="button"
+							onclick={addMpmbPlayer}
 							class="rounded bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-500 active:bg-amber-700"
 						>
 							<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player
