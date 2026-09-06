@@ -34,6 +34,7 @@
 		anomaly: string | null;
 		apprentice: Apprentice | null;
 		experiment: Experiment | null;
+		hasWizard: boolean;
 	}
 	interface WizardStatus {
 		present: boolean;
@@ -674,8 +675,30 @@
 				description,
 				anomaly,
 				apprentice,
-				experiment
+				experiment,
+				hasWizard: false
 			});
+		}
+
+		// If the wizard is present in the tower, make sure they actually show up in one of
+		// the generated floors instead of just being a status flag with nowhere to point to.
+		// Prefer a floor whose room type a wizard would plausibly occupy; fall back to the
+		// top floor (the classic "wizard lives at the top" default) if none of those rolled.
+		if (wizardStatus.present) {
+			const preferredLabels = [
+				'Personal Quarters',
+				'Laboratory',
+				'Library',
+				'Observatory',
+				'Scrying Room',
+				'Mind Laboratory',
+				'Runic Forge',
+				'Golem Workshop'
+			];
+			const wizardFloor =
+				preferredLabels.map((label) => floors.find((f) => f.label === label)).find(Boolean) ??
+				floors[floors.length - 1];
+			if (wizardFloor) wizardFloor.hasWizard = true;
 		}
 
 		return { name, exterior, wizard: { name: wizardName, race, school }, wizardStatus, floors };
@@ -966,11 +989,41 @@
 									{floor.number}
 								</span>
 								<span class="text-sm font-bold text-amber-300">{floor.label}</span>
+								{#if floor.hasWizard}
+									<span
+										class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-300 uppercase ring-1 ring-amber-500/40"
+									>
+										<i class="fa-duotone fa-light fa-hat-wizard" aria-hidden="true"></i> Wizard Here
+									</span>
+								{/if}
 							</div>
 
 							<div class="space-y-4 p-4">
 								<!-- Description -->
 								<p class="text-sm leading-relaxed text-gray-300">{floor.description}</p>
+
+								<!-- Wizard -->
+								{#if floor.hasWizard}
+									<div class="rounded-lg border border-amber-700/50 bg-amber-950/20 px-3 py-2.5">
+										<p
+											class="mb-1.5 text-[10px] font-bold tracking-widest text-amber-400 uppercase"
+										>
+											{towerData.wizardStatus.label}
+										</p>
+										<div class="mb-1.5 flex flex-wrap items-center gap-2">
+											<span class="text-sm font-bold text-gray-100">{towerData.wizard.name}</span>
+											<span class="rounded bg-gray-700 px-1.5 py-0.5 text-[10px] text-gray-300"
+												>{towerData.wizard.race}</span
+											>
+											<span class="text-[11px] text-gray-500 capitalize"
+												>{towerData.wizard.school}</span
+											>
+										</div>
+										<p class="text-xs leading-relaxed text-gray-300">
+											{towerData.wizardStatus.detail}
+										</p>
+									</div>
+								{/if}
 
 								<!-- Anomaly -->
 								{#if floor.anomaly}
