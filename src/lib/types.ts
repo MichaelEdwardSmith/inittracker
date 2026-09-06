@@ -49,6 +49,10 @@ export interface Combatant {
 	voiceAliases?: string[];
 	// Enemies only — legendary actions spent this round (resets at start of their turn)
 	legendaryActionsSpent?: number;
+	// Enemies only — legendary resistances used so far. This is a per-day resource (unlike
+	// legendary actions), so it does NOT reset automatically on turn advance — the DM clears
+	// it manually (e.g. after a long rest) by clicking used pips back to available.
+	legendaryResistancesUsed?: number;
 	// Players only — death saving throw tracker (present when currentHp === 0)
 	deathSaves?: { successes: number; failures: number; stable: boolean };
 	// Enemies only — loot items rolled/edited by the DM after enemy is slain
@@ -276,6 +280,54 @@ export interface Spell5e {
 	entriesHigherLevel?: unknown[];
 	classes?: unknown; // 5etools classes object
 	ritual?: true;
+}
+
+// ---------------------------------------------------------------------------
+// Item Reference (flat structure — weapons, armor, gear, tools, mounts/vehicles,
+// equipment packs, and magic items, sourced from the SRD)
+// ---------------------------------------------------------------------------
+
+export type ItemCategory =
+	| 'weapon'
+	| 'armor'
+	| 'gear'
+	| 'tool'
+	| 'pack'
+	| 'mount'
+	| 'vehicle'
+	| 'magic-item';
+
+export interface Item {
+	name: string;
+	category: ItemCategory;
+	subCategory?: string; // e.g. "Martial Melee", "Heavy", "Artisan's Tools", "Mounts and Other Animals"
+	cost?: string; // e.g. "15 gp"
+	weight?: string; // e.g. "3 lb."
+	description?: string;
+	source: string; // "PHB" | "DMG"
+
+	// weapon only
+	damage?: string; // "1d8"
+	damageType?: string; // "Slashing"
+	range?: string; // "150/600 ft." (ranged weapons only)
+	properties?: string[]; // ["Finesse", "Light", "Thrown (range 20/60 ft.)"]
+
+	// armor only
+	ac?: string; // "16" or "11 + Dex modifier (max 2)"
+	strengthRequirement?: number;
+	stealthDisadvantage?: boolean;
+
+	// equipment pack only
+	contents?: string[]; // ["Backpack (1)", "Bedroll (1)", ...]
+
+	// mount/vehicle only
+	speed?: string; // "60 ft/round"
+	capacity?: string; // "480 lb."
+
+	// magic item only
+	itemType?: string; // "Wondrous item", "Ring", "Staff", "Wand", "Rod", "Potion", "Scroll", "Weapon (any sword)"
+	rarity?: string; // "common" | "uncommon" | "rare" | "very rare" | "legendary" | "artifact" | ...
+	attunement?: string; // e.g. "requires attunement by a spellcaster"
 }
 
 // ---------------------------------------------------------------------------

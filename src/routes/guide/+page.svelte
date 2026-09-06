@@ -22,14 +22,15 @@
 		{ id: 'dice-roller', label: '13. Dice Roller' },
 		{ id: 'encounter-builder', label: '14. Encounter Builder' },
 		{ id: 'spell-reference', label: '15. Spell Reference' },
-		{ id: 'player-messaging', label: '16. Player Messaging' },
-		{ id: 'quick-reference', label: '17. Quick Reference' },
-		{ id: 'generators', label: '18. Generators' },
-		{ id: 'liars-dice', label: '19. Liar’s Dice' },
-		{ id: 'stream-overlay', label: '20. Stream Overlay' },
-		{ id: 'voice-commands', label: '21. Voice Commands (Beta)' },
-		{ id: 'audio-mixer', label: '22. Audio Mixer' },
-		{ id: 'contact', label: '23. Contact & Support' }
+		{ id: 'item-reference', label: '16. Item Reference' },
+		{ id: 'player-messaging', label: '17. Player Messaging' },
+		{ id: 'quick-reference', label: '18. Quick Reference' },
+		{ id: 'generators', label: '19. Generators' },
+		{ id: 'liars-dice', label: '20. Liar’s Dice' },
+		{ id: 'stream-overlay', label: '21. Stream Overlay' },
+		{ id: 'voice-commands', label: '22. Voice Commands (Beta)' },
+		{ id: 'audio-mixer', label: '23. Audio Mixer' },
+		{ id: 'contact', label: '24. Contact & Support' }
 	];
 
 	const conditions = [
@@ -359,7 +360,7 @@
 					<li>
 						<strong class="font-semibold text-white">Messages</strong> — opens the DM inbox (see
 						<a href="#player-messaging" class="text-amber-400 transition hover:text-amber-300"
-							>section 16</a
+							>section 17</a
 						>)
 					</li>
 					<li>
@@ -376,7 +377,7 @@
 						<strong class="font-semibold text-white">Liar's Dice</strong> — starts or joins a Liar's
 						Dice game (see
 						<a href="#liars-dice" class="text-amber-400 transition hover:text-amber-300"
-							>section 19</a
+							>section 20</a
 						>)
 					</li>
 					<li>
@@ -387,30 +388,36 @@
 						>)
 					</li>
 					<li>
+						<strong class="font-semibold text-white">Items</strong> — opens the Item Reference (see
+						<a href="#item-reference" class="text-amber-400 transition hover:text-amber-300"
+							>section 16</a
+						>)
+					</li>
+					<li>
 						<strong class="font-semibold text-white">Voice</strong> — enables hands-free voice
 						commands, Chrome/Edge only (see
 						<a href="#voice-commands" class="text-amber-400 transition hover:text-amber-300"
-							>section 21</a
+							>section 22</a
 						>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Mixer</strong> — opens the Audio Mixer (see
 						<a href="#audio-mixer" class="text-amber-400 transition hover:text-amber-300"
-							>section 22</a
+							>section 23</a
 						>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Quick Reference</strong> — opens the
 						rules-lookup panel (see
 						<a href="#quick-reference" class="text-amber-400 transition hover:text-amber-300"
-							>section 17</a
+							>section 18</a
 						>)
 					</li>
 					<li>
 						<strong class="font-semibold text-white">Generators</strong> — opens the
 						content-generator hub (see
 						<a href="#generators" class="text-amber-400 transition hover:text-amber-300"
-							>section 18</a
+							>section 19</a
 						>)
 					</li>
 					<li>
@@ -450,12 +457,11 @@
 					<strong class="font-semibold text-white"
 						><i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Add Player</strong
 					>
-					to open the add-player popup. It has two tabs:
-					<strong class="font-semibold text-white">Manual</strong>
-					and
-					<strong class="font-semibold text-white">D&amp;D Beyond</strong>. Click a tab to switch
-					between them. The popup stays open after each add, so you can add your whole party in one
-					go.
+					to open the add-player popup. It has three tabs:
+					<strong class="font-semibold text-white">Manual</strong>,
+					<strong class="font-semibold text-white">D&amp;D Beyond</strong>, and
+					<strong class="font-semibold text-white">MPMB PDF</strong>. Click a tab to switch between
+					them. The popup stays open after each add, so you can add your whole party in one go.
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					<strong class="font-semibold text-white">Manual:</strong> Fill in the player's
@@ -507,6 +513,50 @@
 					The character's D&amp;D Beyond portrait is imported automatically and set as their avatar.
 					Both 2014 and 2024 ruleset characters are supported — 2024 initiative proficiency is
 					applied to the DEX modifier automatically.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Importing a MorePurpleMoreBetter PDF
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					If your players use
+					<a
+						href="https://www.flapkan.com/other#RecordSheet"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-amber-400 transition hover:text-amber-300">MorePurpleMoreBetter</a
+					>
+					(MPMB) fillable character sheets, you can import one directly from the PDF file — it's read
+					entirely in your browser, nothing is uploaded to a server.
+				</p>
+				<ol class="mb-4 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
+					<li>
+						Click the <strong class="font-semibold text-white">MPMB PDF</strong> tab in the add-player
+						popup
+					</li>
+					<li>
+						Click the file picker and choose the player's <code
+							class="rounded bg-gray-800 px-1 text-xs text-amber-300">.pdf</code
+						> character sheet
+					</li>
+					<li>
+						A preview card appears with the imported values: <strong
+							class="font-semibold text-white">Name</strong
+						>, Race/Class, <strong class="font-semibold text-white">Level</strong>,
+						<strong class="font-semibold text-white">Max HP</strong>,
+						<strong class="font-semibold text-white">AC</strong>,
+						<strong class="font-semibold text-white">DEX modifier</strong>, and
+						<strong class="font-semibold text-white">Passive Perception</strong>
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Add Player</strong> on the preview card to
+						add them to the roster
+					</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					This reads the sheet's fillable form fields directly, so it only works with the original
+					fillable PDF — not a flattened, printed, or scanned copy. If a value can't be read from
+					the sheet, the preview flags which one so you can double-check it before adding.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1128,6 +1178,45 @@
 				</p>
 
 				<h3
+					id="legendary-resistance"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Legendary Resistance
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Enemies whose stat block includes a <strong class="font-semibold text-white"
+						>Legendary Resistance</strong
+					>
+					trait automatically show a matching row on their initiative card — same dot-tracker interaction
+					as Legendary Actions above, just in
+					<strong class="font-semibold text-sky-300">sky blue</strong> instead of amber so the two are
+					easy to tell apart.
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						The dot count matches that specific creature's daily uses (most are 3/day, but this is
+						read from its stat block rather than assumed).
+					</li>
+					<li>
+						Click a filled dot to spend down to that position; click a hollow dot to restore from
+						that position onward.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">These do not refill automatically</strong> — legendary
+						resistance is a per-day resource, not a per-round one, so the dots stay put until you manually
+						restore them (e.g. after the creature finishes a long rest).
+					</li>
+					<li>
+						Click the <strong class="font-semibold text-white">ℹ️ icon</strong> beside the dots to view
+						the trait's exact text.
+					</li>
+				</ul>
+				<p class="mb-6 text-sm leading-relaxed text-gray-400">
+					Same availability rule as Legendary Actions — only enemies with a full stat block that
+					lists this trait will show the row.
+				</p>
+
+				<h3
 					id="lair-actions"
 					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
 				>
@@ -1306,7 +1395,7 @@
 				<p class="mb-4 text-sm leading-relaxed">
 					A <strong class="font-semibold text-white">Liar's Dice</strong> entry also appears in the
 					viewer's header (or hamburger menu on mobile) whenever the DM has an active game — see
-					<a href="#liars-dice" class="text-amber-400 transition hover:text-amber-300">section 19</a
+					<a href="#liars-dice" class="text-amber-400 transition hover:text-amber-300">section 20</a
 					>.
 				</p>
 
@@ -1437,8 +1526,15 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">New Session</strong> at the bottom of the
-					modal, type a name (or leave blank for a default like "Session 2"), then click
-					<strong class="font-semibold text-white">Create</strong>.
+					modal. In the <strong class="font-semibold text-white">Choose Your Edition</strong> dialog
+					that opens, pick <strong class="font-semibold text-white">D&amp;D 5e (2014)</strong> or
+					<strong class="font-semibold text-white">D&amp;D 2024</strong>
+					for this session (see
+					<a href="#choosing-edition" class="text-amber-400 transition hover:text-amber-300"
+						>section 3</a
+					>), optionally type a name (or leave blank for a default like "Session 2"), then click
+					<strong class="font-semibold text-white">Create Session</strong>. This choice is permanent
+					and can't be changed later.
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
@@ -1910,8 +2006,97 @@
 			</section>
 
 			<!-- 16 ───────────────────────────────────────── -->
+			<section id="item-reference">
+				{@render h2('16', 'Item Reference')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">Items</strong> button in the dashboard header
+					(or the tools menu on mobile) to open the Item Reference modal. It is available at any time
+					— in or out of combat. The list is sourced from the D&amp;D 5e SRD: the full player's-handbook
+					equipment list plus the DMG's magic item roster.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Searching and Filtering
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					The left panel contains a search bar and two filter dropdowns:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Search bar</strong> — filters the list by name in
+						real time
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Category</strong> — Weapon, Armor, Adventuring Gear,
+						Tool, Equipment Pack, Mount, Vehicle, or Magic Item
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Rarity</strong> — shown when the category filter
+						is "Magic Item" (or unset); Common, Uncommon, Rare, Very Rare, Legendary, or Artifact
+					</li>
+				</ul>
+				<p class="mb-4 text-sm leading-relaxed">
+					Each item in the list shows its name plus, on the right, either a rarity badge (magic
+					items) or its cost (everything else). Click any item to open its card in the right panel.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Item Card
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">The right panel shows the full item details:</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-amber-300">Name</strong>, item type/category,
+						sub-category (e.g. "Martial Melee", "Heavy"), rarity badge, and attunement badge, as
+						applicable
+					</li>
+					<li>
+						Info grid — whichever of
+						<strong class="font-semibold text-white">Cost</strong>,
+						<strong class="font-semibold text-white">Weight</strong>,
+						<strong class="font-semibold text-white">Damage</strong>,
+						<strong class="font-semibold text-white">Range</strong>,
+						<strong class="font-semibold text-white">Armor Class</strong>,
+						<strong class="font-semibold text-white">Str Required</strong>,
+						<strong class="font-semibold text-white">Stealth</strong>,
+						<strong class="font-semibold text-white">Speed</strong>, and
+						<strong class="font-semibold text-white">Carrying Capacity</strong> apply to that item
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Properties</strong> — weapon properties (e.g. Finesse,
+						Versatile, Thrown), when applicable
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Contents</strong> — the itemized gear list, for equipment
+						packs
+					</li>
+					<li>
+						Full <strong class="font-semibold text-white">description</strong>, including any tables
+						(e.g. the Potions of Healing table)
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Source</strong> — the book the item comes from (PHB
+						or DMG)
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Clickable Dice
+				</h3>
+				<p class="text-sm leading-relaxed">
+					Dice expressions in an item's damage or description (e.g.
+					<code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">2d6</code> or
+					<code class="rounded bg-gray-800 px-1 font-mono text-xs text-amber-300">d100</code>)
+					appear in <span class="font-semibold text-amber-300">amber</span> with a dotted underline. Click
+					one to roll it — the same result popup used in stat blocks and spells appears, showing individual
+					die values and the total.
+				</p>
+			</section>
+
+			<!-- 17 ───────────────────────────────────────── -->
 			<section id="player-messaging">
-				{@render h2('16', 'Player Messaging')}
+				{@render h2('17', 'Player Messaging')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Players on the viewer screen can send a private message directly to the DM — useful for
@@ -1969,15 +2154,15 @@
 				</p>
 			</section>
 
-			<!-- 17 ─────────────────────────────────────── -->
+			<!-- 18 ─────────────────────────────────────── -->
 			<section id="quick-reference">
-				{@render h2('17', 'Quick Reference')}
+				{@render h2('18', 'Quick Reference')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					The <strong class="font-semibold text-white">Quick Reference</strong> panel is a
 					full-screen rules-lookup panel opened from the DM header — pure D&amp;D 5e reference
 					material, no randomization or content generation. (For randomized content, see
-					<a href="#generators" class="text-amber-400 transition hover:text-amber-300">section 18</a
+					<a href="#generators" class="text-amber-400 transition hover:text-amber-300">section 19</a
 					>, Generators.) The panel is aware of your session's ruleset (2014 or 2024) and adjusts
 					tables accordingly where the rules differ.
 				</p>
@@ -2038,9 +2223,9 @@
 				)}
 			</section>
 
-			<!-- 18 ─────────────────────────────────────── -->
+			<!-- 19 ─────────────────────────────────────── -->
 			<section id="generators">
-				{@render h2('18', 'Generators')}
+				{@render h2('19', 'Generators')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white">Generators</strong> button (gear/flower icon)
@@ -2423,9 +2608,9 @@
 				</p>
 			</section>
 
-			<!-- 19 ─────────────────────────────────────── -->
+			<!-- 20 ─────────────────────────────────────── -->
 			<section id="liars-dice">
-				{@render h2('19', "Liar's Dice")}
+				{@render h2('20', "Liar's Dice")}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Liar's Dice is a built-in bluffing dice minigame you can run with your players as a side
@@ -2532,9 +2717,9 @@
 				</p>
 			</section>
 
-			<!-- 20 ─────────────────────────────────────── -->
+			<!-- 21 ─────────────────────────────────────── -->
 			<section id="stream-overlay">
-				{@render h2('20', 'Stream Overlay')}
+				{@render h2('21', 'Stream Overlay')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					<code class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-amber-300"
@@ -2569,9 +2754,9 @@
 			</section>
 
 			{#if data.showVoiceCommands}
-				<!-- 21 ─────────────────────────────────────── -->
+				<!-- 22 ─────────────────────────────────────── -->
 				<section id="voice-commands">
-					{@render h2('21', 'Voice Commands (Beta)')}
+					{@render h2('22', 'Voice Commands (Beta)')}
 
 					<div
 						class="mb-5 rounded-lg border border-amber-800/50 bg-amber-900/20 px-4 py-3 text-sm leading-relaxed text-amber-300"
@@ -2667,9 +2852,9 @@
 				</section>
 			{/if}
 
-			<!-- 22 ─────────────────────────────────────── -->
+			<!-- 23 ─────────────────────────────────────── -->
 			<section id="audio-mixer">
-				{@render h2('22', 'Audio Mixer')}
+				{@render h2('23', 'Audio Mixer')}
 
 				<p class="mb-4 text-sm leading-relaxed">
 					Click the <strong class="font-semibold text-white"
@@ -2785,9 +2970,9 @@
 				</ul>
 			</section>
 
-			<!-- 23 ─────────────────────────────────────── -->
+			<!-- 24 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('23', 'Contact & Support')}
+				{@render h2('24', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"

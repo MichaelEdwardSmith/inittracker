@@ -108,6 +108,33 @@ export function getMonsterDetail(name: string): MonsterDetail | undefined {
 }
 
 // ---------------------------------------------------------------------------
+// Legendary Resistance — parsed out of the free-text traits block. Unlike legendary
+// actions (always shown as 3 pips), the daily use count genuinely varies by monster
+// (most are 3/Day, but not all), so we extract both the count and the trait's own
+// description text to show in the info modal.
+// ---------------------------------------------------------------------------
+
+export function getLegendaryResistanceInfo(
+	traits: string | undefined
+): { max: number; text: string } | null {
+	if (!traits) return null;
+	const idx = traits.search(/Legendary Resistance/i);
+	if (idx === -1) return null;
+	const countMatch = traits.slice(idx, idx + 60).match(/\((\d+)\s*\/\s*Day/i);
+	if (!countMatch) return null;
+	const max = parseInt(countMatch[1], 10);
+	// Slice out just this trait's paragraph (from its opening <p> to its closing </p>)
+	// rather than dumping every trait the monster has.
+	const startTag = traits.lastIndexOf('<p', idx);
+	const endIdx = traits.indexOf('</p>', idx);
+	const text =
+		startTag !== -1 && endIdx !== -1
+			? traits.slice(startTag, endIdx + 4)
+			: traits.slice(idx, endIdx !== -1 ? endIdx : undefined);
+	return { max, text };
+}
+
+// ---------------------------------------------------------------------------
 // Conditions
 // ---------------------------------------------------------------------------
 

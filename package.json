@@ -43,6 +43,7 @@
 		"jspdf": "^4.2.0",
 		"jspdf-autotable": "^5.0.7",
 		"mongodb": "^7.1.0",
+		"pdf-lib": "^1.17.1",
 		"rot-js": "^2.2.1"
 	}
 }
