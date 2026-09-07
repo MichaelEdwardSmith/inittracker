@@ -152,16 +152,32 @@ function createCombatStore() {
 		});
 	}
 
+	interface TransformRevertResult {
+		name: string;
+		type: Combatant['type'];
+		before: number;
+		after: number;
+	}
+
 	/** Core HP mutation — shared by adjustHp and applyAoE (no sync). */
 	function applyHpChange(id: string, delta: number) {
 		let hpBefore = 0;
 		let hpAfter = 0;
 		let combatantRef: Combatant | undefined;
+		let wasTransformed = false;
+		// Set when a Wild Shape/Polymorph form is destroyed by this hit — carries the
+		// true-form transition so a second, separate event can describe it accurately
+		// (the primary event below stays about the temporary form's own hit). A boxed
+		// array (rather than a reassigned `let`) sidesteps a TS control-flow narrowing
+		// quirk where reassignment inside the .map() callback below otherwise gets
+		// narrowed to `never` at the read site.
+		const revertResultBox: TransformRevertResult[] = [];
 
 		combatants = combatants.map((c) => {
 			if (c.id !== id) return c;
 			combatantRef = c;
 			hpBefore = c.currentHp;
+			wasTransformed = !!c.transformStash;
 			let updated: Combatant;
 			// Portion of a negative delta that actually hits real HP (after temp HP
 			// absorption) — used below to detect Wild Shape/Polymorph overkill.
@@ -180,21 +196,43 @@ function createCombatStore() {
 				updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
 			}
 			hpAfter = updated.currentHp;
-			// Wild Shape / Polymorph: damage beyond 0 while in a temporary form carries
-			// over to the true form's HP once they revert (RAW), instead of vanishing.
-			if (rawHpDamage > 0 && c.transformStash) {
+
+			if (rawHpDamage > 0 && c.transformStash && hpAfter === 0) {
+				// Wild Shape / Polymorph: the temporary form is destroyed. Per RAW, revert
+				// immediately — only the excess damage beyond what it took to zero the
+				// temporary form carries over to the true form's HP.
 				const overflow = Math.max(0, rawHpDamage - c.currentHp);
-				if (overflow > 0) {
+				const stash = c.transformStash;
+				const totalExcess = (stash.excessDamage ?? 0) + overflow;
+				const trueBefore = stash.currentHp;
+				const trueAfter = Math.max(0, trueBefore - totalExcess);
+				updated = {
+					...c,
+					name: stash.name,
+					ac: stash.ac,
+					maxHp: stash.maxHp,
+					currentHp: trueAfter,
+					imgUrl: stash.imgUrl,
+					templateName: stash.templateName,
+					monsterType: stash.monsterType,
+					transformStash: undefined
+				};
+				if (trueBefore > 0 && trueAfter === 0) {
 					updated = {
 						...updated,
-						transformStash: {
-							...c.transformStash,
-							excessDamage: (c.transformStash.excessDamage ?? 0) + overflow
-						}
+						statuses: c.type === 'player' ? ['Unconscious'] : [],
+						...(c.type === 'player'
+							? { deathSaves: { successes: 0, failures: 0, stable: false } }
+							: {})
 					};
 				}
-			}
-			if (hpBefore > 0 && hpAfter === 0) {
+				revertResultBox.push({
+					name: stash.name,
+					type: c.type,
+					before: trueBefore,
+					after: trueAfter
+				});
+			} else if (hpBefore > 0 && hpAfter === 0) {
 				updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
 				if (c.type === 'player' && !updated.deathSaves) {
 					updated = { ...updated, deathSaves: { successes: 0, failures: 0, stable: false } };
@@ -215,7 +253,10 @@ function createCombatStore() {
 			const actualDelta = hpAfter - hpBefore;
 			if (actualDelta < 0) {
 				const dmg = -actualDelta;
-				const causedDown = hpBefore > 0 && hpAfter === 0;
+				// A transformed combatant's temporary form hitting 0 isn't "knocked
+				// unconscious" — it's destroyed and they revert (handled as a separate
+				// event below), so don't attach that misleading wording here.
+				const causedDown = hpBefore > 0 && hpAfter === 0 && !wasTransformed;
 				combatEvents = [
 					...combatEvents,
 					{
@@ -238,6 +279,32 @@ function createCombatStore() {
 						totalDamage: stats.totalDamage + dmg,
 						wasSlain: stats.wasSlain || (causedDown && c.type === 'enemy')
 					});
+				}
+				const r = revertResultBox[0];
+				if (r && r.before - r.after > 0) {
+					const revertCausedDown = r.before > 0 && r.after === 0;
+					combatEvents = [
+						...combatEvents,
+						{
+							type: 'damage',
+							round,
+							combatantId: id,
+							combatantName: r.name,
+							combatantType: r.type as 'player' | 'enemy',
+							value: r.before - r.after,
+							hpBefore: r.before,
+							hpAfter: r.after,
+							causedDown: revertCausedDown || undefined
+						}
+					];
+					if (stats) {
+						participantStats.set(id, {
+							...participantStats.get(id)!,
+							totalDamage: participantStats.get(id)!.totalDamage + (r.before - r.after),
+							wasSlain:
+								participantStats.get(id)!.wasSlain || (revertCausedDown && r.type === 'enemy')
+						});
+					}
 				}
 			} else if (actualDelta > 0) {
 				combatEvents = [
@@ -599,7 +666,16 @@ function createCombatStore() {
 				applyHpChange(id, delta);
 			}
 			suppressSync = false;
-			syncToServer({ combatants, currentTurnId, round, aoeEvents });
+			syncToServer({
+				combatants,
+				currentTurnId,
+				round,
+				aoeEvents,
+				dungeonRoomDescription,
+				dungeonMapState,
+				turnTimerSeconds,
+				turnStartedAt
+			});
 		},
 
 		/** Apply a condition/spell effect to multiple combatants in a single sync — used by
