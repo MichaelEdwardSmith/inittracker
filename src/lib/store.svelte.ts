@@ -163,18 +163,37 @@ function createCombatStore() {
 			combatantRef = c;
 			hpBefore = c.currentHp;
 			let updated: Combatant;
+			// Portion of a negative delta that actually hits real HP (after temp HP
+			// absorption) — used below to detect Wild Shape/Polymorph overkill.
+			let rawHpDamage = 0;
 			if (delta < 0 && c.tempHp > 0) {
 				const absorbed = Math.min(c.tempHp, -delta);
 				const spill = -delta - absorbed;
+				rawHpDamage = spill;
 				updated = {
 					...c,
 					tempHp: c.tempHp - absorbed,
 					currentHp: Math.max(0, c.currentHp - spill)
 				};
 			} else {
+				if (delta < 0) rawHpDamage = -delta;
 				updated = { ...c, currentHp: Math.max(0, Math.min(c.maxHp, c.currentHp + delta)) };
 			}
 			hpAfter = updated.currentHp;
+			// Wild Shape / Polymorph: damage beyond 0 while in a temporary form carries
+			// over to the true form's HP once they revert (RAW), instead of vanishing.
+			if (rawHpDamage > 0 && c.transformStash) {
+				const overflow = Math.max(0, rawHpDamage - c.currentHp);
+				if (overflow > 0) {
+					updated = {
+						...updated,
+						transformStash: {
+							...c.transformStash,
+							excessDamage: (c.transformStash.excessDamage ?? 0) + overflow
+						}
+					};
+				}
+			}
 			if (hpBefore > 0 && hpAfter === 0) {
 				updated = { ...updated, statuses: c.type === 'player' ? ['Unconscious'] : [] };
 				if (c.type === 'player' && !updated.deathSaves) {
@@ -912,24 +931,38 @@ function createCombatStore() {
 		},
 
 		/** Restore a transformed combatant's true-form stats from their stash.
-		 *  Per RAW (Wild Shape/Polymorph), damage taken in the temporary form doesn't
-		 *  carry over to the true form's HP UNLESS the temporary form was dropped to 0 —
-		 *  in that case the true form comes back at 0 HP too, instead of full health. */
+		 *  Per RAW (Wild Shape/Polymorph): damage taken in the temporary form doesn't
+		 *  touch the true form's HP UNLESS the temporary form was dropped to 0, in which
+		 *  case only the excess damage beyond that carries over — not a flat wipe to 0. */
 		revertTransform(id: string) {
 			combatants = combatants.map((c) => {
 				if (c.id !== id || !c.transformStash) return c;
 				const stash = c.transformStash;
-				return {
+				const excess = stash.excessDamage ?? 0;
+				const newHp = Math.max(0, stash.currentHp - excess);
+				let updated: Combatant = {
 					...c,
 					name: stash.name,
 					ac: stash.ac,
 					maxHp: stash.maxHp,
-					currentHp: c.currentHp <= 0 ? 0 : stash.currentHp,
+					currentHp: newHp,
 					imgUrl: stash.imgUrl,
 					templateName: stash.templateName,
 					monsterType: stash.monsterType,
 					transformStash: undefined
 				};
+				// Mirror applyHpChange's 0-HP transition if the carried-over excess was
+				// enough to also drop the true form — otherwise they revert conscious.
+				if (stash.currentHp > 0 && newHp === 0) {
+					updated = {
+						...updated,
+						statuses: c.type === 'player' ? ['Unconscious'] : [],
+						...(c.type === 'player'
+							? { deathSaves: { successes: 0, failures: 0, stable: false } }
+							: {})
+					};
+				}
+				return updated;
 			});
 			sync();
 		},

@@ -71,6 +71,10 @@ export interface Combatant {
 		imgUrl?: string;
 		templateName?: string;
 		monsterType?: string;
+		// Per RAW: damage beyond what it took to reduce the temporary form to 0 carries
+		// over to the true form once they revert. Accumulates if they somehow take more
+		// damage after hitting 0 while still in the temporary form.
+		excessDamage?: number;
 	};
 }
 

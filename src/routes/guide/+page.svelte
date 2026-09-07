@@ -1300,12 +1300,15 @@
 					While transformed, the card shows a <strong class="font-semibold text-emerald-400"
 						>↺ Revert to True Form</strong
 					>
-					button in the same spot. Clicking it restores the original name, AC, and max HP exactly. Per
-					the usual Wild Shape/Polymorph rule, damage taken in the temporary form doesn't carry over when
-					you revert —
-					<strong class="font-semibold text-white"
-						>unless the temporary form was dropped to 0 HP</strong
-					>, in which case the true form comes back at 0 HP too instead of full health.
+					button in the same spot. Clicking it restores the original name, AC, and max HP. Per the RAW
+					Wild Shape/Polymorph rule, damage taken in the temporary form doesn't touch the true form's
+					HP at all —
+					<strong class="font-semibold text-white">unless the temporary form is dropped to 0</strong
+					>, in which case only the <strong class="font-semibold text-white">excess damage</strong>
+					(whatever was left over after zeroing out the temporary form) carries over to the true form's
+					HP, exactly as the rule describes. The true form is only knocked unconscious if that excess
+					is itself enough to drop it to 0 — a small overkill hit leaves them reverting conscious with
+					HP to spare.
 				</p>
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
 					This is a stat-swap tool, not a rules engine — it doesn't look anything up for you; enter
