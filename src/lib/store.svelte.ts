@@ -94,6 +94,8 @@ function createCombatStore() {
 	let suppressSync = false;
 	let dungeonRoomDescription = $state<StorageState['dungeonRoomDescription']>(null);
 	let dungeonMapState = $state<StorageState['dungeonMapState']>(null);
+	let turnTimerSeconds = $state<number | null>(null);
+	let turnStartedAt = $state<number | null>(null);
 
 	const MAX_UNDO_STEPS = 5;
 	let undoStack = $state<UndoSnapshot[]>([]);
@@ -130,6 +132,8 @@ function createCombatStore() {
 				rounds: c.conditionRounds ?? {},
 				legendary: c.legendaryActionsSpent ?? null,
 				legendaryRes: c.legendaryResistancesUsed ?? null,
+				reaction: c.reactionUsed ?? null,
+				transformed: c.transformStash ? c.name : null,
 				death: c.deathSaves ?? null
 			}))
 		});
@@ -137,7 +141,15 @@ function createCombatStore() {
 
 	function sync() {
 		if (suppressSync) return;
-		syncToServer({ combatants, currentTurnId, round, dungeonRoomDescription, dungeonMapState });
+		syncToServer({
+			combatants,
+			currentTurnId,
+			round,
+			dungeonRoomDescription,
+			dungeonMapState,
+			turnTimerSeconds,
+			turnStartedAt
+		});
 	}
 
 	/** Core HP mutation — shared by adjustHp and applyAoE (no sync). */
@@ -311,6 +323,15 @@ function createCombatStore() {
 		get round() {
 			return round;
 		},
+		get combatEvents() {
+			return combatEvents;
+		},
+		get turnTimerSeconds() {
+			return turnTimerSeconds;
+		},
+		get turnStartedAt() {
+			return turnStartedAt;
+		},
 		get currentTurn() {
 			return combatants.find((c) => c.id === currentTurnId) ?? null;
 		},
@@ -362,6 +383,8 @@ function createCombatStore() {
 			combatants = s.combatants;
 			currentTurnId = s.currentTurnId;
 			round = s.round;
+			turnTimerSeconds = s.turnTimerSeconds ?? null;
+			turnStartedAt = s.turnStartedAt ?? null;
 			if (undoFingerprint(s.combatants, s.currentTurnId, s.round) !== before) {
 				undoStack = [];
 			}
@@ -375,6 +398,8 @@ function createCombatStore() {
 				if (!res.ok) return;
 				const s: StorageState = await res.json();
 				combatants = s.combatants;
+				turnTimerSeconds = s.turnTimerSeconds ?? null;
+				turnStartedAt = s.turnStartedAt ?? null;
 				currentTurnId = s.currentTurnId;
 				round = s.round;
 			} catch {
@@ -704,9 +729,18 @@ function createCombatStore() {
 			if (sorted.length === 0) return;
 			currentTurnId = sorted[0].id;
 			round = 1;
+			turnStartedAt = Date.now();
 			// Begin tracking
 			combatStartedAt = new Date().toISOString();
-			combatEvents = [];
+			combatEvents = [
+				{
+					type: 'turn_start',
+					round,
+					combatantId: sorted[0].id,
+					combatantName: sorted[0].name,
+					combatantType: sorted[0].type
+				}
+			];
 			participantStats = new Map();
 			for (const c of activeCombatants()) snapshotCombatant(c);
 			sync();
@@ -718,12 +752,14 @@ function createCombatStore() {
 			if (currentTurnId === null) {
 				currentTurnId = sorted[0].id;
 				round = 1;
+				turnStartedAt = Date.now();
 			} else {
 				const idx = sorted.findIndex((c) => c.id === currentTurnId);
 				if (idx === -1) {
 					// Current combatant is no longer eligible (died mid-turn) — jump to
 					// the first eligible combatant without incrementing the round.
 					currentTurnId = sorted[0].id;
+					turnStartedAt = Date.now();
 				} else {
 					const nextIdx = (idx + 1) % sorted.length;
 					if (nextIdx === 0) {
@@ -774,14 +810,32 @@ function createCombatStore() {
 						});
 						if (expiredEvents.length > 0) combatEvents = [...combatEvents, ...expiredEvents];
 					}
-					const nextId = sorted[nextIdx].id;
-					// Reset legendary actions for the combatant whose turn is starting
-					combatants = combatants.map((c) =>
-						c.id === nextId && c.legendaryActionsSpent !== undefined
-							? { ...c, legendaryActionsSpent: 0 }
-							: c
-					);
+					const nextCombatant = sorted[nextIdx];
+					const nextId = nextCombatant.id;
+					// Reset legendary actions and reaction availability for the combatant
+					// whose turn is starting
+					combatants = combatants.map((c) => {
+						if (c.id !== nextId) return c;
+						return {
+							...c,
+							...(c.legendaryActionsSpent !== undefined ? { legendaryActionsSpent: 0 } : {}),
+							...(c.reactionUsed ? { reactionUsed: false } : {})
+						};
+					});
 					currentTurnId = nextId;
+					turnStartedAt = Date.now();
+					if (combatStartedAt !== null) {
+						combatEvents = [
+							...combatEvents,
+							{
+								type: 'turn_start',
+								round,
+								combatantId: nextCombatant.id,
+								combatantName: nextCombatant.name,
+								combatantType: nextCombatant.type
+							}
+						];
+					}
 				}
 			}
 			sync();
@@ -806,6 +860,80 @@ function createCombatStore() {
 			sync();
 		},
 
+		setReactionUsed(id: string, used: boolean) {
+			combatants = combatants.map((c) => (c.id === id ? { ...c, reactionUsed: used } : c));
+			sync();
+		},
+
+		/** Enable/disable (null) the per-turn countdown and restart it from now. */
+		setTurnTimerSeconds(seconds: number | null) {
+			turnTimerSeconds = seconds;
+			turnStartedAt = seconds !== null ? Date.now() : null;
+			sync();
+		},
+
+		/** Restart the turn timer countdown from now, without changing its duration —
+		 *  lets the DM give a combatant a fresh clock without ending their turn. */
+		restartTurnTimer() {
+			if (turnTimerSeconds === null) return;
+			turnStartedAt = Date.now();
+			sync();
+		},
+
+		/** Swap a combatant into a temporary form (Wild Shape, Polymorph, etc.), stashing
+		 *  their true-form stats so revertTransform() can restore them exactly. */
+		transformCombatant(
+			id: string,
+			form: { name: string; ac: number; maxHp: number; imgUrl?: string; templateName?: string }
+		) {
+			combatants = combatants.map((c) => {
+				if (c.id !== id || c.transformStash) return c;
+				return {
+					...c,
+					transformStash: {
+						name: c.name,
+						ac: c.ac,
+						maxHp: c.maxHp,
+						currentHp: c.currentHp,
+						imgUrl: c.imgUrl,
+						templateName: c.templateName,
+						monsterType: c.monsterType
+					},
+					name: form.name,
+					ac: form.ac,
+					maxHp: form.maxHp,
+					currentHp: form.maxHp,
+					imgUrl: form.imgUrl,
+					templateName: form.templateName,
+					monsterType: undefined
+				};
+			});
+			sync();
+		},
+
+		/** Restore a transformed combatant's true-form stats from their stash.
+		 *  Per RAW (Wild Shape/Polymorph), damage taken in the temporary form doesn't
+		 *  carry over to the true form's HP UNLESS the temporary form was dropped to 0 —
+		 *  in that case the true form comes back at 0 HP too, instead of full health. */
+		revertTransform(id: string) {
+			combatants = combatants.map((c) => {
+				if (c.id !== id || !c.transformStash) return c;
+				const stash = c.transformStash;
+				return {
+					...c,
+					name: stash.name,
+					ac: stash.ac,
+					maxHp: stash.maxHp,
+					currentHp: c.currentHp <= 0 ? 0 : stash.currentHp,
+					imgUrl: stash.imgUrl,
+					templateName: stash.templateName,
+					monsterType: stash.monsterType,
+					transformStash: undefined
+				};
+			});
+			sync();
+		},
+
 		prevTurn() {
 			const sorted = sortCombatants(turnEligible());
 			if (sorted.length === 0) return;
@@ -819,6 +947,22 @@ function createCombatStore() {
 				} else {
 					if (idx === 0 && round > 1) round -= 1;
 					currentTurnId = sorted[(idx - 1 + sorted.length) % sorted.length].id;
+				}
+			}
+			turnStartedAt = Date.now();
+			if (combatStartedAt !== null) {
+				const c = combatants.find((c) => c.id === currentTurnId);
+				if (c) {
+					combatEvents = [
+						...combatEvents,
+						{
+							type: 'turn_start',
+							round,
+							combatantId: c.id,
+							combatantName: c.name,
+							combatantType: c.type
+						}
+					];
 				}
 			}
 			sync();

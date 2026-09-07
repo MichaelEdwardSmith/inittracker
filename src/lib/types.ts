@@ -57,6 +57,21 @@ export interface Combatant {
 	deathSaves?: { successes: number; failures: number; stable: boolean };
 	// Enemies only — loot items rolled/edited by the DM after enemy is slain
 	loot?: LootItem[];
+	// Whether this combatant's reaction is available. Resets to true at the start of
+	// their own turn. Undefined is treated as available (so existing saved state
+	// doesn't suddenly show every combatant as having used their reaction).
+	reactionUsed?: boolean;
+	// Present while this combatant is wearing a temporary form (Wild Shape, Polymorph,
+	// etc.) — holds their true-form stats so "Revert" can restore them exactly.
+	transformStash?: {
+		name: string;
+		ac: number;
+		maxHp: number;
+		currentHp: number;
+		imgUrl?: string;
+		templateName?: string;
+		monsterType?: string;
+	};
 }
 
 export interface StorageState {
@@ -90,6 +105,11 @@ export interface StorageState {
 		revealedRooms: number[][];
 		revealedCorridors: string[][];
 	} | null;
+	/** DM-configured per-turn countdown, in seconds. Null/undefined disables the timer. */
+	turnTimerSeconds?: number | null;
+	/** Client (Date.now()) timestamp when the current turn began — clients compute their own
+	 *  countdown from this plus turnTimerSeconds rather than syncing a live ticking number. */
+	turnStartedAt?: number | null;
 }
 
 export interface EnemyTemplate {
@@ -113,7 +133,14 @@ export interface CustomMonster extends EnemyTemplate {
 }
 
 export interface CombatEvent {
-	type: 'damage' | 'heal' | 'down' | 'condition_add' | 'condition_remove' | 'round_advance';
+	type:
+		| 'damage'
+		| 'heal'
+		| 'down'
+		| 'condition_add'
+		| 'condition_remove'
+		| 'round_advance'
+		| 'turn_start';
 	round: number;
 	// Who performed the action (the combatant whose turn it was)
 	actorId?: string;
@@ -122,7 +149,7 @@ export interface CombatEvent {
 	// Who was affected
 	combatantId: string;
 	combatantName: string;
-	combatantType: 'player' | 'enemy';
+	combatantType: 'player' | 'enemy' | 'lair';
 	value?: number;
 	condition?: string;
 	hpBefore?: number;

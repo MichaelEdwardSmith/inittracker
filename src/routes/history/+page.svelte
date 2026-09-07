@@ -5,6 +5,7 @@
 	import { untrack } from 'svelte';
 	import type { CombatRecord, CombatEvent } from '$lib/types';
 	import { crToXp } from '$lib/utils';
+	import { eventIcon, eventColor, eventDesc } from '$lib/combatEventFormat';
 
 	let { data } = $props();
 	let expanded = $state<Set<string>>(new Set());
@@ -74,90 +75,15 @@
 	function groupByRound(events: CombatEvent[]): Map<number, CombatEvent[]> {
 		const map = new Map<number, CombatEvent[]>();
 		for (const e of events) {
-			if (e.type === 'round_advance') continue;
+			// Both are shown live in the in-combat Combat Log, but omitted from the
+			// persisted Chronicle summary — one entry per turn for every round would
+			// swamp what's meant to be a concise post-combat recap.
+			if (e.type === 'round_advance' || e.type === 'turn_start') continue;
 			const arr = map.get(e.round) ?? [];
 			arr.push(e);
 			map.set(e.round, arr);
 		}
 		return map;
-	}
-
-	// Returns Font Awesome markup for the event's icon — always one of the fixed cases
-	// below (never derived from event/player data), so rendering it via {@html} is safe.
-	function eventIcon(e: CombatEvent): string {
-		if (e.causedDown) return '<i class="fa-duotone fa-light fa-skull"></i>';
-		switch (e.type) {
-			case 'damage':
-				return '<i class="fa-duotone fa-light fa-swords"></i>';
-			case 'heal':
-				return '<i class="fa-duotone fa-light fa-heart"></i>';
-			case 'down':
-				return '<i class="fa-duotone fa-light fa-skull"></i>';
-			case 'condition_add':
-				return '<i class="fa-duotone fa-light fa-star"></i>';
-			case 'condition_remove':
-				return '<i class="fa-regular fa-star"></i>';
-			default:
-				return '&middot;';
-		}
-	}
-
-	function eventColor(e: CombatEvent): string {
-		if (e.causedDown) return 'text-red-300';
-		switch (e.type) {
-			case 'damage':
-				return 'text-red-400';
-			case 'heal':
-				return 'text-green-400';
-			case 'down':
-				return 'text-red-300';
-			case 'condition_add':
-				return 'text-purple-400';
-			case 'condition_remove':
-				return 'text-purple-300/70';
-			default:
-				return 'text-gray-400';
-		}
-	}
-
-	function eventDesc(e: CombatEvent): string {
-		const actor = e.actorName;
-		const target = e.combatantName;
-		const isSelf = !actor || e.actorId === e.combatantId;
-
-		switch (e.type) {
-			case 'damage': {
-				const hpNote = `(${e.hpBefore} → ${e.hpAfter} HP)`;
-				let line = isSelf
-					? `${target} took ${e.value} damage ${hpNote}`
-					: `${actor} dealt ${e.value} damage to ${target} ${hpNote}`;
-				if (e.causedDown) {
-					const suffix =
-						e.combatantType === 'player'
-							? `${target} was knocked unconscious!`
-							: `${target} was slain!`;
-					line += ` — ${suffix}`;
-				}
-				return line;
-			}
-			case 'heal':
-				return isSelf
-					? `${target} recovered ${e.value} HP (${e.hpBefore} → ${e.hpAfter} HP)`
-					: `${actor} healed ${target} for ${e.value} HP (${e.hpBefore} → ${e.hpAfter} HP)`;
-			case 'down':
-				// Legacy records before causedDown was introduced
-				return e.combatantType === 'player'
-					? `${target} was knocked unconscious!`
-					: `${target} was slain!`;
-			case 'condition_add':
-				return isSelf
-					? `${target} became ${e.condition}`
-					: `${actor} inflicted ${e.condition} on ${target}`;
-			case 'condition_remove':
-				return `${target} shook off ${e.condition}`;
-			default:
-				return '';
-		}
 	}
 
 	let records = $state<CombatRecord[]>(untrack(() => data.records));
