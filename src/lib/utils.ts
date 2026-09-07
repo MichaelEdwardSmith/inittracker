@@ -216,7 +216,7 @@ export function crToXp(cr: string): number {
 }
 
 // D&D 5e XP thresholds per player per level [easy, medium, hard, deadly]
-const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
+export const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 	1: [25, 50, 75, 100],
 	2: [50, 100, 150, 200],
 	3: [75, 150, 225, 400],
@@ -241,7 +241,7 @@ const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 
 // D&D 2024 XP budget per character per level [low, moderate, high, severe, deadly]
 // Encounter difficulty = compare raw monster XP (no multiplier) to budget × party size.
-const XP_THRESHOLDS_2024: Record<number, [number, number, number, number, number]> = {
+export const XP_THRESHOLDS_2024: Record<number, [number, number, number, number, number]> = {
 	1: [50, 75, 100, 150, 200],
 	2: [100, 150, 200, 250, 350],
 	3: [150, 225, 400, 550, 700],

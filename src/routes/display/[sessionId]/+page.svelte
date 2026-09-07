@@ -16,6 +16,7 @@
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
+	import TurnTimer from '$lib/components/TurnTimer.svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -849,6 +850,11 @@
 					<span class="text-xs tracking-widest text-gray-500 uppercase">Round</span>
 					<span class="text-2xl font-black text-amber-400">{combatState.round}</span>
 				</div>
+				<TurnTimer
+					seconds={combatState.turnTimerSeconds ?? null}
+					startedAt={combatState.turnStartedAt ?? null}
+					onExpire={() => playSound('condition')}
+				/>
 			{/if}
 			<!-- Time + battery -->
 			{#if currentTime}

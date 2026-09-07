@@ -132,5 +132,13 @@ export function validateStorageState(raw: unknown): StorageState | null {
 		if (!Array.isArray(m.revealedCorridors)) return null;
 	}
 
+	// Optional turn timer — per-turn countdown shown on the dashboard and player display
+	if (o.turnTimerSeconds !== undefined && o.turnTimerSeconds !== null) {
+		if (!isInt(o.turnTimerSeconds, 1, 3600)) return null;
+	}
+	if (o.turnStartedAt !== undefined && o.turnStartedAt !== null) {
+		if (typeof o.turnStartedAt !== 'number' || !Number.isFinite(o.turnStartedAt)) return null;
+	}
+
 	return o as unknown as StorageState;
 }

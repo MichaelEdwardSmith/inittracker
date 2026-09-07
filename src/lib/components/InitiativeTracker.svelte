@@ -20,6 +20,9 @@
 	import ConcentrationCheckModal from '$lib/components/ConcentrationCheckModal.svelte';
 	import ConditionTimingModal from '$lib/components/ConditionTimingModal.svelte';
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
+	import CombatLogPanel from '$lib/components/CombatLogPanel.svelte';
+	import TransformModal from '$lib/components/TransformModal.svelte';
+	import TurnTimer from '$lib/components/TurnTimer.svelte';
 	import LootModal from '$lib/components/LootModal.svelte';
 	import AoEDamageModal from '$lib/components/AoEDamageModal.svelte';
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
@@ -52,6 +55,10 @@
 	);
 	let showAoE = $state(false);
 	let avatarPreview = $state<Combatant | null>(null);
+	let showCombatLog = $state(false);
+	let transformTarget = $state<Combatant | null>(null);
+	let showTimerSettings = $state(false);
+	let timerInput = $state(60);
 
 	// ── Concentration check queue ─────────────────────────────────────────────
 	function dequeueConcentration() {
@@ -217,6 +224,7 @@
 			<span class="rounded bg-amber-900/50 px-2 py-0.5 text-xs font-semibold text-amber-300">
 				Round {combat.round}
 			</span>
+			<TurnTimer compact seconds={combat.turnTimerSeconds} startedAt={combat.turnStartedAt} />
 		{/if}
 
 		<div class="ml-auto flex items-center gap-2">
@@ -298,6 +306,69 @@
 			>
 				Area of Effect
 			</button>
+			<button
+				onclick={() => (showCombatLog = true)}
+				title="View a running log of everything that's happened this combat"
+				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-scroll" aria-hidden="true"></i> Log
+			</button>
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="relative" onmouseleave={() => (showTimerSettings = false)}>
+				<button
+					onclick={() => {
+						timerInput = combat.turnTimerSeconds ?? 60;
+						showTimerSettings = !showTimerSettings;
+					}}
+					title="Set a per-turn countdown"
+					class="rounded px-2 py-1 text-xs transition {combat.turnTimerSeconds !== null
+						? 'bg-blue-900/60 text-blue-300 hover:bg-blue-800'
+						: 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'}"
+				>
+					<i class="fa-duotone fa-light fa-hourglass-half" aria-hidden="true"></i> Timer
+				</button>
+				{#if showTimerSettings}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<div
+						class="absolute top-full right-0 z-20 mt-1 flex w-52 flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3 shadow-xl"
+						onclick={(e) => e.stopPropagation()}
+					>
+						<label class="flex flex-col gap-1 text-xs text-gray-400">
+							Seconds per turn
+							<input
+								type="number"
+								min="10"
+								max="600"
+								bind:value={timerInput}
+								class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+							/>
+						</label>
+						<div class="flex gap-2">
+							<button
+								onclick={() => {
+									combat.setTurnTimerSeconds(Math.max(10, timerInput || 60));
+									showTimerSettings = false;
+								}}
+								class="flex-1 rounded bg-blue-700 px-2 py-1 text-xs font-semibold text-white transition hover:bg-blue-600"
+							>
+								{combat.turnTimerSeconds !== null ? 'Restart' : 'Enable'}
+							</button>
+							{#if combat.turnTimerSeconds !== null}
+								<button
+									onclick={() => {
+										combat.setTurnTimerSeconds(null);
+										showTimerSettings = false;
+									}}
+									class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
+								>
+									Disable
+								</button>
+							{/if}
+						</div>
+					</div>
+				{/if}
+			</div>
 			<button
 				onclick={() => combat.resetInitiatives()}
 				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
@@ -483,6 +554,43 @@
 									class="rounded p-2 text-gray-600 transition hover:text-purple-400"
 								>
 									<i class="fa-duotone fa-light fa-building text-base" aria-hidden="true"></i>
+								</button>
+							{/if}
+							{#if c.type === 'player' || c.type === 'enemy'}
+								{#if c.transformStash}
+									<button
+										onclick={() => combat.revertTransform(c.id)}
+										title="Revert to true form ({c.transformStash.name})"
+										class="rounded p-2 text-emerald-400 transition hover:text-emerald-300"
+									>
+										<i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i>
+									</button>
+								{:else}
+									<button
+										onclick={() => (transformTarget = c)}
+										title="Transform (Wild Shape, Polymorph, etc.)"
+										class="rounded p-2 text-gray-600 transition hover:text-emerald-400"
+									>
+										<i class="fa-duotone fa-light fa-paw-simple text-base" aria-hidden="true"></i>
+									</button>
+								{/if}
+							{/if}
+							{#if c.type === 'player' || c.type === 'enemy'}
+								<button
+									onclick={() => combat.setReactionUsed(c.id, !c.reactionUsed)}
+									title={c.reactionUsed
+										? 'Reaction used — click to mark available'
+										: 'Reaction available — click to mark used'}
+									class="rounded p-2 transition {c.reactionUsed
+										? 'text-gray-600 hover:text-gray-400'
+										: 'text-sky-400 hover:text-sky-300'}"
+								>
+									<i
+										class="fa-duotone fa-light {c.reactionUsed
+											? 'fa-bolt-slash'
+											: 'fa-bolt'} text-base"
+										aria-hidden="true"
+									></i>
 								</button>
 							{/if}
 							<button
@@ -998,6 +1106,19 @@
 />
 
 <LegendaryActionsModal modal={legendaryInfoModal} onclose={() => (legendaryInfoModal = null)} />
+
+{#if showCombatLog}
+	<CombatLogPanel events={combat.combatEvents} onclose={() => (showCombatLog = false)} />
+{/if}
+
+<TransformModal
+	target={transformTarget}
+	onclose={() => (transformTarget = null)}
+	ontransform={(form) => {
+		if (transformTarget) combat.transformCombatant(transformTarget.id, form);
+		transformTarget = null;
+	}}
+/>
 
 {#if pendingInitChange}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->

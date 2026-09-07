@@ -18,10 +18,14 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 6. [Running Combat](#6-running-combat)
    - [Undo](#undo)
    - [Bulk Actions (AoE)](#bulk-actions-aoe)
+   - [Combat Log](#combat-log)
+   - [Turn Timer](#turn-timer)
 7. [Hit Points, Temp HP & Armor Class](#7-hit-points-temp-hp--armor-class)
    - [Death Saving Throws](#death-saving-throws)
    - [Legendary Actions](#legendary-actions)
    - [Legendary Resistance](#legendary-resistance)
+   - [Reaction Tracking](#reaction-tracking)
+   - [Transformation](#transformation)
    - [Lair Actions](#lair-actions)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
 9. [The Player Display (Viewer Screen)](#9-the-player-display-viewer-screen) — header actions, rolling initiative, messaging the DM, flash & audio effects
@@ -29,6 +33,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 11. [Combat Chronicles (History)](#11-combat-chronicles-history)
 12. [Dice Roller](#12-dice-roller)
 13. [Encounter Builder](#13-encounter-builder)
+    - [Quick Compose](#quick-compose)
 14. [Spell Reference](#14-spell-reference)
 15. [Item Reference](#15-item-reference)
 16. [Player Messaging](#16-player-messaging)
@@ -315,6 +320,8 @@ Click **End** to conclude the current combat. The encounter is automatically sav
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | **↺ Undo**        | Reverts the most recent damage/heal, condition/effect, or turn change (see [Undo](#undo))                                   |
 | **AoE**           | Opens the bulk-action modal for damage, healing, conditions, or spell effects (see [Bulk Actions (AoE)](#bulk-actions-aoe)) |
+| **Log**           | Opens the live Combat Log (see [Combat Log](#combat-log))                                                                   |
+| **Timer**         | Sets a per-turn countdown (see [Turn Timer](#turn-timer))                                                                   |
 | **Reset Init**    | Clears all initiative values and resets the round counter to 1                                                              |
 | **Reset Players** | Restores all players to max HP, removes temp HP and all conditions                                                          |
 | **Clear Enemies** | Removes all enemies from the combat tracker                                                                                 |
@@ -343,6 +350,22 @@ Click **AoE** in the initiative order toolbar to open a modal for applying one a
 2. Choose a condition from the dropdown — any of the 15 standard conditions, the four Advantage/Disadvantage markers, a spell effect from the quick-pick list, or **Custom…** to type a freeform name
 3. Optionally set a number of **Rounds** for the effect to last (leave blank for indefinite)
 4. Click **Apply** to add it to every selected, un-saved combatant in one sync; combatants who already have that status are silently skipped rather than having it toggled off
+
+### Combat Log
+
+Click **Log** in the initiative order toolbar to open a running, plain-language feed of everything that's happened so far this combat — damage, healing, conditions applied/removed, and whose turn began each round — newest at the top. It uses the same event descriptions as the post-combat Chronicle, but live and available at any time during the fight without needing to end combat first.
+
+Round boundaries are marked with a divider so you can quickly see how a fight is trending round to round. The log resets when a new combat starts and becomes part of that combat's Chronicle record once it ends (minus the per-turn "began" entries, which are omitted there to keep the Chronicle's summary concise).
+
+### Turn Timer
+
+Click **Timer** in the initiative order toolbar to give each turn a countdown. Type a duration in seconds and click **Enable** — a countdown badge appears next to the round counter (and on the player display) counting down from that many seconds, turning red as it runs low. It resets automatically at the start of each new turn.
+
+- Click **Timer** again and **Restart** to reset the current turn's clock without changing whose turn it is (handy if a player gets a warning and needs a bit more time)
+- Click **Disable** to turn the countdown off entirely
+- On the player display, the countdown hitting zero plays an audio cue (if the viewer has joined with sound on)
+
+The timer is a visual/audio nudge only — nothing happens automatically when it hits zero; it's up to the table how to handle it.
 
 ---
 
@@ -459,6 +482,29 @@ Enemies whose stat block includes a **Legendary Resistance** trait (e.g. dragons
 - Click the **ℹ️ icon** beside the dots to view the trait's exact text
 
 > **Note:** Same availability rule as Legendary Actions — only enemies with a full stat block that lists this trait will show the row.
+
+---
+
+### Reaction Tracking
+
+Every player and enemy card shows a **bolt icon** next to the paw (Transform) icon — blue when the reaction is available, grey once it's spent. Click it to toggle. It resets to available automatically at the start of that combatant's own turn, just like real reaction economy works.
+
+This is a plain manual toggle — nothing stops you from clicking it back to Ready early if a ruling calls for it (e.g. a feature that grants an extra reaction).
+
+### Transformation
+
+Click the **paw icon** on a player or enemy card to temporarily swap their stats for another form — Wild Shape, Polymorph, or any similar effect.
+
+1. Click the **paw icon**; a small form opens
+2. Enter the new form's **Name**, **AC**, and **Max HP**
+3. Click **Transform** — the combatant's card switches to the new form's name/AC/HP, and their true-form stats are stashed
+
+**Reverting happens two ways:**
+
+- **Automatically, the instant the temporary form hits 0 HP** — no button click needed. Per RAW, damage taken in the temporary form doesn't touch the true form's HP at all until this happens; when it does, only the **excess damage** (whatever was left over after zeroing out the temporary form) carries over to the true form's HP — not a flat wipe. The true form is only knocked unconscious if that excess is itself enough to drop it to 0; a small overkill hit leaves them reverting conscious with HP to spare. The [Combat Log](#combat-log) shows both the hit that destroyed the temporary form and, if there was excess, a second line naming the true form and how much carried over.
+- **Voluntarily, at any time** — click the **↺ Revert to True Form** button on the card to end the transformation early while the temporary form still has HP. The true form comes back exactly as it was the moment they transformed, with no damage carried over.
+
+> **Note:** This is a stat-swap tool, not a rules engine — it doesn't look anything up for you. Enter the new form's AC/HP by hand (from the Spell/Item Reference, a stat block, or memory).
 
 ---
 
@@ -795,6 +841,17 @@ Two buttons appear on each card:
 ### Building a New Encounter
 
 Click **New Encounter** to expand the builder form.
+
+### Quick Compose
+
+Instead of picking every monster by hand, let the builder fill the staging list for you:
+
+1. Choose a **shape** — **Boss (solo)**, **Boss + Minions**, **Duo**, **Trio**, or **Horde**
+2. Choose a target **difficulty** (Easy/Medium/Hard/Deadly for 2014, Low/Moderate/High/Severe/Deadly for 2024)
+3. Optionally narrow it to a single **creature type** (e.g. only Undead, only Beasts)
+4. Click **Compose**
+
+It splits the XP budget for that difficulty (using the Party size/Level set above) across the shape's slots — a Boss + Minions split gives most of the budget to one strong monster and the rest to several weak ones, a Horde spreads it evenly across eight — and picks whichever monster in your library (built-in + custom, filtered by type if set) has the closest XP value for each slot. The result replaces whatever's currently staged, and an encounter name is filled in automatically if you haven't typed one yet. Review and tweak the result with the normal **Add**/**✕** controls before saving — it's a starting point, not a guarantee of a perfectly-tuned fight.
 
 1. **Encounter Name** — type a descriptive name (e.g. _Goblin Ambush_)
 2. **Add Enemy** — type in the search box to filter the full enemy library (built-in SRD monsters + your custom monsters); click a result to select it

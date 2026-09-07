@@ -2,13 +2,15 @@
      view CR/XP/difficulty, load them into the initiative tracker, or delete them. -->
 <script lang="ts">
 	import { combat } from '$lib/store.svelte';
-	import { ENEMY_TEMPLATES } from '$lib/enemies';
-	import { ENEMY_TEMPLATES_2024 } from '$lib/enemies2024';
+	import { ENEMY_TEMPLATES, MONSTER_TYPES } from '$lib/enemies';
+	import { ENEMY_TEMPLATES_2024, MONSTER_TYPES_2024 } from '$lib/enemies2024';
 	import {
 		crToXp,
 		encounterDifficulty,
 		encounterDifficulty2024,
-		encounterMultiplier
+		encounterMultiplier,
+		XP_THRESHOLDS,
+		XP_THRESHOLDS_2024
 	} from '$lib/utils';
 	import type { Encounter, EncounterEnemy, CustomMonster, EnemyTemplate } from '$lib/types';
 
@@ -41,6 +43,87 @@
 	let partyLevel = $state(1);
 	let saving = $state(false);
 	let formError = $state('');
+
+	// ── Quick Compose — auto-fill staging from a shape + target difficulty ──
+	interface EncounterShape {
+		value: string;
+		label: string;
+		/** Relative XP share per monster slot (e.g. one big + several small). */
+		shares: number[];
+	}
+	const SHAPES: EncounterShape[] = [
+		{ value: 'boss', label: 'Boss (solo)', shares: [1] },
+		{ value: 'boss_minions', label: 'Boss + Minions', shares: [0.6, 0.1, 0.1, 0.1, 0.1] },
+		{ value: 'duo', label: 'Duo', shares: [0.5, 0.5] },
+		{ value: 'trio', label: 'Trio', shares: [0.34, 0.33, 0.33] },
+		{ value: 'horde', label: 'Horde', shares: Array(8).fill(1 / 8) }
+	];
+	const DIFFICULTY_LABELS_2014 = ['Easy', 'Medium', 'Hard', 'Deadly'];
+	const DIFFICULTY_LABELS_2024 = ['Low', 'Moderate', 'High', 'Severe', 'Deadly'];
+	const difficultyLabels = $derived(
+		ruleset === '2024' ? DIFFICULTY_LABELS_2024 : DIFFICULTY_LABELS_2014
+	);
+
+	let quickShape = $state('boss_minions');
+	let quickDifficulty = $state('Medium');
+	let quickTypeFilter = $state('All');
+
+	// Reset the difficulty pick if it doesn't exist for the current ruleset's label set
+	// (e.g. switching 2014 -> 2024 while "Deadly" isn't selected, or vice versa).
+	$effect(() => {
+		if (!difficultyLabels.includes(quickDifficulty)) quickDifficulty = difficultyLabels[1];
+	});
+
+	const monsterTypeOptions = $derived(ruleset === '2024' ? MONSTER_TYPES_2024 : MONSTER_TYPES);
+
+	/** Fills stagingEnemies with a monster mix matching the chosen shape and difficulty,
+	 *  picking the closest-XP monster (optionally filtered by creature type) for each slot. */
+	function quickCompose() {
+		const level = Math.max(1, Math.min(20, Math.round(partyLevel) || 1));
+		const shape = SHAPES.find((s) => s.value === quickShape) ?? SHAPES[0];
+		const diffIdx = difficultyLabels.indexOf(quickDifficulty);
+		const perPlayerXp =
+			ruleset === '2024'
+				? XP_THRESHOLDS_2024[level][diffIdx]
+				: XP_THRESHOLDS[level][Math.min(diffIdx, 3)];
+		const totalBudget = perPlayerXp * Math.max(1, partySize);
+		const multiplier = ruleset === '2024' ? 1 : encounterMultiplier(shape.shares.length);
+		const rawXpTotal = totalBudget / multiplier;
+
+		const pool =
+			quickTypeFilter === 'All'
+				? allTemplates
+				: allTemplates.filter((t) => t.monsterType === quickTypeFilter);
+		if (pool.length === 0) {
+			formError = `No ${quickTypeFilter} monsters available to compose with.`;
+			return;
+		}
+		formError = '';
+
+		const picks = new Map<string, number>();
+		for (const share of shape.shares) {
+			const target = Math.max(1, rawXpTotal * share);
+			let best = pool[0];
+			let bestDist = Infinity;
+			for (const t of pool) {
+				const xp = Math.max(1, crToXp(t.cr));
+				const dist = Math.abs(Math.log(xp) - Math.log(target));
+				if (dist < bestDist) {
+					bestDist = dist;
+					best = t;
+				}
+			}
+			picks.set(best.name, (picks.get(best.name) ?? 0) + 1);
+		}
+
+		stagingEnemies = [...picks.entries()].map(([templateName, quantity]) => ({
+			templateName,
+			quantity
+		}));
+		if (!encName.trim()) {
+			encName = `${shape.label} (${quickDifficulty})`;
+		}
+	}
 
 	// ── Load on mount ────────────────────────────────────────────────────────
 	$effect(() => {
@@ -307,6 +390,51 @@
 								class="w-full rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
 							/>
 						</label>
+
+						<!-- Quick Compose -->
+						<div class="mb-4 rounded border border-violet-800/40 bg-violet-950/10 p-3">
+							<span class="mb-2 block text-xs font-semibold text-violet-300 uppercase"
+								>Quick Compose</span
+							>
+							<p class="mb-2 text-[11px] text-gray-500">
+								Auto-fills the enemy list below with a monster mix matching a shape and target
+								difficulty, using the party size/level above. Replaces anything currently staged.
+							</p>
+							<div class="flex flex-wrap items-center gap-2">
+								<select
+									bind:value={quickShape}
+									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
+								>
+									{#each SHAPES as s}
+										<option value={s.value}>{s.label}</option>
+									{/each}
+								</select>
+								<select
+									bind:value={quickDifficulty}
+									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
+								>
+									{#each difficultyLabels as d}
+										<option value={d}>{d}</option>
+									{/each}
+								</select>
+								<select
+									bind:value={quickTypeFilter}
+									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
+								>
+									<option value="All">Any type</option>
+									{#each monsterTypeOptions as t}
+										<option value={t}>{t}</option>
+									{/each}
+								</select>
+								<button
+									type="button"
+									onclick={quickCompose}
+									class="rounded border border-violet-700 bg-violet-900/40 px-3 py-1 text-xs font-semibold text-violet-200 transition hover:bg-violet-900/70"
+								>
+									<i class="fa-duotone fa-light fa-shuffle text-sm" aria-hidden="true"></i> Compose
+								</button>
+							</div>
+						</div>
 
 						<!-- Enemy picker -->
 						<div class="mb-3">
