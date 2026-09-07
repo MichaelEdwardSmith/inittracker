@@ -575,6 +575,24 @@
 									</button>
 								{/if}
 							{/if}
+							{#if c.type === 'player' || c.type === 'enemy'}
+								<button
+									onclick={() => combat.setReactionUsed(c.id, !c.reactionUsed)}
+									title={c.reactionUsed
+										? 'Reaction used — click to mark available'
+										: 'Reaction available — click to mark used'}
+									class="rounded p-2 transition {c.reactionUsed
+										? 'text-gray-600 hover:text-gray-400'
+										: 'text-sky-400 hover:text-sky-300'}"
+								>
+									<i
+										class="fa-duotone fa-light {c.reactionUsed
+											? 'fa-bolt-slash'
+											: 'fa-bolt'} text-base"
+										aria-hidden="true"
+									></i>
+								</button>
+							{/if}
 							<button
 								onclick={() => (noteTarget = c)}
 								title="Notes"
@@ -810,25 +828,6 @@
 									</div>
 								{/if}
 							</div>
-						{/if}
-
-						<!-- Reaction availability -->
-						{#if c.type === 'player' || c.type === 'enemy'}
-							<button
-								onclick={() => combat.setReactionUsed(c.id, !c.reactionUsed)}
-								title={c.reactionUsed
-									? 'Reaction used — click to mark available'
-									: 'Reaction available — click to mark used'}
-								class="flex w-fit items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold transition {c.reactionUsed
-									? 'bg-gray-800 text-gray-500 hover:bg-gray-700'
-									: 'bg-sky-900/50 text-sky-300 hover:bg-sky-800/60'}"
-							>
-								<i
-									class="fa-duotone fa-light {c.reactionUsed ? 'fa-bolt-slash' : 'fa-bolt'} text-sm"
-									aria-hidden="true"
-								></i>
-								Reaction {c.reactionUsed ? 'Used' : 'Ready'}
-							</button>
 						{/if}
 
 						<!-- Conditions & spell effects row -->

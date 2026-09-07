@@ -487,7 +487,7 @@ Enemies whose stat block includes a **Legendary Resistance** trait (e.g. dragons
 
 ### Reaction Tracking
 
-Every player and enemy card shows a **Reaction** chip — blue "Reaction Ready" when available, grey "Reaction Used" once spent. Click it to toggle. It resets to Ready automatically at the start of that combatant's own turn, just like real reaction economy works.
+Every player and enemy card shows a **bolt icon** next to the paw (Transform) icon — blue when the reaction is available, grey once it's spent. Click it to toggle. It resets to available automatically at the start of that combatant's own turn, just like real reaction economy works.
 
 This is a plain manual toggle — nothing stops you from clicking it back to Ready early if a ruling calls for it (e.g. a feature that grants an extra reaction).
 

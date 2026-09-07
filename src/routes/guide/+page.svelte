@@ -1267,11 +1267,12 @@
 				</h3>
 				<p class="mb-6 text-sm leading-relaxed">
 					Every player and enemy card shows a <strong class="font-semibold text-sky-300"
-						>Reaction</strong
+						>bolt icon</strong
 					>
-					chip — blue "Reaction Ready" when available, grey "Reaction Used" once spent. Click it to toggle.
-					It resets to Ready automatically at the start of that combatant's own turn. It's a plain manual
-					toggle — nothing stops you from marking it Ready early if a ruling calls for it.
+					next to the paw (Transform) icon — blue when the reaction is available, grey once it's spent.
+					Click it to toggle. It resets to available automatically at the start of that combatant's own
+					turn. It's a plain manual toggle — nothing stops you from marking it available early if a ruling
+					calls for it.
 				</p>
 
 				<h3
@@ -1302,8 +1303,8 @@
 						<strong class="font-semibold text-white"
 							>Automatically, the instant the temporary form hits 0 HP</strong
 						>
-						— no button click needed. Per RAW, damage taken in the temporary form doesn't touch the
-						true form's HP at all until this happens; when it does, only the
+						— no button click needed. Per RAW, damage taken in the temporary form doesn't touch the true
+						form's HP at all until this happens; when it does, only the
 						<strong class="font-semibold text-white">excess damage</strong> (whatever was left over
 						after zeroing out the temporary form) carries over to the true form's HP — not a flat
 						wipe. The true form is only knocked unconscious if that excess is itself enough to drop
