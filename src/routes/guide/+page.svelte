@@ -1296,20 +1296,30 @@
 						new form, and the true-form stats are stashed
 					</li>
 				</ol>
-				<p class="mb-4 text-sm leading-relaxed">
-					While transformed, the card shows a <strong class="font-semibold text-emerald-400"
-						>↺ Revert to True Form</strong
-					>
-					button in the same spot. Clicking it restores the original name, AC, and max HP. Per the RAW
-					Wild Shape/Polymorph rule, damage taken in the temporary form doesn't touch the true form's
-					HP at all —
-					<strong class="font-semibold text-white">unless the temporary form is dropped to 0</strong
-					>, in which case only the <strong class="font-semibold text-white">excess damage</strong>
-					(whatever was left over after zeroing out the temporary form) carries over to the true form's
-					HP, exactly as the rule describes. The true form is only knocked unconscious if that excess
-					is itself enough to drop it to 0 — a small overkill hit leaves them reverting conscious with
-					HP to spare.
-				</p>
+				<p class="mb-2 text-sm font-semibold text-gray-200">Reverting happens two ways</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white"
+							>Automatically, the instant the temporary form hits 0 HP</strong
+						>
+						— no button click needed. Per RAW, damage taken in the temporary form doesn't touch the
+						true form's HP at all until this happens; when it does, only the
+						<strong class="font-semibold text-white">excess damage</strong> (whatever was left over
+						after zeroing out the temporary form) carries over to the true form's HP — not a flat
+						wipe. The true form is only knocked unconscious if that excess is itself enough to drop
+						it to 0; a small overkill hit leaves them reverting conscious with HP to spare. The
+						<a href="#combat-log" class="text-amber-400 transition hover:text-amber-300"
+							>Combat Log</a
+						> shows both the hit that destroyed the temporary form and, if there was excess, a second
+						line naming the true form and how much carried over.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Voluntarily, at any time</strong> — click the
+						<strong class="font-semibold text-emerald-400">↺ Revert to True Form</strong> button on the
+						card to end the transformation early while the temporary form still has HP. The true form
+						comes back exactly as it was the moment they transformed, with no damage carried over.
+					</li>
+				</ul>
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
 					This is a stat-swap tool, not a rules engine — it doesn't look anything up for you; enter
 					the new form's AC/HP by hand.

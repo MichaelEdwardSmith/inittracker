@@ -499,7 +499,10 @@ Click the **paw icon** on a player or enemy card to temporarily swap their stats
 2. Enter the new form's **Name**, **AC**, and **Max HP**
 3. Click **Transform** — the combatant's card switches to the new form's name/AC/HP, and their true-form stats are stashed
 
-While transformed, the card shows a **↺ Revert to True Form** button in the same spot. Clicking it restores the original name, AC, and max HP. Per the RAW Wild Shape/Polymorph rule, damage taken in the temporary form doesn't touch the true form's HP at all — **unless** the temporary form is dropped to 0, in which case only the **excess damage** (whatever was left over after zeroing out the temporary form) carries over to the true form's HP, exactly as the rule describes. The true form is only knocked unconscious (or reduced further) if that excess is itself enough to drop it to 0 — a small overkill hit leaves them reverting conscious with HP to spare.
+**Reverting happens two ways:**
+
+- **Automatically, the instant the temporary form hits 0 HP** — no button click needed. Per RAW, damage taken in the temporary form doesn't touch the true form's HP at all until this happens; when it does, only the **excess damage** (whatever was left over after zeroing out the temporary form) carries over to the true form's HP — not a flat wipe. The true form is only knocked unconscious if that excess is itself enough to drop it to 0; a small overkill hit leaves them reverting conscious with HP to spare. The [Combat Log](#combat-log) shows both the hit that destroyed the temporary form and, if there was excess, a second line naming the true form and how much carried over.
+- **Voluntarily, at any time** — click the **↺ Revert to True Form** button on the card to end the transformation early while the temporary form still has HP. The true form comes back exactly as it was the moment they transformed, with no damage carried over.
 
 > **Note:** This is a stat-swap tool, not a rules engine — it doesn't look anything up for you. Enter the new form's AC/HP by hand (from the Spell/Item Reference, a stat block, or memory).
 
