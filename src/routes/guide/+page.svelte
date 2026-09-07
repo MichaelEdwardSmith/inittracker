@@ -994,6 +994,49 @@
 						than toggled off
 					</li>
 				</ol>
+
+				<h3
+					id="combat-log"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Combat Log
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Log</strong> in the toolbar to open a running,
+					plain-language feed of everything that's happened this combat — damage, healing, conditions
+					applied/removed, and whose turn began each round — newest at the top. It shares its event descriptions
+					with the post-combat Chronicle, but it's live and available any time during the fight without
+					ending combat first. Round boundaries are marked with a divider. The per-turn "began" entries
+					are omitted from the persisted Chronicle record to keep that summary concise.
+				</p>
+
+				<h3
+					id="turn-timer"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Turn Timer
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Timer</strong> in the toolbar to give each
+					turn a countdown. Type a duration in seconds and click
+					<strong class="font-semibold text-white">Enable</strong> — a badge next to the round counter
+					(and on the player display) counts down, turning red as it runs low, and resets automatically
+					at the start of each new turn.
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Restart</strong> resets the current turn's clock
+						without changing whose turn it is
+					</li>
+					<li><strong class="font-semibold text-white">Disable</strong> turns the countdown off</li>
+					<li>
+						On the player display, hitting zero plays an audio cue if the viewer has joined with
+						sound on
+					</li>
+				</ul>
+				<p class="text-sm leading-relaxed text-gray-400">
+					The timer is a visual/audio nudge only — nothing happens automatically at zero.
+				</p>
 			</section>
 
 			<!-- 8 ─────────────────────────────────────── -->
@@ -1214,6 +1257,59 @@
 				<p class="mb-6 text-sm leading-relaxed text-gray-400">
 					Same availability rule as Legendary Actions — only enemies with a full stat block that
 					lists this trait will show the row.
+				</p>
+
+				<h3
+					id="reaction-tracking"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Reaction Tracking
+				</h3>
+				<p class="mb-6 text-sm leading-relaxed">
+					Every player and enemy card shows a <strong class="font-semibold text-sky-300"
+						>Reaction</strong
+					>
+					chip — blue "Reaction Ready" when available, grey "Reaction Used" once spent. Click it to toggle.
+					It resets to Ready automatically at the start of that combatant's own turn. It's a plain manual
+					toggle — nothing stops you from marking it Ready early if a ruling calls for it.
+				</p>
+
+				<h3
+					id="transformation"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Transformation
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-white">paw icon</strong> on a player or enemy card
+					to temporarily swap their stats for another form — Wild Shape, Polymorph, or any similar effect.
+				</p>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>Click the paw icon; a small form opens</li>
+					<li>
+						Enter the new form's <strong class="font-semibold text-white">Name</strong>,
+						<strong class="font-semibold text-white">AC</strong>, and
+						<strong class="font-semibold text-white">Max HP</strong>
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Transform</strong> — the card switches to the
+						new form, and the true-form stats are stashed
+					</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					While transformed, the card shows a <strong class="font-semibold text-emerald-400"
+						>↺ Revert to True Form</strong
+					>
+					button in the same spot. Clicking it restores the original name, AC, and max HP exactly. Per
+					the usual Wild Shape/Polymorph rule, damage taken in the temporary form doesn't carry over when
+					you revert —
+					<strong class="font-semibold text-white"
+						>unless the temporary form was dropped to 0 HP</strong
+					>, in which case the true form comes back at 0 HP too instead of full health.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed text-gray-400">
+					This is a stat-swap tool, not a rules engine — it doesn't look anything up for you; enter
+					the new form's AC/HP by hand.
 				</p>
 
 				<h3
@@ -1848,6 +1944,47 @@
 					Click <strong class="font-semibold text-white">New Encounter</strong> to expand the builder
 					form.
 				</p>
+
+				<h3
+					id="quick-compose"
+					class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Quick Compose
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					Instead of picking every monster by hand, let the builder fill the staging list for you:
+				</p>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Choose a <strong class="font-semibold text-white">shape</strong> —
+						<strong class="font-semibold text-white">Boss (solo)</strong>,
+						<strong class="font-semibold text-white">Boss + Minions</strong>,
+						<strong class="font-semibold text-white">Duo</strong>,
+						<strong class="font-semibold text-white">Trio</strong>, or
+						<strong class="font-semibold text-white">Horde</strong>
+					</li>
+					<li>
+						Choose a target <strong class="font-semibold text-white">difficulty</strong> (Easy/Medium/Hard/Deadly
+						for 2014, Low/Moderate/High/Severe/Deadly for 2024)
+					</li>
+					<li>
+						Optionally narrow it to a single <strong class="font-semibold text-white"
+							>creature type</strong
+						> (e.g. only Undead, only Beasts)
+					</li>
+					<li>Click <strong class="font-semibold text-white">Compose</strong></li>
+				</ol>
+				<p class="mb-6 text-sm leading-relaxed">
+					It splits the XP budget for that difficulty (using the Party size/Level above) across the
+					shape's slots — a Boss + Minions split gives most of the budget to one strong monster and
+					the rest to several weak ones, a Horde spreads it evenly across eight — and picks
+					whichever monster in your library has the closest XP value for each slot. The result
+					<strong class="font-semibold text-white">replaces</strong> whatever's currently staged, and
+					an encounter name is filled in automatically if you haven't typed one yet. It's a starting point,
+					not a guarantee of a perfectly-tuned fight — review and tweak with the normal Add/✕ controls
+					before saving.
+				</p>
+
 				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
 					<li>
 						Give the encounter a <strong class="font-semibold text-white">name</strong> (e.g.
