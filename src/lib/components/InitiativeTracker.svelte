@@ -28,6 +28,8 @@
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
 	import CombatantToggleButton from '$lib/components/CombatantToggleButton.svelte';
 	import DotTracker from '$lib/components/DotTracker.svelte';
+	import ToolbarButton from '$lib/components/ToolbarButton.svelte';
+	import ToolbarMenuItem from '$lib/components/ToolbarMenuItem.svelte';
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
@@ -65,6 +67,7 @@
 	let transformTarget = $state<Combatant | null>(null);
 	let showTimerSettings = $state(false);
 	let timerInput = $state(60);
+	let showToolsMenu = $state(false);
 
 	// ── Concentration check queue ─────────────────────────────────────────────
 	function dequeueConcentration() {
@@ -233,166 +236,171 @@
 			<TurnTimer compact seconds={combat.turnTimerSeconds} startedAt={combat.turnStartedAt} />
 		{/if}
 
-		<div class="ml-auto flex items-center gap-2">
+		<div class="ml-auto flex flex-wrap items-center justify-end gap-2">
 			<!-- Turn navigation -->
 			{#if combat.sorted.length > 0}
 				{#if !combat.isInCombat}
-					<button
+					<ToolbarButton
 						onclick={() => {
 							combat.startCombat();
 							scrollToActive();
 						}}
-						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
-					>
-						Start Combat
-					</button>
+						icon="fa-play"
+						label="Start Combat"
+						colorClass="bg-amber-600 font-bold text-white hover:bg-amber-500"
+					/>
 				{:else}
-					<button
+					<ToolbarButton
 						onclick={() => {
 							combat.prevTurn();
 							scrollToActive();
 						}}
-						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
+						icon="fa-arrow-left"
+						label="Prev"
 						title="Previous turn"
-					>
-						<span class="hidden md:inline"
-							><i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i> Prev</span
-						>
-						<span class="flex flex-col items-center md:hidden">
-							<i class="fa-duotone fa-light fa-arrow-left" aria-hidden="true"></i>
-							<span>Prev</span>
-						</span>
-					</button>
-					<button
+						colorClass="bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white"
+					/>
+					<ToolbarButton
 						onclick={() => {
 							combat.nextTurn();
 							scrollToActive();
 						}}
-						class="rounded bg-amber-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-500"
-					>
-						<span class="hidden md:inline"
-							>Next
-							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i></span
-						>
-						<span class="flex flex-col items-center md:hidden">
-							<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i>
-							<span>Next</span>
-						</span>
-					</button>
-					<button
+						icon="fa-arrow-right"
+						label="Next"
+						colorClass="bg-amber-600 font-bold text-white hover:bg-amber-500"
+					/>
+					<ToolbarButton
 						onclick={() => combat.endCombat()}
-						class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-500 transition hover:bg-gray-600 hover:text-gray-300"
+						icon="fa-stop"
+						label="End"
 						title="End combat"
-					>
-						<span class="hidden md:inline"
-							><i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i> End</span
-						>
-						<span class="flex flex-col items-center md:hidden">
-							<i class="fa-duotone fa-light fa-stop" aria-hidden="true"></i>
-							<span>End</span>
-						</span>
-					</button>
+						colorClass="bg-gray-700 text-gray-500 hover:bg-gray-600 hover:text-gray-300"
+					/>
 				{/if}
 			{/if}
 
-			<!-- Utility buttons -->
+			<!-- Utility buttons, tucked behind a tools menu so this row stays short -->
 			<div class="h-4 w-px bg-gray-700"></div>
-			<button
-				onclick={() => combat.undo()}
-				disabled={!combat.canUndo}
-				title="Undo the last damage/heal, condition/effect, or turn change (up to 5 steps)"
-				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-			>
-				<i class="fa-duotone fa-light fa-arrow-rotate-left" aria-hidden="true"></i> Undo
-			</button>
-			<button
-				onclick={() => (showAoE = true)}
-				title="Apply damage, healing, a condition, or a spell effect to multiple combatants"
-				class="rounded bg-orange-900/60 px-2 py-1 text-xs text-orange-300 transition hover:bg-orange-800 hover:text-white"
-			>
-				Area of Effect
-			</button>
-			<button
-				onclick={() => (showCombatLog = true)}
-				title="View a running log of everything that's happened this combat"
-				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
-			>
-				<i class="fa-duotone fa-light fa-scroll" aria-hidden="true"></i> Log
-			</button>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="relative" onmouseleave={() => (showTimerSettings = false)}>
+			<div class="relative" onmouseleave={() => (showToolsMenu = false)}>
 				<button
-					onclick={() => {
-						timerInput = combat.turnTimerSeconds ?? 60;
-						showTimerSettings = !showTimerSettings;
-					}}
-					title="Set a per-turn countdown"
-					class="rounded px-2 py-1 text-xs transition {combat.turnTimerSeconds !== null
-						? 'bg-blue-900/60 text-blue-300 hover:bg-blue-800'
-						: 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'}"
+					onclick={() => (showToolsMenu = !showToolsMenu)}
+					title="More tools (Undo, Area of Effect, Log, Timer, Resets, Clear Enemies)"
+					class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 				>
-					<i class="fa-duotone fa-light fa-hourglass-half" aria-hidden="true"></i> Timer
+					<i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i>
 				</button>
-				{#if showTimerSettings}
+				{#if showToolsMenu}
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<div
-						class="absolute top-full right-0 z-20 mt-1 flex w-52 flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3 shadow-xl"
+						class="absolute top-full right-0 z-20 mt-1 w-60 rounded-lg border border-gray-700 bg-gray-800 py-1 shadow-xl"
 						onclick={(e) => e.stopPropagation()}
 					>
-						<label class="flex flex-col gap-1 text-xs text-gray-400">
-							Seconds per turn
-							<input
-								type="number"
-								min="10"
-								max="600"
-								bind:value={timerInput}
-								class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
-							/>
-						</label>
-						<div class="flex gap-2">
-							<button
-								onclick={() => {
-									combat.setTurnTimerSeconds(Math.max(10, timerInput || 60));
-									showTimerSettings = false;
-								}}
-								class="flex-1 rounded bg-blue-700 px-2 py-1 text-xs font-semibold text-white transition hover:bg-blue-600"
+						<ToolbarMenuItem
+							onclick={() => {
+								combat.undo();
+								showToolsMenu = false;
+							}}
+							disabled={!combat.canUndo}
+							icon="fa-arrow-rotate-left"
+							label="Undo"
+						/>
+						<ToolbarMenuItem
+							onclick={() => {
+								showAoE = true;
+								showToolsMenu = false;
+							}}
+							icon="fa-swords"
+							label="Area of Effect"
+							textClass="text-orange-300"
+						/>
+						<ToolbarMenuItem
+							onclick={() => {
+								showCombatLog = true;
+								showToolsMenu = false;
+							}}
+							icon="fa-scroll"
+							label="Log"
+						/>
+						<ToolbarMenuItem
+							onclick={() => {
+								timerInput = combat.turnTimerSeconds ?? 60;
+								showTimerSettings = !showTimerSettings;
+							}}
+							icon="fa-hourglass-half"
+							label="Timer"
+							textClass={combat.turnTimerSeconds !== null ? 'text-blue-300' : 'text-gray-300'}
+						/>
+						{#if showTimerSettings}
+							<div
+								class="mx-3 mb-2 flex flex-col gap-2 rounded border border-gray-700 bg-gray-900 p-2"
 							>
-								{combat.turnTimerSeconds !== null ? 'Restart' : 'Enable'}
-							</button>
-							{#if combat.turnTimerSeconds !== null}
-								<button
-									onclick={() => {
-										combat.setTurnTimerSeconds(null);
-										showTimerSettings = false;
-									}}
-									class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
-								>
-									Disable
-								</button>
-							{/if}
-						</div>
+								<label class="flex flex-col gap-1 text-xs text-gray-400">
+									Seconds per turn
+									<input
+										type="number"
+										min="10"
+										max="600"
+										bind:value={timerInput}
+										class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+									/>
+								</label>
+								<div class="flex gap-2">
+									<button
+										onclick={() => {
+											combat.setTurnTimerSeconds(Math.max(10, timerInput || 60));
+											showTimerSettings = false;
+											showToolsMenu = false;
+										}}
+										class="flex-1 rounded bg-blue-700 px-2 py-1 text-xs font-semibold text-white transition hover:bg-blue-600"
+									>
+										{combat.turnTimerSeconds !== null ? 'Restart' : 'Enable'}
+									</button>
+									{#if combat.turnTimerSeconds !== null}
+										<button
+											onclick={() => {
+												combat.setTurnTimerSeconds(null);
+												showTimerSettings = false;
+												showToolsMenu = false;
+											}}
+											class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
+										>
+											Disable
+										</button>
+									{/if}
+								</div>
+							</div>
+						{/if}
+						<div class="my-1 border-t border-gray-700"></div>
+						<ToolbarMenuItem
+							onclick={() => {
+								combat.resetInitiatives();
+								showToolsMenu = false;
+							}}
+							icon="fa-arrows-rotate"
+							label="Reset Init"
+						/>
+						<ToolbarMenuItem
+							onclick={() => {
+								combat.resetPlayers();
+								showToolsMenu = false;
+							}}
+							icon="fa-heart"
+							label="Reset Players"
+						/>
+						<ToolbarMenuItem
+							onclick={() => {
+								combat.clearEnemies();
+								showToolsMenu = false;
+							}}
+							icon="fa-trash"
+							label="Clear Enemies"
+							textClass="text-red-300"
+						/>
 					</div>
 				{/if}
 			</div>
-			<button
-				onclick={() => combat.resetInitiatives()}
-				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
-			>
-				Reset Init
-			</button>
-			<button
-				onclick={() => combat.resetPlayers()}
-				class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
-			>
-				Reset Players
-			</button>
-			<button
-				onclick={() => combat.clearEnemies()}
-				class="rounded bg-red-900/60 px-2 py-1 text-xs text-red-300 transition hover:bg-red-800 hover:text-white"
-			>
-				Clear Enemies
-			</button>
 		</div>
 	</div>
 
