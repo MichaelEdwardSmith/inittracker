@@ -326,6 +326,23 @@
 		if (!target) return null;
 
 		const removing = REMOVE_CONDITION_WORDS.test(lower);
+
+		// Exhaustion stacks by level rather than toggling on/off — route it through
+		// setExhaustionLevel instead of the flat statuses array.
+		if (status === 'Exhausted') {
+			const has = (target.exhaustionLevel ?? 0) > 0;
+			if (removing === has) {
+				return () => {
+					combat.setExhaustionLevel(target.id, removing ? 0 : 1);
+					showToast(
+						'fa-tag',
+						removing ? `${target.name} no longer Exhausted` : `${target.name} is now Exhausted`
+					);
+				};
+			}
+			return null;
+		}
+
 		const has = target.statuses.includes(status);
 		// Adding an already-present status (or removing an absent one) is a
 		// no-op — toggleStatus would otherwise flip it the wrong way.

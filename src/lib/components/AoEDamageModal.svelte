@@ -83,12 +83,24 @@
 	function applyCondition() {
 		const name = (selectedEffect === CUSTOM_VALUE ? customEffect : selectedEffect).trim();
 		if (!name) return;
-		const targets = combatants
-			.filter((c) => isSelected(c.id) && !saved[c.id])
-			.map((c) => ({ id: c.id }));
+		const targets = combatants.filter((c) => isSelected(c.id) && !saved[c.id]);
 		if (targets.length === 0) return;
+		if (name === 'Exhausted') {
+			// Exhaustion stacks by level rather than toggling on/off, and doesn't expire on a
+			// round timer — bump each target's existing level by one instead of the flat
+			// add/skip-if-present bulk status logic (and ignore the Rounds field).
+			for (const c of targets) {
+				combat.setExhaustionLevel(c.id, (c.exhaustionLevel ?? 0) + 1);
+			}
+			onclose();
+			return;
+		}
 		const rounds = parseInt(effectRounds);
-		combat.applyBulkStatus(targets, name, isNaN(rounds) || rounds <= 0 ? undefined : rounds);
+		combat.applyBulkStatus(
+			targets.map((c) => ({ id: c.id })),
+			name,
+			isNaN(rounds) || rounds <= 0 ? undefined : rounds
+		);
 		onclose();
 	}
 
@@ -303,11 +315,22 @@
 						bind:value={effectRounds}
 						type="number"
 						min="1"
-						placeholder="Rounds"
-						title="Rounds (optional — blank for indefinite)"
-						class="w-20 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-center text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none"
+						disabled={selectedEffect === 'Exhausted'}
+						placeholder={selectedEffect === 'Exhausted' ? 'N/A' : 'Rounds'}
+						title={selectedEffect === 'Exhausted'
+							? 'Exhaustion is a cumulative level, not a timed effect'
+							: 'Rounds (optional — blank for indefinite)'}
+						class="w-20 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-center text-sm text-white placeholder-gray-600 focus:border-amber-500 focus:outline-none disabled:opacity-40"
 					/>
 				</div>
+				{#if selectedEffect === 'Exhausted'}
+					<p class="text-xs text-gray-500">
+						Applying this adds <strong class="font-semibold text-orange-300"
+							>+1 exhaustion level</strong
+						>
+						to each selected target (their existing level, if any, carries over).
+					</p>
+				{/if}
 				{#if selectedEffect === CUSTOM_VALUE}
 					<input
 						bind:value={customEffect}

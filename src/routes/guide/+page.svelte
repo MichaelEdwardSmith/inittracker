@@ -580,6 +580,18 @@
 				</p>
 
 				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Inspiration
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click the <strong class="font-semibold text-amber-300"
+						><i class="fa-duotone fa-light fa-star" aria-hidden="true"></i> star icon</strong
+					> next to a player's name — on their Party panel card or their initiative order card — to grant
+					Heroic Inspiration. It turns amber while active; click again to clear it once spent. A plain
+					reminder flag with no automation attached, and it persists whether or not the player is currently
+					in combat.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
 					Editing a Player
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
@@ -1276,6 +1288,71 @@
 				</p>
 
 				<h3
+					id="readied-actions--surprise"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Readied Actions &amp; Surprise
+				</h3>
+				<p class="mb-6 text-sm leading-relaxed">
+					Two more icons sit next to the reaction bolt on every player and enemy card:
+					<strong class="font-semibold text-violet-300">⏱ Readied Action</strong>
+					(violet when active) marks that this combatant used their action to Ready something — it's a
+					reminder badge that clears automatically the next time their own turn comes around — and
+					<strong class="font-semibold text-pink-300">⚠ Surprised</strong>
+					(pink when active) marks them as surprised at the start of combat, clearing itself the moment
+					their first turn ends. Both also appear as small labeled badges near the active combatant's
+					name on the Player Display.
+				</p>
+
+				<h3
+					id="exhaustion"
+					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
+				>
+					Exhaustion
+				</h3>
+				<p class="mb-6 text-sm leading-relaxed">
+					Exhaustion is cumulative (levels 1–6 per RAW), so it's tracked as a level rather than a
+					badge. Picking <strong class="font-semibold text-orange-300">Exhausted</strong> from the
+					+Condition/Spell Effect menu sets it to level 1 and reveals a dedicated
+					<strong class="font-semibold text-orange-300">Exhaustion row</strong>
+					on that card, right below the condition badges — six orange dots plus the current level. The
+					row stays hidden on cards that aren't exhausted. Click a hollow dot to raise the level to that
+					point, or click the topmost filled dot to lower it by one; a
+					<strong class="font-semibold text-white">✕</strong> button clears it back to 0 (and hides
+					the row again). The ℹ️ icon shows the exact per-level effects for your session's edition.
+					<strong class="font-semibold text-white">Reset Players</strong> in the initiative order header
+					clears exhaustion on all players too, alongside HP and conditions. In the AoE modal, picking
+					Exhausted adds +1 level to each selected target instead of a flat badge, with no rounds option.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed">
+					<strong class="font-semibold text-white">Level 4:</strong> Per RAW, exhaustion level 4
+					halves a creature's hit point maximum. Raising a
+					<strong class="font-semibold text-white">player's</strong> level to 4 or higher halves
+					their Max HP automatically. If their current HP was higher than the new max, it's brought
+					down to match; otherwise it's left alone. A small
+					<i class="fa-duotone fa-light fa-face-tired text-orange-400" aria-hidden="true"></i>
+					icon appears next to their HP flagging it as halved. The true max is remembered and restored
+					exactly once exhaustion drops back below level 4 (lowering the dots, clearing exhaustion, or
+					<strong class="font-semibold text-white">Reset Players</strong>) — but current HP is
+					<strong class="font-semibold text-white">not</strong> bumped back up to match; healing them
+					afterward is a separate, deliberate action.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed">
+					<strong class="font-semibold text-white">Level 6:</strong> Per RAW, exhaustion level 6 is
+					instant death. Raising a
+					<strong class="font-semibold text-white">player's</strong> level to 6 marks them Dead
+					immediately — 0 HP, the Dead condition, and the
+					<a href="#death-saves" class="text-amber-400 transition hover:text-amber-300"
+						>death saves tracker</a
+					> shown already resolved (three failures) rather than something to roll, the same end state
+					as failing three death saving throws.
+				</p>
+				<p class="mb-6 text-sm leading-relaxed">
+					Neither of these applies to enemies automatically — an enemy hitting level 4 or 6 doesn't
+					auto-halve or auto-die; make the call and adjust its card by hand.
+				</p>
+
+				<h3
 					id="transformation"
 					class="mt-6 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase"
 				>
@@ -1395,13 +1472,20 @@
 					>
 					on any combatant row. A dropdown lists the 15 standard conditions, the four Adv/Disadv markers,
 					a quick-pick list of common spell effects (Bless, Bane, Haste, Hex, and more), and a
-					<strong class="font-semibold text-fuchsia-300">Custom</strong> text field for any other
-					effect name. Click one to apply it — the badge appears immediately on the row, styled grey
-					for standard conditions/markers and
+					<strong class="font-semibold text-fuchsia-300">Custom</strong>
+					text field for any other effect name. Click a condition or effect to apply it — the badge appears
+					immediately on the row, styled grey for standard conditions/markers and
 					<strong class="font-semibold text-fuchsia-300">fuchsia</strong> for spell effects. A
 					prompt lets you set a number of rounds for the effect to last, or leave it blank for
-					indefinite. Dead and Unconscious are not selectable: when a player drops to 0 HP they
-					automatically become Unconscious (all other conditions cleared) and a
+					indefinite.
+					<strong class="font-semibold text-orange-300">Exhausted</strong> is the one exception —
+					clicking it sets exhaustion to level 1 and reveals a dedicated
+					<a href="#exhaustion" class="text-amber-400 transition hover:text-amber-300"
+						>Exhaustion row</a
+					>
+					on the card (hidden otherwise) instead of adding a flat badge, and skips the rounds prompt since
+					exhaustion doesn't expire on a timer. Dead and Unconscious are not selectable: when a player
+					drops to 0 HP they automatically become Unconscious (all other conditions cleared) and a
 					<a href="#death-saves" class="text-amber-400 transition hover:text-amber-300"
 						>death saving throw tracker</a
 					> appears on their row. Enemies at 0 HP are simply removed from the turn order.
