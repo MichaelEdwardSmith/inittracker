@@ -403,6 +403,7 @@
 				{@const isDead = c.currentHp === 0}
 				{@const isActive = c.id === combat.currentTurnId}
 				{@const pct = hpPercent(c)}
+				{@const exLevel = c.exhaustionLevel ?? 0}
 				{@const prevSameInit = i > 0 && combat.sorted[i - 1].initiative === c.initiative}
 				{@const nextSameInit =
 					i < combat.sorted.length - 1 && combat.sorted[i + 1].initiative === c.initiative}
@@ -592,6 +593,42 @@
 										aria-hidden="true"
 									></i>
 								</button>
+								<button
+									onclick={() => combat.setReadiedAction(c.id, !c.readiedAction)}
+									title={c.readiedAction
+										? 'Holding a readied action — click to clear'
+										: 'Mark as holding a readied action'}
+									class="rounded p-2 transition {c.readiedAction
+										? 'text-violet-400 hover:text-violet-300'
+										: 'text-gray-600 hover:text-violet-400'}"
+								>
+									<i class="fa-duotone fa-light fa-stopwatch text-base" aria-hidden="true"></i>
+								</button>
+								<button
+									onclick={() => combat.setSurprised(c.id, !c.surprised)}
+									title={c.surprised
+										? 'Surprised — clears automatically after their first turn ends'
+										: 'Mark as surprised'}
+									class="rounded p-2 transition {c.surprised
+										? 'text-pink-400 hover:text-pink-300'
+										: 'text-gray-600 hover:text-pink-400'}"
+								>
+									<i
+										class="fa-duotone fa-light fa-triangle-exclamation text-base"
+										aria-hidden="true"
+									></i>
+								</button>
+							{/if}
+							{#if c.type === 'player'}
+								<button
+									onclick={() => combat.setInspiration(c.id, !c.inspiration)}
+									title={c.inspiration ? 'Has Inspiration — click to clear' : 'Grant Inspiration'}
+									class="rounded p-2 transition {c.inspiration
+										? 'text-amber-300 hover:text-amber-200'
+										: 'text-gray-600 hover:text-amber-400'}"
+								>
+									<i class="fa-duotone fa-light fa-star text-base" aria-hidden="true"></i>
+								</button>
 							{/if}
 							<button
 								onclick={() => (noteTarget = c)}
@@ -635,6 +672,13 @@
 									<span class="text-base font-bold {hpTextColor(pct)}">{c.currentHp}</span>
 									<span class="text-xs text-gray-600">/</span>
 									<span class="text-sm text-gray-400">{c.maxHp}</span>
+									{#if c.preExhaustionMaxHp !== undefined}
+										<i
+											class="fa-duotone fa-light fa-face-tired text-xs text-orange-400"
+											title="Max HP halved by exhaustion (true max: {c.preExhaustionMaxHp})"
+											aria-hidden="true"
+										></i>
+									{/if}
 									{#if c.tempHp > 0}
 										<span
 											class="flex items-center gap-0.5 rounded bg-yellow-800/70 px-1.5 py-0.5 text-xs font-bold text-yellow-300"
@@ -876,12 +920,22 @@
 								>
 									<div class="grid grid-cols-2 gap-1">
 										{#each CONDITIONS as cond}
-											{@const active = c.statuses.includes(cond)}
+											{@const active =
+												cond === 'Exhausted' ? exLevel > 0 : c.statuses.includes(cond)}
 											<button
-												onclick={() =>
-													active
-														? combat.toggleStatus(c.id, cond)
-														: requestAddCondition(c.id, c.name, cond)}
+												onclick={() => {
+													if (cond === 'Exhausted') {
+														// Exhaustion stacks by level rather than toggling on/off — start
+														// it at level 1 here; the dedicated Exhaustion row (which
+														// appears once level > 0) handles raising/lowering/clearing.
+														combat.setExhaustionLevel(c.id, active ? 0 : 1);
+														openEffectMenuId = null;
+													} else if (active) {
+														combat.toggleStatus(c.id, cond);
+													} else {
+														requestAddCondition(c.id, c.name, cond);
+													}
+												}}
 												class="rounded px-2 py-1 text-left text-xs transition
 											       {active
 													? (conditionColors[cond] ?? 'bg-gray-700 text-white') +
@@ -966,6 +1020,48 @@
 								</div>
 							{/if}
 						</div>
+
+						<!-- Exhaustion (cumulative 0-6, separate from the flat condition list) — only
+						     shown once a combatant is actually exhausted, to keep the card uncluttered
+						     otherwise. Mark someone exhausted via the "Exhausted" entry in the
+						     +Condition/Spell Effect menu above; this row then takes over for
+						     raising/lowering/clearing the level. -->
+						{#if exLevel > 0}
+							<div class="flex items-center gap-2">
+								<span class="shrink-0 text-xs font-semibold text-orange-300/70">Exhaustion:</span>
+								<div class="flex items-center gap-1">
+									{#each [0, 1, 2, 3, 4, 5] as dotIdx}
+										{@const filled = dotIdx < exLevel}
+										<button
+											onclick={() =>
+												combat.setExhaustionLevel(
+													c.id,
+													exLevel === dotIdx + 1 ? dotIdx : dotIdx + 1
+												)}
+											title="Set exhaustion to level {dotIdx + 1}"
+											class="h-4 w-4 rounded-full border-2 transition {filled
+												? 'border-orange-500 bg-orange-500 hover:bg-orange-400'
+												: 'border-orange-800 bg-transparent hover:bg-orange-900/30'}"
+										></button>
+									{/each}
+								</div>
+								<span class="text-xs font-bold text-orange-300">Lvl {exLevel}</span>
+								<button
+									onclick={() => combat.setExhaustionLevel(c.id, 0)}
+									title="Clear exhaustion"
+									class="rounded p-1 text-gray-600 transition hover:text-red-400"
+								>
+									<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
+								</button>
+								<button
+									onclick={() => (conditionInfo = 'Exhausted')}
+									title="What is Exhaustion?"
+									class="rounded p-1 text-gray-600 transition hover:text-blue-400"
+								>
+									<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
+								</button>
+							</div>
+						{/if}
 						{#if c.type === 'enemy'}
 							{@const legendaryDetail = getDetailForCombatant(c)}
 							{#if legendaryDetail?.legendaryActions}

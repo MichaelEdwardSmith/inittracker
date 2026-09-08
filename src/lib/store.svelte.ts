@@ -802,20 +802,27 @@ function createCombatStore() {
 		},
 
 		resetPlayers() {
-			combatants = combatants.map((c) =>
-				c.type === 'player'
-					? {
-							...c,
-							currentHp: c.maxHp,
-							tempHp: 0,
-							statuses: [],
-							conditionRounds: undefined,
-							initiative: null,
-							inCombat: true,
-							deathSaves: undefined
-						}
-					: c
-			);
+			combatants = combatants.map((c) => {
+				if (c.type !== 'player') return c;
+				// Undo any exhaustion-level-4 max HP halving before fully healing, so "Reset
+				// Players" restores their true max rather than locking in the halved one.
+				const maxHp = c.preExhaustionMaxHp ?? c.maxHp;
+				return {
+					...c,
+					maxHp,
+					currentHp: maxHp,
+					tempHp: 0,
+					statuses: [],
+					conditionRounds: undefined,
+					initiative: null,
+					inCombat: true,
+					deathSaves: undefined,
+					exhaustionLevel: undefined,
+					preExhaustionMaxHp: undefined,
+					readiedAction: undefined,
+					surprised: undefined
+				};
+			});
 			sync();
 		},
 
@@ -907,15 +914,26 @@ function createCombatStore() {
 					}
 					const nextCombatant = sorted[nextIdx];
 					const nextId = nextCombatant.id;
-					// Reset legendary actions and reaction availability for the combatant
-					// whose turn is starting
+					const endingId = currentTurnId;
+					// Reset legendary actions, reaction availability, and any readied action for
+					// the combatant whose turn is starting; clear "surprised" on the combatant
+					// whose turn just ended (surprise only lasts through a creature's first turn).
 					combatants = combatants.map((c) => {
-						if (c.id !== nextId) return c;
-						return {
-							...c,
-							...(c.legendaryActionsSpent !== undefined ? { legendaryActionsSpent: 0 } : {}),
-							...(c.reactionUsed ? { reactionUsed: false } : {})
-						};
+						let updated = c;
+						if (c.id === endingId && c.surprised) {
+							updated = { ...updated, surprised: false };
+						}
+						if (c.id === nextId) {
+							updated = {
+								...updated,
+								...(updated.legendaryActionsSpent !== undefined
+									? { legendaryActionsSpent: 0 }
+									: {}),
+								...(updated.reactionUsed ? { reactionUsed: false } : {}),
+								...(updated.readiedAction ? { readiedAction: false } : {})
+							};
+						}
+						return updated;
 					});
 					currentTurnId = nextId;
 					turnStartedAt = Date.now();
@@ -957,6 +975,95 @@ function createCombatStore() {
 
 		setReactionUsed(id: string, used: boolean) {
 			combatants = combatants.map((c) => (c.id === id ? { ...c, reactionUsed: used } : c));
+			sync();
+		},
+
+		/** Players only — toggle Heroic Inspiration. */
+		setInspiration(id: string, value: boolean) {
+			combatants = combatants.map((c) => (c.id === id ? { ...c, inspiration: value } : c));
+			sync();
+		},
+
+		/** Toggle the "holding a readied action" reminder badge. Clears itself automatically
+		 *  the next time this combatant's turn starts (see nextTurn). */
+		setReadiedAction(id: string, value: boolean) {
+			combatants = combatants.map((c) => (c.id === id ? { ...c, readiedAction: value } : c));
+			sync();
+		},
+
+		/** Toggle the "surprised" reminder badge. Clears itself automatically once this
+		 *  combatant's first turn ends (see nextTurn). */
+		setSurprised(id: string, value: boolean) {
+			combatants = combatants.map((c) => (c.id === id ? { ...c, surprised: value } : c));
+			sync();
+		},
+
+		/** Set cumulative exhaustion level (clamped 0-6) and log the change, same as toggleStatus
+		 *  does for flat conditions. 0 is stored as undefined so old saved state without this
+		 *  field reads the same as "not exhausted". Reaching level 4 halves a player's max HP,
+		 *  capping current HP down to the new max if it was higher (same rule the rest of the
+		 *  app already follows whenever max HP drops) — the true max is stashed in
+		 *  preExhaustionMaxHp and restored exactly if exhaustion later drops back below level 4,
+		 *  *without* bumping current HP back up (it stays wherever it was, halved max or not).
+		 *  Reaching level 6 is instant death per RAW — marks a player Dead (0 HP, Dead condition)
+		 *  outright, same end state as failing three death saves, so the rest of the app (card
+		 *  styling, chronicle, etc.) treats it exactly like any other death without needing
+		 *  separate handling. */
+		setExhaustionLevel(id: string, level: number) {
+			const clamped = Math.max(0, Math.min(6, level));
+			let combatantRef: Combatant | undefined;
+			let prevLevel = 0;
+			combatants = combatants.map((c) => {
+				if (c.id !== id) return c;
+				combatantRef = c;
+				prevLevel = c.exhaustionLevel ?? 0;
+				let updated: Combatant = { ...c, exhaustionLevel: clamped || undefined };
+
+				if (c.type === 'player' && clamped >= 4 && c.preExhaustionMaxHp === undefined) {
+					const halvedMaxHp = Math.max(1, Math.floor(c.maxHp / 2));
+					updated = {
+						...updated,
+						preExhaustionMaxHp: c.maxHp,
+						maxHp: halvedMaxHp,
+						currentHp: Math.min(c.currentHp, halvedMaxHp)
+					};
+				} else if (clamped < 4 && c.preExhaustionMaxHp !== undefined) {
+					updated = { ...updated, maxHp: c.preExhaustionMaxHp, preExhaustionMaxHp: undefined };
+				}
+
+				if (c.type === 'player' && clamped >= 6 && !c.statuses.includes('Dead')) {
+					updated = {
+						...updated,
+						currentHp: 0,
+						statuses: ['Dead'],
+						deathSaves: { successes: 0, failures: 3, stable: false }
+					};
+				}
+				return updated;
+			});
+
+			if (combatStartedAt !== null && combatantRef && clamped !== prevLevel) {
+				const actor = currentTurnId ? combatants.find((x) => x.id === currentTurnId) : undefined;
+				const actorFields = actor
+					? {
+							actorId: actor.id,
+							actorName: actor.name,
+							actorType: actor.type as 'player' | 'enemy'
+						}
+					: {};
+				combatEvents = [
+					...combatEvents,
+					{
+						type: clamped > prevLevel ? 'condition_add' : 'condition_remove',
+						round,
+						...actorFields,
+						combatantId: id,
+						combatantName: combatantRef.name,
+						combatantType: combatantRef.type as 'player' | 'enemy',
+						condition: clamped > 0 ? `Exhausted (Level ${clamped})` : 'Exhausted'
+					}
+				];
+			}
 			sync();
 		},
 

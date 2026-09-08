@@ -14,6 +14,7 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
    - [Importing from D&D Beyond](#importing-from-dd-beyond)
    - [Importing a MorePurpleMoreBetter PDF](#importing-a-morepurplemorebetter-pdf)
    - [Leveling Up a Player](#leveling-up-a-player)
+   - [Inspiration](#inspiration)
 5. [Managing Enemies](#5-managing-enemies)
 6. [Running Combat](#6-running-combat)
    - [Undo](#undo)
@@ -25,6 +26,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
    - [Legendary Actions](#legendary-actions)
    - [Legendary Resistance](#legendary-resistance)
    - [Reaction Tracking](#reaction-tracking)
+   - [Readied Actions & Surprise](#readied-actions--surprise)
+   - [Exhaustion](#exhaustion)
    - [Transformation](#transformation)
    - [Lair Actions](#lair-actions)
 8. [Conditions & Status Effects](#8-conditions--status-effects)
@@ -212,6 +215,10 @@ If your players use [MorePurpleMoreBetter](https://www.flapkan.com/other#RecordS
 Each player card shows a circular avatar. Click the avatar circle to upload an image (JPEG/PNG). The image is automatically cropped to a square and resized to 256×256. To remove an avatar, hover over it and click the **✕** button that appears.
 
 On the initiative order (the DM's center panel), clicking a player's avatar opens it full-size in a lightbox preview — click outside the image, press **Escape**, or click the **✕** to close it.
+
+### Inspiration
+
+Click the **star icon** next to a player's name — on their card in the Party panel, or on their card in the initiative order — to grant Heroic Inspiration. The star turns amber while they have it; click it again to clear it once they spend it. It's a plain flag with no automation attached (nothing rolls advantage for them), just a shared reminder that persists whether or not the player is currently in combat.
 
 ### Editing a Player
 
@@ -491,6 +498,31 @@ Every player and enemy card shows a **bolt icon** next to the paw (Transform) ic
 
 This is a plain manual toggle — nothing stops you from clicking it back to Ready early if a ruling calls for it (e.g. a feature that grants an extra reaction).
 
+### Readied Actions & Surprise
+
+Two more icons sit next to the reaction bolt on every player and enemy card:
+
+- **⏱ Readied Action** (violet when active) — click to mark that this combatant used their action to Ready something this turn. It's a reminder badge only; clicking it again clears it manually, or it clears itself automatically the next time this combatant's own turn comes around (the window for a readied action to trigger has passed either way by then).
+- **⚠ Surprised** (pink when active) — click to mark a combatant as surprised at the start of combat, so the table remembers they can't move, act, or react during their first turn. It clears itself automatically the moment their first turn ends — no manual cleanup needed once combat gets past round 1.
+
+Both appear on the [Player Display](#9-the-player-display-viewer-screen) too, as small labeled badges near the active combatant's name, so players can see the reminder without asking.
+
+### Exhaustion
+
+Exhaustion is cumulative (levels 1–6 per RAW), so unlike the flat conditions in [Conditions & Status Effects](#8-conditions--status-effects) it's tracked as a level rather than a badge. To mark someone exhausted, pick **Exhausted** from the **+ Condition/Spell Effect** menu like any other condition — this sets their level to 1 and reveals a dedicated **Exhaustion** row on their card, right below the condition badges — six orange dots plus the current level. The row stays hidden on cards that aren't exhausted, so it doesn't clutter every combatant.
+
+- Click any hollow dot to raise exhaustion to that level; click the topmost filled dot to lower it by one
+- The current level is shown as **Lvl N** next to the dots, with a **✕** button to clear it back to 0 (which also hides the row again)
+- Click the **ℹ️ icon** to see the exact per-level effects for your session's edition (2014 or 2024 rules read differently)
+- **Reset Players** in the initiative order header also clears exhaustion on all players, alongside HP and conditions — treat it as the "long rest" reset button
+- In [Bulk Actions (AoE)](#bulk-actions-aoe), picking Exhausted adds **+1 level** to each selected target rather than setting a flat level — it has no rounds/timing option, since exhaustion doesn't expire on its own
+
+> **Level 4:** Per RAW, exhaustion level 4 halves a creature's hit point maximum. Raising a **player's** level to 4 (or higher) halves their **Max HP** automatically. If their current HP was higher than the new (halved) max, it's brought down to match — otherwise current HP is left alone. A small tired-face icon appears next to their HP to flag that it's currently halved. The true max is remembered and restored exactly once their exhaustion drops back below level 4 (by lowering the dots, clearing exhaustion, or **Reset Players**) — but current HP is **not** bumped back up to match; it stays wherever it was, even if that's still the halved max, so healing them back up afterward is a separate, deliberate action.
+>
+> **Level 6:** Per RAW, exhaustion level 6 is instant death. Raising a **player's** level to 6 marks them **Dead** immediately — 0 HP, the Dead condition, and the death saves tracker shown already resolved (three failures) rather than something to roll — the same end state as failing three death saving throws.
+>
+> Neither of these applies to enemies automatically — an enemy hitting level 4 or 6 doesn't auto-halve or auto-die; make the call and adjust its card by hand.
+
 ### Transformation
 
 Click the **paw icon** on a player or enemy card to temporarily swap their stats for another form — Wild Shape, Polymorph, or any similar effect.
@@ -555,6 +587,8 @@ Click the **+ Condition/Spell Effect** button on any combatant row. A dropdown m
 > **Note:** Dead and Unconscious are not in the selectable list. When a **player** reaches 0 HP, they automatically become Unconscious (all other conditions are cleared) and a death saving throw tracker appears on their row — see [Death Saving Throws](#death-saving-throws). Enemies at 0 HP are simply removed from the turn order.
 
 Click any condition or spell effect to apply it. Conditions/effects already active on that combatant are hidden from the list (except the custom field, which is always available). If you set a number of rounds in the timing prompt, the effect is automatically removed once that many rounds have elapsed; leave it blank for an indefinite effect you remove manually.
+
+> **Exhausted is special:** clicking it sets the combatant to exhaustion level 1 and reveals a dedicated [Exhaustion](#exhaustion) row on their card (it isn't shown otherwise, to keep uncomplicated cards uncluttered) — that row then handles raising, lowering, or clearing the level. There's no rounds prompt for it, since exhaustion doesn't expire on a timer.
 
 Standard conditions and Adv/Disadv markers are styled as grey badges; spell effects (whether from the quick-pick list or typed as custom) are styled as fuchsia badges to visually distinguish "official condition" from "tracked spell/buff."
 

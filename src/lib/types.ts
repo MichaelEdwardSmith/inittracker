@@ -61,6 +61,23 @@ export interface Combatant {
 	// their own turn. Undefined is treated as available (so existing saved state
 	// doesn't suddenly show every combatant as having used their reaction).
 	reactionUsed?: boolean;
+	// Players only — Heroic Inspiration, toggled via a star icon. A simple flag (no
+	// stacking) per RAW.
+	inspiration?: boolean;
+	// Cumulative exhaustion level (0–6). Tracked separately from `statuses` because it
+	// stacks rather than toggling on/off; 0 (or unset) means not exhausted.
+	exhaustionLevel?: number;
+	// Players only — present while exhaustion level 4+ has halved `maxHp`. Holds the true
+	// (pre-halving) max HP so it can be restored exactly if exhaustion later drops back
+	// below level 4. Current HP is left untouched by the halving either way.
+	preExhaustionMaxHp?: number;
+	// Marked while this combatant is holding a readied action. Purely a DM reminder —
+	// clears automatically once their own next turn starts (the window in which a
+	// readied action can trigger has passed either way).
+	readiedAction?: boolean;
+	// Marked while this combatant is surprised at the start of combat (can't move, act,
+	// or react during their first turn). Clears automatically once their own turn ends.
+	surprised?: boolean;
 	// Present while this combatant is wearing a temporary form (Wild Shape, Polymorph,
 	// etc.) — holds their true-form stats so "Revert" can restore them exactly.
 	transformStash?: {

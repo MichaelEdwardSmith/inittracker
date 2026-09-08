@@ -1174,6 +1174,62 @@
 						</div>
 					{/if}
 
+					<!-- Reminder badges: inspiration, readied action, surprised, exhaustion -->
+					{#if dc.inspiration || dc.readiedAction || dc.surprised || (dc.exhaustionLevel ?? 0) > 0}
+						<div class="mb-3 flex flex-wrap items-center justify-center gap-2">
+							{#if dc.inspiration}
+								<div
+									class="flex items-center gap-2 rounded-full border border-amber-700/60 bg-amber-950/60 px-4 py-1"
+								>
+									<i class="fa-duotone fa-light fa-star text-base leading-none" aria-hidden="true"
+									></i>
+									<span class="text-xs font-black tracking-[0.25em] text-amber-300 uppercase"
+										>Inspired</span
+									>
+								</div>
+							{/if}
+							{#if dc.readiedAction}
+								<div
+									class="flex items-center gap-2 rounded-full border border-violet-700/60 bg-violet-950/60 px-4 py-1"
+								>
+									<i
+										class="fa-duotone fa-light fa-stopwatch text-base leading-none"
+										aria-hidden="true"
+									></i>
+									<span class="text-xs font-black tracking-[0.25em] text-violet-300 uppercase"
+										>Readied</span
+									>
+								</div>
+							{/if}
+							{#if dc.surprised}
+								<div
+									class="flex items-center gap-2 rounded-full border border-pink-700/60 bg-pink-950/60 px-4 py-1"
+								>
+									<i
+										class="fa-duotone fa-light fa-triangle-exclamation text-base leading-none"
+										aria-hidden="true"
+									></i>
+									<span class="text-xs font-black tracking-[0.25em] text-pink-300 uppercase"
+										>Surprised</span
+									>
+								</div>
+							{/if}
+							{#if (dc.exhaustionLevel ?? 0) > 0}
+								<div
+									class="flex items-center gap-2 rounded-full border border-orange-700/60 bg-orange-950/60 px-4 py-1"
+								>
+									<i
+										class="fa-duotone fa-light fa-face-tired text-base leading-none"
+										aria-hidden="true"
+									></i>
+									<span class="text-xs font-black tracking-[0.25em] text-orange-300 uppercase"
+										>Exhausted {dc.exhaustionLevel}</span
+									>
+								</div>
+							{/if}
+						</div>
+					{/if}
+
 					<!-- Name -->
 					<h1
 						class="mb-2 text-center leading-none font-black tracking-widest uppercase
@@ -1459,6 +1515,34 @@
 											<i
 												class="fa-duotone fa-light fa-droplet shrink-0 text-sm leading-none"
 												title="Bloodied"
+												aria-hidden="true"
+											></i>
+										{/if}
+										{#if c.inspiration}
+											<i
+												class="fa-duotone fa-light fa-star shrink-0 text-sm leading-none text-amber-400"
+												title="Inspired"
+												aria-hidden="true"
+											></i>
+										{/if}
+										{#if c.readiedAction}
+											<i
+												class="fa-duotone fa-light fa-stopwatch shrink-0 text-sm leading-none text-violet-400"
+												title="Readied action"
+												aria-hidden="true"
+											></i>
+										{/if}
+										{#if c.surprised}
+											<i
+												class="fa-duotone fa-light fa-triangle-exclamation shrink-0 text-sm leading-none text-pink-400"
+												title="Surprised"
+												aria-hidden="true"
+											></i>
+										{/if}
+										{#if (c.exhaustionLevel ?? 0) > 0}
+											<i
+												class="fa-duotone fa-light fa-face-tired shrink-0 text-sm leading-none text-orange-400"
+												title="Exhausted (Level {c.exhaustionLevel})"
 												aria-hidden="true"
 											></i>
 										{/if}
