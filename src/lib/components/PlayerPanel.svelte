@@ -5,6 +5,7 @@
 	import { combat } from '$lib/store.svelte';
 	import LevelUpModal from './LevelUpModal.svelte';
 	import AddPlayerModal from './AddPlayerModal.svelte';
+	import CombatantToggleButton from './CombatantToggleButton.svelte';
 
 	interface Props {
 		presences?: Record<string, string>;
@@ -266,17 +267,16 @@
 									>benched</span
 								>
 							{/if}
-							<button
+							<CombatantToggleButton
+								active={!!player.inspiration}
 								onclick={() => combat.setInspiration(player.id, !player.inspiration)}
-								title={player.inspiration
-									? 'Has Inspiration — click to clear'
-									: 'Grant Inspiration'}
-								class="shrink-0 rounded p-0.5 transition {player.inspiration
-									? 'text-amber-300 hover:text-amber-200'
-									: 'text-gray-600 hover:text-amber-400'}"
-							>
-								<i class="fa-duotone fa-light fa-star text-xs" aria-hidden="true"></i>
-							</button>
+								icon="fa-star"
+								activeTitle="Has Inspiration — click to clear"
+								inactiveTitle="Grant Inspiration"
+								activeClass="text-amber-300 hover:text-amber-200"
+								inactiveClass="text-gray-600 hover:text-amber-400"
+								compact
+							/>
 						</div>
 						<div class="text-xs text-gray-400">
 							{#if player.level}Level {player.level} &bull;

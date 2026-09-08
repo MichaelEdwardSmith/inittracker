@@ -2971,7 +2971,8 @@
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
 						A <strong class="font-semibold text-white">"Now Acting"</strong> panel — portrait, HP bar,
-						condition badges, and the current round number
+						condition badges, and the current round number. Badges cover every standard condition plus
+						Exhausted (with level), Transformed, Inspired, Readied, and Surprised.
 					</li>
 					<li>
 						A scrolling <strong class="font-semibold text-white">combat event ticker</strong> — damage,
@@ -2981,10 +2982,21 @@
 						An <strong class="font-semibold text-white">"Up Next"</strong> bar across the bottom showing
 						upcoming turns, with a wrap marker at the end of the round
 					</li>
+					<li>
+						A full-screen <strong class="font-semibold text-amber-300">"COMBAT"</strong> banner — a
+						flash, expanding shockwave ring, and a brief screen-shake — the instant you click
+						<strong class="font-semibold text-white">Start Combat</strong>, and a calmer
+						<strong class="font-semibold text-white">"COMBAT ENDED"</strong> fade when you click
+						<strong class="font-semibold text-white">End Combat</strong>
+					</li>
 				</ul>
-				<p class="text-sm leading-relaxed">
+				<p class="mb-4 text-sm leading-relaxed">
 					The background is fully transparent and the overlay ignores mouse/click input, so it
 					composites cleanly over your other stream sources without blocking anything underneath.
+				</p>
+				<p class="text-sm leading-relaxed">
+					The start/end banners are driven by the actual Start/End Combat action, not just whether
+					combatants exist, so opening the overlay mid-fight won't replay the start animation.
 				</p>
 			</section>
 

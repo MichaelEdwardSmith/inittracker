@@ -20,13 +20,15 @@
 	let combatState: StorageState = $state({ combatants: [], currentTurnId: null, round: 1 });
 	let connected = $state(false);
 
+	// Note: 'Exhausted' is deliberately not in these two maps — it's a cumulative level
+	// (exhaustionLevel) rather than a flat entry in `statuses`, so it's synthesized into
+	// extraBadges below instead, alongside Transformed/Inspired/Readied/Surprised.
 	const conditionAbbrev: Record<string, string> = {
 		Blinded: 'Blind',
 		Charmed: 'Chrm',
 		Concentrating: 'Conc',
 		Deafened: 'Deaf',
 		Dead: 'Dead',
-		Exhausted: 'Exhst',
 		Frightened: 'Frgtn',
 		Grappled: 'Grpl',
 		Incapacitated: 'Incap',
@@ -50,7 +52,6 @@
 		Concentrating: '#155e75',
 		Deafened: '#92400e',
 		Dead: '#111827',
-		Exhausted: '#7c2d12',
 		Frightened: '#6b21a8',
 		Grappled: '#c2410c',
 		Incapacitated: '#991b1b',
@@ -68,12 +69,31 @@
 		'Disadvantage Against': '#134e4a'
 	};
 
+	// ── Battle start/end banner ──
+	// Driven by currentTurnId (the DM's actual Start Combat / End Combat signal), not the
+	// `inCombat` HUD-visibility proxy below — that one just tracks "is there a roster to
+	// show," so it doesn't reliably flip when combat itself starts/ends.
+	const isActiveCombat = $derived(combatState.currentTurnId !== null);
+	let showStartBanner = $state(false);
+	let showEndBanner = $state(false);
+	let shakeScreen = $state(false);
+	let prevActiveCombat: boolean | null = null;
+	let receivedFirstMessage = false;
+
 	$effect(() => {
 		const source = new EventSource(`/api/state?session=${data.sessionId}`);
 		source.onopen = () => (connected = true);
 		source.onmessage = (e) => {
 			try {
-				combatState = JSON.parse(e.data) as StorageState;
+				const parsed = JSON.parse(e.data) as StorageState;
+				if (!receivedFirstMessage) {
+					// Prime the battle-banner baseline from the real first snapshot (not the
+					// placeholder default state) so opening the overlay mid-fight doesn't
+					// misread that as combat just starting.
+					receivedFirstMessage = true;
+					prevActiveCombat = parsed.currentTurnId !== null;
+				}
+				combatState = parsed;
 			} catch {
 				// ignore malformed messages
 			}
@@ -88,6 +108,36 @@
 	);
 
 	const inCombat = $derived(visible.length > 0 && combatState.round > 0);
+
+	$effect(() => {
+		const now = isActiveCombat;
+		if (prevActiveCombat === null) {
+			// First state received — establish the baseline without animating, so refreshing
+			// mid-combat doesn't replay the start banner.
+			prevActiveCombat = now;
+			return;
+		}
+		let startTimer: ReturnType<typeof setTimeout> | undefined;
+		let endTimer: ReturnType<typeof setTimeout> | undefined;
+		let shakeTimer: ReturnType<typeof setTimeout> | undefined;
+		if (now && !prevActiveCombat) {
+			showEndBanner = false;
+			showStartBanner = true;
+			shakeScreen = true;
+			shakeTimer = setTimeout(() => (shakeScreen = false), 400);
+			startTimer = setTimeout(() => (showStartBanner = false), 1700);
+		} else if (!now && prevActiveCombat) {
+			showStartBanner = false;
+			showEndBanner = true;
+			endTimer = setTimeout(() => (showEndBanner = false), 2200);
+		}
+		prevActiveCombat = now;
+		return () => {
+			clearTimeout(startTimer);
+			clearTimeout(endTimer);
+			clearTimeout(shakeTimer);
+		};
+	});
 
 	const currentIndex = $derived(visible.findIndex((c) => c.id === combatState.currentTurnId));
 
@@ -115,6 +165,22 @@
 	}
 
 	const avatarSrc = $derived(current ? (current.avatarUrl ?? current.imgUrl ?? null) : null);
+
+	// Badges for combatant state that isn't stored in `statuses` (and so wouldn't otherwise
+	// show up next to the flat conditions below) — shown ahead of the regular condition
+	// badges on the Now Acting card.
+	const extraBadges = $derived.by<Array<{ text: string; bg: string }>>(() => {
+		if (!current) return [];
+		const badges: Array<{ text: string; bg: string }> = [];
+		if (current.transformStash) badges.push({ text: 'Transformed', bg: '#047857' });
+		if ((current.exhaustionLevel ?? 0) > 0) {
+			badges.push({ text: `Exhausted ${current.exhaustionLevel}`, bg: '#7c2d12' });
+		}
+		if (current.inspiration) badges.push({ text: 'Inspired', bg: '#b45309' });
+		if (current.readiedAction) badges.push({ text: 'Readied', bg: '#5b21b6' });
+		if (current.surprised) badges.push({ text: 'Surprised', bg: '#be123c' });
+		return badges;
+	});
 
 	// ── Combat event ticker ──
 	let tickerEvents = $state<TickerEvent[]>([]);
@@ -234,7 +300,7 @@
 </svelte:head>
 
 <!-- Full-screen transparent canvas — OBS browser source fills this -->
-<div class="screen">
+<div class="screen" class:screen-shake={shakeScreen}>
 	{#if !connected}
 		<!-- Small connecting indicator top-left -->
 		<div class="connecting-chip">
@@ -282,27 +348,41 @@
 											<span class="current-hp-label">HP</span>
 										</div>
 										<div class="current-hp-track">
-											<div
-												class="current-hp-fill"
-												style="width:{pct}%;background:{pct <= 0
-													? '#374151'
-													: pct <= 25
-														? '#dc2626'
-														: pct <= 50
-															? '#d97706'
-															: '#16a34a'}"
-											></div>
 											{#if current.tempHp > 0}
+												{@const total = current.maxHp + current.tempHp}
+												{@const hpW = (current.currentHp / total) * 100}
+												{@const thpW = (current.tempHp / total) * 100}
 												<div
-													class="current-hp-temp"
-													style="width:{Math.min(100, (current.tempHp / current.maxHp) * 100)}%"
+													class="current-hp-fill"
+													style="width:{hpW}%;background:{pct <= 0
+														? '#374151'
+														: pct <= 25
+															? '#dc2626'
+															: pct <= 50
+																? '#d97706'
+																: '#16a34a'}"
+												></div>
+												<div class="current-hp-temp" style="left:{hpW}%;width:{thpW}%"></div>
+											{:else}
+												<div
+													class="current-hp-fill"
+													style="width:{pct}%;background:{pct <= 0
+														? '#374151'
+														: pct <= 25
+															? '#dc2626'
+															: pct <= 50
+																? '#d97706'
+																: '#16a34a'}"
 												></div>
 											{/if}
 										</div>
 									{/if}
 
-									{#if current.statuses.length > 0}
+									{#if current.statuses.length > 0 || extraBadges.length > 0}
 										<div class="current-badges">
+											{#each extraBadges as extra}
+												<span class="badge" style="background:{extra.bg}">{extra.text}</span>
+											{/each}
 											{#each current.statuses as status}
 												<span class="badge" style="background:{conditionBg[status] ?? '#374151'}"
 													>{conditionAbbrev[status] ?? status}</span
@@ -378,6 +458,23 @@
 				</div>
 			</footer>
 		{/if}
+	{/if}
+
+	<!-- ── Battle start/end banner ── -->
+	{#if showStartBanner}
+		<div class="battle-banner">
+			<div class="impact-flash"></div>
+			<div class="shockwave"></div>
+			<div class="combat-banner-text start-text">
+				<i class="fa-duotone fa-light fa-swords banner-icon" aria-hidden="true"></i>
+				Combat
+				<i class="fa-duotone fa-light fa-swords banner-icon" aria-hidden="true"></i>
+			</div>
+		</div>
+	{:else if showEndBanner}
+		<div class="battle-banner">
+			<div class="combat-banner-text end-text">Combat Ended</div>
+		</div>
 	{/if}
 </div>
 
@@ -630,12 +727,13 @@
 	.current-hp-temp {
 		position: absolute;
 		top: 0;
-		left: 0;
 		height: 100%;
-		background: #2dd4bf;
+		background: #facc15;
 		border-radius: 4px;
-		opacity: 0.7;
-		transition: width 0.4s ease;
+		opacity: 0.9;
+		transition:
+			width 0.4s ease,
+			left 0.4s ease;
 	}
 
 	.current-badges {
@@ -819,6 +917,177 @@
 		50% {
 			opacity: 1;
 			transform: scale(1.3);
+		}
+	}
+
+	/* ── Battle start/end banner ── */
+	.screen-shake {
+		animation: screen-shake 0.4s ease-in-out;
+	}
+
+	@keyframes screen-shake {
+		0%,
+		100% {
+			transform: translate(0, 0);
+		}
+		10% {
+			transform: translate(-6px, 3px);
+		}
+		20% {
+			transform: translate(5px, -4px);
+		}
+		30% {
+			transform: translate(-5px, 4px);
+		}
+		40% {
+			transform: translate(6px, -3px);
+		}
+		50% {
+			transform: translate(-4px, 2px);
+		}
+		60% {
+			transform: translate(3px, -2px);
+		}
+		70% {
+			transform: translate(-2px, 1px);
+		}
+		80% {
+			transform: translate(2px, -1px);
+		}
+		90% {
+			transform: translate(-1px, 0);
+		}
+	}
+
+	.battle-banner {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+	}
+
+	.impact-flash {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(
+			circle,
+			rgba(255, 255, 255, 0.9) 0%,
+			rgba(251, 191, 36, 0.4) 40%,
+			transparent 70%
+		);
+		animation: impact-flash 0.35s ease-out forwards;
+	}
+
+	@keyframes impact-flash {
+		0% {
+			opacity: 0;
+		}
+		15% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
+	}
+
+	.shockwave {
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		border: 6px solid rgba(251, 191, 36, 0.8);
+		border-radius: 50%;
+		animation: shockwave-ring 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	@keyframes shockwave-ring {
+		0% {
+			width: 40px;
+			height: 40px;
+			opacity: 0.9;
+			border-width: 6px;
+		}
+		100% {
+			width: 900px;
+			height: 900px;
+			opacity: 0;
+			border-width: 1px;
+		}
+	}
+
+	.combat-banner-text {
+		position: relative;
+		font-weight: 900;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		display: flex;
+		align-items: center;
+		gap: 24px;
+	}
+
+	.banner-icon {
+		font-size: 0.55em;
+		opacity: 0.85;
+	}
+
+	.start-text {
+		font-size: 96px;
+		color: #fef3c7;
+		text-shadow:
+			0 0 30px rgba(251, 191, 36, 0.9),
+			0 4px 12px rgba(0, 0, 0, 0.8);
+		animation: banner-in-out 1.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+	}
+
+	@keyframes banner-in-out {
+		0% {
+			transform: scale(0) rotate(-8deg);
+			opacity: 0;
+		}
+		15% {
+			transform: scale(1.18) rotate(2deg);
+			opacity: 1;
+		}
+		25% {
+			transform: scale(1) rotate(0deg);
+			opacity: 1;
+		}
+		82% {
+			transform: scale(1) rotate(0deg);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(0.6) rotate(0deg);
+			opacity: 0;
+		}
+	}
+
+	.end-text {
+		font-size: 64px;
+		color: #e2e8f0;
+		text-shadow:
+			0 0 24px rgba(148, 163, 184, 0.6),
+			0 4px 12px rgba(0, 0, 0, 0.8);
+		animation: banner-fade 2.2s ease-in-out forwards;
+	}
+
+	@keyframes banner-fade {
+		0% {
+			opacity: 0;
+			transform: translateY(14px);
+		}
+		15% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		75% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		100% {
+			opacity: 0;
+			transform: translateY(-10px);
 		}
 	}
 </style>
