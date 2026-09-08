@@ -26,12 +26,18 @@
 	import LootModal from '$lib/components/LootModal.svelte';
 	import AoEDamageModal from '$lib/components/AoEDamageModal.svelte';
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
+	import CombatantToggleButton from '$lib/components/CombatantToggleButton.svelte';
+	import DotTracker from '$lib/components/DotTracker.svelte';
 
 	let { ruleset = '2014' }: { ruleset?: '2014' | '2024' } = $props();
 
 	// ── DOM utilities ─────────────────────────────────────────────────────────
+	// Scrolls the whole combatant card into view (top-aligned) rather than just the focused
+	// input — otherwise the card's header (name, badges, remove button) can end up scrolled
+	// out of view above an input that isn't the first thing in the card.
 	function scrollInputToTop(el: HTMLElement) {
-		setTimeout(() => el.scrollIntoView({ block: 'start', behavior: 'smooth' }), 150);
+		const card = el.closest<HTMLElement>('[id^="combatant-"]');
+		setTimeout(() => (card ?? el).scrollIntoView({ block: 'start', behavior: 'smooth' }), 150);
 	}
 
 	async function scrollToActive() {
@@ -577,58 +583,45 @@
 								{/if}
 							{/if}
 							{#if c.type === 'player' || c.type === 'enemy'}
-								<button
+								<CombatantToggleButton
+									active={!c.reactionUsed}
 									onclick={() => combat.setReactionUsed(c.id, !c.reactionUsed)}
-									title={c.reactionUsed
-										? 'Reaction used — click to mark available'
-										: 'Reaction available — click to mark used'}
-									class="rounded p-2 transition {c.reactionUsed
-										? 'text-gray-600 hover:text-gray-400'
-										: 'text-sky-400 hover:text-sky-300'}"
-								>
-									<i
-										class="fa-duotone fa-light {c.reactionUsed
-											? 'fa-bolt-slash'
-											: 'fa-bolt'} text-base"
-										aria-hidden="true"
-									></i>
-								</button>
-								<button
+									icon="fa-bolt"
+									inactiveIcon="fa-bolt-slash"
+									activeTitle="Reaction available — click to mark used"
+									inactiveTitle="Reaction used — click to mark available"
+									activeClass="text-sky-400 hover:text-sky-300"
+									inactiveClass="text-gray-600 hover:text-gray-400"
+								/>
+								<CombatantToggleButton
+									active={!!c.readiedAction}
 									onclick={() => combat.setReadiedAction(c.id, !c.readiedAction)}
-									title={c.readiedAction
-										? 'Holding a readied action — click to clear'
-										: 'Mark as holding a readied action'}
-									class="rounded p-2 transition {c.readiedAction
-										? 'text-violet-400 hover:text-violet-300'
-										: 'text-gray-600 hover:text-violet-400'}"
-								>
-									<i class="fa-duotone fa-light fa-stopwatch text-base" aria-hidden="true"></i>
-								</button>
-								<button
+									icon="fa-stopwatch"
+									activeTitle="Holding a readied action — click to clear"
+									inactiveTitle="Mark as holding a readied action"
+									activeClass="text-violet-400 hover:text-violet-300"
+									inactiveClass="text-gray-600 hover:text-violet-400"
+								/>
+								<CombatantToggleButton
+									active={!!c.surprised}
 									onclick={() => combat.setSurprised(c.id, !c.surprised)}
-									title={c.surprised
-										? 'Surprised — clears automatically after their first turn ends'
-										: 'Mark as surprised'}
-									class="rounded p-2 transition {c.surprised
-										? 'text-pink-400 hover:text-pink-300'
-										: 'text-gray-600 hover:text-pink-400'}"
-								>
-									<i
-										class="fa-duotone fa-light fa-triangle-exclamation text-base"
-										aria-hidden="true"
-									></i>
-								</button>
+									icon="fa-triangle-exclamation"
+									activeTitle="Surprised — clears automatically after their first turn ends"
+									inactiveTitle="Mark as surprised"
+									activeClass="text-pink-400 hover:text-pink-300"
+									inactiveClass="text-gray-600 hover:text-pink-400"
+								/>
 							{/if}
 							{#if c.type === 'player'}
-								<button
+								<CombatantToggleButton
+									active={!!c.inspiration}
 									onclick={() => combat.setInspiration(c.id, !c.inspiration)}
-									title={c.inspiration ? 'Has Inspiration — click to clear' : 'Grant Inspiration'}
-									class="rounded p-2 transition {c.inspiration
-										? 'text-amber-300 hover:text-amber-200'
-										: 'text-gray-600 hover:text-amber-400'}"
-								>
-									<i class="fa-duotone fa-light fa-star text-base" aria-hidden="true"></i>
-								</button>
+									icon="fa-star"
+									activeTitle="Has Inspiration — click to clear"
+									inactiveTitle="Grant Inspiration"
+									activeClass="text-amber-300 hover:text-amber-200"
+									inactiveClass="text-gray-600 hover:text-amber-400"
+								/>
 							{/if}
 							<button
 								onclick={() => (noteTarget = c)}
@@ -1027,112 +1020,73 @@
 						     +Condition/Spell Effect menu above; this row then takes over for
 						     raising/lowering/clearing the level. -->
 						{#if exLevel > 0}
-							<div class="flex items-center gap-2">
-								<span class="shrink-0 text-xs font-semibold text-orange-300/70">Exhaustion:</span>
-								<div class="flex items-center gap-1">
-									{#each [0, 1, 2, 3, 4, 5] as dotIdx}
-										{@const filled = dotIdx < exLevel}
-										<button
-											onclick={() =>
-												combat.setExhaustionLevel(
-													c.id,
-													exLevel === dotIdx + 1 ? dotIdx : dotIdx + 1
-												)}
-											title="Set exhaustion to level {dotIdx + 1}"
-											class="h-4 w-4 rounded-full border-2 transition {filled
-												? 'border-orange-500 bg-orange-500 hover:bg-orange-400'
-												: 'border-orange-800 bg-transparent hover:bg-orange-900/30'}"
-										></button>
-									{/each}
-								</div>
-								<span class="text-xs font-bold text-orange-300">Lvl {exLevel}</span>
-								<button
-									onclick={() => combat.setExhaustionLevel(c.id, 0)}
-									title="Clear exhaustion"
-									class="rounded p-1 text-gray-600 transition hover:text-red-400"
-								>
-									<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
-								</button>
-								<button
-									onclick={() => (conditionInfo = 'Exhausted')}
-									title="What is Exhaustion?"
-									class="rounded p-1 text-gray-600 transition hover:text-blue-400"
-								>
-									<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
-								</button>
-							</div>
+							<DotTracker
+								label="Exhaustion"
+								color="orange"
+								count={6}
+								filledCount={exLevel}
+								dotTitle={(dotIdx) => `Set exhaustion to level ${dotIdx + 1}`}
+								onDotClick={(dotIdx) =>
+									combat.setExhaustionLevel(c.id, exLevel === dotIdx + 1 ? dotIdx : dotIdx + 1)}
+								infoTitle="What is Exhaustion?"
+								onInfoClick={() => (conditionInfo = 'Exhausted')}
+							>
+								{#snippet extra()}
+									<span class="text-xs font-bold text-orange-300">Lvl {exLevel}</span>
+									<button
+										onclick={() => combat.setExhaustionLevel(c.id, 0)}
+										title="Clear exhaustion"
+										class="rounded p-1 text-gray-600 transition hover:text-red-400"
+									>
+										<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
+									</button>
+								{/snippet}
+							</DotTracker>
 						{/if}
 						{#if c.type === 'enemy'}
 							{@const legendaryDetail = getDetailForCombatant(c)}
 							{#if legendaryDetail?.legendaryActions}
 								{@const spent = c.legendaryActionsSpent ?? 0}
-								<div class="flex items-center gap-2">
-									<span class="shrink-0 text-xs font-semibold text-amber-200/70"
-										>Legendary Actions:</span
-									>
-									<div class="flex items-center gap-1">
-										{#each [0, 1, 2] as dotIdx}
-											{@const isSpent = dotIdx >= 3 - spent}
-											<button
-												onclick={() =>
-													combat.setLegendaryActionsSpent(c.id, isSpent ? 2 - dotIdx : 3 - dotIdx)}
-												title={isSpent ? 'Mark as available' : 'Spend action'}
-												class="h-4 w-4 rounded-full border-2 transition {isSpent
-													? 'border-amber-600 bg-transparent hover:bg-amber-900/30'
-													: 'border-amber-400 bg-amber-400 hover:bg-amber-300'}"
-											></button>
-										{/each}
-									</div>
-									<button
-										onclick={() =>
-											(legendaryInfoModal = {
-												name: c.name,
-												text: legendaryDetail.legendaryActions!
-											})}
-										title="View legendary actions"
-										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
-									>
-										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
-									</button>
-								</div>
+								<DotTracker
+									label="Legendary Actions"
+									color="amber"
+									count={3}
+									filledCount={3 - spent}
+									dotTitle={(dotIdx, filled) => (filled ? 'Spend action' : 'Mark as available')}
+									onDotClick={(dotIdx, filled) =>
+										combat.setLegendaryActionsSpent(c.id, filled ? 3 - dotIdx : 2 - dotIdx)}
+									infoTitle="View legendary actions"
+									onInfoClick={() =>
+										(legendaryInfoModal = {
+											name: c.name,
+											text: legendaryDetail.legendaryActions!
+										})}
+								/>
 							{/if}
 							{@const legendaryResistance = getLegendaryResistanceInfo(legendaryDetail?.traits)}
 							{#if legendaryResistance}
-								{@const used = Math.min(c.legendaryResistancesUsed ?? 0, legendaryResistance.max)}
-								<div class="flex items-center gap-2">
-									<span class="shrink-0 text-xs font-semibold text-sky-200/70"
-										>Legendary Resistance:</span
-									>
-									<div class="flex items-center gap-1">
-										{#each Array(legendaryResistance.max) as _, dotIdx}
-											{@const max = legendaryResistance.max}
-											{@const isSpent = dotIdx >= max - used}
-											<button
-												onclick={() =>
-													combat.setLegendaryResistancesUsed(
-														c.id,
-														isSpent ? max - 1 - dotIdx : max - dotIdx
-													)}
-												title={isSpent ? 'Mark as available' : 'Spend a legendary resistance'}
-												class="h-4 w-4 rounded-full border-2 transition {isSpent
-													? 'border-sky-600 bg-transparent hover:bg-sky-900/30'
-													: 'border-sky-400 bg-sky-400 hover:bg-sky-300'}"
-											></button>
-										{/each}
-									</div>
-									<button
-										onclick={() =>
-											(legendaryInfoModal = {
-												name: c.name,
-												text: legendaryResistance.text,
-												title: 'Legendary Resistance'
-											})}
-										title="View legendary resistance"
-										class="rounded p-1 text-gray-600 transition hover:text-blue-400"
-									>
-										<i class="fa-duotone fa-light fa-circle-info text-sm" aria-hidden="true"></i>
-									</button>
-								</div>
+								{@const max = legendaryResistance.max}
+								{@const used = Math.min(c.legendaryResistancesUsed ?? 0, max)}
+								<DotTracker
+									label="Legendary Resistance"
+									color="sky"
+									count={max}
+									filledCount={max - used}
+									dotTitle={(dotIdx, filled) =>
+										filled ? 'Spend a legendary resistance' : 'Mark as available'}
+									onDotClick={(dotIdx, filled) =>
+										combat.setLegendaryResistancesUsed(
+											c.id,
+											filled ? max - dotIdx : max - 1 - dotIdx
+										)}
+									infoTitle="View legendary resistance"
+									onInfoClick={() =>
+										(legendaryInfoModal = {
+											name: c.name,
+											text: legendaryResistance.text,
+											title: 'Legendary Resistance'
+										})}
+								/>
 							{/if}
 						{/if}
 						{#if c.type === 'enemy' && c.currentHp <= 0}

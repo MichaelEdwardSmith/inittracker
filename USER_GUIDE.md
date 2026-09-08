@@ -1189,11 +1189,12 @@ An Observing DM sees every player's dice face-up at all times, the current bid, 
 
 It subscribes to the same live combat-state feed as the player display and shows:
 
-- A **"Now Acting"** panel — portrait, HP bar, condition badges, and the current round number
+- A **"Now Acting"** panel — portrait, HP bar, condition badges, and the current round number. Badges cover every standard condition plus Exhausted (with level), Transformed, Inspired, Readied, and Surprised.
 - A scrolling **combat event ticker** — damage, healing, and condition changes as they happen
 - An **"Up Next"** bar across the bottom showing upcoming turns, with a wrap marker at the end of the round
+- A full-screen **"COMBAT"** banner — a flash, expanding shockwave ring, and a brief screen-shake — the instant you click **Start Combat**, and a calmer **"COMBAT ENDED"** fade when you click **End Combat**
 
-The background is fully transparent and the overlay ignores mouse/click input, so it composites cleanly over your other stream sources without blocking anything underneath.
+The background is fully transparent and the overlay ignores mouse/click input, so it composites cleanly over your other stream sources without blocking anything underneath. The start/end banners are driven by the actual Start/End Combat action, not just whether combatants exist, so opening the overlay mid-fight won't replay the start animation.
 
 ---
 

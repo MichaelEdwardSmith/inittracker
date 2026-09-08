@@ -17,6 +17,8 @@
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
 	import TurnTimer from '$lib/components/TurnTimer.svelte';
+	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
+	import StatusIcon from '$lib/components/StatusIcon.svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -1163,14 +1165,8 @@
 
 					<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
 					{#if isBloodied}
-						<div
-							class="mb-3 flex items-center gap-2 rounded-full border border-red-700/60 bg-red-950/60 px-4 py-1"
-						>
-							<i class="fa-duotone fa-light fa-droplet text-base leading-none" aria-hidden="true"
-							></i>
-							<span class="text-xs font-black tracking-[0.25em] text-red-400 uppercase"
-								>Bloodied</span
-							>
+						<div class="mb-3">
+							<StatusPillBadge icon="fa-droplet" label="Bloodied" color="red" />
 						</div>
 					{/if}
 
@@ -1178,54 +1174,20 @@
 					{#if dc.inspiration || dc.readiedAction || dc.surprised || (dc.exhaustionLevel ?? 0) > 0}
 						<div class="mb-3 flex flex-wrap items-center justify-center gap-2">
 							{#if dc.inspiration}
-								<div
-									class="flex items-center gap-2 rounded-full border border-amber-700/60 bg-amber-950/60 px-4 py-1"
-								>
-									<i class="fa-duotone fa-light fa-star text-base leading-none" aria-hidden="true"
-									></i>
-									<span class="text-xs font-black tracking-[0.25em] text-amber-300 uppercase"
-										>Inspired</span
-									>
-								</div>
+								<StatusPillBadge icon="fa-star" label="Inspired" color="amber" />
 							{/if}
 							{#if dc.readiedAction}
-								<div
-									class="flex items-center gap-2 rounded-full border border-violet-700/60 bg-violet-950/60 px-4 py-1"
-								>
-									<i
-										class="fa-duotone fa-light fa-stopwatch text-base leading-none"
-										aria-hidden="true"
-									></i>
-									<span class="text-xs font-black tracking-[0.25em] text-violet-300 uppercase"
-										>Readied</span
-									>
-								</div>
+								<StatusPillBadge icon="fa-stopwatch" label="Readied" color="violet" />
 							{/if}
 							{#if dc.surprised}
-								<div
-									class="flex items-center gap-2 rounded-full border border-pink-700/60 bg-pink-950/60 px-4 py-1"
-								>
-									<i
-										class="fa-duotone fa-light fa-triangle-exclamation text-base leading-none"
-										aria-hidden="true"
-									></i>
-									<span class="text-xs font-black tracking-[0.25em] text-pink-300 uppercase"
-										>Surprised</span
-									>
-								</div>
+								<StatusPillBadge icon="fa-triangle-exclamation" label="Surprised" color="pink" />
 							{/if}
 							{#if (dc.exhaustionLevel ?? 0) > 0}
-								<div
-									class="flex items-center gap-2 rounded-full border border-orange-700/60 bg-orange-950/60 px-4 py-1"
-								>
-									<i
-										class="fa-duotone fa-light fa-face-tired text-base leading-none"
-										aria-hidden="true"
-									></i>
-									<span class="text-xs font-black tracking-[0.25em] text-orange-300 uppercase"
-										>Exhausted {dc.exhaustionLevel}</span
-									>
-								</div>
+								<StatusPillBadge
+									icon="fa-face-tired"
+									label="Exhausted {dc.exhaustionLevel}"
+									color="orange"
+								/>
 							{/if}
 						</div>
 					{/if}
@@ -1512,39 +1474,31 @@
 										</span>
 										<span class="truncate text-sm font-semibold text-gray-200">{c.name}</span>
 										{#if c.type === 'enemy' && hpPercent(c) > 0 && hpPercent(c) <= 50}
-											<i
-												class="fa-duotone fa-light fa-droplet shrink-0 text-sm leading-none"
-												title="Bloodied"
-												aria-hidden="true"
-											></i>
+											<StatusIcon icon="fa-droplet" title="Bloodied" />
 										{/if}
 										{#if c.inspiration}
-											<i
-												class="fa-duotone fa-light fa-star shrink-0 text-sm leading-none text-amber-400"
-												title="Inspired"
-												aria-hidden="true"
-											></i>
+											<StatusIcon icon="fa-star" title="Inspired" colorClass="text-amber-400" />
 										{/if}
 										{#if c.readiedAction}
-											<i
-												class="fa-duotone fa-light fa-stopwatch shrink-0 text-sm leading-none text-violet-400"
+											<StatusIcon
+												icon="fa-stopwatch"
 												title="Readied action"
-												aria-hidden="true"
-											></i>
+												colorClass="text-violet-400"
+											/>
 										{/if}
 										{#if c.surprised}
-											<i
-												class="fa-duotone fa-light fa-triangle-exclamation shrink-0 text-sm leading-none text-pink-400"
+											<StatusIcon
+												icon="fa-triangle-exclamation"
 												title="Surprised"
-												aria-hidden="true"
-											></i>
+												colorClass="text-pink-400"
+											/>
 										{/if}
 										{#if (c.exhaustionLevel ?? 0) > 0}
-											<i
-												class="fa-duotone fa-light fa-face-tired shrink-0 text-sm leading-none text-orange-400"
+											<StatusIcon
+												icon="fa-face-tired"
 												title="Exhausted (Level {c.exhaustionLevel})"
-												aria-hidden="true"
-											></i>
+												colorClass="text-orange-400"
+											/>
 										{/if}
 										{#if c.initiative !== null}
 											<span class="ml-auto hidden shrink-0 text-xs text-amber-500 sm:inline"
