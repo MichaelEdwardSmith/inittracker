@@ -1655,14 +1655,14 @@
 	onclose={() => (showLiarsDice = false)}
 />
 
-{#if joined}
-	<PollView
-		sessionId={data.sessionId}
-		voterName={myCharacter?.name ?? myPlayerName}
-		bind:active={pollActive}
-		bind:collapsed={pollCollapsed}
-	/>
-{/if}
+<!-- Not gated behind `joined` — unlike audio, voting needs no autoplay gesture, and a
+     poll shouldn't be invisible to anyone who hasn't dismissed the join screen yet. -->
+<PollView
+	sessionId={data.sessionId}
+	voterName={myCharacter?.name ?? myPlayerName}
+	bind:active={pollActive}
+	bind:collapsed={pollCollapsed}
+/>
 
 <DiceOverlay />
 
