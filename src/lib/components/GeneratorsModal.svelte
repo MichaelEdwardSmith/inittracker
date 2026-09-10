@@ -85,7 +85,27 @@
 			label: 'Graveyard / Crypt',
 			icon: '<i class="fa-duotone fa-light fa-coffin"></i>'
 		},
-		{ id: 'npc', label: 'NPC Generator', icon: '<i class="fa-duotone fa-light fa-user"></i>' }
+		{ id: 'npc', label: 'NPC Generator', icon: '<i class="fa-duotone fa-light fa-user"></i>' },
+		{
+			id: 'villain',
+			label: 'Villain Generator',
+			icon: '<i class="fa-duotone fa-light fa-skull"></i>'
+		},
+		{
+			id: 'ship',
+			label: 'Ship / Vessel',
+			icon: '<i class="fa-duotone fa-light fa-sailboat"></i>'
+		},
+		{
+			id: 'temple',
+			label: 'Temple / Shrine',
+			icon: '<i class="fa-duotone fa-light fa-place-of-worship"></i>'
+		},
+		{
+			id: 'festival',
+			label: 'Festival / Local Event',
+			icon: '<i class="fa-duotone fa-light fa-champagne-glasses"></i>'
+		}
 	];
 
 	let selected = $state('weather');
@@ -3998,7 +4018,10 @@
 		}
 		const allItems = [...picked, ...magicPicked];
 		generatedShop = allItems.map((item) => {
-			const base = item.price * aff.mult;
+			// Magic items keep their DMG/XGE price fixed — a wealthier town shouldn't
+			// inflate what a Potion of Healing is actually worth. Only mundane goods
+			// (no rarity tag) scale with local market conditions.
+			const base = item.rarity ? item.price : item.price * aff.mult;
 			return {
 				name: item.name,
 				liked: formatPrice(base * 0.85),
@@ -5315,7 +5338,11 @@
 				'caravan',
 				'blackmarket',
 				'graveyard',
-				'npc'
+				'npc',
+				'villain',
+				'ship',
+				'temple',
+				'festival'
 			].includes(selected)
 				? 'overflow-hidden'
 				: 'overflow-y-auto px-8 py-6'}"
@@ -6307,6 +6334,46 @@
 					</div>
 				{:then { default: NpcGen }}
 					<NpcGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'villain'}
+				{#await import('$lib/components/VillainGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: VillainGen }}
+					<VillainGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'ship'}
+				{#await import('$lib/components/ShipGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: ShipGen }}
+					<ShipGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'temple'}
+				{#await import('$lib/components/TempleGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: TempleGen }}
+					<TempleGen onclose={() => (selected = '')} embedded />
+				{/await}
+			{/if}
+
+			{#if selected === 'festival'}
+				{#await import('$lib/components/FestivalGeneratorModal.svelte')}
+					<div class="flex h-full items-center justify-center text-sm text-gray-500">
+						Loading...
+					</div>
+				{:then { default: FestivalGen }}
+					<FestivalGen onclose={() => (selected = '')} embedded />
 				{/await}
 			{/if}
 		</div>

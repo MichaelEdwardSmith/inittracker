@@ -68,6 +68,28 @@
 	let showTimerSettings = $state(false);
 	let timerInput = $state(60);
 	let showToolsMenu = $state(false);
+	// Closing the tools menu on mouseleave is debounced: the trigger button is much
+	// narrower than the menu below it, so a mouse path from button to menu easily
+	// dips outside both rects for a moment (e.g. drifting left/right off the button
+	// before reaching the wider panel). A short delay — cancelled on re-entry —
+	// absorbs that without requiring the hover geometry to line up pixel-perfect.
+	let toolsMenuCloseTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function toggleToolsMenu() {
+		clearTimeout(toolsMenuCloseTimer);
+		showToolsMenu = !showToolsMenu;
+	}
+
+	function cancelToolsMenuClose() {
+		clearTimeout(toolsMenuCloseTimer);
+	}
+
+	function scheduleToolsMenuClose() {
+		clearTimeout(toolsMenuCloseTimer);
+		toolsMenuCloseTimer = setTimeout(() => {
+			showToolsMenu = false;
+		}, 300);
+	}
 
 	// ── Concentration check queue ─────────────────────────────────────────────
 	function dequeueConcentration() {
@@ -282,9 +304,13 @@
 			<!-- Utility buttons, tucked behind a tools menu so this row stays short -->
 			<div class="h-4 w-px bg-gray-700"></div>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="relative" onmouseleave={() => (showToolsMenu = false)}>
+			<div
+				class="relative"
+				onmouseenter={cancelToolsMenuClose}
+				onmouseleave={scheduleToolsMenuClose}
+			>
 				<button
-					onclick={() => (showToolsMenu = !showToolsMenu)}
+					onclick={toggleToolsMenu}
 					title="More tools (Undo, Area of Effect, Log, Timer, Resets, Clear Enemies)"
 					class="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 transition hover:bg-gray-600 hover:text-white"
 				>
@@ -664,7 +690,7 @@
 									oninput={(e) =>
 										handleInitiativeInput(c.id, e.currentTarget.value, c.name, c.initiative)}
 									onfocus={(e) => scrollInputToTop(e.currentTarget)}
-									class="h-11 w-14 rounded border border-gray-600 bg-gray-900 text-center text-xl font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
+									class="h-11 w-16 rounded border border-gray-600 bg-gray-900 text-center text-xl font-bold text-amber-300 focus:border-amber-500 focus:outline-none"
 								/>
 							</div>
 							<!-- HP display + bar -->
