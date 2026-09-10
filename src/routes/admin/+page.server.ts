@@ -7,7 +7,14 @@
 //   suspend/unsuspend — block/restore login + dashboard access without touching their data.
 //   resetPassword  — generate a new password for a locked-out DM, shown once in the UI.
 //   delete         — permanently remove a DM account and everything embedded in it.
-// All except stop/impersonate-cancel are logged to the adminAudit collection.
+//   setEmailSubscription — toggles a DM's admin-broadcast subscription (the checkbox in the table).
+//   sendTestEmail  — sends the composed broadcast to dm@inittracker.com only, for previewing.
+//   sendBroadcast  — sends the composed broadcast to every DM who hasn't unsubscribed.
+//   previewEmail   — renders the composer's Markdown to HTML without sending anything.
+// All except stop/impersonate-cancel/sendTestEmail/previewEmail are logged to the adminAudit
+// collection. sendTestEmail and sendBroadcast both additionally log the subject/body Markdown
+// to the separate `sentEmails` collection (see dmModel.ts logSentEmail/listSentEmails), which
+// backs the composer's History tab — adminAudit only keeps a one-line summary, not the body.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
@@ -19,19 +26,32 @@ import {
 	unsuspendDM,
 	setDMAdmin,
 	resetDMPassword,
-	logAdminAction
+	logAdminAction,
+	getOrCreateUnsubscribeToken,
+	getEmailBlastRecipients,
+	logSentEmail,
+	listSentEmails,
+	setEmailOptOut
 } from '$lib/server/dmModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { sessionStates, sessionClients } from '$lib/server/sseState';
+import { sendMail, adminBroadcastEmail, appBaseUrl } from '$lib/server/mail';
+
+const TEST_EMAIL_RECIPIENT = 'dm@inittracker.com';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [dms, auditLog] = await Promise.all([listAllDMs(), listAdminAudit()]);
+	const [dms, auditLog, sentEmails] = await Promise.all([
+		listAllDMs(),
+		listAdminAudit(),
+		listSentEmails()
+	]);
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
 		realSessionId: locals.realSessionId,
 		isRootAdmin: locals.isRootAdmin,
 		dms,
-		auditLog
+		auditLog,
+		sentEmails
 	};
 };
 
@@ -228,5 +248,123 @@ export const actions: Actions = {
 		});
 
 		return { deleted: true };
+	},
+
+	setEmailSubscription: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+		// Checkboxes only send their field when checked, so absence means "unsubscribed".
+		const subscribed = data.get('subscribed') === 'true';
+
+		const result = await setEmailOptOut(targetSessionId, !subscribed);
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: subscribed ? 'resubscribe-dm' : 'unsubscribe-dm',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { subscriptionUpdated: true };
+	},
+
+	sendTestEmail: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.realSessionId || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+
+		// Uses the admin's own unsubscribe link so the test is a faithful preview — including a
+		// link that actually works, rather than a dummy placeholder.
+		const token = await getOrCreateUnsubscribeToken(locals.realSessionId);
+		const { html, text } = adminBroadcastEmail(
+			subject,
+			body,
+			`${appBaseUrl()}/unsubscribe/${token}`
+		);
+		await sendMail({
+			to: TEST_EMAIL_RECIPIENT,
+			subject: `[TEST] ${subject}`,
+			html,
+			text,
+			tag: 'admin-test'
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: true,
+			recipientCount: 1,
+			failedCount: 0
+		});
+
+		return { testSent: true, loggedEmail };
+	},
+
+	sendBroadcast: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail || !locals.realSessionId) return fail(403);
+
+		const data = await request.formData();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+
+		const recipients = await getEmailBlastRecipients(locals.realSessionId);
+		const results = await Promise.allSettled(
+			recipients.map(async (r) => {
+				const token = await getOrCreateUnsubscribeToken(r.sessionId);
+				const { html, text } = adminBroadcastEmail(
+					subject,
+					body,
+					`${appBaseUrl()}/unsubscribe/${token}`
+				);
+				await sendMail({ to: r.email, subject, html, text, tag: 'admin-broadcast' });
+			})
+		);
+		const sentCount = results.filter((r) => r.status === 'fulfilled').length;
+		const failedCount = results.length - sentCount;
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'email-broadcast',
+			targetEmail: `${sentCount} recipient${sentCount === 1 ? '' : 's'}`,
+			targetSessionId: 'broadcast',
+			detail: subject
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: false,
+			recipientCount: sentCount,
+			failedCount
+		});
+
+		return { broadcastSent: sentCount, broadcastFailed: failedCount, loggedEmail };
+	},
+
+	previewEmail: async ({ request, locals }) => {
+		if (!locals.isAdmin) return fail(403);
+
+		const data = await request.formData();
+		const subject = ((data.get('subject') as string) ?? '').trim() || 'Subject';
+		const body = (data.get('body') as string) ?? '';
+
+		// '#' unsubscribe link — this never sends anything, just renders the Markdown so the
+		// composer can see formatting/images before using Test or Send.
+		const { html } = adminBroadcastEmail(subject, body, '#');
+		return { previewHtml: html };
 	}
 };

@@ -73,12 +73,17 @@
 					placeholder="dungeon@master.com"
 				/>
 
-				<label
-					for="password"
-					class="mt-4 mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
-				>
-					Password
-				</label>
+				<div class="mt-4 flex items-baseline justify-between">
+					<label
+						for="password"
+						class="mb-2 block text-xs font-bold tracking-widest text-gray-400 uppercase"
+					>
+						Password
+					</label>
+					<a href="/forgot-password" class="text-xs text-gray-500 transition hover:text-amber-400">
+						Forgot?
+					</a>
+				</div>
 				<input
 					id="password"
 					name="password"
@@ -110,6 +115,15 @@
 				class="mt-3 rounded-lg border border-red-800 bg-red-950/60 px-4 py-2 text-center text-xs text-red-400"
 			>
 				{oauthErrorMessages[data.oauthError] ?? 'Sign-in failed. Please try again.'}
+			</p>
+		{/if}
+
+		<!-- Password reset succeeded -->
+		{#if data?.reset}
+			<p
+				class="mt-3 rounded-lg border border-emerald-800 bg-emerald-950/60 px-4 py-2 text-center text-xs text-emerald-400"
+			>
+				Password updated. Sign in with your new password.
 			</p>
 		{/if}
 

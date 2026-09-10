@@ -1,7 +1,8 @@
 // Server actions for /player/register.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { createPlayer } from '$lib/server/playerModel';
+import { createPlayer, createPlayerEmailVerificationToken } from '$lib/server/playerModel';
+import { sendMail, verifyEmailEmail, appBaseUrl } from '$lib/server/mail';
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
@@ -25,6 +26,17 @@ export const actions: Actions = {
 		if ('error' in result) {
 			return fail(400, { error: result.error });
 		}
+
+		// Fire-and-forget: verification is informational only, doesn't block registration.
+		createPlayerEmailVerificationToken(result.sessionId)
+			.then((token) => {
+				if (!token) return;
+				const { subject, html, text } = verifyEmailEmail(
+					`${appBaseUrl()}/player/verify-email/${token}`
+				);
+				return sendMail({ to: email, subject, html, text, tag: 'email-verify' });
+			})
+			.catch((err) => console.error('Failed to send verification email', err));
 
 		cookies.set('player_auth', result.sessionId, {
 			path: '/',

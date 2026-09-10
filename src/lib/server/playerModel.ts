@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { getDb } from './db';
 import type { NoteEntry } from '$lib/types';
+import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
 
 const SESSION_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -27,10 +28,17 @@ export interface Player {
 	passwordHash: string;
 	sessionId: string;
 	avatarUrl?: string;
-	oauth?: { google?: string };
+	oauth?: { google?: string; discord?: string };
 	joinedSessions?: PlayerSession[];
 	notes?: NoteEntry[];
 	createdAt: Date;
+	/** True once the account's email has been confirmed via a verify-email link. Informational
+	 *  only — nothing is gated on this. Absent for accounts created before this field existed. */
+	emailVerified?: boolean;
+	passwordResetTokenHash?: string;
+	passwordResetExpiresAt?: Date;
+	emailVerifyTokenHash?: string;
+	emailVerifyExpiresAt?: Date;
 }
 
 async function col() {
@@ -53,32 +61,45 @@ export async function findOrCreatePlayerByOAuth(profile: {
 	const c = await col();
 	const providerField = `oauth.${profile.provider}`;
 
-	// Existing account for this provider
+	// Existing account for this provider. Also marks emailVerified (idempotent) — completing
+	// this provider's OAuth flow again proves control of it, covering an account created before
+	// OAuth logins started implying verification.
 	let player = await c.findOne({ [providerField]: profile.providerId });
 	if (player) {
 		// Keep avatar fresh from provider
 		if (profile.avatarUrl && profile.avatarUrl !== player.avatarUrl) {
 			await c.updateOne(
 				{ sessionId: player.sessionId },
-				{ $set: { avatarUrl: profile.avatarUrl } }
+				{ $set: { avatarUrl: profile.avatarUrl, emailVerified: true } }
 			);
+		} else {
+			await c.updateOne({ sessionId: player.sessionId }, { $set: { emailVerified: true } });
 		}
 		return { sessionId: player.sessionId };
 	}
 
-	// Link to existing email account
+	// Link to existing email account — the provider is directly asserting this exact email
+	// address, so it counts as verified.
 	if (profile.email) {
 		player = await c.findOne({ email: profile.email.toLowerCase() });
 		if (player) {
 			await c.updateOne(
 				{ email: profile.email.toLowerCase() },
-				{ $set: { [providerField]: profile.providerId, avatarUrl: profile.avatarUrl } }
+				{
+					$set: {
+						[providerField]: profile.providerId,
+						avatarUrl: profile.avatarUrl,
+						emailVerified: true
+					}
+				}
 			);
 			return { sessionId: player.sessionId };
 		}
 	}
 
-	// Create new player account
+	// Create new player account. The provider already vouches for this email — no verify-email
+	// link is ever sent for a brand-new OAuth signup (unlike createPlayer), so this can't be left
+	// to that flow.
 	const sessionId = randomSessionId();
 	await c.insertOne({
 		displayName: profile.displayName,
@@ -86,6 +107,7 @@ export async function findOrCreatePlayerByOAuth(profile: {
 		passwordHash: '',
 		sessionId,
 		avatarUrl: profile.avatarUrl,
+		emailVerified: !!profile.email,
 		oauth: { [profile.provider]: profile.providerId },
 		createdAt: new Date()
 	});
@@ -129,6 +151,105 @@ export async function loginPlayer(
 	if (!valid) return null;
 
 	return { sessionId: player.sessionId };
+}
+
+// ---------------------------------------------------------------------------
+// Self-serve password reset & email verification (Postmark-backed — see mail.ts).
+// Mirrors the equivalent functions in dmModel.ts.
+// ---------------------------------------------------------------------------
+
+/**
+ * Starts a password-reset flow for the given email. Always safe to call with an unknown email —
+ * returns null in that case so the route can show the same generic message either way.
+ */
+export async function createPlayerPasswordResetToken(email: string): Promise<string | null> {
+	const c = await col();
+	const lower = email.toLowerCase();
+	const player = await c.findOne({ email: lower });
+	if (!player) return null;
+
+	const token = generateToken();
+	await c.updateOne(
+		{ email: lower },
+		{
+			$set: {
+				passwordResetTokenHash: hashToken(token),
+				passwordResetExpiresAt: new Date(Date.now() + PASSWORD_RESET_TTL_MS)
+			}
+		}
+	);
+	return token;
+}
+
+/** Completes a password reset. Returns an error for an invalid, expired, or already-used token. */
+export async function resetPlayerPasswordWithToken(
+	token: string,
+	newPassword: string
+): Promise<{ ok: boolean; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ passwordResetTokenHash: hashToken(token) });
+	if (
+		!player ||
+		!player.passwordResetExpiresAt ||
+		player.passwordResetExpiresAt.getTime() < Date.now()
+	) {
+		return { ok: false, error: 'This reset link is invalid or has expired.' };
+	}
+
+	const passwordHash = await bcrypt.hash(newPassword, 12);
+	await c.updateOne(
+		{ sessionId: player.sessionId },
+		{
+			$set: { passwordHash },
+			$unset: { passwordResetTokenHash: '', passwordResetExpiresAt: '' }
+		}
+	);
+	return { ok: true };
+}
+
+/** Generates a fresh email-verification token for a player account. */
+export async function createPlayerEmailVerificationToken(
+	playerSessionId: string
+): Promise<string | null> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return null;
+
+	const token = generateToken();
+	await c.updateOne(
+		{ sessionId: playerSessionId },
+		{
+			$set: {
+				emailVerifyTokenHash: hashToken(token),
+				emailVerifyExpiresAt: new Date(Date.now() + EMAIL_VERIFY_TTL_MS)
+			}
+		}
+	);
+	return token;
+}
+
+/** Marks a player account's email verified from a link token. */
+export async function verifyPlayerEmailToken(
+	token: string
+): Promise<{ ok: boolean; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ emailVerifyTokenHash: hashToken(token) });
+	if (
+		!player ||
+		!player.emailVerifyExpiresAt ||
+		player.emailVerifyExpiresAt.getTime() < Date.now()
+	) {
+		return { ok: false, error: 'This verification link is invalid or has expired.' };
+	}
+
+	await c.updateOne(
+		{ sessionId: player.sessionId },
+		{
+			$set: { emailVerified: true },
+			$unset: { emailVerifyTokenHash: '', emailVerifyExpiresAt: '' }
+		}
+	);
+	return { ok: true };
 }
 
 /** Upserts a game session entry on the player's joined-sessions list. */
