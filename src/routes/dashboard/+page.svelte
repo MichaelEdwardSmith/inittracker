@@ -177,6 +177,14 @@
 		if (!LiarsDiceModalComp)
 			LiarsDiceModalComp = (await import('$lib/components/LiarsDiceModal.svelte')).default;
 	}
+	let showPoll = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let PollModalComp = $state<any>(null);
+	async function openPoll() {
+		showPoll = true;
+		showMobileMenu = false;
+		if (!PollModalComp) PollModalComp = (await import('$lib/components/PollModal.svelte')).default;
+	}
 	let showDungeon = $state(false);
 	let showDonjon = $state(false);
 	let showTown = $state(false);
@@ -644,6 +652,15 @@
 				Liar's Dice
 			</button>
 			<button
+				onclick={openPoll}
+				title="Ask your players a question and watch the votes come in live"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-square-poll-vertical shrink-0 text-base" aria-hidden="true"
+				></i>
+				Poll
+			</button>
+			<button
 				onclick={openGenerators}
 				title="Random NPC, dungeon, and encounter generators"
 				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
@@ -1055,6 +1072,11 @@
 		dmName={data.dmFirstName || 'Dungeon Master'}
 		onclose={() => (showLiarsDice = false)}
 	/>
+{/if}
+
+{#if showPoll && PollModalComp}
+	{@const Poll = PollModalComp}
+	<Poll sessionId={activeSession.sessionId} onclose={() => (showPoll = false)} />
 {/if}
 
 {#if showQuickRules && QuickRulesModalComp}
