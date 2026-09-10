@@ -37,6 +37,19 @@ body {
 	background: #111827;
 }
 
+/* Hide the up/down spinner on number inputs (initiative, damage/heal, etc.) —
+   these are quick-entry fields, not counters people click through. */
+input[type='number'] {
+	appearance: textfield;
+	-moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
 /* ─── Light mode ──────────────────────────────────────────────────────────── */
 
 html.light,

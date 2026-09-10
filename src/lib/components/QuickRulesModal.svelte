@@ -29,6 +29,11 @@
 			icon: '<i class="fa-duotone fa-light fa-swords"></i>'
 		},
 		{ id: 'bonus', label: 'Bonus Actions', icon: '<i class="fa-duotone fa-light fa-bolt"></i>' },
+		{
+			id: 'chases',
+			label: 'Chase Rules',
+			icon: '<i class="fa-duotone fa-light fa-person-running"></i>'
+		},
 		{ id: 'saves', label: 'Common Save DCs', icon: '<i class="fa-duotone fa-light fa-skull"></i>' },
 		{
 			id: 'concentration',
@@ -68,7 +73,8 @@
 			label: 'Movement & Position',
 			icon: '<i class="fa-duotone fa-light fa-shoe-prints"></i>'
 		},
-		{ id: 'resting', label: 'Resting', icon: '<i class="fa-duotone fa-light fa-moon"></i>' }
+		{ id: 'resting', label: 'Resting', icon: '<i class="fa-duotone fa-light fa-moon"></i>' },
+		{ id: 'sea', label: 'Sea Travel', icon: '<i class="fa-duotone fa-light fa-sailboat"></i>' }
 	];
 
 	let selected = $state('actions');
@@ -4024,6 +4030,121 @@
 					</tbody>
 				</table>
 
+				<!-- ── Chase Rules ────────────────────────────────────────── -->
+			{:else if selected === 'chases'}
+				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
+					Chase Rules
+				</h3>
+				<div class="space-y-6 text-sm">
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Running the Chase</h4>
+						<ul class="space-y-1.5 text-gray-300">
+							<li>
+								• Treat it like combat: everyone rolls <strong class="text-white">initiative</strong
+								>, then takes one action and moves on their turn each round.
+							</li>
+							<li>
+								• Track the <strong class="text-white">distance</strong> between quarry and pursuers.
+								The closest pursuer is the "lead."
+							</li>
+							<li>
+								• The chase ends when a side <strong class="text-white">drops out</strong>, the
+								quarry is <strong class="text-white">caught</strong>, or the quarry
+								<strong class="text-white">escapes</strong> (below).
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Dashing & Exhaustion</h4>
+						<ul class="space-y-1.5 text-gray-300">
+							<li>
+								• Everyone can freely <strong class="text-white">Dash</strong> up to
+								<strong class="text-white">3 + their CON modifier</strong> times during the chase.
+							</li>
+							<li>
+								• Each Dash beyond that requires a <strong class="text-white"
+									>DC 10 Constitution check</strong
+								>
+								at the end of the turn, or the creature gains one level of exhaustion.
+							</li>
+							<li>
+								• A creature drops out of the chase at <strong class="text-white"
+									>exhaustion level 5</strong
+								> (speed 0). See the Exhaustion reference for level-by-level effects.
+							</li>
+							<li>• Exhaustion gained this way clears after a short or long rest.</li>
+						</ul>
+					</section>
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Escaping</h4>
+						<p class="mb-2 text-gray-300">
+							Once out of sight of every pursuer, the quarry rolls a <strong class="text-white"
+								>Dexterity (Stealth)</strong
+							> check at the end of each round and compares it to the pursuers' passive Wisdom (Perception).
+							Beating the highest passive score ends the chase — the quarry gets away.
+						</p>
+						<table class="w-full max-w-lg">
+							<thead>
+								<tr class="border-b border-gray-700">
+									<th class="pb-2 text-left font-semibold text-gray-400">Circumstance</th>
+									<th class="pb-2 text-left font-semibold text-gray-400">Effect on the Check</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-gray-800 text-gray-300">
+								{#each [['Many hiding places along the escape route', 'Advantage'], ['Area is crowded or noisy', 'Advantage'], ['Few hiding places along the escape route', 'Disadvantage'], ['Area is uncrowded or quiet', 'Disadvantage'], ['Lead pursuer is a ranger or has Survival proficiency', 'Disadvantage']] as [factor, effect]}
+									<tr>
+										<td class="py-1.5 pr-4">{factor}</td>
+										<td class="py-1.5 font-semibold text-amber-300">{effect}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</section>
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Complications</h4>
+						<p class="mb-3 text-gray-300">
+							At the end of each participant's turn, roll a d20 — on a <strong class="text-white"
+								>10 or lower</strong
+							> a complication hits the next participant in initiative order. Either side can spend Inspiration
+							to negate one.
+						</p>
+						<div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+							<div>
+								<h5 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">
+									Urban (d20)
+								</h5>
+								<table class="w-full">
+									<tbody class="divide-y divide-gray-800 text-gray-300">
+										{#each [['1', 'Large obstacle (cart/horse)', 'DC 15 Dex (Acrobatics) or 10 ft. difficult terrain'], ['2', 'Crowd blocks the way', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 10 ft. difficult terrain'], ['3', 'Stained-glass window', 'DC 10 Str save or fall prone'], ['4', 'Maze of barrels/crates', 'DC 10 Dex (Acrobatics)/Int or 10 ft. difficult terrain'], ['5', 'Slippery ground', 'DC 10 Dex save or fall prone'], ['6', 'Pack of dogs', 'DC 10 Dex (Acrobatics) or 1d4 piercing + difficult terrain'], ['7', 'Brawl in progress', 'DC 15 Str/Dex/Cha or 2d4 bludgeoning + difficult terrain'], ['8', 'Beggar in the way', 'Toss a coin (auto-avoid) or DC 10 check / difficult terrain'], ['9', 'Overzealous guard', 'OA if you move 20+ ft (+3 to hit, 1d6+1)'], ['10', 'Sharp turn', 'DC 10 Dex save or 1d4 bludgeoning'], ['11–20', 'No complication', '—']] as [roll, name, effect]}
+											<tr>
+												<td class="w-10 py-1.5 pr-2 align-top font-bold text-amber-300">{roll}</td>
+												<td class="py-1.5 pr-2 align-top font-semibold text-white">{name}</td>
+												<td class="py-1.5 align-top text-xs text-gray-400">{effect}</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+							<div>
+								<h5 class="mb-2 text-xs font-bold tracking-wide text-gray-400 uppercase">
+									Wilderness (d20)
+								</h5>
+								<table class="w-full">
+									<tbody class="divide-y divide-gray-800 text-gray-300">
+										{#each [['1', 'Rough brush', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 5 ft. difficult terrain'], ['2', 'Uneven ground', 'DC 10 Dex (Acrobatics) or 10 ft. difficult terrain'], ['3', 'Insect swarm', 'OA (+3 to hit, 4d4 piercing)'], ['4', 'Stream, ravine, or rocky bed', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 10 ft. difficult terrain'], ['5', 'Blinding elements', 'DC 10 CON save or blinded until end of turn, speed halved'], ['6', 'Sudden drop', 'DC 10 Dex save or fall 1d4 × 5 ft, 1d6/10 ft, prone'], ['7', "Hunter's snare", 'DC 15 Dex save or restrained (netted)'], ['8', 'Animal stampede', 'DC 10 Dex save or 1d4 bludgeoning + 1d4 piercing'], ['9', 'Razorvine patch', 'DC 15 Dex save or 1d10 slashing (or lose 10 ft. movement)'], ['10', 'Indigenous creature joins the chase', "DM's choice"], ['11–20', 'No complication', '—']] as [roll, name, effect]}
+											<tr>
+												<td class="w-10 py-1.5 pr-2 align-top font-bold text-amber-300">{roll}</td>
+												<td class="py-1.5 pr-2 align-top font-semibold text-white">{name}</td>
+												<td class="py-1.5 align-top text-xs text-gray-400">{effect}</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+				</div>
+
 				<!-- ── Movement & Position ──────────────────────────────── -->
 			{:else if selected === 'movement'}
 				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
@@ -4419,6 +4540,94 @@
 								• Can take a long rest only <strong class="text-white">once per 24 hours</strong>.
 							</li>
 							<li>• More than 1 hour of combat or strenuous activity interrupts the rest.</li>
+						</ul>
+					</section>
+				</div>
+
+				<!-- ── Sea Travel ─────────────────────────────────────────── -->
+			{:else if selected === 'sea'}
+				<h3 class="mb-4 text-base font-black tracking-widest text-amber-400 uppercase">
+					Sea Travel
+				</h3>
+				<div class="space-y-6 text-sm">
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Waterborne Vehicles</h4>
+						<div class="overflow-x-auto">
+							<table class="w-full min-w-[640px]">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="pb-2 text-left font-semibold text-gray-400">Vessel</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Cost</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Speed</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Crew</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Pass.</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Cargo</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">AC</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">HP</th>
+										<th class="pb-2 text-right font-semibold text-gray-400">Dmg Thresh.</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-gray-800 text-gray-300">
+									{#each [['Keelboat', '3,000 gp', '1 mph', '1', '6', '½ ton', '15', '100', '10'], ['Rowboat', '50 gp', '1½ mph', '1', '3', '—', '11', '50', '—'], ['Sailing Ship', '10,000 gp', '2 mph', '20', '20', '100 tons', '15', '300', '15'], ['Warship', '25,000 gp', '2½ mph', '60', '60', '200 tons', '15', '500', '20'], ['Longship', '10,000 gp', '3 mph', '40', '150', '10 tons', '15', '300', '15'], ['Galley', '30,000 gp', '4 mph', '80', '—', '150 tons', '15', '500', '20']] as [name, cost, speed, crew, pass, cargo, ac, hp, dt]}
+										<tr>
+											<td class="py-1.5 pr-3 font-semibold text-white">{name}</td>
+											<td class="py-1.5 pr-3 text-right">{cost}</td>
+											<td class="py-1.5 pr-3 text-right font-bold text-amber-300">{speed}</td>
+											<td class="py-1.5 pr-3 text-right">{crew}</td>
+											<td class="py-1.5 pr-3 text-right">{pass}</td>
+											<td class="py-1.5 pr-3 text-right">{cargo}</td>
+											<td class="py-1.5 pr-3 text-right">{ac}</td>
+											<td class="py-1.5 pr-3 text-right">{hp}</td>
+											<td class="py-1.5 text-right">{dt}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						<p class="mt-2 text-xs text-gray-500">
+							Crew is the minimum hands needed to get the vessel underway at its listed speed —
+							short-handed, it can't make way. DMG p.119.
+						</p>
+					</section>
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Travel Distance</h4>
+						<ul class="space-y-1.5 text-gray-300">
+							<li>
+								• A vessel can sail <strong class="text-white">24 hours a day</strong> — the crew works
+								in shifts, so passengers aboard get no fast/slow travel-pace bonus or penalty the way
+								a walking party does.
+							</li>
+							<li>
+								• <strong class="text-white">Miles per day = speed (mph) × 24.</strong> A sailing ship
+								(2 mph) covers roughly 48 miles a day; a galley (4 mph) roughly 96.
+							</li>
+							<li>
+								• Wind, current, and weather are DM calls — a foul wind or a storm can easily halve
+								or halt a sailing vessel's progress for the day.
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h4 class="mb-2 font-semibold text-gray-200">Ship-to-Ship Combat</h4>
+						<ul class="space-y-1.5 text-gray-300">
+							<li>
+								• Treat a ship like a huge creature on the battle grid: it has its own AC, HP, and
+								damage threshold (above) — damage below the threshold is ignored entirely.
+							</li>
+							<li>
+								• <strong class="text-white">Boarding</strong> — a grappled or adjacent ship lets creatures
+								move between decks as normal movement; resolve the fight with the standard combat rules
+								once crews are mixed.
+							</li>
+							<li>
+								• <strong class="text-white">Ramming / collisions</strong> — a DM-adjudicated attack roll
+								or straightforward damage to both vessels' HP is the simplest resolution; a galley's ram
+								is built for exactly this.
+							</li>
+							<li>
+								• A ship reduced to <strong class="text-white">0 HP</strong> is wrecked and begins taking
+								on water/sinking rather than being destroyed outright.
+							</li>
 						</ul>
 					</section>
 				</div>

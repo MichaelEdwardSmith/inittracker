@@ -494,7 +494,7 @@
 			class="ml-6 flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5"
 		>
 			<span class="hidden text-xs tracking-widest text-gray-500 uppercase sm:inline">Session</span>
-			<span class="max-w-[120px] truncate text-sm font-semibold text-amber-300"
+			<span class="hidden max-w-[120px] truncate text-sm font-semibold text-amber-300 sm:inline"
 				>{activeSession.name}</span
 			>
 			<span class="font-black tracking-[0.2em] text-amber-400">{activeSession.sessionId}</span>
