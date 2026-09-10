@@ -16,6 +16,7 @@
 	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
+	import PollView from '$lib/components/PollView.svelte';
 	import TurnTimer from '$lib/components/TurnTimer.svelte';
 	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
 	import StatusIcon from '$lib/components/StatusIcon.svelte';
@@ -83,6 +84,8 @@
 	let showEmojiPicker = $state(false);
 	let showDiceRoller = $state(false);
 	let showLiarsDice = $state(false);
+	let pollActive = $state(false);
+	let pollCollapsed = $state(true);
 
 	// ── DM → Player inbox ────────────────────────────────────────────────
 	let dmMessages = $state<DmReply[]>([]);
@@ -961,6 +964,19 @@
 			></i>
 			Liar's Dice
 		</button>
+		{#if pollActive}
+			<button
+				onclick={() => {
+					pollCollapsed = false;
+					showMobileMenu = false;
+				}}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-indigo-300 transition hover:bg-indigo-900/30 hover:text-indigo-200"
+			>
+				<i class="fa-duotone fa-light fa-square-poll-vertical shrink-0 text-base" aria-hidden="true"
+				></i>
+				View Poll
+			</button>
+		{/if}
 		{#if combatState.dungeonMapState}
 			<button
 				onclick={() => {
@@ -1638,6 +1654,15 @@
 	show={showLiarsDice}
 	onclose={() => (showLiarsDice = false)}
 />
+
+{#if joined}
+	<PollView
+		sessionId={data.sessionId}
+		voterName={myCharacter?.name ?? myPlayerName}
+		bind:active={pollActive}
+		bind:collapsed={pollCollapsed}
+	/>
+{/if}
 
 <DiceOverlay />
 

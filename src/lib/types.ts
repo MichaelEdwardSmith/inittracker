@@ -432,6 +432,23 @@ export interface LiarsDiceGame {
 	reveal: LiarsDiceReveal | null;
 }
 
+// ── DM → Player polling ──────────────────────────────────────────────────────
+export interface PollOptionView {
+	id: string;
+	text: string;
+	votes: number;
+}
+
+/** Personalized client view of the active poll — `myVote` reflects only the requesting viewer's own choice. */
+export interface PollState {
+	id: string;
+	question: string;
+	options: PollOptionView[];
+	totalVotes: number;
+	open: boolean;
+	myVote: string | null;
+}
+
 export interface MonsterDetail {
 	name: string;
 	meta: string;
