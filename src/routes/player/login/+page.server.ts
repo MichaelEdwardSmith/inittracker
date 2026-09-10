@@ -1,7 +1,12 @@
 // Server actions for /player/login.
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { loginPlayer } from '$lib/server/playerModel';
+
+export const load: PageServerLoad = async ({ url }) => {
+	// Bounced back here after a successful self-serve password reset
+	if (url.searchParams.get('reset')) return { reset: true };
+};
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {

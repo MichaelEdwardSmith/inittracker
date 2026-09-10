@@ -42,8 +42,10 @@
 		"claude": "^0.1.2",
 		"jspdf": "^4.2.0",
 		"jspdf-autotable": "^5.0.7",
+		"marked": "^18.0.12",
 		"mongodb": "^7.1.0",
 		"pdf-lib": "^1.17.1",
+		"postmark": "^5.1.0",
 		"rot-js": "^2.2.1"
 	}
 }

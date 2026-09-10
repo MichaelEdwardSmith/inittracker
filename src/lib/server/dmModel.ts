@@ -7,6 +7,7 @@ import { randomUUID, randomBytes, createHash } from 'crypto';
 import type { WithId, Document } from 'mongodb';
 import { getDb } from './db';
 import { isRootAdminEmail } from './admin';
+import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
 import type {
 	StorageState,
 	CustomMonster,
@@ -55,6 +56,29 @@ export interface DM {
 	/** Set by the root admin via the /admin "Make admin" action — grants full admin access
 	 *  (see isAdminDM() in $lib/server/admin.ts). Only the root admin can set or clear this. */
 	isAdmin?: boolean;
+	/** True once the account's email address has been confirmed via a verify-email link.
+	 *  Informational only for now — nothing is gated on this. Absent for accounts created
+	 *  before this field existed. */
+	emailVerified?: boolean;
+	/** SHA-256 hash of the current outstanding password-reset token, if any (see authTokens.ts).
+	 *  Cleared once used or superseded by a newer request. */
+	passwordResetTokenHash?: string;
+	passwordResetExpiresAt?: Date;
+	/** SHA-256 hash of the current outstanding email-verification token, if any. */
+	emailVerifyTokenHash?: string;
+	emailVerifyExpiresAt?: Date;
+	/** True once this DM has clicked the unsubscribe link on an admin broadcast email —
+	 *  excludes them from future ?/sendBroadcast sends. Does not affect password-reset or
+	 *  verification mail, only the admin "Email DMs" feature. */
+	emailOptOut?: boolean;
+	/** Persistent, non-expiring token embedded in admin broadcast emails' unsubscribe link.
+	 *  Stored in plaintext (unlike password-reset/verify tokens) — worst case of exposure is
+	 *  someone unsubscribing this DM from broadcast mail, not an account compromise, and the
+	 *  same token has to keep working across every future broadcast email sent to them. */
+	unsubscribeToken?: string;
+	/** Linked OAuth identities, keyed by provider — written dynamically in
+	 *  findOrCreateDMByOAuth() via a computed `oauth.<provider>` field path. */
+	oauth?: { google?: string; facebook?: string; discord?: string };
 }
 
 // 6 chars from an unambiguous alphabet (no O/0/I/1 confusion)
@@ -199,24 +223,33 @@ export interface OAuthProfile {
 export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ sessionId: string }> {
 	const c = await col();
 
-	// 1. Exact match on provider ID
+	// 1. Exact match on provider ID. Also marks emailVerified (idempotent) — an account that
+	// can still complete this provider's OAuth flow has proven control of it again, covering an
+	// account created before OAuth logins started implying verification.
 	const providerField = `oauth.${profile.provider}`;
 	let dm = await c.findOne({ [providerField]: profile.providerId });
 	if (dm) {
 		await c.updateOne(
 			{ [providerField]: profile.providerId },
-			{ $set: { lastLoginAt: new Date() } }
+			{ $set: { lastLoginAt: new Date(), emailVerified: true } }
 		);
 		return { sessionId: dm.sessionId };
 	}
 
-	// 2. Email match — link the OAuth identity to an existing account
+	// 2. Email match — link the OAuth identity to an existing account. The provider is directly
+	// asserting this exact email address, so it counts as verified.
 	if (profile.email) {
 		dm = await c.findOne({ email: profile.email });
 		if (dm) {
 			await c.updateOne(
 				{ email: profile.email },
-				{ $set: { [providerField]: profile.providerId, lastLoginAt: new Date() } }
+				{
+					$set: {
+						[providerField]: profile.providerId,
+						lastLoginAt: new Date(),
+						emailVerified: true
+					}
+				}
 			);
 			return { sessionId: dm.sessionId };
 		}
@@ -248,6 +281,9 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 		activeGameSessionId: firstSession.id,
 		gameSessions: [firstSession],
 		customMonsters: [],
+		// The provider already vouches for this email — no verify-email link is ever sent for a
+		// brand-new OAuth signup (unlike createDM), so this can't be left to that flow.
+		emailVerified: !!profile.email,
 		createdAt: now,
 		lastLoginAt: now,
 		[providerField]: profile.providerId
@@ -703,6 +739,8 @@ export interface DMSummary {
 	encounterCount: number;
 	/** Total combat records across all of this DM's game sessions (each capped at 100). */
 	combatHistoryCount: number;
+	/** True if this DM has unsubscribed from admin broadcast emails (see emailOptOut on DM). */
+	emailOptOut: boolean;
 }
 
 /** Returns every DM account in the system, most recently active first. */
@@ -726,7 +764,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					activeGameSessionId: 1,
 					gameSessions: 1,
 					customMonsters: 1,
-					encounters: 1
+					encounters: 1,
+					emailOptOut: 1
 				}
 			}
 		)
@@ -751,7 +790,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 				gameSessionCount: sessions.length,
 				customMonsterCount: (dm.customMonsters as CustomMonster[] | undefined)?.length ?? 0,
 				encounterCount: (dm.encounters as Encounter[] | undefined)?.length ?? 0,
-				combatHistoryCount: sessions.reduce((sum, s) => sum + (s.combatHistory?.length ?? 0), 0)
+				combatHistoryCount: sessions.reduce((sum, s) => sum + (s.combatHistory?.length ?? 0), 0),
+				emailOptOut: !!(dm as DM).emailOptOut
 			};
 		})
 		.sort((a, b) => {
@@ -826,6 +866,200 @@ export async function resetDMPassword(
 	return { ok: true, email: dm.email, tempPassword };
 }
 
+// ---------------------------------------------------------------------------
+// Self-serve password reset & email verification (Postmark-backed — see mail.ts).
+// Mirrors the equivalent functions in playerModel.ts.
+// ---------------------------------------------------------------------------
+
+/**
+ * Starts a password-reset flow for the given email. Always safe to call with an unknown email —
+ * returns null in that case so the route can show the same generic message either way and avoid
+ * leaking which addresses have accounts.
+ */
+export async function createPasswordResetToken(email: string): Promise<string | null> {
+	const c = await col();
+	const dm = await c.findOne({ email });
+	if (!dm) return null;
+
+	const token = generateToken();
+	await c.updateOne(
+		{ email },
+		{
+			$set: {
+				passwordResetTokenHash: hashToken(token),
+				passwordResetExpiresAt: new Date(Date.now() + PASSWORD_RESET_TTL_MS)
+			}
+		}
+	);
+	return token;
+}
+
+/** Completes a password reset. Returns an error for an invalid, expired, or already-used token. */
+export async function resetPasswordWithToken(
+	token: string,
+	newPassword: string
+): Promise<{ ok: boolean; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ passwordResetTokenHash: hashToken(token) });
+	if (!dm || !dm.passwordResetExpiresAt || dm.passwordResetExpiresAt.getTime() < Date.now()) {
+		return { ok: false, error: 'This reset link is invalid or has expired.' };
+	}
+
+	const passwordHash = await bcrypt.hash(newPassword, 12);
+	await c.updateOne(
+		{ sessionId: dm.sessionId },
+		{
+			$set: { passwordHash },
+			$unset: { passwordResetTokenHash: '', passwordResetExpiresAt: '' }
+		}
+	);
+	return { ok: true };
+}
+
+/** Generates a fresh email-verification token for an account (e.g. right after registration). */
+export async function createEmailVerificationToken(authSessionId: string): Promise<string | null> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return null;
+
+	const token = generateToken();
+	await c.updateOne(
+		{ sessionId: authSessionId },
+		{
+			$set: {
+				emailVerifyTokenHash: hashToken(token),
+				emailVerifyExpiresAt: new Date(Date.now() + EMAIL_VERIFY_TTL_MS)
+			}
+		}
+	);
+	return token;
+}
+
+/** Marks an account's email verified from a link token. */
+export async function verifyEmailToken(token: string): Promise<{ ok: boolean; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ emailVerifyTokenHash: hashToken(token) });
+	if (!dm || !dm.emailVerifyExpiresAt || dm.emailVerifyExpiresAt.getTime() < Date.now()) {
+		return { ok: false, error: 'This verification link is invalid or has expired.' };
+	}
+
+	await c.updateOne(
+		{ sessionId: dm.sessionId },
+		{
+			$set: { emailVerified: true },
+			$unset: { emailVerifyTokenHash: '', emailVerifyExpiresAt: '' }
+		}
+	);
+	return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Admin broadcast email — "Email DMs" button on /admin (see mail.ts adminBroadcastEmail()).
+// Unsubscribe tokens are persistent and plaintext (not security-sensitive — see the field
+// comment on DM.unsubscribeToken).
+// ---------------------------------------------------------------------------
+
+/** Returns this DM's unsubscribe token, generating and persisting one on first use. */
+export async function getOrCreateUnsubscribeToken(authSessionId: string): Promise<string | null> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return null;
+	if (dm.unsubscribeToken) return dm.unsubscribeToken;
+
+	const token = generateToken();
+	await c.updateOne({ sessionId: authSessionId }, { $set: { unsubscribeToken: token } });
+	return token;
+}
+
+/** Read-only lookup for the unsubscribe confirmation page — does not unsubscribe anyone. */
+export async function getEmailByUnsubscribeToken(token: string): Promise<string | null> {
+	const c = await col();
+	const dm = await c.findOne({ unsubscribeToken: token });
+	return dm?.email ?? null;
+}
+
+/** Opts a DM out of future admin broadcast emails. Called only from the unsubscribe page's
+ *  POST action — never on page load (see that route's comment on why). */
+export async function unsubscribeByToken(token: string): Promise<{ ok: boolean; email?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ unsubscribeToken: token });
+	if (!dm) return { ok: false };
+	await c.updateOne({ sessionId: dm.sessionId }, { $set: { emailOptOut: true } });
+	return { ok: true, email: dm.email };
+}
+
+/** Directly sets a DM's subscription state from the admin panel's checkbox — the admin-driven
+ *  counterpart to unsubscribeByToken() (which only the DM's own unsubscribe-link click uses). */
+export async function setEmailOptOut(
+	authSessionId: string,
+	optOut: boolean
+): Promise<{ ok: boolean; email?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+	await c.updateOne({ sessionId: authSessionId }, { $set: { emailOptOut: optOut } });
+	return { ok: true, email: dm.email };
+}
+
+/** DMs eligible to receive an admin broadcast email — has an email, hasn't opted out, and
+ *  (optionally) isn't the admin sending it. */
+export async function getEmailBlastRecipients(
+	excludeSessionId?: string
+): Promise<{ sessionId: string; email: string; firstName: string }[]> {
+	const c = await col();
+	const dms = await c
+		.find(
+			{ email: { $ne: '' }, emailOptOut: { $ne: true } },
+			{ projection: { sessionId: 1, email: 1, firstName: 1, _id: 0 } }
+		)
+		.toArray();
+	return dms
+		.filter((dm) => dm.sessionId !== excludeSessionId)
+		.map((dm) => ({ sessionId: dm.sessionId, email: dm.email, firstName: dm.firstName }));
+}
+
+/**
+ * A record of one admin "Email DMs" send — kept so the composer's History tab can recall past
+ * subject/body pairs. Stores the Markdown source (not rendered HTML) so recalling one puts it
+ * back in the composer exactly as it was written, editable and re-sendable. Separate collection
+ * from adminAudit (which only keeps a one-line summary + subject, not the full body).
+ */
+export interface SentEmailEntry {
+	id: string;
+	adminEmail: string;
+	subject: string;
+	body: string;
+	/** True for a Test send (dm@inittracker.com only); false for a real broadcast. */
+	isTest: boolean;
+	recipientCount: number;
+	failedCount: number;
+	sentAt: Date;
+}
+
+async function sentEmailsCol() {
+	const db = await getDb();
+	return db.collection<SentEmailEntry>('sentEmails');
+}
+
+export async function logSentEmail(
+	entry: Omit<SentEmailEntry, 'id' | 'sentAt'>
+): Promise<SentEmailEntry> {
+	const full: SentEmailEntry = { ...entry, id: randomUUID(), sentAt: new Date() };
+	const c = await sentEmailsCol();
+	// insertOne() mutates whatever object it's given, injecting a BSON _id — pass it a throwaway
+	// copy so `full` stays clean and safe to return. A returned _id isn't serializable through a
+	// SvelteKit action response (same pitfall listAdminAudit() below works around with an
+	// explicit `_id: 0` projection).
+	await c.insertOne({ ...full });
+	return full;
+}
+
+/** Returns past sent emails, newest first, capped so the History tab stays light. */
+export async function listSentEmails(limit = 50): Promise<SentEmailEntry[]> {
+	const c = await sentEmailsCol();
+	return c.find({}, { projection: { _id: 0 }, sort: { sentAt: -1 }, limit }).toArray();
+}
+
 /**
  * Permanently deletes a DM account and everything embedded in it (game sessions, combat
  * history, custom monsters, encounters). Returns the deleted account's email and the public
@@ -853,13 +1087,19 @@ export type AdminAuditAction =
 	| 'demote-admin'
 	| 'password-reset'
 	| 'export-data'
-	| 'delete-account';
+	| 'delete-account'
+	| 'email-broadcast'
+	| 'unsubscribe-dm'
+	| 'resubscribe-dm';
 
 export interface AdminAuditEntry {
 	adminEmail: string;
 	action: AdminAuditAction;
 	targetEmail: string;
 	targetSessionId: string;
+	/** Free-text context for actions that don't fit the target-email/target-sessionId shape —
+	 *  currently just the subject line of an 'email-broadcast'. */
+	detail?: string;
 	at: Date;
 }
 

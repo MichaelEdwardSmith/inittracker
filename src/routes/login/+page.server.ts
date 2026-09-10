@@ -28,6 +28,9 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 	// Bounced back here from hooks.server.ts after a suspended account tried to reach /dashboard
 	if (url.searchParams.get('suspended')) return { suspended: true };
+
+	// Bounced back here after a successful self-serve password reset
+	if (url.searchParams.get('reset')) return { reset: true };
 };
 
 export const actions: Actions = {

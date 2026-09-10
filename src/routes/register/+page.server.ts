@@ -3,7 +3,8 @@
 // action: validates the form, creates the DM account, redirects to /login?registered=1.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { createDM, getDMBySessionId } from '$lib/server/dmModel';
+import { createDM, createEmailVerificationToken, getDMBySessionId } from '$lib/server/dmModel';
+import { sendMail, verifyEmailEmail, appBaseUrl } from '$lib/server/mail';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const sessionId = cookies.get('dm_auth');
@@ -41,6 +42,16 @@ export const actions: Actions = {
 		if ('error' in result) {
 			return fail(409, { error: result.error, firstName, lastName, email });
 		}
+
+		// Fire-and-forget: verification is informational only, so a mail failure shouldn't block
+		// registration or surface as an error to a brand-new user.
+		createEmailVerificationToken(result.sessionId)
+			.then((token) => {
+				if (!token) return;
+				const { subject, html, text } = verifyEmailEmail(`${appBaseUrl()}/verify-email/${token}`);
+				return sendMail({ to: email, subject, html, text, tag: 'email-verify' });
+			})
+			.catch((err) => console.error('Failed to send verification email', err));
 
 		// Registration successful — send them to login
 		redirect(303, '/login?registered=1');

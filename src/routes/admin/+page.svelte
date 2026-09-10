@@ -16,6 +16,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { AdminAuditAction } from '$lib/server/dmModel';
+	import AdminEmailModal from '$lib/components/AdminEmailModal.svelte';
 
 	let { data, form } = $props();
 
@@ -24,6 +25,13 @@
 	let filter = $state<Filter>('all');
 	let expanded = $state<Set<string>>(new Set());
 	let dismissedTempPassword = $state(false);
+	let showEmailModal = $state(false);
+
+	// Who a broadcast would actually reach: has an email, hasn't unsubscribed, isn't the sender.
+	let emailRecipientCount = $derived(
+		data.dms.filter((dm) => dm.email && !dm.emailOptOut && dm.sessionId !== data.realSessionId)
+			.length
+	);
 
 	const STALE_MS = 1000 * 60 * 60 * 24 * 90; // 90 days
 
@@ -99,7 +107,10 @@
 		'demote-admin': 'Revoked admin access',
 		'password-reset': 'Reset password',
 		'export-data': 'Exported data',
-		'delete-account': 'Deleted account'
+		'delete-account': 'Deleted account',
+		'email-broadcast': 'Sent broadcast email',
+		'unsubscribe-dm': 'Unsubscribed from admin emails',
+		'resubscribe-dm': 'Resubscribed to admin emails'
 	};
 
 	let auditByEmail = $derived.by(() => {
@@ -150,13 +161,29 @@
 					Logged in as {data.dmFirstName} · every DM account that has accessed this system.
 				</p>
 			</div>
-			<a
-				href="/dashboard"
-				class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
-			>
-				My dashboard
-			</a>
+			<div class="flex items-center gap-2">
+				<button
+					onclick={() => (showEmailModal = true)}
+					class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email DMs
+				</button>
+				<a
+					href="/dashboard"
+					class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
+				>
+					My dashboard
+				</a>
+			</div>
 		</header>
+
+		{#if showEmailModal}
+			<AdminEmailModal
+				recipientCount={emailRecipientCount}
+				sentEmails={data.sentEmails}
+				onclose={() => (showEmailModal = false)}
+			/>
+		{/if}
 
 		{#if form?.tempPassword && !dismissedTempPassword}
 			<div class="mb-4 rounded border border-amber-700 bg-amber-950/40 px-4 py-3 text-sm">
@@ -222,6 +249,7 @@
 						<th class="px-4 py-3 font-medium">Name</th>
 						<th class="px-4 py-3 font-medium">Email</th>
 						<th class="px-4 py-3 font-medium">Status</th>
+						<th class="px-4 py-3 text-center font-medium">Subscribed</th>
 						<th class="px-4 py-3 font-medium">Signed up</th>
 						<th class="px-4 py-3 font-medium">Last active</th>
 						<th class="px-4 py-3 font-medium"></th>
@@ -277,6 +305,26 @@
 										>Active</span
 									>
 								{/if}
+							</td>
+							<td class="px-4 py-3 text-center">
+								<form method="POST" action="?/setEmailSubscription" use:enhance>
+									<input type="hidden" name="sessionId" value={dm.sessionId} />
+									<label
+										class="inline-flex cursor-pointer items-center justify-center"
+										title={dm.emailOptOut
+											? 'Unsubscribed from admin broadcast emails — click to resubscribe'
+											: 'Subscribed to admin broadcast emails — click to unsubscribe'}
+									>
+										<input
+											type="checkbox"
+											name="subscribed"
+											value="true"
+											checked={!dm.emailOptOut}
+											onchange={(e) => e.currentTarget.form?.requestSubmit()}
+											class="h-5 w-5 cursor-pointer accent-amber-500"
+										/>
+									</label>
+								</form>
 							</td>
 							<td class="px-4 py-3 text-gray-500">{formatDate(dm.createdAt)}</td>
 							<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastActiveAt)}</td>
@@ -336,7 +384,7 @@
 						</tr>
 						{#if isExpanded}
 							<tr class="border-b border-gray-800/60 bg-black/20">
-								<td colspan="7" class="px-6 py-4">
+								<td colspan="8" class="px-6 py-4">
 									<div class="flex flex-wrap gap-6">
 										<!-- Usage stats -->
 										<div>

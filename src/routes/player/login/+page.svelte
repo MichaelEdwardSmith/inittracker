@@ -1,8 +1,8 @@
 <!-- Player login page (/player/login). Mobile-first design. -->
 <script lang="ts">
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { form, data }: { form: ActionData; data: PageData } = $props();
 
 	const oauthError: Record<string, string> = {
 		invalid_state: 'Sign-in session expired. Please try again.',
@@ -33,6 +33,15 @@
 		</div>
 
 		<div class="rounded-xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl backdrop-blur">
+			<!-- Password reset succeeded -->
+			{#if data?.reset}
+				<p
+					class="mb-4 rounded-lg border border-emerald-800 bg-emerald-950/60 px-3 py-2 text-center text-sm text-emerald-400"
+				>
+					Password updated. Sign in with your new password.
+				</p>
+			{/if}
+
 			<!-- OAuth error -->
 			{#if form?.error}
 				<p
@@ -88,12 +97,20 @@
 				</div>
 
 				<div>
-					<label
-						for="password"
-						class="mb-1.5 block text-xs font-bold tracking-widest text-gray-400 uppercase"
-					>
-						Password
-					</label>
+					<div class="mb-1.5 flex items-baseline justify-between">
+						<label
+							for="password"
+							class="block text-xs font-bold tracking-widest text-gray-400 uppercase"
+						>
+							Password
+						</label>
+						<a
+							href="/player/forgot-password"
+							class="text-xs text-gray-500 transition hover:text-blue-400"
+						>
+							Forgot?
+						</a>
+					</div>
 					<input
 						id="password"
 						name="password"
