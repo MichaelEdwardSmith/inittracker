@@ -493,7 +493,7 @@
 	<!-- App header -->
 	<header class="flex shrink-0 items-center border-b border-gray-800 bg-gray-900 px-6 py-3">
 		<i class="fa-duotone fa-light fa-swords text-xl" aria-hidden="true"></i>
-		<h1 class="ml-3 hidden text-xl font-bold tracking-widest text-amber-400 uppercase md:block">
+		<h1 class="ml-3 hidden text-sm font-bold tracking-[0.3em] text-amber-400 uppercase md:block">
 			Initiative Tracker
 		</h1>
 
