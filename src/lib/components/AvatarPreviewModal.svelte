@@ -1,21 +1,22 @@
-<!-- Simple lightbox-style modal for viewing a combatant's avatar at full size.
-     Receives the target combatant (or null to stay closed) and an onclose callback. -->
+<!-- Simple lightbox-style modal for viewing a combatant's avatar/token image at full size.
+     Receives the image to show (or null to stay closed) and an onclose callback. Works for
+     either a player's avatar or an enemy's monster image — callers just pass whichever URL
+     applies. -->
 <script lang="ts">
-	import type { Combatant } from '$lib/types';
-
 	interface Props {
-		combatant: Combatant | null;
+		imageUrl: string | null;
+		name: string;
 		onclose: () => void;
 	}
 
-	let { combatant, onclose }: Props = $props();
+	let { imageUrl, name, onclose }: Props = $props();
 </script>
 
-{#if combatant?.avatarUrl}
+{#if imageUrl}
 	<div
 		role="dialog"
 		aria-modal="true"
-		aria-label="{combatant.name} avatar"
+		aria-label="{name} image"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 		tabindex="-1"
 		onclick={(e) => {
@@ -28,8 +29,8 @@
 		<div class="flex max-w-sm flex-col items-center gap-3">
 			<div class="relative">
 				<img
-					src={combatant.avatarUrl}
-					alt={combatant.name}
+					src={imageUrl}
+					alt={name}
 					class="max-h-[70vh] max-w-full rounded-xl border border-gray-700 object-contain shadow-2xl"
 				/>
 				<button
@@ -40,7 +41,7 @@
 					<i class="fa-duotone fa-light fa-xmark text-lg" aria-hidden="true"></i>
 				</button>
 			</div>
-			<p class="text-sm font-semibold text-gray-200">{combatant.name}</p>
+			<p class="text-sm font-semibold text-gray-200">{name}</p>
 		</div>
 	</div>
 {/if}

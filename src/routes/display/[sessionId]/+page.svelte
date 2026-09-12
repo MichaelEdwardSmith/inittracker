@@ -20,6 +20,7 @@
 	import TurnTimer from '$lib/components/TurnTimer.svelte';
 	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
 	import StatusIcon from '$lib/components/StatusIcon.svelte';
+	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -30,6 +31,12 @@
 	let connected = $state(false);
 	let conditionInfo = $state<string | null>(null);
 	let ruleset = $state<'2014' | '2024'>('2014');
+	let avatarPreviewUrl = $state<string | null>(null);
+	let avatarPreviewName = $state('');
+	function openAvatarPreview(url: string, name: string) {
+		avatarPreviewUrl = url;
+		avatarPreviewName = name;
+	}
 
 	$effect(() => {
 		fetch(`/api/session-ruleset?session=${data.sessionId}`)
@@ -548,6 +555,101 @@
 			: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(185,28,28,0.14) 0%, transparent 70%)';
 	});
 
+	// Drifting background orbs recolor and reposition to match whose turn it is: blues/
+	// purples drifting from their "player" corners for a player, oranges/reds from a
+	// different set of corners for an enemy or lair. With no current combatant (before
+	// combat starts, or after it ends) they settle into a third, neutral arrangement.
+	type OrbSide = 'player' | 'enemy' | 'idle';
+	const orbSide = $derived.by<OrbSide>(() => {
+		const c = displayCombatant ?? current;
+		if (!c) return 'idle';
+		return c.type === 'player' ? 'player' : 'enemy';
+	});
+
+	const ORB_COLORS: Record<OrbSide, string[]> = {
+		player: [
+			'rgba(88, 28, 135, 0.45)', // purple
+			'rgba(30, 58, 138, 0.45)', // blue
+			'rgba(67, 56, 202, 0.35)', // violet
+			'rgba(49, 46, 129, 0.4)' // indigo
+		],
+		enemy: [
+			'rgba(153, 27, 27, 0.45)', // red
+			'rgba(194, 65, 12, 0.45)', // orange
+			'rgba(120, 53, 15, 0.35)', // amber/brown
+			'rgba(127, 29, 29, 0.4)' // dark red
+		],
+		// No current combatant (before combat starts, or after it ends) — blues/purples only.
+		idle: [
+			'rgba(30, 58, 138, 0.45)', // blue
+			'rgba(88, 28, 135, 0.45)', // purple
+			'rgba(67, 56, 202, 0.35)', // violet
+			'rgba(49, 46, 129, 0.4)' // indigo
+		]
+	};
+	const orbColors = $derived(ORB_COLORS[orbSide]);
+
+	// Anchor point (top/left/right/bottom, in %) each orb drifts from; `null` means that
+	// side is 'auto' so switching anchors fully replaces the old one instead of leaving a
+	// stale value behind. These are the base per-side anchors; a random per-turn jitter
+	// (below) is added on top so consecutive same-side turns don't land on an identical
+	// layout.
+	type OrbAnchor = {
+		top: number | null;
+		right: number | null;
+		bottom: number | null;
+		left: number | null;
+	};
+	const BASE_ORB_POSITIONS: Record<OrbSide, OrbAnchor[]> = {
+		player: [
+			{ top: -15, right: null, bottom: null, left: -12 },
+			{ top: null, right: -10, bottom: -18, left: null },
+			{ top: 35, right: null, bottom: null, left: 42 },
+			{ top: 15, right: 18, bottom: null, left: null }
+		],
+		enemy: [
+			{ top: -12, right: -14, bottom: null, left: null },
+			{ top: null, right: null, bottom: -15, left: -8 },
+			{ top: 62, right: null, bottom: null, left: 60 },
+			{ top: null, right: null, bottom: 18, left: 20 }
+		],
+		idle: [
+			{ top: 8, right: null, bottom: null, left: 32 },
+			{ top: null, right: 22, bottom: 2, left: null },
+			{ top: 55, right: null, bottom: null, left: 6 },
+			{ top: 4, right: 6, bottom: null, left: null }
+		]
+	};
+	// Percentage-point jitter applied to each orb's anchor, so it moves around within its
+	// side's general region on every turn rather than only when the side changes.
+	const ORB_JITTER = [9, 9, 12, 9];
+
+	// Small deterministic hash → [0, 1), so every viewer on the same session renders the
+	// same "random" jitter for a given combatant/orb instead of each picking their own.
+	function seededRandom(seed: string): number {
+		let h = 0;
+		for (let i = 0; i < seed.length; i++) h = (Math.imul(h, 31) + seed.charCodeAt(i)) | 0;
+		h = Math.imul(h ^ (h >>> 15), h | 1);
+		h ^= h + Math.imul(h ^ (h >>> 7), h | 61);
+		return ((h ^ (h >>> 14)) >>> 0) / 4294967296;
+	}
+
+	const orbPositions = $derived.by(() => {
+		const c = displayCombatant ?? current;
+		const seedKey = c ? c.id : 'idle';
+		return BASE_ORB_POSITIONS[orbSide].map((anchor, i) => {
+			const jitter = ORB_JITTER[i];
+			const dx = (seededRandom(`${seedKey}:${i}:x`) * 2 - 1) * jitter;
+			const dy = (seededRandom(`${seedKey}:${i}:y`) * 2 - 1) * jitter;
+			return {
+				top: anchor.top === null ? 'auto' : `${anchor.top + dy}%`,
+				right: anchor.right === null ? 'auto' : `${anchor.right + dx}%`,
+				bottom: anchor.bottom === null ? 'auto' : `${anchor.bottom - dy}%`,
+				left: anchor.left === null ? 'auto' : `${anchor.left + dx}%`
+			};
+		});
+	});
+
 	const typeAccent = $derived.by(() => {
 		const c = displayCombatant ?? current;
 		if (!c) return { badge: 'text-gray-400 border-gray-600', label: '' };
@@ -566,10 +668,15 @@
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white">
 	<!-- Drifting atmospheric orbs -->
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-		<div class="bg-orb orb-1"></div>
-		<div class="bg-orb orb-2"></div>
-		<div class="bg-orb orb-3"></div>
-		<div class="bg-orb orb-4"></div>
+		{#each [0, 1, 2, 3] as i (i)}
+			{@const pos = orbPositions[i]}
+			<div
+				class="bg-orb orb-{i + 1}"
+				style="background: {orbColors[
+					i
+				]}; top: {pos.top}; right: {pos.right}; bottom: {pos.bottom}; left: {pos.left};"
+			></div>
+		{/each}
 	</div>
 
 	<!-- Fog-of-war dungeon map — full-screen, opened via hamburger menu -->
@@ -837,7 +944,7 @@
 	>
 		<div class="flex items-center gap-3">
 			<i class="fa-duotone fa-light fa-swords text-lg" aria-hidden="true"></i>
-			<span class="text-sm font-bold tracking-[0.3em] text-amber-400 uppercase"
+			<span class="hidden text-sm font-bold tracking-[0.3em] text-amber-400 uppercase sm:inline"
 				>Initiative Tracker</span
 			>
 			<span
@@ -1130,7 +1237,7 @@
 				<main
 					in:fly={{ y: 28, duration: 500 }}
 					out:fly={{ y: -20, duration: 500 }}
-					class="absolute inset-0 flex flex-col items-center justify-center bg-gray-950 px-12 pb-4"
+					class="absolute inset-0 flex flex-col items-center justify-center px-12 pb-4"
 				>
 					<!-- Type label -->
 					<div class="mb-5 flex items-center gap-3">
@@ -1148,17 +1255,16 @@
 						{@const style = getMonsterStyle(dc.monsterType)}
 						{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
 						{#if imgUrl}
-							<a
-								href={imgUrl}
-								target="_blank"
-								rel="noopener noreferrer"
+							<button
+								onclick={() => openAvatarPreview(imgUrl, dc.name)}
+								title="View {dc.name}'s image"
 								class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {isBloodied
 									? 'bloodied-avatar ring-red-600'
 									: style.ring}"
 								style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
 							>
 								<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
-							</a>
+							</button>
 						{:else}
 							{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
 							<div
@@ -1171,12 +1277,14 @@
 							</div>
 						{/if}
 					{:else if dc.avatarUrl}
-						<div
-							class="mb-6 h-44 w-44 overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
+						<button
+							onclick={() => openAvatarPreview(dc.avatarUrl ?? '', dc.name)}
+							title="View {dc.name}'s avatar"
+							class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
 							style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
 						>
 							<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
-						</div>
+						</button>
 					{/if}
 
 					<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
@@ -1440,10 +1548,9 @@
 									{@const style = getMonsterStyle(c.monsterType)}
 									{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
 									{#if imgUrl}
-										<a
-											href={imgUrl}
-											target="_blank"
-											rel="noopener noreferrer"
+										<button
+											onclick={() => openAvatarPreview(imgUrl, c.name)}
+											title="View {c.name}'s image"
 											class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 {style.ring} cursor-pointer"
 										>
 											<img
@@ -1451,7 +1558,7 @@
 												alt={c.name}
 												class="h-full w-full object-cover object-top"
 											/>
-										</a>
+										</button>
 									{:else}
 										<div
 											class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 {style.bg} {style.ring}"
@@ -1462,9 +1569,13 @@
 										</div>
 									{/if}
 								{:else if c.avatarUrl}
-									<div class="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-blue-700">
+									<button
+										onclick={() => openAvatarPreview(c.avatarUrl ?? '', c.name)}
+										title="View {c.name}'s avatar"
+										class="h-10 w-10 shrink-0 cursor-pointer overflow-hidden rounded-full ring-2 ring-blue-700"
+									>
 										<img src={c.avatarUrl} alt={c.name} class="h-full w-full object-cover" />
-									</div>
+									</button>
 								{:else}
 									<div
 										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 ring-2 ring-blue-700"
@@ -1619,6 +1730,11 @@
 {/if}
 
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
+<AvatarPreviewModal
+	imageUrl={avatarPreviewUrl}
+	name={avatarPreviewName}
+	onclose={() => (avatarPreviewUrl = null)}
+/>
 
 {#if showNotesModal && myPlayerName}
 	<PlayerNotesModal playerName={myPlayerName} onclose={() => (showNotesModal = false)} />
@@ -1732,43 +1848,41 @@
 	}
 
 	/* ── Atmospheric drifting orbs ── */
+	/* Background color and anchor (top/right/bottom/left) are set inline (`orbColors` /
+	   `orbPositions`) so both can shift per whose turn it is; these transitions just
+	   smooth those changes. The continuous drift itself stays in the per-orb keyframes
+	   below, layered on top via `transform`. */
 	.bg-orb {
 		position: absolute;
 		border-radius: 50%;
 		filter: blur(90px);
+		transition:
+			background 1.2s ease,
+			top 2.5s ease,
+			right 2.5s ease,
+			bottom 2.5s ease,
+			left 2.5s ease;
 	}
 
 	.orb-1 {
 		width: min(65vw, 700px);
 		height: min(65vw, 700px);
-		background: rgba(88, 28, 135, 0.45);
-		top: -15%;
-		left: -12%;
 		animation: orb-drift-1 24s ease-in-out infinite;
 	}
 	.orb-2 {
 		width: min(55vw, 620px);
 		height: min(55vw, 620px);
-		background: rgba(30, 58, 138, 0.45);
-		bottom: -18%;
-		right: -10%;
 		animation: orb-drift-2 30s ease-in-out infinite;
 	}
 	.orb-3 {
 		width: min(45vw, 520px);
 		height: min(45vw, 520px);
-		background: rgba(120, 53, 15, 0.35);
-		top: 35%;
-		left: 42%;
 		transform: translate(-50%, -50%);
 		animation: orb-drift-3 20s ease-in-out infinite;
 	}
 	.orb-4 {
 		width: min(38vw, 440px);
 		height: min(38vw, 440px);
-		background: rgba(49, 46, 129, 0.4);
-		top: 15%;
-		right: 18%;
 		animation: orb-drift-4 26s ease-in-out infinite;
 	}
 

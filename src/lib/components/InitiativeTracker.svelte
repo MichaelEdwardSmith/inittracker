@@ -17,6 +17,7 @@
 	import CombatantNoteModal from '$lib/components/CombatantNoteModal.svelte';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	import { tick } from 'svelte';
+	import { flip } from 'svelte/animate';
 	import ConcentrationCheckModal from '$lib/components/ConcentrationCheckModal.svelte';
 	import ConditionTimingModal from '$lib/components/ConditionTimingModal.svelte';
 	import LegendaryActionsModal from '$lib/components/LegendaryActionsModal.svelte';
@@ -449,6 +450,7 @@
 					i < combat.sorted.length - 1 && combat.sorted[i + 1].initiative === c.initiative}
 				<div
 					id="combatant-{c.id}"
+					animate:flip={{ duration: 300 }}
 					class="relative flex flex-col gap-2 rounded-lg border px-3 py-2 transition-all
 					       {isActive
 						? 'border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
@@ -1141,7 +1143,11 @@
 </div>
 
 <MonsterInfoModal monster={infoMonster} onclose={() => (infoMonster = null)} />
-<AvatarPreviewModal combatant={avatarPreview} onclose={() => (avatarPreview = null)} />
+<AvatarPreviewModal
+	imageUrl={avatarPreview?.avatarUrl ?? null}
+	name={avatarPreview?.name ?? ''}
+	onclose={() => (avatarPreview = null)}
+/>
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
 <CombatantNoteModal
 	combatant={noteTarget}
