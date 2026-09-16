@@ -35,7 +35,7 @@ import {
 } from '$lib/server/dmModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { sessionStates, sessionClients } from '$lib/server/sseState';
-import { sendMail, adminBroadcastEmail, appBaseUrl } from '$lib/server/mail';
+import { sendMail, adminBroadcastEmail, appBaseUrl, isMailConfigured } from '$lib/server/mail';
 
 const TEST_EMAIL_RECIPIENT = 'dm@inittracker.com';
 
@@ -281,6 +281,11 @@ export const actions: Actions = {
 		if (!subject || !body) {
 			return fail(400, { emailError: 'Subject and message body are required.' });
 		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
 
 		// Uses the admin's own unsubscribe link so the test is a faithful preview — including a
 		// link that actually works, rather than a dummy placeholder.
@@ -290,13 +295,18 @@ export const actions: Actions = {
 			body,
 			`${appBaseUrl()}/unsubscribe/${token}`
 		);
-		await sendMail({
+		const sent = await sendMail({
 			to: TEST_EMAIL_RECIPIENT,
 			subject: `[TEST] ${subject}`,
 			html,
 			text,
 			tag: 'admin-test'
 		});
+		if (!sent) {
+			return fail(502, {
+				emailError: 'Postmark rejected the send — check the server logs for details.'
+			});
+		}
 
 		const loggedEmail = await logSentEmail({
 			adminEmail: locals.dmEmail,
@@ -319,6 +329,11 @@ export const actions: Actions = {
 		if (!subject || !body) {
 			return fail(400, { emailError: 'Subject and message body are required.' });
 		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
 
 		const recipients = await getEmailBlastRecipients(locals.realSessionId);
 		const results = await Promise.allSettled(
@@ -329,7 +344,11 @@ export const actions: Actions = {
 					body,
 					`${appBaseUrl()}/unsubscribe/${token}`
 				);
-				await sendMail({ to: r.email, subject, html, text, tag: 'admin-broadcast' });
+				const sent = await sendMail({ to: r.email, subject, html, text, tag: 'admin-broadcast' });
+				// sendMail never throws (see mail.ts) — a false result means Postmark rejected or
+				// wasn't configured, so it has to be turned into a rejection here for
+				// Promise.allSettled below to actually count it as a failure.
+				if (!sent) throw new Error(`Failed to send to ${r.email}`);
 			})
 		);
 		const sentCount = results.filter((r) => r.status === 'fulfilled').length;
