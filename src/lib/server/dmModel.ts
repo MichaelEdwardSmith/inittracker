@@ -14,7 +14,8 @@ import type {
 	CombatRecord,
 	GameSession,
 	NoteEntry,
-	Encounter
+	Encounter,
+	SchedulingProposal
 } from '$lib/types';
 
 // ---------------------------------------------------------------------------
@@ -24,6 +25,7 @@ interface DMGameSession extends Omit<GameSession, 'ruleset'> {
 	combatState: StorageState;
 	combatHistory: CombatRecord[];
 	notes?: NoteEntry[];
+	schedulingProposals?: SchedulingProposal[];
 	createdAt: Date;
 	ruleset?: '2014' | '2024';
 }

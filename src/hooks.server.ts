@@ -8,6 +8,9 @@ import { getDMBySessionId, getActiveGameSession, touchDMActivity } from '$lib/se
 import { getPlayerBySessionId } from '$lib/server/playerModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { isAdminDM, isRootAdminEmail } from '$lib/server/admin';
+// Side-effect import — starts the 24h scheduling-reminder background scan (see the module
+// comment). Doing nothing with the import itself is intentional.
+import '$lib/server/schedulingReminders';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('dm_auth') ?? null;

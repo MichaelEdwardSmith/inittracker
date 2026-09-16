@@ -295,6 +295,35 @@ export async function getPlayerSessions(playerSessionId: string): Promise<Player
 	);
 }
 
+/**
+ * The invitee roster for a scheduling proposal: every player who has ever joined this game
+ * session's display link while logged in (see recordPlayerSession(), called from /join). A
+ * player who only ever opened /display/[id] anonymously — without a player account — won't
+ * appear here, since there's nothing to record it against.
+ */
+export interface SessionPlayerSummary {
+	playerSessionId: string;
+	displayName: string;
+	email: string | null;
+}
+
+export async function getPlayersForGameSession(
+	gameSessionId: string
+): Promise<SessionPlayerSummary[]> {
+	const c = await col();
+	const players = await c
+		.find(
+			{ 'joinedSessions.sessionId': gameSessionId },
+			{ projection: { sessionId: 1, displayName: 1, email: 1, _id: 0 } }
+		)
+		.toArray();
+	return players.map((p) => ({
+		playerSessionId: p.sessionId,
+		displayName: p.displayName,
+		email: p.email
+	}));
+}
+
 // ── Player notes ──────────────────────────────────────────────────────────────
 
 /** Returns all notes for a player, newest first. */

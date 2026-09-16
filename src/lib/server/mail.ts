@@ -87,6 +87,36 @@ function button(href: string, label: string): string {
 	return `<a href="${href}" style="display:inline-block;margin:8px 0 4px;padding:12px 24px;background:#d97706;color:#0a0a0f;font-weight:800;font-size:13px;letter-spacing:0.05em;text-transform:uppercase;text-decoration:none;border-radius:8px;">${label}</a>`;
 }
 
+const HTML_ESCAPES: Record<string, string> = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;'
+};
+
+/** Escapes user-authored text (session names, slot labels) before it's interpolated into a
+ *  hand-built HTML email string — unlike Svelte templates, these get no automatic escaping. */
+function escapeHtml(s: string): string {
+	return s.replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
+}
+
+/** Formats an ISO instant for email display in a specific IANA time zone. Emails are rendered
+ *  once on the server, so — unlike the in-app UI, where the viewer's own browser formats dates
+ *  in their local zone automatically — there's no viewer browser to defer to here. The DM's zone
+ *  (captured when they propose times, see SchedulingProposal.timeZone) is used instead, so the
+ *  email shows the same wall-clock time the DM intended regardless of where the mail server runs. */
+function formatDateTime(iso: string, timeZone: string): string {
+	return new Date(iso).toLocaleString('en-US', {
+		weekday: 'long',
+		month: 'long',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+		timeZone
+	});
+}
+
 export function passwordResetEmail(link: string): { subject: string; html: string; text: string } {
 	const subject = 'Reset your Initiative Tracker password';
 	const html = wrapper(
@@ -199,5 +229,85 @@ export function verifyEmailEmail(link: string): { subject: string; html: string;
 		<p style="margin:20px 0 0;font-size:12px;color:#777;word-break:break-all;">${link}</p>`
 	);
 	const text = `Verify your Initiative Tracker email: ${link}`;
+	return { subject, html, text };
+}
+
+// ---------------------------------------------------------------------------
+// Scheduling emails — DM proposes/confirms candidate session times (see
+// src/lib/server/schedulingModel.ts and /api/scheduling). All three link back to the player's
+// display page; PlayerSchedulingView.svelte there pops the Session Times card open on its own
+// once it polls and finds an active proposal, for any player already logged in — no query param
+// needed to trigger it.
+// ---------------------------------------------------------------------------
+
+export function schedulingProposedEmail(
+	sessionName: string,
+	slots: { start: string; label?: string }[],
+	timeZone: string,
+	link: string
+): { subject: string; html: string; text: string } {
+	const subject = `New session times proposed for ${sessionName}`;
+	const listItem = (s: { start: string; label?: string }) => {
+		const when = formatDateTime(s.start, timeZone);
+		return `${when}${s.label ? ` — ${escapeHtml(s.label)}` : ''}`;
+	};
+	const htmlRows = slots.map((s) => `<li style="margin:0 0 6px;">${listItem(s)}</li>`).join('');
+	const textRows = slots.map((s) => `- ${listItem(s)}`).join('\n');
+
+	const html = wrapper(
+		'New session times proposed',
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#c5c5c5;">
+			Your DM proposed the following candidate times for the next
+			<strong style="color:#fff;">${escapeHtml(sessionName)}</strong> session. Mark your
+			availability for each one:
+		</p>
+		<ul style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.6;color:#e5e5e5;">${htmlRows}</ul>
+		${button(link, 'Respond Now')}
+		<p style="margin:20px 0 0;font-size:12px;color:#777;word-break:break-all;">${link}</p>`
+	);
+	const text = `Your DM proposed the following candidate times for the next ${sessionName} session:\n\n${textRows}\n\nRespond: ${link}`;
+	return { subject, html, text };
+}
+
+export function schedulingConfirmedEmail(
+	sessionName: string,
+	confirmedStart: string,
+	timeZone: string,
+	link: string
+): { subject: string; html: string; text: string } {
+	const when = formatDateTime(confirmedStart, timeZone);
+	const subject = `${sessionName} confirmed for ${when}`;
+	const html = wrapper(
+		'Session time confirmed',
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#c5c5c5;">
+			Your next <strong style="color:#fff;">${escapeHtml(sessionName)}</strong> session is locked
+			in for:
+		</p>
+		<p style="margin:0 0 20px;font-size:19px;font-weight:800;color:#34d399;text-align:center;">${when}</p>
+		${button(link, 'View Details')}
+		<p style="margin:20px 0 0;font-size:12px;color:#777;word-break:break-all;">${link}</p>`
+	);
+	const text = `Your next ${sessionName} session is confirmed for ${when}.\n\nDetails: ${link}`;
+	return { subject, html, text };
+}
+
+export function schedulingReminderEmail(
+	sessionName: string,
+	confirmedStart: string,
+	timeZone: string,
+	link: string
+): { subject: string; html: string; text: string } {
+	const when = formatDateTime(confirmedStart, timeZone);
+	const subject = `Reminder: ${sessionName} starts tomorrow`;
+	const html = wrapper(
+		'Session reminder',
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#c5c5c5;">
+			Your next <strong style="color:#fff;">${escapeHtml(sessionName)}</strong> session starts in
+			about 24 hours:
+		</p>
+		<p style="margin:0 0 20px;font-size:19px;font-weight:800;color:#f59e0b;text-align:center;">${when}</p>
+		${button(link, 'View Details')}`
+	);
+	const text = `Your next ${sessionName} session starts in about 24 hours: ${when}\n\nDetails: ${link}`;
 	return { subject, html, text };
 }

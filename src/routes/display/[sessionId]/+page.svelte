@@ -10,6 +10,7 @@
 	import MessageDMModal from '$lib/components/MessageDMModal.svelte';
 	import InitiativeRollerModal from '$lib/components/InitiativeRollerModal.svelte';
 	import PlayerNotesModal from '$lib/components/PlayerNotesModal.svelte';
+	import PlayerSchedulingView from '$lib/components/PlayerSchedulingView.svelte';
 	import PlayerInboxModal from '$lib/components/PlayerInboxModal.svelte';
 	import type { DmReply } from '$lib/components/PlayerInboxModal.svelte';
 	import EmojiPickerModal from '$lib/components/EmojiPickerModal.svelte';
@@ -88,6 +89,8 @@
 	// ── Player → DM messaging ───────────────────────────────────────────
 	let showMsgModal = $state(false);
 	let showNotesModal = $state(false);
+	let schedulingActive = $state(false);
+	let schedulingCollapsed = $state(true);
 	let showEmojiPicker = $state(false);
 	let showDiceRoller = $state(false);
 	let showLiarsDice = $state(false);
@@ -1150,6 +1153,18 @@
 				My Notes
 			</button>
 		{/if}
+		{#if schedulingActive}
+			<button
+				onclick={() => {
+					schedulingCollapsed = false;
+					showMobileMenu = false;
+				}}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-teal-300 transition hover:bg-teal-900/30 hover:text-teal-200"
+			>
+				<i class="fa-duotone fa-light fa-calendar-days shrink-0 text-base" aria-hidden="true"></i>
+				Session Times
+			</button>
+		{/if}
 		<button
 			onclick={() => {
 				showDmInbox = true;
@@ -1739,6 +1754,15 @@
 {#if showNotesModal && myPlayerName}
 	<PlayerNotesModal playerName={myPlayerName} onclose={() => (showNotesModal = false)} />
 {/if}
+
+<!-- Not gated behind a menu click — pops up on its own, same as PollView below, since an
+     invited player shouldn't have to know to go looking for it. -->
+<PlayerSchedulingView
+	sessionId={data.sessionId}
+	loggedIn={!!myPlayerName}
+	bind:active={schedulingActive}
+	bind:collapsed={schedulingCollapsed}
+/>
 
 {#if showDmInbox}
 	<PlayerInboxModal

@@ -185,6 +185,15 @@
 		showMobileMenu = false;
 		if (!PollModalComp) PollModalComp = (await import('$lib/components/PollModal.svelte')).default;
 	}
+	let showScheduling = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let SchedulingModalComp = $state<any>(null);
+	async function openScheduling() {
+		showScheduling = true;
+		showMobileMenu = false;
+		if (!SchedulingModalComp)
+			SchedulingModalComp = (await import('$lib/components/SchedulingModal.svelte')).default;
+	}
 	let showDungeon = $state(false);
 	let showDonjon = $state(false);
 	let showTown = $state(false);
@@ -710,6 +719,14 @@
 				Sessions
 			</button>
 			<button
+				onclick={openScheduling}
+				title="Propose session times and see who's available"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-calendar-days shrink-0 text-base" aria-hidden="true"></i>
+				Schedule Session
+			</button>
+			<button
 				onclick={() => {
 					showEncounters = true;
 					showMobileMenu = false;
@@ -1077,6 +1094,11 @@
 {#if showPoll && PollModalComp}
 	{@const Poll = PollModalComp}
 	<Poll sessionId={activeSession.sessionId} onclose={() => (showPoll = false)} />
+{/if}
+
+{#if showScheduling && SchedulingModalComp}
+	{@const Scheduling = SchedulingModalComp}
+	<Scheduling onclose={() => (showScheduling = false)} />
 {/if}
 
 {#if showQuickRules && QuickRulesModalComp}
