@@ -293,6 +293,43 @@ export interface NoteEntry {
 }
 
 // ---------------------------------------------------------------------------
+// Scheduling — "when's our next session" availability polls, per game session
+// ---------------------------------------------------------------------------
+
+/** One candidate date/time the DM has proposed for the next session. */
+export interface SchedulingSlot {
+	id: string;
+	start: string; // ISO datetime
+	label?: string; // optional free-text note, e.g. "Session 12"
+}
+
+export type SchedulingAvailability = 'yes' | 'no' | 'maybe';
+
+/** One player's availability across every slot of a proposal. */
+export interface SchedulingVote {
+	playerSessionId: string;
+	displayName: string;
+	avail: Record<string /* slotId */, SchedulingAvailability>;
+}
+
+export interface SchedulingProposal {
+	id: string;
+	createdAt: string; // ISO datetime
+	status: 'open' | 'confirmed' | 'cancelled';
+	slots: SchedulingSlot[];
+	votes: SchedulingVote[];
+	confirmedSlotId?: string;
+	/** IANA time zone the DM was in when proposing (e.g. "America/Chicago") — used to render
+	 *  slot times in emails, which are rendered once server-side with no viewer browser to defer
+	 *  to (unlike the in-app UI, where each viewer's own browser formats the same ISO instant in
+	 *  their local zone automatically). Falls back to UTC if absent or invalid. */
+	timeZone?: string;
+	/** Tracks which one-shot emails have already gone out for this proposal, so the reminder
+	 *  scanner and the confirm action never double-send. */
+	remindersSent?: { confirmedEmail?: boolean; reminder24h?: boolean };
+}
+
+// ---------------------------------------------------------------------------
 // 2024 Spell (flat structure — plain text, not 5etools nested entries)
 // ---------------------------------------------------------------------------
 
