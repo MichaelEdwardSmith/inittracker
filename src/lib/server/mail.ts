@@ -28,20 +28,29 @@ interface MailMessage {
 	tag: string;
 }
 
-/** Fire-and-forget-safe: caller should still await it to log failures, but a rejected send
- *  should never block the request that triggered it (a reset/verify flow must not fail loudly
- *  just because Postmark is down — the token still exists and the user can ask again). */
-export async function sendMail(msg: MailMessage): Promise<void> {
+/** True if Postmark is configured to actually send (token + from address both present). Callers
+ *  that need to fail fast with a clear reason — rather than attempt N sends that are each
+ *  guaranteed to no-op — should check this before calling sendMail in a loop. */
+export function isMailConfigured(): boolean {
+	return !!client && !!env.EMAIL_FROM;
+}
+
+/** Fire-and-forget-safe: never throws, so a rejected send never blocks the request that
+ *  triggered it (a reset/verify flow must not fail loudly just because Postmark is down — the
+ *  token still exists and the user can ask again). Returns whether the send actually succeeded
+ *  so callers that need to know (e.g. the admin broadcast composer) can surface a real failure
+ *  instead of assuming success just because sendMail didn't throw. */
+export async function sendMail(msg: MailMessage): Promise<boolean> {
 	if (!client) {
 		console.warn(
 			`[mail] POSTMARK_SERVER_TOKEN not set — would have sent "${msg.subject}" to ${msg.to}`
 		);
-		return;
+		return false;
 	}
 	const from = env.EMAIL_FROM;
 	if (!from) {
 		console.warn('[mail] EMAIL_FROM not set — cannot send mail');
-		return;
+		return false;
 	}
 	try {
 		await client.sendEmail({
@@ -53,8 +62,10 @@ export async function sendMail(msg: MailMessage): Promise<void> {
 			MessageStream: 'outbound',
 			Tag: msg.tag
 		});
+		return true;
 	} catch (err) {
 		console.error(`[mail] Failed to send "${msg.subject}" to ${msg.to}:`, err);
+		return false;
 	}
 }
 
