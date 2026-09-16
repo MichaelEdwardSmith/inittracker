@@ -448,20 +448,28 @@
 				{@const prevSameInit = i > 0 && combat.sorted[i - 1].initiative === c.initiative}
 				{@const nextSameInit =
 					i < combat.sorted.length - 1 && combat.sorted[i + 1].initiative === c.initiative}
+				{@const stripeColor = isActive
+					? 'bg-amber-400'
+					: isDead
+						? 'bg-gray-600'
+						: c.type === 'lair'
+							? 'bg-purple-500'
+							: c.type === 'player'
+								? 'bg-blue-500'
+								: 'bg-red-500'}
 				<div
 					id="combatant-{c.id}"
 					animate:flip={{ duration: 300 }}
 					class="relative flex flex-col gap-2 rounded-lg border px-3 py-2 transition-all
 					       {isActive
-						? 'border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+						? 'active-turn-glow border-gray-800 bg-amber-950/40'
 						: isDead
 							? 'border-gray-800 bg-gray-900/50 opacity-60'
 							: c.type === 'lair'
-								? 'border-purple-700/50 bg-purple-950/20'
-								: c.type === 'player'
-									? 'border-blue-900/50 bg-gray-800'
-									: 'border-red-900/50 bg-gray-800'}"
+								? 'border-gray-800 bg-purple-950/20'
+								: 'border-gray-800 bg-gray-800'}"
 				>
+					<div class="absolute inset-y-0 left-0 w-1 rounded-l-lg {stripeColor}"></div>
 					{#if c.type === 'lair'}
 						<!-- Lair Actions card -->
 						<div class="flex items-center gap-2">
@@ -561,10 +569,16 @@
 								</button>
 							{:else}
 								<span
-									class="shrink-0 rounded px-1.5 py-0.5 text-xs font-bold
+									title={c.type === 'player' ? 'Player Character' : 'Non-Player Character'}
+									class="flex h-6 w-6 shrink-0 items-center justify-center rounded
 							       {c.type === 'player' ? 'bg-blue-900/60 text-blue-300' : 'bg-red-900/60 text-red-300'}"
 								>
-									{c.type === 'player' ? 'PC' : 'NPC'}
+									<i
+										class="fa-duotone fa-light {c.type === 'player'
+											? 'fa-shield-halved'
+											: 'fa-sword'} text-xs"
+										aria-hidden="true"
+									></i>
 								</span>
 							{/if}
 							<span
@@ -1251,3 +1265,26 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.active-turn-glow {
+		animation: active-turn-pulse 2.4s ease-in-out infinite;
+	}
+
+	@keyframes active-turn-pulse {
+		0%,
+		100% {
+			box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+		}
+		50% {
+			box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.active-turn-glow {
+			animation: none;
+			box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+		}
+	}
+</style>
