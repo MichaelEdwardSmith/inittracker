@@ -62,7 +62,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 20. [Stream Overlay](#20-stream-overlay)
 21. [Voice Commands _(Beta)_](#21-voice-commands-beta)
 22. [Audio Mixer](#22-audio-mixer)
-23. [Contact & Support](#23-contact--support)
+23. [Session Scheduling](#23-session-scheduling)
+24. [Contact & Support](#24-contact--support)
 
 ---
 
@@ -1295,6 +1296,36 @@ When you pick a file on Chrome or Edge, the mixer saves a lightweight **referenc
 
 ---
 
-## 23. Contact & Support
+## 23. Session Scheduling
+
+The DM can propose a handful of candidate date/times for the next session, watch players' availability come in, then confirm one. This requires **signed-in players** (see [Optional: Player Accounts](#optional-player-accounts)) — a player who only ever joined as a guest never appears on the invite roster and can't vote.
+
+### Proposing Times (DM)
+
+1. Open the menu (☰) in the dashboard header and click **Schedule Session** under **Campaign**
+2. Add one or more **candidate times** (up to 8), each with an optional label (e.g. "Backup date")
+3. Click **Propose to Players**
+
+Every signed-in player on the roster who has an email on file gets a notification email, and the proposal appears on their player display. Proposing new dates while one is still open automatically cancels it — only one proposal is ever live at a time.
+
+### Responding (Players)
+
+A signed-in player's proposal pops up automatically on the [Player Display](#9-the-player-display-viewer-screen) as a full-screen card — the first time it's seen, and again whenever a new proposal appears or the DM confirms one. Mark each candidate time **Yes**, **Maybe**, or **No**; responses save immediately. Minimize the card with the down-arrow to keep watching combat — a **Session Times** entry stays in the header menu to reopen it.
+
+### Confirming a Time (DM)
+
+The Schedule Session modal shows a **Yes / Maybe / No** tally for each candidate time and how many of the roster have responded so far. Click **Confirm** on a time to lock it in — every player immediately sees a confirmed banner with that date/time. Confirming (or cancelling) sends another notification email to the roster.
+
+### Reminder Emails
+
+A background job checks confirmed proposals every 15 minutes and sends the roster a one-time reminder email roughly 24 hours before the confirmed session time.
+
+### Cancelling a Proposal
+
+Click **Cancel Proposal** in the Schedule Session modal to withdraw an open proposal. Players lose the voting UI and no time is locked in.
+
+---
+
+## 24. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
