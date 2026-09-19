@@ -4,6 +4,7 @@
 	import RichTextEditor from './RichTextEditor.svelte';
 	import type { NoteEntry } from '$lib/types';
 	import { exportNotesPdf } from '$lib/pdfExport';
+	import { formatNoteDate as formatDate } from '$lib/utils';
 
 	interface Props {
 		onclose: () => void;
@@ -41,14 +42,6 @@
 			})
 			.catch(() => {});
 	});
-
-	function formatDate(iso: string): string {
-		return new Date(iso).toLocaleDateString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric'
-		});
-	}
 
 	async function createNew() {
 		const r = await fetch('/api/player-notes', {

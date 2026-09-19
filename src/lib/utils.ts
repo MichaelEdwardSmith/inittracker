@@ -324,3 +324,31 @@ export function encounterDifficulty(
 	if (adjusted < deadly) return 'Hard';
 	return 'Deadly';
 }
+
+/** Formats an ISO instant for in-app display in the viewer's local time zone, e.g.
+ *  "Mon, Jan 5, 7:00 PM". Used by the scheduling proposal UI (DM and player views). */
+export function formatSlot(iso: string): string {
+	return new Date(iso).toLocaleString('en-US', {
+		weekday: 'short',
+		month: 'short',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit'
+	});
+}
+
+/** Formats an ISO date for note-list display, e.g. "Jan 5, 2026". Used by the DM and
+ *  player notes modals. */
+export function formatNoteDate(iso: string): string {
+	return new Date(iso).toLocaleDateString('en-US', {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric'
+	});
+}
+
+/** Formats an epoch-ms timestamp as a clock time, e.g. "7:00 PM". Used by the DM and
+ *  player inbox modals. */
+export function formatShortTime(ts: number): string {
+	return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}

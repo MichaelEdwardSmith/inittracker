@@ -5,6 +5,7 @@
 <script lang="ts">
 	import type { SchedulingAvailability, SchedulingProposal } from '$lib/types';
 	import type { SessionPlayerSummary } from '$lib/server/playerModel';
+	import { formatSlot } from '$lib/utils';
 
 	interface Props {
 		onclose: () => void;
@@ -113,16 +114,6 @@
 			if (a) counts[a]++;
 		}
 		return counts;
-	}
-
-	function formatSlot(iso: string): string {
-		return new Date(iso).toLocaleString('en-US', {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric',
-			hour: 'numeric',
-			minute: '2-digit'
-		});
 	}
 
 	const respondedCount = $derived(active?.votes.length ?? 0);
