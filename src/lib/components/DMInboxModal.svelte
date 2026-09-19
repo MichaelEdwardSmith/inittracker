@@ -1,5 +1,7 @@
 <!-- DM inbox modal — shows received player messages with inline reply + compose. -->
 <script lang="ts">
+	import { formatShortTime as formatTime } from '$lib/utils';
+
 	interface DmMessage {
 		id: string;
 		from: string;
@@ -27,10 +29,6 @@
 	let replyOpenId = $state<string | null>(null);
 	let replyText = $state('');
 	let replySending = $state(false);
-
-	function formatTime(ts: number) {
-		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
 
 	function openReply(id: string, from: string) {
 		replyOpenId = id;

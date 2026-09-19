@@ -1,5 +1,7 @@
 <!-- Read-only inbox for messages received from the DM. -->
 <script lang="ts">
+	import { formatShortTime as formatTime } from '$lib/utils';
+
 	export interface DmReply {
 		id: string;
 		to: string;
@@ -14,10 +16,6 @@
 	}
 
 	let { messages, onclose, onclear }: Props = $props();
-
-	function formatTime(ts: number) {
-		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
 
 	function formatDate(ts: number) {
 		return new Date(ts).toLocaleDateString('en-US', {

@@ -30,7 +30,8 @@
 		{ id: 'stream-overlay', label: '21. Stream Overlay' },
 		{ id: 'voice-commands', label: '22. Voice Commands (Beta)' },
 		{ id: 'audio-mixer', label: '23. Audio Mixer' },
-		{ id: 'contact', label: '24. Contact & Support' }
+		{ id: 'session-scheduling', label: '24. Session Scheduling' },
+		{ id: 'contact', label: '25. Contact & Support' }
 	];
 
 	const conditions = [
@@ -3218,8 +3219,90 @@
 			</section>
 
 			<!-- 24 ─────────────────────────────────────── -->
+			<section id="session-scheduling">
+				{@render h2('24', 'Session Scheduling')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					The DM can propose a handful of candidate date/times for the next session, watch players'
+					availability come in, then confirm one. This requires
+					<strong class="font-semibold text-white">signed-in players</strong> — a player who only ever
+					joined as a guest never appears on the invite roster and can't vote.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Proposing Times (DM)
+				</h3>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Open the menu (<i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i>) in the
+						dashboard header and click
+						<strong class="font-semibold text-white"
+							><i class="fa-duotone fa-light fa-calendar-days" aria-hidden="true"></i> Schedule Session</strong
+						> under Campaign
+					</li>
+					<li>
+						Add one or more <strong class="font-semibold text-white">candidate times</strong> (up to 8),
+						each with an optional label (e.g. "Backup date")
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Propose to Players</strong>
+					</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					Every signed-in player on the roster who has an email on file gets a notification email,
+					and the proposal appears on their player display. Proposing new dates while one is still
+					open automatically cancels it — only one proposal is ever live at a time.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Responding (Players)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					A signed-in player's proposal pops up automatically on the
+					<a href="#player-display" class="text-amber-400 transition hover:text-amber-300"
+						>Player Display</a
+					>
+					as a full-screen card — the first time it's seen, and again whenever a new proposal appears
+					or the DM confirms one. Mark each candidate time
+					<strong class="font-semibold text-emerald-400">Yes</strong>,
+					<strong class="font-semibold text-amber-400">Maybe</strong>, or
+					<strong class="font-semibold text-red-400">No</strong>
+					— responses save immediately. Minimize the card with the down-arrow to keep watching combat
+					— a <strong class="font-semibold text-white">Session Times</strong> entry stays in the header
+					menu to reopen it.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Confirming a Time (DM)
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The Schedule Session modal shows a Yes / Maybe / No tally for each candidate time and how
+					many of the roster have responded so far. Click
+					<strong class="font-semibold text-white">Confirm</strong> on a time to lock it in — every player
+					immediately sees a confirmed banner with that date/time. Confirming (or cancelling) sends another
+					notification email to the roster.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Reminder Emails
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					A background job checks confirmed proposals every 15 minutes and sends the roster a
+					one-time reminder email roughly 24 hours before the confirmed session time.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Cancelling a Proposal
+				</h3>
+				<p class="text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Cancel Proposal</strong> in the Schedule Session
+					modal to withdraw an open proposal. Players lose the voting UI and no time is locked in.
+				</p>
+			</section>
+
+			<!-- 25 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('24', 'Contact & Support')}
+				{@render h2('25', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"

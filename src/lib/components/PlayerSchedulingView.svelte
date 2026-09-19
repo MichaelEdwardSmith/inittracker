@@ -9,6 +9,7 @@
 <script lang="ts">
 	import type { SchedulingAvailability, SchedulingProposal } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
+	import { formatSlot } from '$lib/utils';
 
 	interface Props {
 		sessionId: string;
@@ -83,16 +84,6 @@
 		} finally {
 			saving = false;
 		}
-	}
-
-	function formatSlot(iso: string): string {
-		return new Date(iso).toLocaleString('en-US', {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric',
-			hour: 'numeric',
-			minute: '2-digit'
-		});
 	}
 
 	const confirmedStart = $derived(
