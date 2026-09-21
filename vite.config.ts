@@ -18,8 +18,11 @@ export default defineConfig({
 	},
 
 	build: {
-		// The enemies/spells data bundles are large but compress well (~88 kB gzip).
-		// Raising the limit avoids a noisy warning without changing actual bundle behaviour.
-		chunkSizeWarningLimit: 600
+		// The enemies/spells data bundles are large but compress well (~88 kB gzip). The 3D dice
+		// roller (three.js) and on-device voice transcription (@huggingface/transformers) chunks
+		// are bigger still (~275 kB / ~135 kB gzip) but are already dynamically imported/worker-only,
+		// so they never load until those features are used. Raising the limit avoids noisy warnings
+		// for chunks that are already off the critical path, without changing actual bundle behaviour.
+		chunkSizeWarningLimit: 1000
 	}
 });
