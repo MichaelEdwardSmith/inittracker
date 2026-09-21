@@ -1,6 +1,8 @@
 <!-- Shown when creating a new game session. Lets the DM choose 2014 or 2024 ruleset.
      This choice is permanent and cannot be changed after the session is created. -->
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	interface Props {
 		defaultName: string;
 		oncreate: (name: string, ruleset: '2014' | '2024') => void;
@@ -10,7 +12,7 @@
 	let { defaultName, oncreate, oncancel }: Props = $props();
 
 	let selectedRuleset = $state<'2014' | '2024' | null>(null);
-	let sessionName = $state(defaultName);
+	let sessionName = $state(untrack(() => defaultName));
 
 	function submit() {
 		if (!selectedRuleset) return;

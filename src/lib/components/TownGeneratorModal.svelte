@@ -1859,6 +1859,7 @@
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	aria-modal="true"
+	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
 	<!-- Header -->
@@ -1892,9 +1893,12 @@
 			class="hidden w-56 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
 		>
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Town Name</label
+				<label
+					for="town-name-input"
+					class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Town Name</label
 				>
 				<input
+					id="town-name-input"
 					type="text"
 					bind:value={townName}
 					placeholder="Town name"
@@ -1903,10 +1907,13 @@
 			</div>
 
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
+				<label
+					for="settlement-size-select"
+					class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
 					>Settlement Size</label
 				>
 				<select
+					id="settlement-size-select"
 					bind:value={townSize}
 					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
 				>
@@ -1920,8 +1927,12 @@
 			</div>
 
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Wealth</label>
+				<label
+					for="wealth-select"
+					class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Wealth</label
+				>
 				<select
+					id="wealth-select"
 					bind:value={opulence}
 					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
 				>
@@ -2182,6 +2193,8 @@
 					if (e.key === 'Escape') diceRollResult = null;
 				}}
 			>
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<div
 					class="max-w-xs min-w-[14rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 					onclick={(e) => e.stopPropagation()}

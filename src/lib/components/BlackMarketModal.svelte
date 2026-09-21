@@ -771,6 +771,7 @@
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	aria-modal="true"
+	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
 	{#if !embedded}

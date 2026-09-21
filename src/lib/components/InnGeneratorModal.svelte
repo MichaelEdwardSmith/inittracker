@@ -1388,6 +1388,7 @@
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	aria-modal="true"
+	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
 	<!-- Header -->
@@ -1419,8 +1420,7 @@
 		>
 			<!-- Inn Quality -->
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
-					>Inn Quality</label
+				<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Inn Quality</span
 				>
 				<div class="flex flex-col gap-1">
 					{#each ['poor', 'modest', 'comfortable', 'wealthy', 'legendary'] as Quality[] as q}
@@ -1439,9 +1439,7 @@
 
 			<!-- Party Size -->
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
-					>Party Size</label
-				>
+				<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Party Size</span>
 				<div class="flex items-center gap-2">
 					<button
 						onclick={() => (partySize = Math.max(2, partySize - 1))}
@@ -1463,8 +1461,7 @@
 
 			<!-- Party Level -->
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
-					>Party Level</label
+				<span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Party Level</span
 				>
 				<div class="flex items-center gap-2">
 					<button

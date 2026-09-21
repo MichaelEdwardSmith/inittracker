@@ -1,5 +1,7 @@
 <!-- Embeds Watabou's Dwellings generator (watabou.github.io/dwellings) -->
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	let { building, onclose }: { building: { type: string; name: string }; onclose: () => void } =
 		$props();
 
@@ -38,7 +40,7 @@
 		return `https://watabou.github.io/dwellings/?seed=${seed}&tags=${tags}&name=${name}&view=plan`;
 	}
 
-	let seed = $state(hashStr(building.name + building.type) % 1_000_000 || 1);
+	let seed = $state(untrack(() => hashStr(building.name + building.type) % 1_000_000 || 1));
 	let src = $derived(buildUrl(seed));
 
 	function reroll() {

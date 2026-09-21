@@ -1,5 +1,6 @@
 <!-- Message DM modal — players use this to send a text message to the DM. -->
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Combatant } from '$lib/types';
 
 	interface Props {
@@ -11,7 +12,7 @@
 
 	let { players, sessionId, onclose, preselectedName = '' }: Props = $props();
 
-	let msgFrom = $state(preselectedName);
+	let msgFrom = $state(untrack(() => preselectedName));
 	let msgText = $state('');
 	let msgSending = $state(false);
 	let msgSent = $state(false);

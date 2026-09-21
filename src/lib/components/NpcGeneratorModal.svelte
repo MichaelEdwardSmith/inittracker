@@ -1049,6 +1049,7 @@
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	aria-modal="true"
+	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
 	<!-- Header -->
@@ -1129,8 +1130,12 @@
 
 			<!-- Seed -->
 			<div class="flex flex-col gap-1.5">
-				<label class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Seed</label>
+				<label
+					for="npc-seed-input"
+					class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Seed</label
+				>
 				<input
+					id="npc-seed-input"
 					type="number"
 					bind:value={seed}
 					class="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-gray-200 focus:border-amber-600 focus:outline-none"

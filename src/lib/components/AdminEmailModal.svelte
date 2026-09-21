@@ -6,7 +6,7 @@
      page's shared `form` prop, so reopening the modal never replays a stale previous result. -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { SentEmailEntry } from '$lib/server/dmModel';
 
@@ -44,7 +44,7 @@
 	// Seeded once from the page's loaded data; new sends are prepended locally (optimistic —
 	// the actual persistence already happened server-side in logSentEmail()) so History reflects
 	// this session's activity without needing a full page reload.
-	let history = $state<SentEmailEntry[]>(sentEmails);
+	let history = $state<SentEmailEntry[]>(untrack(() => sentEmails));
 
 	function formatSentAt(d: string | Date): string {
 		return new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
