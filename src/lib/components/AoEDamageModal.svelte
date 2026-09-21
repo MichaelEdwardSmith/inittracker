@@ -17,9 +17,10 @@
 	interface Props {
 		onclose: () => void;
 		onconcentrationchecks?: (checks: ConcentrationCheck[]) => void;
+		ruleset?: '2014' | '2024';
 	}
 
-	let { onclose, onconcentrationchecks }: Props = $props();
+	let { onclose, onconcentrationchecks, ruleset = '2014' }: Props = $props();
 
 	const CUSTOM_VALUE = '__custom';
 
@@ -90,7 +91,7 @@
 			// round timer — bump each target's existing level by one instead of the flat
 			// add/skip-if-present bulk status logic (and ignore the Rounds field).
 			for (const c of targets) {
-				combat.setExhaustionLevel(c.id, (c.exhaustionLevel ?? 0) + 1);
+				combat.setExhaustionLevel(c.id, (c.exhaustionLevel ?? 0) + 1, ruleset);
 			}
 			onclose();
 			return;

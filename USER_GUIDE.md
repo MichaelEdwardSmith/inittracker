@@ -88,7 +88,7 @@ All three land you on your DM dashboard with your last active combat state resto
 The first time you (or a guest) reach the dashboard, a **"Choose Your Edition"** modal appears and can't be dismissed until you pick one:
 
 - **D&D 5e (2014)** — the original Monster Manual bestiary, classic spell list, 6-tier Exhaustion, and standard action economy
-- **D&D 2024** — the revised Monster Manual bestiary, the 2024 spell list, stacking −1 Exhaustion, and the 2024 action economy (a dedicated Bonus Actions section in stat blocks)
+- **D&D 2024** — the revised Monster Manual bestiary, the 2024 spell list, stacking −2/level Exhaustion (6 levels), and the 2024 action economy (a dedicated Bonus Actions section in stat blocks)
 
 This choice applies to a single game session — see [Creating a New Session](#10-game-sessions) for how to pick an edition again whenever you start a new one.
 
@@ -882,7 +882,7 @@ Click **New Encounter** to expand the builder form.
 Instead of picking every monster by hand, let the builder fill the staging list for you:
 
 1. Choose a **shape** — **Boss (solo)**, **Boss + Minions**, **Duo**, **Trio**, or **Horde**
-2. Choose a target **difficulty** (Easy/Medium/Hard/Deadly for 2014, Low/Moderate/High/Severe/Deadly for 2024)
+2. Choose a target **difficulty** (Easy/Medium/Hard/Deadly for 2014, Low/Moderate/High for 2024)
 3. Optionally narrow it to a single **creature type** (e.g. only Undead, only Beasts)
 4. Click **Compose**
 

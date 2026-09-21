@@ -59,7 +59,7 @@
 		{ value: 'horde', label: 'Horde', shares: Array(8).fill(1 / 8) }
 	];
 	const DIFFICULTY_LABELS_2014 = ['Easy', 'Medium', 'Hard', 'Deadly'];
-	const DIFFICULTY_LABELS_2024 = ['Low', 'Moderate', 'High', 'Severe', 'Deadly'];
+	const DIFFICULTY_LABELS_2024 = ['Low', 'Moderate', 'High'];
 	const difficultyLabels = $derived(
 		ruleset === '2024' ? DIFFICULTY_LABELS_2024 : DIFFICULTY_LABELS_2014
 	);
@@ -173,8 +173,7 @@
 		if (d === 'Easy' || d === 'Low') return 'bg-green-800 text-green-200';
 		if (d === 'Medium' || d === 'Moderate') return 'bg-yellow-700 text-yellow-200';
 		if (d === 'Hard' || d === 'High') return 'bg-orange-700 text-orange-200';
-		if (d === 'Severe') return 'bg-red-700 text-red-200';
-		return 'bg-red-900 text-red-200'; // Deadly
+		return 'bg-red-900 text-red-200'; // Deadly (2014 only)
 	}
 
 	// ── Per-encounter XP helper ──────────────────────────────────────────────

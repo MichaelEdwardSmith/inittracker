@@ -689,7 +689,7 @@
 				Mixer
 			</button>
 			{#if data.showVoiceCommands}
-				<VoiceCommands mobile={true} />
+				<VoiceCommands mobile={true} ruleset={activeSession.ruleset} />
 			{/if}
 		{/if}
 

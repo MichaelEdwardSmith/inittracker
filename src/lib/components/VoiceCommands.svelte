@@ -13,7 +13,8 @@
 	import VoiceCommandsHelpModal from './VoiceCommandsHelpModal.svelte';
 
 	// ── Props ─────────────────────────────────────────────────────────────────
-	const { mobile = false }: { mobile?: boolean } = $props();
+	const { mobile = false, ruleset = '2014' }: { mobile?: boolean; ruleset?: '2014' | '2024' } =
+		$props();
 
 	// ── Help modal (shown every time voice commands are turned on) ────────────
 	let showHelp = $state(false);
@@ -333,7 +334,7 @@
 			const has = (target.exhaustionLevel ?? 0) > 0;
 			if (removing === has) {
 				return () => {
-					combat.setExhaustionLevel(target.id, removing ? 0 : 1);
+					combat.setExhaustionLevel(target.id, removing ? 0 : 1, ruleset);
 					showToast(
 						'fa-tag',
 						removing ? `${target.name} no longer Exhausted` : `${target.name} is now Exhausted`

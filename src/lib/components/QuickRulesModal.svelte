@@ -1,6 +1,8 @@
 <!-- Full-screen Quick Rules reference for DMs. Left column lists categories;
      right panel shows the selected category's content. -->
 <script lang="ts">
+	import { getConditionDescription } from '$lib/utils';
+
 	let {
 		onclose,
 		ruleset = '2014'
@@ -8,6 +10,50 @@
 		onclose: () => void;
 		ruleset?: '2014' | '2024';
 	} = $props();
+
+	// Single source of truth for condition text lives in utils.ts (shared with
+	// ConditionInfoModal) so the two never drift out of sync per edition.
+	const CONDITION_NAMES = [
+		'Blinded',
+		'Charmed',
+		'Deafened',
+		'Exhausted',
+		'Frightened',
+		'Grappled',
+		'Incapacitated',
+		'Invisible',
+		'Paralyzed',
+		'Petrified',
+		'Poisoned',
+		'Prone',
+		'Restrained',
+		'Stunned',
+		'Unconscious'
+	];
+	const conditionRows = $derived(
+		CONDITION_NAMES.map((name) => [name, getConditionDescription(name, ruleset)])
+	);
+
+	// Grapple/Shove became a saving throw vs. a flat DC in 2024, replacing the 2014
+	// opposed-Athletics-check mechanic. Escaping an existing grapple also switched from a
+	// contest to a check against that same flat DC.
+	const grappleShoveRows = $derived(
+		ruleset === '2024'
+			? [
+					[
+						'Grapple / Shove (resist)',
+						"Target's Strength or Dexterity save (their choice) vs. 8 + your STR modifier + proficiency bonus"
+					],
+					[
+						'Grapple (escape)',
+						"Your Athletics or Acrobatics check vs. 8 + grappler's STR modifier + proficiency bonus (no longer a contest)"
+					]
+				]
+			: [
+					['Grapple (escape)', "Grappler's Athletics vs. your Athletics or Acrobatics"],
+					['Shove (resist)', "Attacker's Athletics vs. your Athletics or Acrobatics"]
+				]
+	);
 
 	type Category = {
 		id: string;
@@ -3976,7 +4022,7 @@
 					</thead>
 					<tbody class="divide-y divide-gray-800">
 						{#if ruleset === '2024'}
-							{#each [['Attack', 'Make one attack (more with Extra Attack). Can replace one attack with a Grapple or Shove.'], ['Dash', 'Double your movement for the turn.'], ['Disengage', "Your movement doesn't provoke opportunity attacks this turn."], ['Dodge', 'Until the start of your next turn: attacks against you have disadvantage, you have advantage on DEX saves. Lost if incapacitated or speed drops to 0.'], ['Help', 'Aid a creature within 5 ft: give advantage on their next ability check or attack roll. Or aid another creature on a skill check they can see.'], ['Hide', 'Make a Stealth check. You become hidden if the result exceeds the passive Perception of any creature that could detect you.'], ['Influence', "Make a Charisma check (Persuasion, Deception, Intimidation, or Performance) to alter a creature's attitude. Replaces some social interactions that were free actions in 2014."], ['Magic', 'Cast a spell or use a magical item. Most spells with a casting time of 1 Action use this.'], ['Ready', 'Choose an action and a trigger. React to execute the action when the trigger occurs (before your next turn).'], ['Search', 'Devote attention to finding something — Perception or Investigation check.'], ['Study', 'Make an Investigation, Arcana, History, Medicine, Nature, or Religion check to recall information about a target or situation.'], ['Utilize', 'Use a non-weapon item (replaces "Use an Object"). Does not include attacking with a weapon.'], ['Use Class Feature', 'Activate a feature that requires an action (e.g. Second Wind).'], ['Improvise', 'Attempt any reasonable action not listed. DM sets the rules on the fly.']] as [action, desc]}
+							{#each [['Attack', 'Make one attack (more with Extra Attack). An Unarmed Strike can instead Grapple or Shove — target makes a STR or DEX save (their choice) vs. 8 + your STR mod + proficiency bonus.'], ['Dash', 'Double your movement for the turn.'], ['Disengage', "Your movement doesn't provoke opportunity attacks this turn."], ['Dodge', 'Until the start of your next turn: attacks against you have disadvantage, you have advantage on DEX saves. Lost if incapacitated or speed drops to 0.'], ['Help', 'Aid a creature within 5 ft: give advantage on their next ability check or attack roll. Or aid another creature on a skill check they can see.'], ['Hide', 'Make a Stealth check. You become hidden if the result exceeds the passive Perception of any creature that could detect you.'], ['Influence', "Make a Charisma check (Persuasion, Deception, Intimidation, or Performance) to alter a creature's attitude. Replaces some social interactions that were free actions in 2014."], ['Magic', 'Cast a spell or use a magical item. Most spells with a casting time of 1 Action use this.'], ['Ready', 'Choose an action and a trigger. React to execute the action when the trigger occurs (before your next turn).'], ['Search', 'Devote attention to finding something — Perception or Investigation check.'], ['Study', 'Make an Investigation, Arcana, History, Medicine, Nature, or Religion check to recall information about a target or situation.'], ['Utilize', 'Use a non-weapon item (replaces "Use an Object"). Does not include attacking with a weapon.'], ['Use Class Feature', 'Activate a feature that requires an action (e.g. Second Wind).'], ['Improvise', 'Attempt any reasonable action not listed. DM sets the rules on the fly.']] as [action, desc]}
 								<tr>
 									<td class="py-2 pr-4 align-top font-semibold text-white">{action}</td>
 									<td class="py-2 text-gray-300">{desc}</td>
@@ -4068,9 +4114,10 @@
 								at the end of the turn, or the creature gains one level of exhaustion.
 							</li>
 							<li>
-								• A creature drops out of the chase at <strong class="text-white"
-									>exhaustion level 5</strong
-								> (speed 0). See the Exhaustion reference for level-by-level effects.
+								• A creature drops out of the chase once exhaustion drops its
+								<strong class="text-white">speed to 0</strong>
+								({ruleset === '2024' ? 'level 6, at which point it also dies' : 'level 5'}). See the
+								Exhaustion reference for level-by-level effects.
 							</li>
 							<li>• Exhaustion gained this way clears after a short or long rest.</li>
 						</ul>
@@ -4190,16 +4237,26 @@
 							</li>
 						</ul>
 					</section>
-					<section>
-						<h4 class="mb-2 font-semibold text-gray-200">Squeezing Through Tight Spaces</h4>
-						<ul class="space-y-1.5 text-gray-300">
-							<li>• A creature can squeeze through a space one size smaller than itself.</li>
-							<li>• Costs 1 extra foot per foot moved.</li>
-							<li>
-								• Disadvantage on attack rolls and DEX saves; attacks against you have advantage.
-							</li>
-						</ul>
-					</section>
+					{#if ruleset === '2024'}
+						<section>
+							<h4 class="mb-2 font-semibold text-gray-200">Squeezing Through Tight Spaces</h4>
+							<p class="text-gray-300">
+								2024 dropped this as a distinct rule — squeezing through a smaller space is left to
+								Difficult Terrain and DM judgment rather than a fixed combat penalty.
+							</p>
+						</section>
+					{:else}
+						<section>
+							<h4 class="mb-2 font-semibold text-gray-200">Squeezing Through Tight Spaces</h4>
+							<ul class="space-y-1.5 text-gray-300">
+								<li>• A creature can squeeze through a space one size smaller than itself.</li>
+								<li>• Costs 1 extra foot per foot moved.</li>
+								<li>
+									• Disadvantage on attack rolls and DEX saves; attacks against you have advantage.
+								</li>
+							</ul>
+						</section>
+					{/if}
 					<section>
 						<h4 class="mb-2 font-semibold text-gray-200">Space &amp; Size</h4>
 						<table class="w-full">
@@ -4234,7 +4291,7 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-800">
-						{#each [['Blinded', "Can't see. Attacks against it have advantage; its attacks have disadvantage. Auto-fail checks requiring sight."], ['Charmed', "Can't attack the charmer. Charmer has advantage on social ability checks against it."], ['Deafened', "Can't hear. Auto-fail checks requiring hearing."], ['Exhausted', 'See Exhaustion table. Removed by long rest (one level per rest).'], ['Frightened', "Disadvantage on ability checks and attacks while source is in line of sight. Can't willingly move closer to source."], ['Grappled', 'Speed = 0. Ends if grappler is incapacitated or if creature is moved out of reach.'], ['Incapacitated', "Can't take actions or reactions."], ['Invisible', "Can't be seen normally. Attacks against it have disadvantage; its attacks have advantage. Location still detectable by noise."], ['Paralyzed', "Incapacitated; can't move or speak. Auto-fail STR/DEX saves. Attacks against it have advantage. Hits within 5 ft are critical hits."], ['Petrified', "Transformed to stone; incapacitated; can't move or speak; unaware of surroundings. Resistance to all damage; immune to poison/disease. Auto-fail STR/DEX saves. Attacks have advantage."], ['Poisoned', 'Disadvantage on attack rolls and ability checks.'], ['Prone', 'Can only crawl or stand up (costs half speed). Disadvantage on attack rolls. Melee attacks against it have advantage; ranged attacks have disadvantage.'], ['Restrained', 'Speed = 0. Attacks against it have advantage; its attacks have disadvantage. Disadvantage on DEX saves.'], ['Stunned', "Incapacitated; can't move; can only speak falteringly. Auto-fail STR/DEX saves. Attacks against it have advantage."], ['Unconscious', "Incapacitated; can't move or speak; unaware of surroundings. Drops held items; falls prone. Auto-fail STR/DEX saves. Attacks have advantage; hits within 5 ft are critical."]] as [cond, desc]}
+						{#each conditionRows as [cond, desc]}
 							<tr>
 								<td class="py-2 pr-4 align-top font-semibold text-white">{cond}</td>
 								<td class="py-2 text-gray-300">{desc}</td>
@@ -4360,35 +4417,39 @@
 				</h3>
 				{#if ruleset === '2024'}
 					<p class="mb-4 text-sm text-gray-300">
-						Each level of Exhaustion applies a cumulative <strong class="text-white"
-							>−1 penalty</strong
-						>
-						to all d20 Tests (ability checks, attack rolls, saving throws) and to your
-						<strong class="text-white">spell save DC</strong>. A long rest removes
-						<strong class="text-white">one level</strong>.
+						Each level of Exhaustion imposes two effects, both scaling with your current level: a
+						cumulative <strong class="text-white">−2 penalty per level</strong> to all d20 Tests
+						(ability checks, attack rolls, saving throws), and
+						<strong class="text-white">−5 ft of Speed per level</strong>. A long rest removes
+						<strong class="text-white">one level</strong> (still 6 levels total, same as 2014 — only the
+						effects changed).
 					</p>
 					<table class="w-full max-w-md text-sm">
 						<thead>
 							<tr class="border-b border-gray-700">
 								<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
-								<th class="pb-2 text-left font-semibold text-gray-400">Additional Effect</th>
+								<th class="pb-2 text-left font-semibold text-gray-400">d20 Tests</th>
+								<th class="pb-2 text-left font-semibold text-gray-400">Speed</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-800">
-							{#each [['1', '−1 to all d20 Tests and spell save DCs'], ['2', '−2 to all d20 Tests and spell save DCs'], ['3', '−3 to all d20 Tests and spell save DCs'], ['4', '−4 to all d20 Tests and spell save DCs'], ['5', '−5 to all d20 Tests and spell save DCs; Speed halved'], ['6', '−6 to all d20 Tests and spell save DCs'], ['7', '−7 to all d20 Tests and spell save DCs'], ['8', '−8 to all d20 Tests and spell save DCs'], ['9', '−9 to all d20 Tests and spell save DCs'], ['10', 'Death']] as [lvl, effect]}
+							{#each [['1', '−2', '−5 ft'], ['2', '−4', '−10 ft'], ['3', '−6', '−15 ft'], ['4', '−8', '−20 ft'], ['5', '−10', '−25 ft'], ['6', 'Death', 'Death']] as [lvl, test, speed]}
 								<tr>
 									<td class="py-2 pr-4 text-lg font-black text-amber-300">{lvl}</td>
-									<td class="py-2 text-gray-300 {lvl === '10' ? 'font-semibold text-red-400' : ''}"
-										>{effect}</td
+									<td class="py-2 text-gray-300 {lvl === '6' ? 'font-semibold text-red-400' : ''}"
+										>{test}</td
+									>
+									<td class="py-2 text-gray-300 {lvl === '6' ? 'font-semibold text-red-400' : ''}"
+										>{speed}</td
 									>
 								</tr>
 							{/each}
 						</tbody>
 					</table>
 					<p class="mt-4 text-xs text-gray-500">
-						Common sources: forced march, starvation, some spells and monster abilities. The
-						Exhausted condition in 2024 works on a single stacking scale rather than six discrete
-						tiers.
+						Common sources: forced march, starvation, some spells and monster abilities. Reaching
+						level 6 kills the creature regardless of current HP; if it's later revived, it comes
+						back one level below what it died at.
 					</p>
 				{:else}
 					<p class="mb-4 text-sm text-gray-300">
@@ -4431,7 +4492,7 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-800">
-						{#each [['Half Cover', '+2 AC &amp; DEX saves', 'Low wall, large furniture, another creature'], ['Three-Quarters Cover', '+5 AC &amp; DEX saves', 'Portcullis, arrow slit, thick tree trunk'], ['Full Cover', "Can't be targeted", 'Completely hidden behind a solid barrier']] as [type, bonus, examples]}
+						{#each [['Half Cover', '+2 AC &amp; DEX saves', 'Low wall, large furniture, another creature'], ['Three-Quarters Cover', '+5 AC &amp; DEX saves', 'Portcullis, arrow slit, thick tree trunk'], [ruleset === '2024' ? 'Total Cover' : 'Full Cover', "Can't be targeted", 'Completely hidden behind a solid barrier']] as [type, bonus, examples]}
 							<tr>
 								<td class="py-2 pr-4 align-top font-semibold text-white">{type}</td>
 								<td class="py-2 pr-4 align-top font-bold text-amber-300">{@html bonus}</td>
@@ -4681,7 +4742,7 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-800">
-						{#each [['Spell save DC', '8 + proficiency bonus + spellcasting ability modifier'], ['Concentration save', 'max(10, ½ damage taken) — round down'], ['Grapple (escape)', "Grappler's Athletics vs. your Athletics or Acrobatics"], ['Shove (resist)', "Attacker's Athletics vs. your Athletics or Acrobatics"], ['Trap / environmental', 'Varies — typically DC 10–20 based on trap tier'], ['Poison (generic)', 'Typically DC 10–15; varies by source']] as [save, formula]}
+						{#each [['Spell save DC', '8 + proficiency bonus + spellcasting ability modifier'], ['Concentration save', 'max(10, ½ damage taken) — round down'], ...grappleShoveRows, ['Trap / environmental', 'Varies — typically DC 10–20 based on trap tier'], ['Poison (generic)', 'Typically DC 10–15; varies by source']] as [save, formula]}
 							<tr>
 								<td class="py-2 pr-4 align-top font-semibold text-white">{save}</td>
 								<td class="py-2 text-gray-300">{formula}</td>
@@ -4727,26 +4788,22 @@
 						</p>
 						<div>
 							<h4 class="mb-2 font-semibold text-gray-200">XP Budget per Character (by Level)</h4>
-							<table class="w-full max-w-lg">
+							<table class="w-full max-w-md">
 								<thead>
 									<tr class="border-b border-gray-700">
 										<th class="w-16 pb-2 text-left font-semibold text-gray-400">Level</th>
 										<th class="pb-2 text-right font-semibold text-gray-400">Low</th>
 										<th class="pb-2 text-right font-semibold text-gray-400">Moderate</th>
 										<th class="pb-2 text-right font-semibold text-gray-400">High</th>
-										<th class="pb-2 text-right font-semibold text-gray-400">Severe</th>
-										<th class="pb-2 text-right font-semibold text-gray-400">Deadly</th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-800 text-gray-300">
-									{#each [[1, 50, 75, 100, 150, 200], [2, 100, 150, 200, 250, 350], [3, 150, 225, 400, 550, 700], [4, 250, 375, 500, 750, 1100], [5, 500, 750, 1100, 1700, 2700], [6, 600, 1000, 1400, 2100, 3200], [7, 750, 1100, 1700, 2600, 3900], [8, 1000, 1400, 2100, 3100, 4700], [9, 1300, 1600, 2400, 3700, 5400], [10, 1600, 1900, 2800, 4300, 6400], [11, 1900, 2400, 3600, 5400, 7800], [12, 2200, 3000, 4500, 6600, 9600], [13, 2600, 3400, 5100, 7800, 11200], [14, 2900, 3800, 5700, 8600, 12400], [15, 3300, 4300, 6400, 9800, 14000], [16, 3800, 4800, 7200, 10800, 15800], [17, 4500, 5900, 8800, 13200, 18800], [18, 5000, 6300, 9500, 14300, 20800], [19, 5500, 7300, 10900, 16100, 23000], [20, 6400, 8500, 12700, 19200, 27200]] as [lvl, low, mod, high, sev, dead]}
+									{#each [[1, 50, 75, 100], [2, 100, 150, 200], [3, 150, 225, 400], [4, 250, 375, 500], [5, 500, 750, 1100], [6, 600, 1000, 1400], [7, 750, 1300, 1700], [8, 1000, 1700, 2100], [9, 1300, 2000, 2600], [10, 1600, 2300, 3100], [11, 1900, 2900, 4100], [12, 2200, 3700, 4700], [13, 2600, 4200, 5400], [14, 2900, 4900, 6200], [15, 3300, 5400, 7800], [16, 3800, 6100, 9800], [17, 4500, 7200, 11700], [18, 5000, 8700, 14200], [19, 5500, 10700, 17200], [20, 6400, 13200, 22000]] as [lvl, low, mod, high]}
 										<tr>
 											<td class="py-1 pr-4 font-bold text-amber-300">{lvl}</td>
 											<td class="py-1 text-right">{low}</td>
 											<td class="py-1 text-right">{mod}</td>
 											<td class="py-1 text-right text-orange-300">{high}</td>
-											<td class="py-1 text-right text-red-300">{sev}</td>
-											<td class="py-1 text-right text-red-500">{dead}</td>
 										</tr>
 									{/each}
 								</tbody>
@@ -4754,8 +4811,8 @@
 						</div>
 						<p class="text-xs text-gray-500">
 							Multiply each column by the number of characters in the party to get the total budget.
-							Total monster XP ≥ budget = encounter meets that difficulty tier. No monster-count
-							multiplier is used in 2024.
+							Total monster XP ≥ budget = encounter meets that difficulty tier. 2024 has only three
+							tiers (Low/Moderate/High) and no monster-count multiplier.
 						</p>
 					</div>
 				{:else}
@@ -4852,24 +4909,51 @@
 
 					<section>
 						<h4 class="mb-2 font-semibold text-gray-200">Ritual Casting</h4>
-						<table class="w-full">
-							<thead
-								><tr class="border-b border-gray-700"
-									><th class="w-36 pb-2 text-left font-semibold text-gray-400">Class</th><th
-										class="pb-2 text-left font-semibold text-gray-400">Requirement</th
-									></tr
-								></thead
-							>
-							<tbody class="divide-y divide-gray-800">
-								{#each [['Wizard', 'Any ritual tag spell in spellbook — no preparation required. Spellbook must be on hand.'], ['Cleric / Druid', 'Must have the spell prepared that day.'], ['Bard', 'Must know the spell.'], ['Ranger / Paladin', 'Cannot ritual cast by default.'], ['Ritual Caster feat', 'Any class; grants a ritual book with two spells; more can be added. No preparation required.']] as [cls, req]}
-									<tr
-										><td class="py-2 pr-4 align-top font-semibold text-white">{cls}</td><td
-											class="py-2 text-gray-300">{req}</td
+						{#if ruleset === '2024'}
+							<p class="mb-2 text-sm text-gray-300">
+								Class gating is gone — <strong class="text-white"
+									>any class with Spellcasting or Pact Magic</strong
+								> can cast a spell as a ritual if they have it prepared (or known) and it has the Ritual
+								tag. No extra feature or preparation slot needed for it specifically.
+							</p>
+							<table class="w-full">
+								<thead
+									><tr class="border-b border-gray-700"
+										><th class="w-36 pb-2 text-left font-semibold text-gray-400">Class</th><th
+											class="pb-2 text-left font-semibold text-gray-400">Requirement</th
 										></tr
-									>
-								{/each}
-							</tbody>
-						</table>
+									></thead
+								>
+								<tbody class="divide-y divide-gray-800">
+									{#each [['Wizard', 'Unique exception — can ritual cast straight from the spellbook without preparing it first. Spellbook must be on hand.'], ['Any other spellcaster', "Must have the ritual-tagged spell prepared (or known, for a caster that doesn't prepare) that day."], ['Ranger / Paladin', 'Can now ritual cast (unlike 2014) — same prepared-spell rule as other classes.'], ['Ritual Caster feat', 'Requires level 4+ and an existing spellcasting feature. Grants a number of 1st-level ritual spells equal to your proficiency bonus.']] as [cls, req]}
+										<tr
+											><td class="py-2 pr-4 align-top font-semibold text-white">{cls}</td><td
+												class="py-2 text-gray-300">{req}</td
+											></tr
+										>
+									{/each}
+								</tbody>
+							</table>
+						{:else}
+							<table class="w-full">
+								<thead
+									><tr class="border-b border-gray-700"
+										><th class="w-36 pb-2 text-left font-semibold text-gray-400">Class</th><th
+											class="pb-2 text-left font-semibold text-gray-400">Requirement</th
+										></tr
+									></thead
+								>
+								<tbody class="divide-y divide-gray-800">
+									{#each [['Wizard', 'Any ritual tag spell in spellbook — no preparation required. Spellbook must be on hand.'], ['Cleric / Druid', 'Must have the spell prepared that day.'], ['Bard', 'Must know the spell.'], ['Ranger / Paladin', 'Cannot ritual cast by default.'], ['Ritual Caster feat', 'Any class; grants a ritual book with two spells; more can be added. No preparation required.']] as [cls, req]}
+										<tr
+											><td class="py-2 pr-4 align-top font-semibold text-white">{cls}</td><td
+												class="py-2 text-gray-300">{req}</td
+											></tr
+										>
+									{/each}
+								</tbody>
+							</table>
+						{/if}
 					</section>
 
 					<section>
@@ -5004,17 +5088,28 @@
 										<div>
 											Reaction · 60 ft · Trigger: a creature within range begins casting a spell.
 										</div>
-										<div>
-											<strong class="text-white">3rd level or lower</strong>
-											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> automatic
-											counter, no check.
-										</div>
-										<div>
-											<strong class="text-white">4th level+</strong>
-											<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Spellcasting
-											Ability check, DC = 10 + spell level. Upcast to match or exceed the spell level
-											for an automatic counter.
-										</div>
+										{#if ruleset === '2024'}
+											<div>
+												<strong class="text-white">Reworked in 2024</strong> — no more auto-counter
+												by spell level. The target always makes a
+												<strong class="text-white">Constitution save</strong> against
+												<strong class="text-white">your spell save DC</strong>. Failure stops the
+												spell, but unlike 2014, the target does
+												<strong class="text-white">not</strong> lose the spell slot they spent.
+											</div>
+										{:else}
+											<div>
+												<strong class="text-white">3rd level or lower</strong>
+												<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> automatic
+												counter, no check.
+											</div>
+											<div>
+												<strong class="text-white">4th level+</strong>
+												<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Spellcasting
+												Ability check, DC = 10 + spell level. Upcast to match or exceed the spell level
+												for an automatic counter.
+											</div>
+										{/if}
 									</td>
 								</tr>
 								<tr>

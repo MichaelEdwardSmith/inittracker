@@ -1000,16 +1000,18 @@ function createCombatStore() {
 
 		/** Set cumulative exhaustion level (clamped 0-6) and log the change, same as toggleStatus
 		 *  does for flat conditions. 0 is stored as undefined so old saved state without this
-		 *  field reads the same as "not exhausted". Reaching level 4 halves a player's max HP,
-		 *  capping current HP down to the new max if it was higher (same rule the rest of the
-		 *  app already follows whenever max HP drops) — the true max is stashed in
-		 *  preExhaustionMaxHp and restored exactly if exhaustion later drops back below level 4,
-		 *  *without* bumping current HP back up (it stays wherever it was, halved max or not).
-		 *  Reaching level 6 is instant death per RAW — marks a player Dead (0 HP, Dead condition)
-		 *  outright, same end state as failing three death saves, so the rest of the app (card
-		 *  styling, chronicle, etc.) treats it exactly like any other death without needing
-		 *  separate handling. */
-		setExhaustionLevel(id: string, level: number) {
+		 *  field reads the same as "not exhausted". Under 2014 rules, reaching level 4 halves a
+		 *  player's max HP, capping current HP down to the new max if it was higher (same rule
+		 *  the rest of the app already follows whenever max HP drops) — the true max is stashed
+		 *  in preExhaustionMaxHp and restored exactly if exhaustion later drops back below level
+		 *  4, *without* bumping current HP back up (it stays wherever it was, halved max or not).
+		 *  2024 rules dropped the HP-halving effect entirely (exhaustion there only penalizes
+		 *  d20 Tests and Speed, tracked elsewhere), so that branch is skipped for ruleset 2024.
+		 *  Reaching level 6 is instant death in both editions — marks a player Dead (0 HP, Dead
+		 *  condition) outright, same end state as failing three death saves, so the rest of the
+		 *  app (card styling, chronicle, etc.) treats it exactly like any other death without
+		 *  needing separate handling. */
+		setExhaustionLevel(id: string, level: number, ruleset: '2014' | '2024' = '2014') {
 			const clamped = Math.max(0, Math.min(6, level));
 			let combatantRef: Combatant | undefined;
 			let prevLevel = 0;
@@ -1019,7 +1021,12 @@ function createCombatStore() {
 				prevLevel = c.exhaustionLevel ?? 0;
 				let updated: Combatant = { ...c, exhaustionLevel: clamped || undefined };
 
-				if (c.type === 'player' && clamped >= 4 && c.preExhaustionMaxHp === undefined) {
+				if (
+					ruleset === '2014' &&
+					c.type === 'player' &&
+					clamped >= 4 &&
+					c.preExhaustionMaxHp === undefined
+				) {
 					const halvedMaxHp = Math.max(1, Math.floor(c.maxHp / 2));
 					updated = {
 						...updated,
@@ -1027,7 +1034,7 @@ function createCombatStore() {
 						maxHp: halvedMaxHp,
 						currentHp: Math.min(c.currentHp, halvedMaxHp)
 					};
-				} else if (clamped < 4 && c.preExhaustionMaxHp !== undefined) {
+				} else if ((ruleset !== '2014' || clamped < 4) && c.preExhaustionMaxHp !== undefined) {
 					updated = { ...updated, maxHp: c.preExhaustionMaxHp, preExhaustionMaxHp: undefined };
 				}
 

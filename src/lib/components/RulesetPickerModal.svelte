@@ -114,7 +114,7 @@
 					</li>
 					<li class="flex items-center gap-2 text-xs text-gray-500">
 						<span class="h-1.5 w-1.5 rounded-full bg-blue-600/60"></span>
-						Revised Exhaustion (stacking −1 per level)
+						Revised Exhaustion (stacking −2 per level)
 					</li>
 					<li class="flex items-center gap-2 text-xs text-gray-500">
 						<span class="h-1.5 w-1.5 rounded-full bg-blue-600/60"></span>

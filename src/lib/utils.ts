@@ -47,9 +47,9 @@ export const conditionDescriptions: Record<string, string> = {
 // All other conditions fall back to conditionDescriptions (2014).
 const conditionDescriptions2024Overrides: Partial<Record<string, string>> = {
 	Exhausted:
-		'Each level applies a cumulative −1 penalty to all d20 Tests (attack rolls, ability checks, saving throws) and to your Spell Save DC. Speed is also halved at level 5. Death at level 10. A long rest removes one level.',
+		'Each level applies a cumulative −2 penalty per level to all d20 Tests (attack rolls, ability checks, saving throws) and reduces Speed by 5 ft per level. Still 6 levels total — reaching level 6 kills the creature regardless of HP. A long rest removes one level.',
 	Grappled:
-		"Speed is 0 and can't benefit from bonuses to Speed. Ends if the grappler becomes Incapacitated, or if the grappled creature escapes (Athletics or Acrobatics vs. grappler's Athletics).",
+		"Speed is 0 and can't benefit from bonuses to Speed. Ends if the grappler becomes Incapacitated, or if the grappled creature uses its action to succeed on a Strength (Athletics) or Dexterity (Acrobatics) check against a flat DC (8 + grappler's STR modifier + proficiency bonus) rather than a contest.",
 	Incapacitated: "Can't take Actions, Bonus Actions, or Reactions. Can't concentrate.",
 	Prone:
 		'Can only crawl, or spend half Speed to stand up. Disadvantage on attack rolls. Attacks from within 5 ft. have advantage; attacks from farther away have disadvantage.'
@@ -239,32 +239,33 @@ export const XP_THRESHOLDS: Record<number, [number, number, number, number]> = {
 	20: [2800, 5700, 8500, 12700]
 };
 
-// D&D 2024 XP budget per character per level [low, moderate, high, severe, deadly]
+// D&D 2024 XP budget per character per level [low, moderate, high]
 // Encounter difficulty = compare raw monster XP (no multiplier) to budget × party size.
-export const XP_THRESHOLDS_2024: Record<number, [number, number, number, number, number]> = {
-	1: [50, 75, 100, 150, 200],
-	2: [100, 150, 200, 250, 350],
-	3: [150, 225, 400, 550, 700],
-	4: [250, 375, 500, 750, 1100],
-	5: [500, 750, 1100, 1700, 2700],
-	6: [600, 1000, 1400, 2100, 3200],
-	7: [750, 1100, 1700, 2600, 3900],
-	8: [1000, 1400, 2100, 3100, 4700],
-	9: [1300, 1600, 2400, 3700, 5400],
-	10: [1600, 1900, 2800, 4300, 6400],
-	11: [1900, 2400, 3600, 5400, 7800],
-	12: [2200, 3000, 4500, 6600, 9600],
-	13: [2600, 3400, 5100, 7800, 11200],
-	14: [2900, 3800, 5700, 8600, 12400],
-	15: [3300, 4300, 6400, 9800, 14000],
-	16: [3800, 4800, 7200, 10800, 15800],
-	17: [4500, 5900, 8800, 13200, 18800],
-	18: [5000, 6300, 9500, 14300, 20800],
-	19: [5500, 7300, 10900, 16100, 23000],
-	20: [6400, 8500, 12700, 19200, 27200]
+// The 2024 DMG has only three tiers (Low/Moderate/High) — unlike 2014's four.
+export const XP_THRESHOLDS_2024: Record<number, [number, number, number]> = {
+	1: [50, 75, 100],
+	2: [100, 150, 200],
+	3: [150, 225, 400],
+	4: [250, 375, 500],
+	5: [500, 750, 1100],
+	6: [600, 1000, 1400],
+	7: [750, 1300, 1700],
+	8: [1000, 1700, 2100],
+	9: [1300, 2000, 2600],
+	10: [1600, 2300, 3100],
+	11: [1900, 2900, 4100],
+	12: [2200, 3700, 4700],
+	13: [2600, 4200, 5400],
+	14: [2900, 4900, 6200],
+	15: [3300, 5400, 7800],
+	16: [3800, 6100, 9800],
+	17: [4500, 7200, 11700],
+	18: [5000, 8700, 14200],
+	19: [5500, 10700, 17200],
+	20: [6400, 13200, 22000]
 };
 
-export type EncounterDifficulty2024 = 'Trivial' | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Deadly';
+export type EncounterDifficulty2024 = 'Trivial' | 'Low' | 'Moderate' | 'High';
 
 /**
  * 2024 encounter difficulty — no enemy-count multiplier; uses XP budget thresholds.
@@ -279,13 +280,11 @@ export function encounterDifficulty2024(
 ): EncounterDifficulty2024 {
 	if (partySize <= 0 || partyLevel <= 0) return 'Trivial';
 	const level = Math.max(1, Math.min(20, Math.round(partyLevel)));
-	const [low, moderate, high, severe, deadly] = XP_THRESHOLDS_2024[level].map((t) => t * partySize);
+	const [low, moderate, high] = XP_THRESHOLDS_2024[level].map((t) => t * partySize);
 	if (rawXp < low) return 'Trivial';
 	if (rawXp < moderate) return 'Low';
 	if (rawXp < high) return 'Moderate';
-	if (rawXp < severe) return 'High';
-	if (rawXp < deadly) return 'Severe';
-	return 'Deadly';
+	return 'High';
 }
 
 /** D&D 5e encounter multiplier based on total enemy count. */

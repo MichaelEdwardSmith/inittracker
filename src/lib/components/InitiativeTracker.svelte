@@ -971,7 +971,7 @@
 														// Exhaustion stacks by level rather than toggling on/off — start
 														// it at level 1 here; the dedicated Exhaustion row (which
 														// appears once level > 0) handles raising/lowering/clearing.
-														combat.setExhaustionLevel(c.id, active ? 0 : 1);
+														combat.setExhaustionLevel(c.id, active ? 0 : 1, ruleset);
 														openEffectMenuId = null;
 													} else if (active) {
 														combat.toggleStatus(c.id, cond);
@@ -1077,14 +1077,18 @@
 								filledCount={exLevel}
 								dotTitle={(dotIdx) => `Set exhaustion to level ${dotIdx + 1}`}
 								onDotClick={(dotIdx) =>
-									combat.setExhaustionLevel(c.id, exLevel === dotIdx + 1 ? dotIdx : dotIdx + 1)}
+									combat.setExhaustionLevel(
+										c.id,
+										exLevel === dotIdx + 1 ? dotIdx : dotIdx + 1,
+										ruleset
+									)}
 								infoTitle="What is Exhaustion?"
 								onInfoClick={() => (conditionInfo = 'Exhausted')}
 							>
 								{#snippet extra()}
 									<span class="text-xs font-bold text-orange-300">Lvl {exLevel}</span>
 									<button
-										onclick={() => combat.setExhaustionLevel(c.id, 0)}
+										onclick={() => combat.setExhaustionLevel(c.id, 0, ruleset)}
 										title="Clear exhaustion"
 										class="rounded p-1 text-gray-600 transition hover:text-red-400"
 									>
@@ -1193,6 +1197,7 @@
 	<AoEDamageModal
 		onclose={() => (showAoE = false)}
 		onconcentrationchecks={handleAoEConcentrationChecks}
+		{ruleset}
 	/>
 {/if}
 

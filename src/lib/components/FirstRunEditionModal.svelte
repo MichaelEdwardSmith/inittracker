@@ -108,7 +108,7 @@
 				<ul class="space-y-1 text-xs text-gray-300">
 					<li>• 2024 Monster Manual bestiary</li>
 					<li>• 339 spells, flat format</li>
-					<li>• Stacking −1 Exhaustion (10 levels)</li>
+					<li>• Stacking −2/level Exhaustion (6 levels)</li>
 					<li>• XP budget encounter difficulty</li>
 				</ul>
 				{#if selected === '2024'}
