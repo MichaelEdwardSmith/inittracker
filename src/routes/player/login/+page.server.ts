@@ -22,6 +22,11 @@ export const actions: Actions = {
 		if (!result) {
 			return fail(401, { error: 'Invalid email or password.' });
 		}
+		if (result.suspended) {
+			return fail(403, {
+				error: 'This account has been suspended. Contact the system administrator.'
+			});
+		}
 
 		cookies.set('player_auth', result.sessionId, {
 			path: '/',

@@ -8,11 +8,13 @@
        Suspend/Restore — blocks/restores login + dashboard access without touching their data.
        Delete          — permanently removes the account and everything embedded in it.
 
-     Everything else (usage stats, the read-only Inspect link, password reset, JSON export,
-     Make/Remove admin, and this user's slice of the audit log) lives behind a per-row "Details"
-     toggle — collapsed by default so the table stays scannable as the account list grows.
-     Make/Remove admin only appears for the root admin — a promoted admin can't mint further
-     admins (see $lib/server/admin.ts). -->
+     Everything else (usage stats, the read-only Inspect link, a direct Email, password reset,
+     JSON export, Make/Remove admin, and this user's slice of the audit log) lives behind a
+     per-row "Details" toggle — collapsed by default so the table stays scannable as the account
+     list grows. Make/Remove admin only appears for the root admin — a promoted admin can't mint
+     further admins (see $lib/server/admin.ts). The Players tab (same layout, its own table)
+     follows the same pattern: Suspend/Restore/Delete stay as row actions, while Email and Reset
+     password live in that row's Support tools. -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { AdminAuditAction } from '$lib/server/dmModel';
@@ -21,16 +23,25 @@
 	let { data, form } = $props();
 
 	type Filter = 'all' | 'suspended' | 'stale';
+	type EntityTab = 'dms' | 'players';
+	let entityTab = $state<EntityTab>('dms');
 	let search = $state('');
 	let filter = $state<Filter>('all');
 	let expanded = $state<Set<string>>(new Set());
+	let expandedPlayers = $state<Set<string>>(new Set());
 	let dismissedTempPassword = $state(false);
 	let showEmailModal = $state(false);
+	let showPlayerEmailModal = $state(false);
+	let dmEmailTarget = $state<{ sessionId: string; name: string; email: string } | null>(null);
+	let playerEmailTarget = $state<{ sessionId: string; name: string; email: string } | null>(null);
 
 	// Who a broadcast would actually reach: has an email, hasn't unsubscribed, isn't the sender.
 	let emailRecipientCount = $derived(
 		data.dms.filter((dm) => dm.email && !dm.emailOptOut && dm.sessionId !== data.realSessionId)
 			.length
+	);
+	let playerEmailRecipientCount = $derived(
+		data.players.filter((p) => p.email && !p.emailOptOut).length
 	);
 
 	const STALE_MS = 1000 * 60 * 60 * 24 * 90; // 90 days
@@ -45,6 +56,13 @@
 		if (next.has(sessionId)) next.delete(sessionId);
 		else next.add(sessionId);
 		expanded = next;
+	}
+
+	function toggleExpandPlayer(sessionId: string) {
+		const next = new Set(expandedPlayers);
+		if (next.has(sessionId)) next.delete(sessionId);
+		else next.add(sessionId);
+		expandedPlayers = next;
 	}
 
 	function confirmDelete(name: string) {
@@ -98,6 +116,36 @@
 		};
 	}
 
+	function confirmDeletePlayer(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (
+				!confirm(
+					`Permanently delete ${name}'s player account? This removes their joined-session history and notes. This cannot be undone.`
+				)
+			) {
+				cancel();
+			}
+		};
+	}
+
+	function confirmSuspendPlayer(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (!confirm(`Suspend ${name}? They won't be able to log in until you restore them.`))
+				cancel();
+		};
+	}
+
+	function confirmResetPlayerPassword(name: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (
+				!confirm(
+					`Generate a new password for ${name}? Their current password will stop working immediately.`
+				)
+			)
+				cancel();
+		};
+	}
+
 	const actionLabels: Record<AdminAuditAction, string> = {
 		'impersonate-start': 'Started impersonating',
 		'impersonate-stop': 'Stopped impersonating',
@@ -109,8 +157,17 @@
 		'export-data': 'Exported data',
 		'delete-account': 'Deleted account',
 		'email-broadcast': 'Sent broadcast email',
+		'email-dm': 'Sent direct email',
 		'unsubscribe-dm': 'Unsubscribed from admin emails',
-		'resubscribe-dm': 'Resubscribed to admin emails'
+		'resubscribe-dm': 'Resubscribed to admin emails',
+		'suspend-player': 'Suspended account',
+		'unsuspend-player': 'Restored account',
+		'password-reset-player': 'Reset password',
+		'delete-player': 'Deleted account',
+		'email-player': 'Sent direct email',
+		'email-player-broadcast': 'Sent broadcast email',
+		'unsubscribe-player': 'Unsubscribed from admin emails',
+		'resubscribe-player': 'Resubscribed to admin emails'
 	};
 
 	let auditByEmail = $derived.by(() => {
@@ -139,6 +196,22 @@
 		})
 	);
 
+	let filteredPlayers = $derived(
+		data.players.filter((p) => {
+			if (filter === 'suspended' && !p.suspended) return false;
+			if (filter === 'stale') {
+				const last = new Date(p.lastActiveAt ?? p.createdAt).getTime();
+				if (Date.now() - last < STALE_MS) return false;
+			}
+			const q = search.trim().toLowerCase();
+			if (q) {
+				const hay = `${p.displayName} ${p.email ?? ''}`.toLowerCase();
+				if (!hay.includes(q)) return false;
+			}
+			return true;
+		})
+	);
+
 	// New temp password just came back from the resetPassword action — surface it and reset the
 	// dismiss state so a second reset (for the same or a different DM) shows its own banner.
 	$effect(() => {
@@ -158,16 +231,30 @@
 					<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> System Admin
 				</h1>
 				<p class="mt-1 text-sm text-gray-500">
-					Logged in as {data.dmFirstName} · every DM account that has accessed this system.
+					Logged in as {data.dmFirstName} ·
+					{#if entityTab === 'dms'}
+						every DM account that has accessed this system.
+					{:else}
+						every player account that has logged in.
+					{/if}
 				</p>
 			</div>
 			<div class="flex items-center gap-2">
-				<button
-					onclick={() => (showEmailModal = true)}
-					class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
-				>
-					<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email DMs
-				</button>
+				{#if entityTab === 'dms'}
+					<button
+						onclick={() => (showEmailModal = true)}
+						class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
+					>
+						<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email DMs
+					</button>
+				{:else}
+					<button
+						onclick={() => (showPlayerEmailModal = true)}
+						class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
+					>
+						<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email Players
+					</button>
+				{/if}
 				<a
 					href="/dashboard"
 					class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
@@ -177,11 +264,62 @@
 			</div>
 		</header>
 
+		<!-- DMs / Players tab switcher -->
+		<div class="mb-4 flex w-fit rounded border border-gray-700 bg-gray-900 text-sm">
+			<button
+				onclick={() => (entityTab = 'dms')}
+				class="px-4 py-1.5 transition {entityTab === 'dms'
+					? 'bg-amber-900/40 text-amber-300'
+					: 'text-gray-400 hover:text-gray-200'}"
+			>
+				<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> DMs ({data.dms.length})
+			</button>
+			<button
+				onclick={() => (entityTab = 'players')}
+				class="px-4 py-1.5 transition {entityTab === 'players'
+					? 'bg-amber-900/40 text-amber-300'
+					: 'text-gray-400 hover:text-gray-200'}"
+			>
+				<i class="fa-duotone fa-light fa-users" aria-hidden="true"></i> Players ({data.players
+					.length})
+			</button>
+		</div>
+
 		{#if showEmailModal}
 			<AdminEmailModal
+				audience="dm"
 				recipientCount={emailRecipientCount}
 				sentEmails={data.sentEmails}
 				onclose={() => (showEmailModal = false)}
+			/>
+		{/if}
+
+		{#if showPlayerEmailModal}
+			<AdminEmailModal
+				audience="player"
+				recipientCount={playerEmailRecipientCount}
+				sentEmails={data.playerSentEmails}
+				onclose={() => (showPlayerEmailModal = false)}
+			/>
+		{/if}
+
+		{#if dmEmailTarget}
+			<AdminEmailModal
+				audience="dm"
+				recipientCount={1}
+				sentEmails={data.sentEmails}
+				target={dmEmailTarget}
+				onclose={() => (dmEmailTarget = null)}
+			/>
+		{/if}
+
+		{#if playerEmailTarget}
+			<AdminEmailModal
+				audience="player"
+				recipientCount={1}
+				sentEmails={data.playerSentEmails}
+				target={playerEmailTarget}
+				onclose={() => (playerEmailTarget = null)}
 			/>
 		{/if}
 
@@ -236,113 +374,423 @@
 					</button>
 				{/each}
 			</div>
-			<span class="text-xs text-gray-600">{filteredDms.length} of {data.dms.length}</span>
+			<span class="text-xs text-gray-600"
+				>{entityTab === 'dms'
+					? `${filteredDms.length} of ${data.dms.length}`
+					: `${filteredPlayers.length} of ${data.players.length}`}</span
+			>
 		</div>
 
-		<div class="overflow-x-auto rounded-lg border border-gray-800">
-			<table class="w-full min-w-[820px] border-collapse text-sm">
-				<thead>
-					<tr
-						class="border-b border-gray-800 bg-gray-900 text-left text-xs tracking-wider text-gray-500 uppercase"
-					>
-						<th class="px-4 py-3 font-medium"></th>
-						<th class="px-4 py-3 font-medium">Name</th>
-						<th class="px-4 py-3 font-medium">Email</th>
-						<th class="px-4 py-3 font-medium">Status</th>
-						<th class="px-4 py-3 text-center font-medium">Subscribed</th>
-						<th class="px-4 py-3 font-medium">Signed up</th>
-						<th class="px-4 py-3 font-medium">Last active</th>
-						<th class="px-4 py-3 font-medium"></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each filteredDms as dm (dm.sessionId)}
-						{@const isSelf = dm.sessionId === data.realSessionId}
-						{@const isExpanded = expanded.has(dm.sessionId)}
-						{@const auditEntries = auditByEmail.get(dm.email) ?? []}
-						<tr class="border-b border-gray-800/60 bg-gray-900/40 hover:bg-gray-900">
-							<td class="px-4 py-3">
-								<button
-									onclick={() => toggleExpand(dm.sessionId)}
-									class="rounded p-1 text-gray-500 transition hover:text-amber-400"
-									title={isExpanded ? 'Hide details' : 'Show details'}
-									aria-expanded={isExpanded}
-								>
-									<i
-										class="fa-duotone fa-light fa-chevron-right text-sm transition-transform {isExpanded
-											? 'rotate-90'
-											: ''}"
-										aria-hidden="true"
-									></i>
-								</button>
-							</td>
-							<td class="px-4 py-3 font-semibold text-gray-100">
-								<div>
-									{dm.firstName}
-									{dm.lastName}
-									{#if isSelf}<span class="ml-1 text-xs font-normal text-gray-600">(you)</span>{/if}
-								</div>
-								{#if dm.isAdmin}
-									<span
-										class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
-										title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
+		{#if entityTab === 'dms'}
+			<div class="overflow-x-auto rounded-lg border border-gray-800">
+				<table class="w-full min-w-[820px] border-collapse text-sm">
+					<thead>
+						<tr
+							class="border-b border-gray-800 bg-gray-900 text-left text-xs tracking-wider text-gray-500 uppercase"
+						>
+							<th class="px-4 py-3 font-medium"></th>
+							<th class="px-4 py-3 font-medium">Name</th>
+							<th class="px-4 py-3 font-medium">Email</th>
+							<th class="px-4 py-3 font-medium">Status</th>
+							<th class="px-4 py-3 text-center font-medium">Subscribed</th>
+							<th class="px-4 py-3 font-medium">Signed up</th>
+							<th class="px-4 py-3 font-medium">Last active</th>
+							<th class="px-4 py-3 font-medium"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredDms as dm (dm.sessionId)}
+							{@const isSelf = dm.sessionId === data.realSessionId}
+							{@const isExpanded = expanded.has(dm.sessionId)}
+							{@const auditEntries = auditByEmail.get(dm.email) ?? []}
+							<tr class="border-b border-gray-800/60 bg-gray-900/40 hover:bg-gray-900">
+								<td class="px-4 py-3">
+									<button
+										onclick={() => toggleExpand(dm.sessionId)}
+										class="rounded p-1 text-gray-500 transition hover:text-amber-400"
+										title={isExpanded ? 'Hide details' : 'Show details'}
+										aria-expanded={isExpanded}
 									>
-										{#if dm.isRootAdmin}<i class="fa-duotone fa-light fa-star" aria-hidden="true"
-											></i> Root Admin{:else}Admin{/if}
-									</span>
-								{/if}
-							</td>
-							<td class="px-4 py-3 text-gray-400">{dm.email}</td>
-							<td class="px-4 py-3">
-								{#if dm.suspended}
-									<span
-										class="rounded border border-red-800 bg-red-950/40 px-2 py-0.5 text-xs text-red-400"
-										>Suspended</span
-									>
-								{:else}
-									<span
-										class="rounded border border-green-800 bg-green-950/40 px-2 py-0.5 text-xs text-green-400"
-										>Active</span
-									>
-								{/if}
-							</td>
-							<td class="px-4 py-3 text-center">
-								<form method="POST" action="?/setEmailSubscription" use:enhance>
-									<input type="hidden" name="sessionId" value={dm.sessionId} />
-									<label
-										class="inline-flex cursor-pointer items-center justify-center"
-										title={dm.emailOptOut
-											? 'Unsubscribed from admin broadcast emails — click to resubscribe'
-											: 'Subscribed to admin broadcast emails — click to unsubscribe'}
-									>
-										<input
-											type="checkbox"
-											name="subscribed"
-											value="true"
-											checked={!dm.emailOptOut}
-											onchange={(e) => e.currentTarget.form?.requestSubmit()}
-											class="h-5 w-5 cursor-pointer accent-amber-500"
-										/>
-									</label>
-								</form>
-							</td>
-							<td class="px-4 py-3 text-gray-500">{formatDate(dm.createdAt)}</td>
-							<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastActiveAt)}</td>
-							<td class="px-4 py-3 text-right">
-								{#if !isSelf}
-									<div class="flex justify-end gap-2">
-										<form method="POST" action="?/impersonate" use:enhance>
-											<input type="hidden" name="sessionId" value={dm.sessionId} />
-											<button
-												type="submit"
-												class="rounded border border-amber-700/60 bg-amber-900/20 px-3 py-1 text-xs font-semibold text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
-											>
-												Enter dashboard
-											</button>
-										</form>
-										{#if dm.suspended}
-											<form method="POST" action="?/unsuspend" use:enhance>
+										<i
+											class="fa-duotone fa-light fa-chevron-right text-sm transition-transform {isExpanded
+												? 'rotate-90'
+												: ''}"
+											aria-hidden="true"
+										></i>
+									</button>
+								</td>
+								<td class="px-4 py-3 font-semibold text-gray-100">
+									<div>
+										{dm.firstName}
+										{dm.lastName}
+										{#if isSelf}<span class="ml-1 text-xs font-normal text-gray-600">(you)</span
+											>{/if}
+									</div>
+									{#if dm.isAdmin}
+										<span
+											class="mt-1 inline-block rounded border border-amber-700/60 bg-amber-900/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide whitespace-nowrap text-amber-300 uppercase"
+											title={dm.isRootAdmin ? 'Root admin' : 'Promoted admin'}
+										>
+											{#if dm.isRootAdmin}<i class="fa-duotone fa-light fa-star" aria-hidden="true"
+												></i> Root Admin{:else}Admin{/if}
+										</span>
+									{/if}
+								</td>
+								<td class="px-4 py-3 text-gray-400">{dm.email}</td>
+								<td class="px-4 py-3">
+									{#if dm.suspended}
+										<span
+											class="rounded border border-red-800 bg-red-950/40 px-2 py-0.5 text-xs text-red-400"
+											>Suspended</span
+										>
+									{:else}
+										<span
+											class="rounded border border-green-800 bg-green-950/40 px-2 py-0.5 text-xs text-green-400"
+											>Active</span
+										>
+									{/if}
+								</td>
+								<td class="px-4 py-3 text-center">
+									<form method="POST" action="?/setEmailSubscription" use:enhance>
+										<input type="hidden" name="sessionId" value={dm.sessionId} />
+										<label
+											class="inline-flex cursor-pointer items-center justify-center"
+											title={dm.emailOptOut
+												? 'Unsubscribed from admin broadcast emails — click to resubscribe'
+												: 'Subscribed to admin broadcast emails — click to unsubscribe'}
+										>
+											<input
+												type="checkbox"
+												name="subscribed"
+												value="true"
+												checked={!dm.emailOptOut}
+												onchange={(e) => e.currentTarget.form?.requestSubmit()}
+												class="h-5 w-5 cursor-pointer accent-amber-500"
+											/>
+										</label>
+									</form>
+								</td>
+								<td class="px-4 py-3 text-gray-500">{formatDate(dm.createdAt)}</td>
+								<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastActiveAt)}</td>
+								<td class="px-4 py-3 text-right">
+									{#if !isSelf}
+										<div class="flex justify-end gap-2">
+											<form method="POST" action="?/impersonate" use:enhance>
 												<input type="hidden" name="sessionId" value={dm.sessionId} />
+												<button
+													type="submit"
+													class="rounded border border-amber-700/60 bg-amber-900/20 px-3 py-1 text-xs font-semibold text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
+												>
+													Enter dashboard
+												</button>
+											</form>
+											{#if dm.suspended}
+												<form method="POST" action="?/unsuspend" use:enhance>
+													<input type="hidden" name="sessionId" value={dm.sessionId} />
+													<button
+														type="submit"
+														class="rounded border border-green-800/60 bg-green-950/20 px-3 py-1 text-xs font-semibold text-green-300 transition hover:border-green-600 hover:bg-green-900/40"
+													>
+														Restore
+													</button>
+												</form>
+											{:else}
+												<form
+													method="POST"
+													action="?/suspend"
+													use:enhance={confirmSuspend(`${dm.firstName} ${dm.lastName}`)}
+												>
+													<input type="hidden" name="sessionId" value={dm.sessionId} />
+													<button
+														type="submit"
+														class="rounded border border-gray-600 bg-gray-800/60 px-3 py-1 text-xs font-semibold text-gray-300 transition hover:border-gray-500 hover:bg-gray-800"
+													>
+														Suspend
+													</button>
+												</form>
+											{/if}
+											<form
+												method="POST"
+												action="?/delete"
+												use:enhance={confirmDelete(`${dm.firstName} ${dm.lastName}`)}
+											>
+												<input type="hidden" name="sessionId" value={dm.sessionId} />
+												<button
+													type="submit"
+													class="rounded border border-red-800/60 bg-red-950/20 px-3 py-1 text-xs font-semibold text-red-300 transition hover:border-red-600 hover:bg-red-900/40"
+												>
+													Delete
+												</button>
+											</form>
+										</div>
+									{/if}
+								</td>
+							</tr>
+							{#if isExpanded}
+								<tr class="border-b border-gray-800/60 bg-black/20">
+									<td colspan="8" class="px-6 py-4">
+										<div class="flex flex-wrap gap-6">
+											<!-- Usage stats -->
+											<div>
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+												>
+													Usage
+												</p>
+												<div class="flex flex-wrap gap-1.5 text-xs">
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{dm.gameSessionCount} session{dm.gameSessionCount === 1
+															? ''
+															: 's'}</span
+													>
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{dm.customMonsterCount} custom monster{dm.customMonsterCount === 1
+															? ''
+															: 's'}</span
+													>
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{dm.encounterCount} saved encounter{dm.encounterCount === 1
+															? ''
+															: 's'}</span
+													>
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{dm.combatHistoryCount} combat record{dm.combatHistoryCount === 1
+															? ''
+															: 's'}</span
+													>
+												</div>
+											</div>
+
+											<!-- Support tools -->
+											{#if !isSelf}
+												<div>
+													<p
+														class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+													>
+														Support tools
+													</p>
+													<div class="flex flex-wrap items-center gap-2 text-xs">
+														{#if dm.activeSessionPublicId}
+															<a
+																href="/display/{dm.activeSessionPublicId}"
+																target="_blank"
+																rel="noopener noreferrer"
+																class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-blue-500 hover:text-blue-300"
+															>
+																Inspect (read-only)
+																<i
+																	class="fa-duotone fa-light fa-arrow-up-right-from-square"
+																	aria-hidden="true"
+																></i>
+															</a>
+														{/if}
+														{#if dm.email}
+															<button
+																onclick={() =>
+																	(dmEmailTarget = {
+																		sessionId: dm.sessionId,
+																		name: `${dm.firstName} ${dm.lastName}`,
+																		email: dm.email
+																	})}
+																class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-amber-500 hover:text-amber-300"
+															>
+																Email
+															</button>
+														{/if}
+														<form
+															method="POST"
+															action="?/resetPassword"
+															use:enhance={confirmResetPassword(`${dm.firstName} ${dm.lastName}`)}
+														>
+															<input type="hidden" name="sessionId" value={dm.sessionId} />
+															<button
+																type="submit"
+																title={dm.hasPassword
+																	? 'Generates a new password, shown once, for you to relay to them'
+																	: 'This account currently uses OAuth only — this adds a password login option'}
+																class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-amber-500 hover:text-amber-300"
+															>
+																Reset password
+															</button>
+														</form>
+														<a
+															href="/admin/export/{dm.sessionId}"
+															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
+														>
+															Export JSON v
+														</a>
+														{#if data.isRootAdmin && !dm.isRootAdmin}
+															{#if dm.isAdmin}
+																<form
+																	method="POST"
+																	action="?/demote"
+																	use:enhance={confirmDemote(`${dm.firstName} ${dm.lastName}`)}
+																>
+																	<input type="hidden" name="sessionId" value={dm.sessionId} />
+																	<button
+																		type="submit"
+																		class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
+																	>
+																		Remove admin
+																	</button>
+																</form>
+															{:else}
+																<form
+																	method="POST"
+																	action="?/promote"
+																	use:enhance={confirmPromote(`${dm.firstName} ${dm.lastName}`)}
+																>
+																	<input type="hidden" name="sessionId" value={dm.sessionId} />
+																	<button
+																		type="submit"
+																		class="rounded border border-amber-700/60 bg-amber-900/20 px-2.5 py-1 text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
+																	>
+																		Make admin
+																	</button>
+																</form>
+															{/if}
+														{/if}
+													</div>
+												</div>
+											{/if}
+
+											<!-- Activity log — this DM's slice of the admin audit trail -->
+											<div class="min-w-[240px] flex-1">
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+												>
+													Activity log
+												</p>
+												{#if auditEntries.length === 0}
+													<p class="text-xs text-gray-600">
+														No admin actions recorded for this account.
+													</p>
+												{:else}
+													<ul class="space-y-1 text-xs text-gray-400">
+														{#each auditEntries as entry, i (i)}
+															<li>
+																<span class="text-gray-300"
+																	>{actionLabels[entry.action] ?? entry.action}</span
+																>
+																<span class="text-gray-600"
+																	>by {entry.adminEmail} · {formatDate(entry.at)}</span
+																>
+															</li>
+														{/each}
+													</ul>
+												{/if}
+											</div>
+										</div>
+									</td>
+								</tr>
+							{/if}
+						{/each}
+					</tbody>
+				</table>
+			</div>
+
+			{#if filteredDms.length === 0}
+				<p class="mt-6 text-center text-gray-500">
+					{data.dms.length === 0 ? 'No DM accounts yet.' : 'No accounts match your search/filter.'}
+				</p>
+			{/if}
+		{:else}
+			<div class="overflow-x-auto rounded-lg border border-gray-800">
+				<table class="w-full min-w-[820px] border-collapse text-sm">
+					<thead>
+						<tr
+							class="border-b border-gray-800 bg-gray-900 text-left text-xs tracking-wider text-gray-500 uppercase"
+						>
+							<th class="px-4 py-3 font-medium"></th>
+							<th class="px-4 py-3 font-medium">Name</th>
+							<th class="px-4 py-3 font-medium">Email</th>
+							<th class="px-4 py-3 font-medium">Status</th>
+							<th class="px-4 py-3 text-center font-medium">Subscribed</th>
+							<th class="px-4 py-3 font-medium">Signed up</th>
+							<th class="px-4 py-3 font-medium">Last active</th>
+							<th class="px-4 py-3 font-medium"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredPlayers as p (p.sessionId)}
+							{@const isExpanded = expandedPlayers.has(p.sessionId)}
+							{@const auditEntries = p.email ? (auditByEmail.get(p.email) ?? []) : []}
+							<tr class="border-b border-gray-800/60 bg-gray-900/40 hover:bg-gray-900">
+								<td class="px-4 py-3">
+									<button
+										onclick={() => toggleExpandPlayer(p.sessionId)}
+										class="rounded p-1 text-gray-500 transition hover:text-amber-400"
+										title={isExpanded ? 'Hide details' : 'Show details'}
+										aria-expanded={isExpanded}
+									>
+										<i
+											class="fa-duotone fa-light fa-chevron-right text-sm transition-transform {isExpanded
+												? 'rotate-90'
+												: ''}"
+											aria-hidden="true"
+										></i>
+									</button>
+								</td>
+								<td class="px-4 py-3 font-semibold text-gray-100">
+									<div>{p.displayName}</div>
+									{#if p.oauthProviders.length}
+										<div class="mt-1 flex gap-1.5 text-[11px] text-gray-500">
+											{#each p.oauthProviders as provider (provider)}
+												<span
+													><i class="fa-brands fa-{provider}" aria-hidden="true"></i>
+													{provider}</span
+												>
+											{/each}
+										</div>
+									{/if}
+								</td>
+								<td class="px-4 py-3 text-gray-400">{p.email ?? '—'}</td>
+								<td class="px-4 py-3">
+									{#if p.suspended}
+										<span
+											class="rounded border border-red-800 bg-red-950/40 px-2 py-0.5 text-xs text-red-400"
+											>Suspended</span
+										>
+									{:else}
+										<span
+											class="rounded border border-green-800 bg-green-950/40 px-2 py-0.5 text-xs text-green-400"
+											>Active</span
+										>
+									{/if}
+								</td>
+								<td class="px-4 py-3 text-center">
+									{#if p.email}
+										<form method="POST" action="?/setPlayerEmailSubscription" use:enhance>
+											<input type="hidden" name="sessionId" value={p.sessionId} />
+											<label
+												class="inline-flex cursor-pointer items-center justify-center"
+												title={p.emailOptOut
+													? 'Unsubscribed from admin broadcast emails — click to resubscribe'
+													: 'Subscribed to admin broadcast emails — click to unsubscribe'}
+											>
+												<input
+													type="checkbox"
+													name="subscribed"
+													value="true"
+													checked={!p.emailOptOut}
+													onchange={(e) => e.currentTarget.form?.requestSubmit()}
+													class="h-5 w-5 cursor-pointer accent-amber-500"
+												/>
+											</label>
+										</form>
+									{/if}
+								</td>
+								<td class="px-4 py-3 text-gray-500">{formatDate(p.createdAt)}</td>
+								<td class="px-4 py-3 text-gray-500">{formatDate(p.lastActiveAt)}</td>
+								<td class="px-4 py-3 text-right">
+									<div class="flex justify-end gap-2">
+										{#if p.suspended}
+											<form method="POST" action="?/unsuspendPlayer" use:enhance>
+												<input type="hidden" name="sessionId" value={p.sessionId} />
 												<button
 													type="submit"
 													class="rounded border border-green-800/60 bg-green-950/20 px-3 py-1 text-xs font-semibold text-green-300 transition hover:border-green-600 hover:bg-green-900/40"
@@ -353,10 +801,10 @@
 										{:else}
 											<form
 												method="POST"
-												action="?/suspend"
-												use:enhance={confirmSuspend(`${dm.firstName} ${dm.lastName}`)}
+												action="?/suspendPlayer"
+												use:enhance={confirmSuspendPlayer(p.displayName)}
 											>
-												<input type="hidden" name="sessionId" value={dm.sessionId} />
+												<input type="hidden" name="sessionId" value={p.sessionId} />
 												<button
 													type="submit"
 													class="rounded border border-gray-600 bg-gray-800/60 px-3 py-1 text-xs font-semibold text-gray-300 transition hover:border-gray-500 hover:bg-gray-800"
@@ -367,10 +815,10 @@
 										{/if}
 										<form
 											method="POST"
-											action="?/delete"
-											use:enhance={confirmDelete(`${dm.firstName} ${dm.lastName}`)}
+											action="?/deletePlayer"
+											use:enhance={confirmDeletePlayer(p.displayName)}
 										>
-											<input type="hidden" name="sessionId" value={dm.sessionId} />
+											<input type="hidden" name="sessionId" value={p.sessionId} />
 											<button
 												type="submit"
 												class="rounded border border-red-800/60 bg-red-950/20 px-3 py-1 text-xs font-semibold text-red-300 transition hover:border-red-600 hover:bg-red-900/40"
@@ -379,46 +827,38 @@
 											</button>
 										</form>
 									</div>
-								{/if}
-							</td>
-						</tr>
-						{#if isExpanded}
-							<tr class="border-b border-gray-800/60 bg-black/20">
-								<td colspan="8" class="px-6 py-4">
-									<div class="flex flex-wrap gap-6">
-										<!-- Usage stats -->
-										<div>
-											<p class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-												Usage
-											</p>
-											<div class="flex flex-wrap gap-1.5 text-xs">
-												<span
-													class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
-													>{dm.gameSessionCount} session{dm.gameSessionCount === 1 ? '' : 's'}</span
+								</td>
+							</tr>
+							{#if isExpanded}
+								<tr class="border-b border-gray-800/60 bg-black/20">
+									<td colspan="8" class="px-6 py-4">
+										<div class="flex flex-wrap gap-6">
+											<!-- Usage stats -->
+											<div>
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
 												>
-												<span
-													class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
-													>{dm.customMonsterCount} custom monster{dm.customMonsterCount === 1
-														? ''
-														: 's'}</span
-												>
-												<span
-													class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
-													>{dm.encounterCount} saved encounter{dm.encounterCount === 1
-														? ''
-														: 's'}</span
-												>
-												<span
-													class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
-													>{dm.combatHistoryCount} combat record{dm.combatHistoryCount === 1
-														? ''
-														: 's'}</span
-												>
+													Usage
+												</p>
+												<div class="flex flex-wrap gap-1.5 text-xs">
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{p.joinedSessionCount} joined session{p.joinedSessionCount === 1
+															? ''
+															: 's'}</span
+													>
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{p.noteCount} note{p.noteCount === 1 ? '' : 's'}</span
+													>
+													<span
+														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
+														>{p.hasPassword ? 'Has password' : 'OAuth only'}</span
+													>
+												</div>
 											</div>
-										</div>
 
-										<!-- Support tools -->
-										{#if !isSelf}
+											<!-- Support tools -->
 											<div>
 												<p
 													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
@@ -426,29 +866,28 @@
 													Support tools
 												</p>
 												<div class="flex flex-wrap items-center gap-2 text-xs">
-													{#if dm.activeSessionPublicId}
-														<a
-															href="/display/{dm.activeSessionPublicId}"
-															target="_blank"
-															rel="noopener noreferrer"
-															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-blue-500 hover:text-blue-300"
+													{#if p.email}
+														<button
+															onclick={() =>
+																(playerEmailTarget = {
+																	sessionId: p.sessionId,
+																	name: p.displayName,
+																	email: p.email as string
+																})}
+															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-amber-500 hover:text-amber-300"
 														>
-															Inspect (read-only)
-															<i
-																class="fa-duotone fa-light fa-arrow-up-right-from-square"
-																aria-hidden="true"
-															></i>
-														</a>
+															Email
+														</button>
 													{/if}
 													<form
 														method="POST"
-														action="?/resetPassword"
-														use:enhance={confirmResetPassword(`${dm.firstName} ${dm.lastName}`)}
+														action="?/resetPlayerPassword"
+														use:enhance={confirmResetPlayerPassword(p.displayName)}
 													>
-														<input type="hidden" name="sessionId" value={dm.sessionId} />
+														<input type="hidden" name="sessionId" value={p.sessionId} />
 														<button
 															type="submit"
-															title={dm.hasPassword
+															title={p.hasPassword
 																? 'Generates a new password, shown once, for you to relay to them'
 																: 'This account currently uses OAuth only — this adds a password login option'}
 															class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-amber-500 hover:text-amber-300"
@@ -456,84 +895,51 @@
 															Reset password
 														</button>
 													</form>
-													<a
-														href="/admin/export/{dm.sessionId}"
-														class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
-													>
-														Export JSON v
-													</a>
-													{#if data.isRootAdmin && !dm.isRootAdmin}
-														{#if dm.isAdmin}
-															<form
-																method="POST"
-																action="?/demote"
-																use:enhance={confirmDemote(`${dm.firstName} ${dm.lastName}`)}
-															>
-																<input type="hidden" name="sessionId" value={dm.sessionId} />
-																<button
-																	type="submit"
-																	class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-gray-300 transition hover:border-gray-500 hover:text-gray-100"
-																>
-																	Remove admin
-																</button>
-															</form>
-														{:else}
-															<form
-																method="POST"
-																action="?/promote"
-																use:enhance={confirmPromote(`${dm.firstName} ${dm.lastName}`)}
-															>
-																<input type="hidden" name="sessionId" value={dm.sessionId} />
-																<button
-																	type="submit"
-																	class="rounded border border-amber-700/60 bg-amber-900/20 px-2.5 py-1 text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
-																>
-																	Make admin
-																</button>
-															</form>
-														{/if}
-													{/if}
 												</div>
 											</div>
-										{/if}
 
-										<!-- Activity log — this DM's slice of the admin audit trail -->
-										<div class="min-w-[240px] flex-1">
-											<p class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-												Activity log
-											</p>
-											{#if auditEntries.length === 0}
-												<p class="text-xs text-gray-600">
-													No admin actions recorded for this account.
+											<!-- Activity log — this player's slice of the admin audit trail -->
+											<div class="min-w-[240px] flex-1">
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+												>
+													Activity log
 												</p>
-											{:else}
-												<ul class="space-y-1 text-xs text-gray-400">
-													{#each auditEntries as entry, i (i)}
-														<li>
-															<span class="text-gray-300"
-																>{actionLabels[entry.action] ?? entry.action}</span
-															>
-															<span class="text-gray-600"
-																>by {entry.adminEmail} · {formatDate(entry.at)}</span
-															>
-														</li>
-													{/each}
-												</ul>
-											{/if}
+												{#if auditEntries.length === 0}
+													<p class="text-xs text-gray-600">
+														No admin actions recorded for this account.
+													</p>
+												{:else}
+													<ul class="space-y-1 text-xs text-gray-400">
+														{#each auditEntries as entry, i (i)}
+															<li>
+																<span class="text-gray-300"
+																	>{actionLabels[entry.action] ?? entry.action}</span
+																>
+																<span class="text-gray-600"
+																	>by {entry.adminEmail} · {formatDate(entry.at)}</span
+																>
+															</li>
+														{/each}
+													</ul>
+												{/if}
+											</div>
 										</div>
-									</div>
-								</td>
-							</tr>
-						{/if}
-					{/each}
-				</tbody>
-			</table>
-		</div>
+									</td>
+								</tr>
+							{/if}
+						{/each}
+					</tbody>
+				</table>
+			</div>
 
-		{#if filteredDms.length === 0}
-			<p class="mt-6 text-center text-gray-500">
-				{data.dms.length === 0 ? 'No DM accounts yet.' : 'No accounts match your search/filter.'}
-			</p>
+			{#if filteredPlayers.length === 0}
+				<p class="mt-6 text-center text-gray-500">
+					{data.players.length === 0
+						? 'No player accounts yet.'
+						: 'No accounts match your search/filter.'}
+				</p>
+			{/if}
 		{/if}
 	</div>
 </div>

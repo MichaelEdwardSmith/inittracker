@@ -212,20 +212,21 @@ const markdownToEmailHtml = new Marked({ renderer: emailRenderer });
 export function adminBroadcastEmail(
 	subject: string,
 	body: string,
-	unsubscribeLink: string
+	unsubscribeLink: string,
+	accountLabel: string = 'Dungeon Master'
 ): { subject: string; html: string; text: string } {
 	const bodyHtml = markdownToEmailHtml.parse(body, { async: false }) as string;
 	const html = wrapper(
 		subject,
 		`${bodyHtml}
 		<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid #2a2a35;font-size:11px;color:#666;">
-			You're receiving this because you have a Dungeon Master account on Initiative Tracker.
+			You're receiving this because you have a ${accountLabel} account on Initiative Tracker.
 			<a href="${unsubscribeLink}" style="color:#888;">Unsubscribe from these emails</a>.
 		</p>`
 	);
 	// Plain-text fallback keeps the raw Markdown source — readable enough for a text-only client,
 	// and consistent with how most Markdown-authored emails degrade.
-	const text = `${body}\n\n---\nYou're receiving this because you have a Dungeon Master account on Initiative Tracker.\nUnsubscribe: ${unsubscribeLink}`;
+	const text = `${body}\n\n---\nYou're receiving this because you have a ${accountLabel} account on Initiative Tracker.\nUnsubscribe: ${unsubscribeLink}`;
 	return { subject, html, text };
 }
 

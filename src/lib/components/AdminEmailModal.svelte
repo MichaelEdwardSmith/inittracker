@@ -1,8 +1,9 @@
-<!-- "Email DMs" modal on /admin — compose a branded broadcast email to every DM who hasn't
-     unsubscribed. Test sends the exact same template to dm@inittracker.com only, so the admin
-     can see it before blasting everyone. Fully self-contained: handles its own POST results
-     via use:enhance callbacks rather than the page's shared `form` prop, so reopening the modal
-     never replays a stale previous result. -->
+<!-- "Email DMs"/"Email Players" modal on /admin — compose a branded broadcast email to every
+     DM/player who hasn't unsubscribed, or (with `target` set) a direct message to one DM or
+     player from their row's Support tools. Test sends the exact same template to
+     dm@inittracker.com only, so the admin can see it before blasting everyone. Fully
+     self-contained: handles its own POST results via use:enhance callbacks rather than the
+     page's shared `form` prop, so reopening the modal never replays a stale previous result. -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { tick } from 'svelte';
@@ -10,12 +11,24 @@
 	import type { SentEmailEntry } from '$lib/server/dmModel';
 
 	interface Props {
+		audience: 'dm' | 'player';
 		recipientCount: number;
 		sentEmails: SentEmailEntry[];
 		onclose: () => void;
+		/** When set, sends directly to this one DM/player instead of broadcasting — used by their
+		 *  row's Support tools "Email" action. */
+		target?: { sessionId: string; name: string; email: string };
 	}
 
-	let { recipientCount, sentEmails, onclose }: Props = $props();
+	let { audience, recipientCount, sentEmails, onclose, target }: Props = $props();
+
+	let audienceNoun = $derived(audience === 'player' ? 'Player' : 'Dungeon Master');
+	let audienceNounPlural = $derived(audience === 'player' ? 'Players' : 'Dungeon Masters');
+	let testAction = $derived(audience === 'player' ? '?/sendTestEmailPlayer' : '?/sendTestEmail');
+	let broadcastAction = $derived(
+		audience === 'player' ? '?/sendBroadcastPlayer' : '?/sendBroadcast'
+	);
+	let directAction = $derived(audience === 'player' ? '?/sendPlayerEmail' : '?/sendEmail');
 
 	let subject = $state('');
 	let body = $state('');
@@ -152,7 +165,7 @@
 	const handleSend: SubmitFunction = ({ cancel }) => {
 		if (
 			!confirm(
-				`Send this email to ${recipientCount} Dungeon Master${recipientCount === 1 ? '' : 's'}? This can't be undone.`
+				`Send this email to ${recipientCount} ${audienceNoun}${recipientCount === 1 ? '' : 's'}? This can't be undone.`
 			)
 		) {
 			cancel();
@@ -174,6 +187,30 @@
 			}
 		};
 	};
+
+	// Direct single-recipient send (target set) — same composer, different confirm text and a
+	// simpler success state (no sent/failed counts, just "sent" or not).
+	let directSent = $state(false);
+	const handleDirectSend: SubmitFunction = ({ cancel }) => {
+		if (!target) return;
+		if (!confirm(`Send this email to ${target.name} (${target.email})?`)) {
+			cancel();
+			return;
+		}
+		emailError = '';
+		sending = true;
+		return async ({ result }) => {
+			sending = false;
+			if (result.type === 'failure') {
+				emailError = (result.data?.emailError as string) ?? 'Failed to send.';
+			} else if (result.type === 'success') {
+				directSent = true;
+				const logged = result.data?.loggedEmail as SentEmailEntry | undefined;
+				if (logged) history = [logged, ...history];
+				setTimeout(() => onclose(), 1800);
+			}
+		};
+	};
 </script>
 
 <div
@@ -182,7 +219,8 @@
 	<div class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
 		<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
 			<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">
-				<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email Dungeon Masters
+				<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i>
+				{#if target}Email {target.name}{:else}Email {audienceNounPlural}{/if}
 			</h2>
 			<button
 				onclick={onclose}
@@ -193,12 +231,19 @@
 			</button>
 		</div>
 
-		{#if broadcastResult}
+		{#if directSent}
+			<div class="flex flex-col items-center gap-3 px-5 py-10 text-center">
+				<i class="fa-duotone fa-light fa-paper-plane text-3xl text-emerald-400" aria-hidden="true"
+				></i>
+				<p class="text-sm font-semibold text-emerald-400">Sent to {target?.name}.</p>
+			</div>
+		{:else if broadcastResult}
 			<div class="flex flex-col items-center gap-3 px-5 py-10 text-center">
 				<i class="fa-duotone fa-light fa-paper-plane text-3xl text-emerald-400" aria-hidden="true"
 				></i>
 				<p class="text-sm font-semibold text-emerald-400">
-					Sent to {broadcastResult.sent} Dungeon Master{broadcastResult.sent === 1 ? '' : 's'}.
+					Sent to {broadcastResult.sent}
+					{audienceNoun}{broadcastResult.sent === 1 ? '' : 's'}.
 				</p>
 				{#if broadcastResult.failed}
 					<p class="text-xs text-red-400">{broadcastResult.failed} failed to send.</p>
@@ -207,11 +252,15 @@
 		{:else}
 			<div class="flex flex-col gap-4 px-5 py-5">
 				<p class="text-xs text-gray-500">
-					Sends to <span class="text-gray-300">{recipientCount}</span> Dungeon Master{recipientCount ===
-					1
-						? ''
-						: 's'} who haven't unsubscribed. Automatically wrapped in the Initiative Tracker branded template
-					with an unsubscribe link.
+					{#if target}
+						Sends directly to <span class="text-gray-300">{target.name}</span> ({target.email}),
+						regardless of their broadcast subscription. Automatically wrapped in the Initiative
+						Tracker branded template.
+					{:else}
+						Sends to <span class="text-gray-300">{recipientCount}</span>
+						{audienceNoun}{recipientCount === 1 ? '' : 's'} who haven't unsubscribed. Automatically wrapped
+						in the Initiative Tracker branded template with an unsubscribe link.
+					{/if}
 				</p>
 
 				<div class="flex flex-col gap-1.5">
@@ -250,6 +299,7 @@
 							<form method="POST" action="/admin?/previewEmail" use:enhance={handlePreview}>
 								<input type="hidden" name="subject" value={subject} />
 								<input type="hidden" name="body" value={body} />
+								<input type="hidden" name="audience" value={audience} />
 								<button
 									type="submit"
 									disabled={!body.trim() || loadingPreview}
@@ -377,28 +427,43 @@
 				{/if}
 
 				<div class="flex items-center justify-end gap-2 pt-1">
-					<form method="POST" action="/admin?/sendTestEmail" use:enhance={handleTest}>
-						<input type="hidden" name="subject" value={subject} />
-						<input type="hidden" name="body" value={body} />
-						<button
-							type="submit"
-							disabled={!subject.trim() || !body.trim() || testing}
-							class="rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-sm font-bold text-gray-300 transition hover:border-amber-500 hover:text-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							{testing ? 'Sending…' : 'Test'}
-						</button>
-					</form>
-					<form method="POST" action="/admin?/sendBroadcast" use:enhance={handleSend}>
-						<input type="hidden" name="subject" value={subject} />
-						<input type="hidden" name="body" value={body} />
-						<button
-							type="submit"
-							disabled={!subject.trim() || !body.trim() || sending}
-							class="rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							{sending ? 'Sending…' : `Send to ${recipientCount}`}
-						</button>
-					</form>
+					{#if target}
+						<form method="POST" action="/admin{directAction}" use:enhance={handleDirectSend}>
+							<input type="hidden" name="sessionId" value={target.sessionId} />
+							<input type="hidden" name="subject" value={subject} />
+							<input type="hidden" name="body" value={body} />
+							<button
+								type="submit"
+								disabled={!subject.trim() || !body.trim() || sending}
+								class="rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+							>
+								{sending ? 'Sending…' : 'Send'}
+							</button>
+						</form>
+					{:else}
+						<form method="POST" action="/admin{testAction}" use:enhance={handleTest}>
+							<input type="hidden" name="subject" value={subject} />
+							<input type="hidden" name="body" value={body} />
+							<button
+								type="submit"
+								disabled={!subject.trim() || !body.trim() || testing}
+								class="rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-sm font-bold text-gray-300 transition hover:border-amber-500 hover:text-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
+							>
+								{testing ? 'Sending…' : 'Test'}
+							</button>
+						</form>
+						<form method="POST" action="/admin{broadcastAction}" use:enhance={handleSend}>
+							<input type="hidden" name="subject" value={subject} />
+							<input type="hidden" name="body" value={body} />
+							<button
+								type="submit"
+								disabled={!subject.trim() || !body.trim() || sending}
+								class="rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+							>
+								{sending ? 'Sending…' : `Send to ${recipientCount}`}
+							</button>
+						</form>
+					{/if}
 				</div>
 			</div>
 		{/if}

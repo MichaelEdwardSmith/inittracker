@@ -4,7 +4,7 @@
 // multi-session schema on first access.
 import bcrypt from 'bcryptjs';
 import { randomUUID, randomBytes, createHash } from 'crypto';
-import type { WithId, Document } from 'mongodb';
+import type { WithId, Document, Filter } from 'mongodb';
 import { getDb } from './db';
 import { isRootAdminEmail } from './admin';
 import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
@@ -1036,6 +1036,10 @@ export interface SentEmailEntry {
 	recipientCount: number;
 	failedCount: number;
 	sentAt: Date;
+	/** Who this was sent to — a broadcast ('dm'/'player') or a single targeted message
+	 *  ('dm-direct'/'player-direct'). Absent on entries logged before this field existed, which
+	 *  are all DM broadcasts. */
+	audience?: 'dm' | 'player' | 'dm-direct' | 'player-direct';
 }
 
 async function sentEmailsCol() {
@@ -1056,10 +1060,22 @@ export async function logSentEmail(
 	return full;
 }
 
-/** Returns past sent emails, newest first, capped so the History tab stays light. */
-export async function listSentEmails(limit = 50): Promise<SentEmailEntry[]> {
+/** Returns past sent emails, newest first, capped so the History tab stays light. Filtering by
+ *  'dm' includes legacy entries with no `audience` field (everything predates the Players tab,
+ *  so they're all DM broadcasts); 'player' only matches broadcasts explicitly tagged as such. */
+export async function listSentEmails(
+	limit = 50,
+	audience?: 'dm' | 'player'
+): Promise<SentEmailEntry[]> {
 	const c = await sentEmailsCol();
-	return c.find({}, { projection: { _id: 0 }, sort: { sentAt: -1 }, limit }).toArray();
+	const playerAudiences: SentEmailEntry['audience'][] = ['player', 'player-direct'];
+	const query: Filter<SentEmailEntry> =
+		audience === 'player'
+			? { audience: { $in: playerAudiences } }
+			: audience === 'dm'
+				? { audience: { $nin: playerAudiences } }
+				: {};
+	return c.find(query, { projection: { _id: 0 }, sort: { sentAt: -1 }, limit }).toArray();
 }
 
 /**
@@ -1091,8 +1107,17 @@ export type AdminAuditAction =
 	| 'export-data'
 	| 'delete-account'
 	| 'email-broadcast'
+	| 'email-dm'
 	| 'unsubscribe-dm'
-	| 'resubscribe-dm';
+	| 'resubscribe-dm'
+	| 'suspend-player'
+	| 'unsuspend-player'
+	| 'password-reset-player'
+	| 'delete-player'
+	| 'email-player'
+	| 'email-player-broadcast'
+	| 'unsubscribe-player'
+	| 'resubscribe-player';
 
 export interface AdminAuditEntry {
 	adminEmail: string;

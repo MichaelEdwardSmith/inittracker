@@ -2,7 +2,7 @@
 // Lighter weight: display name, email, optional Google OAuth, optional avatar.
 // Stored in the 'players' MongoDB collection.
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes } from 'crypto';
 import { getDb } from './db';
 import type { NoteEntry } from '$lib/types';
 import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
@@ -14,6 +14,15 @@ function randomSessionId(): string {
 		{ length: 6 },
 		() => SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)]
 	).join('');
+}
+
+// Readable charset for admin-generated temporary passwords — avoids visually ambiguous
+// characters (0/O, 1/l/I) since these get read aloud or typed from a screen. Mirrors dmModel.ts.
+const TEMP_PASSWORD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+
+function randomTempPassword(length = 14): string {
+	const bytes = randomBytes(length);
+	return Array.from(bytes, (b) => TEMP_PASSWORD_CHARS[b % TEMP_PASSWORD_CHARS.length]).join('');
 }
 
 export interface PlayerSession {
@@ -39,6 +48,15 @@ export interface Player {
 	passwordResetExpiresAt?: Date;
 	emailVerifyTokenHash?: string;
 	emailVerifyExpiresAt?: Date;
+	/** Set by an admin via the /admin Players tab — blocks login and clears any live session
+	 *  (see the suspension check in hooks.server.ts). Mirrors DM.suspendedAt. */
+	suspendedAt?: Date;
+	/** True once this player has clicked the unsubscribe link on an admin broadcast email.
+	 *  Mirrors DM.emailOptOut. */
+	emailOptOut?: boolean;
+	/** Persistent, non-expiring token embedded in admin broadcast emails' unsubscribe link.
+	 *  Mirrors DM.unsubscribeToken. */
+	unsubscribeToken?: string;
 }
 
 async function col() {
@@ -142,7 +160,7 @@ export async function createPlayer(
 export async function loginPlayer(
 	email: string,
 	password: string
-): Promise<{ sessionId: string } | null> {
+): Promise<{ sessionId: string; suspended: boolean } | null> {
 	const c = await col();
 	const player = await c.findOne({ email: email.toLowerCase() });
 	if (!player || !player.passwordHash) return null;
@@ -150,7 +168,7 @@ export async function loginPlayer(
 	const valid = await bcrypt.compare(password, player.passwordHash);
 	if (!valid) return null;
 
-	return { sessionId: player.sessionId };
+	return { sessionId: player.sessionId, suspended: !!player.suspendedAt };
 }
 
 // ---------------------------------------------------------------------------
@@ -367,4 +385,183 @@ export async function deletePlayerNote(playerSessionId: string, noteId: string):
 	if (!player) return;
 	const notes: NoteEntry[] = (player.notes ?? []).filter((n: NoteEntry) => n.id !== noteId);
 	await c.updateOne({ sessionId: playerSessionId }, { $set: { notes } });
+}
+
+// ---------------------------------------------------------------------------
+// Admin — system-wide player listing + moderation. Mirrors the equivalent section in
+// dmModel.ts. Gated by isAdminDM() at the route level (see src/lib/server/admin.ts and
+// src/routes/admin/+page.server.ts); these functions themselves are not access-controlled.
+// ---------------------------------------------------------------------------
+export interface PlayerSummary {
+	displayName: string;
+	email: string | null;
+	/** Auth sessionId — pass to the suspend/delete/reset-password/email actions to target this account. */
+	sessionId: string;
+	createdAt: Date;
+	/** Most recent lastSeen across every game session this player has joined, or null if never. */
+	lastActiveAt: Date | null;
+	suspended: boolean;
+	/** False for OAuth-only accounts that have never had a password set. */
+	hasPassword: boolean;
+	oauthProviders: ('google' | 'discord')[];
+	joinedSessionCount: number;
+	noteCount: number;
+	emailOptOut: boolean;
+}
+
+/** Returns every player account in the system, most recently active first. */
+export async function listAllPlayers(): Promise<PlayerSummary[]> {
+	const c = await col();
+	const players = await c.find({}).toArray();
+
+	return players
+		.map((p) => {
+			const joined = p.joinedSessions ?? [];
+			const lastActiveAt = joined.length
+				? joined.reduce(
+						(latest, s) => (new Date(s.lastSeen) > latest ? new Date(s.lastSeen) : latest),
+						new Date(joined[0].lastSeen)
+					)
+				: null;
+			const oauthProviders: ('google' | 'discord')[] = [];
+			if (p.oauth?.google) oauthProviders.push('google');
+			if (p.oauth?.discord) oauthProviders.push('discord');
+			return {
+				displayName: p.displayName,
+				email: p.email,
+				sessionId: p.sessionId,
+				createdAt: p.createdAt,
+				lastActiveAt,
+				suspended: !!p.suspendedAt,
+				hasPassword: !!p.passwordHash,
+				oauthProviders,
+				joinedSessionCount: joined.length,
+				noteCount: p.notes?.length ?? 0,
+				emailOptOut: !!p.emailOptOut
+			};
+		})
+		.sort((a, b) => {
+			const at = a.lastActiveAt ?? a.createdAt;
+			const bt = b.lastActiveAt ?? b.createdAt;
+			return new Date(bt).getTime() - new Date(at).getTime();
+		});
+}
+
+/** Suspends a player account — blocks login and any live /join or /display session (see
+ *  hooks.server.ts). */
+export async function suspendPlayer(
+	playerSessionId: string
+): Promise<{ ok: boolean; email?: string | null; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return { ok: false, error: 'Player account not found.' };
+	await c.updateOne({ sessionId: playerSessionId }, { $set: { suspendedAt: new Date() } });
+	return { ok: true, email: player.email };
+}
+
+/** Lifts a suspension, restoring normal access. */
+export async function unsuspendPlayer(
+	playerSessionId: string
+): Promise<{ ok: boolean; email?: string | null; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return { ok: false, error: 'Player account not found.' };
+	await c.updateOne({ sessionId: playerSessionId }, { $unset: { suspendedAt: '' } });
+	return { ok: true, email: player.email };
+}
+
+/**
+ * Generates a new random password for a locked-out player and returns it in plaintext — shown
+ * once in the admin UI for the admin to relay out-of-band. Works for OAuth-only accounts too,
+ * giving them a password-login fallback.
+ */
+export async function adminResetPlayerPassword(
+	playerSessionId: string
+): Promise<{ ok: boolean; email?: string | null; tempPassword?: string; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return { ok: false, error: 'Player account not found.' };
+
+	const tempPassword = randomTempPassword();
+	const passwordHash = await bcrypt.hash(tempPassword, 12);
+	await c.updateOne({ sessionId: playerSessionId }, { $set: { passwordHash } });
+
+	return { ok: true, email: player.email, tempPassword };
+}
+
+/** Permanently deletes a player account (joined-session history, notes, everything embedded). */
+export async function deletePlayerAccount(
+	playerSessionId: string
+): Promise<{ ok: boolean; email?: string | null; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return { ok: false, error: 'Player account not found.' };
+	await c.deleteOne({ sessionId: playerSessionId });
+	return { ok: true, email: player.email };
+}
+
+// ---------------------------------------------------------------------------
+// Admin broadcast email — "Email Players" on /admin's Players tab (see mail.ts
+// adminBroadcastEmail()). Mirrors the equivalent DM section in dmModel.ts.
+// ---------------------------------------------------------------------------
+
+/** Returns this player's unsubscribe token, generating and persisting one on first use. */
+export async function getOrCreatePlayerUnsubscribeToken(
+	playerSessionId: string
+): Promise<string | null> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return null;
+	if (player.unsubscribeToken) return player.unsubscribeToken;
+
+	const token = generateToken();
+	await c.updateOne({ sessionId: playerSessionId }, { $set: { unsubscribeToken: token } });
+	return token;
+}
+
+/** Read-only lookup for the unsubscribe confirmation page — does not unsubscribe anyone. */
+export async function getEmailByPlayerUnsubscribeToken(token: string): Promise<string | null> {
+	const c = await col();
+	const player = await c.findOne({ unsubscribeToken: token });
+	return player?.email ?? null;
+}
+
+/** Opts a player out of future admin broadcast emails. Called only from the unsubscribe page's
+ *  POST action. */
+export async function unsubscribePlayerByToken(
+	token: string
+): Promise<{ ok: boolean; email?: string | null }> {
+	const c = await col();
+	const player = await c.findOne({ unsubscribeToken: token });
+	if (!player) return { ok: false };
+	await c.updateOne({ sessionId: player.sessionId }, { $set: { emailOptOut: true } });
+	return { ok: true, email: player.email };
+}
+
+/** Directly sets a player's subscription state from the admin panel's checkbox. */
+export async function setPlayerEmailOptOut(
+	playerSessionId: string,
+	optOut: boolean
+): Promise<{ ok: boolean; email?: string | null; error?: string }> {
+	const c = await col();
+	const player = await c.findOne({ sessionId: playerSessionId });
+	if (!player) return { ok: false, error: 'Player account not found.' };
+	await c.updateOne({ sessionId: playerSessionId }, { $set: { emailOptOut: optOut } });
+	return { ok: true, email: player.email };
+}
+
+/** Players eligible to receive an admin broadcast email — has an email and hasn't opted out. */
+export async function getPlayerEmailBlastRecipients(): Promise<
+	{ sessionId: string; email: string; displayName: string }[]
+> {
+	const c = await col();
+	const players = await c
+		.find(
+			{ email: { $ne: null }, emailOptOut: { $ne: true } },
+			{ projection: { sessionId: 1, email: 1, displayName: 1, _id: 0 } }
+		)
+		.toArray();
+	return players
+		.filter((p): p is typeof p & { email: string } => !!p.email)
+		.map((p) => ({ sessionId: p.sessionId, email: p.email, displayName: p.displayName }));
 }

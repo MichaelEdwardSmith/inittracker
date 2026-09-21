@@ -34,7 +34,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
 	if (playerSessionId && (pathname === '/join' || pathname.startsWith('/display/'))) {
 		const player = await getPlayerBySessionId(playerSessionId);
-		if (player) {
+		if (player && player.suspendedAt) {
+			// Suspended via /admin's Players tab — log them out immediately, same as a stale cookie.
+			event.cookies.delete('player_auth', { path: '/' });
+		} else if (player) {
 			event.locals.playerName = player.displayName;
 			event.locals.playerAvatarUrl = player.avatarUrl ?? null;
 		} else {

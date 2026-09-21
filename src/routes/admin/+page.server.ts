@@ -10,11 +10,17 @@
 //   setEmailSubscription — toggles a DM's admin-broadcast subscription (the checkbox in the table).
 //   sendTestEmail  — sends the composed broadcast to dm@inittracker.com only, for previewing.
 //   sendBroadcast  — sends the composed broadcast to every DM who hasn't unsubscribed.
+//   sendEmail      — direct message to a single DM from their row's Support tools, bypassing
+//                     their broadcast opt-out since it's a targeted contact, not marketing.
 //   previewEmail   — renders the composer's Markdown to HTML without sending anything.
 // All except stop/impersonate-cancel/sendTestEmail/previewEmail are logged to the adminAudit
-// collection. sendTestEmail and sendBroadcast both additionally log the subject/body Markdown
-// to the separate `sentEmails` collection (see dmModel.ts logSentEmail/listSentEmails), which
-// backs the composer's History tab — adminAudit only keeps a one-line summary, not the body.
+// collection. sendTestEmail, sendBroadcast, and sendEmail all additionally log the subject/body
+// Markdown to the separate `sentEmails` collection (see dmModel.ts logSentEmail/listSentEmails),
+// which backs the composer's History tab — adminAudit only keeps a one-line summary, not the body.
+//
+// The Players tab mirrors all of this with its own action set (suspendPlayer, unsuspendPlayer,
+// resetPlayerPassword, deletePlayer, setPlayerEmailSubscription, sendTestEmailPlayer,
+// sendBroadcastPlayer, sendPlayerEmail). See playerModel.ts for the underlying model functions.
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
@@ -33,6 +39,17 @@ import {
 	listSentEmails,
 	setEmailOptOut
 } from '$lib/server/dmModel';
+import {
+	listAllPlayers,
+	getPlayerBySessionId,
+	suspendPlayer,
+	unsuspendPlayer,
+	adminResetPlayerPassword,
+	deletePlayerAccount,
+	getOrCreatePlayerUnsubscribeToken,
+	getPlayerEmailBlastRecipients,
+	setPlayerEmailOptOut
+} from '$lib/server/playerModel';
 import { authToGameSession, authToRuleset } from '$lib/server/sessionCache';
 import { sessionStates, sessionClients } from '$lib/server/sseState';
 import { sendMail, adminBroadcastEmail, appBaseUrl, isMailConfigured } from '$lib/server/mail';
@@ -40,18 +57,22 @@ import { sendMail, adminBroadcastEmail, appBaseUrl, isMailConfigured } from '$li
 const TEST_EMAIL_RECIPIENT = 'dm@inittracker.com';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [dms, auditLog, sentEmails] = await Promise.all([
+	const [dms, players, auditLog, sentEmails, playerSentEmails] = await Promise.all([
 		listAllDMs(),
+		listAllPlayers(),
 		listAdminAudit(),
-		listSentEmails()
+		listSentEmails(50, 'dm'),
+		listSentEmails(50, 'player')
 	]);
 	return {
 		dmFirstName: locals.dmFirstName ?? '',
 		realSessionId: locals.realSessionId,
 		isRootAdmin: locals.isRootAdmin,
 		dms,
+		players,
 		auditLog,
-		sentEmails
+		sentEmails,
+		playerSentEmails
 	};
 };
 
@@ -374,16 +395,349 @@ export const actions: Actions = {
 		return { broadcastSent: sentCount, broadcastFailed: failedCount, loggedEmail };
 	},
 
+	// Direct message to a single DM — used by the row's Support tools "Email" action rather than
+	// the broadcast composer. Bypasses emailOptOut: this is a targeted moderation/support contact,
+	// not marketing, the same way a password reset isn't blocked by it either.
+	sendEmail: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!targetSessionId || !subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
+
+		const dm = await getDMBySessionId(targetSessionId);
+		if (!dm?.email) return fail(404, { emailError: 'DM account not found.' });
+
+		const token = await getOrCreateUnsubscribeToken(targetSessionId);
+		const { html, text } = adminBroadcastEmail(
+			subject,
+			body,
+			`${appBaseUrl()}/unsubscribe/${token}`
+		);
+		const sent = await sendMail({ to: dm.email, subject, html, text, tag: 'admin-direct' });
+		if (!sent) {
+			return fail(502, {
+				emailError: 'Postmark rejected the send — check the server logs for details.'
+			});
+		}
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'email-dm',
+			targetEmail: dm.email,
+			targetSessionId,
+			detail: subject
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: false,
+			recipientCount: 1,
+			failedCount: 0,
+			audience: 'dm-direct'
+		});
+
+		return { directSent: true, loggedEmail };
+	},
+
 	previewEmail: async ({ request, locals }) => {
 		if (!locals.isAdmin) return fail(403);
 
 		const data = await request.formData();
 		const subject = ((data.get('subject') as string) ?? '').trim() || 'Subject';
 		const body = (data.get('body') as string) ?? '';
+		const accountLabel = data.get('audience') === 'player' ? 'Player' : 'Dungeon Master';
 
 		// '#' unsubscribe link — this never sends anything, just renders the Markdown so the
 		// composer can see formatting/images before using Test or Send.
-		const { html } = adminBroadcastEmail(subject, body, '#');
+		const { html } = adminBroadcastEmail(subject, body, '#', accountLabel);
 		return { previewHtml: html };
+	},
+
+	// -------------------------------------------------------------------------
+	// Player moderation — mirrors the DM actions above (suspend/unsuspend/resetPassword/delete/
+	// setEmailSubscription), plus a direct single-recipient send. See playerModel.ts.
+	// -------------------------------------------------------------------------
+
+	suspendPlayer: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await suspendPlayer(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'Player account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'suspend-player',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { playerSuspended: true };
+	},
+
+	unsuspendPlayer: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await unsuspendPlayer(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'Player account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'unsuspend-player',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { playerUnsuspended: true };
+	},
+
+	resetPlayerPassword: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await adminResetPlayerPassword(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'Player account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'password-reset-player',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { tempPassword: result.tempPassword, tempPasswordFor: result.email };
+	},
+
+	deletePlayer: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await deletePlayerAccount(targetSessionId);
+		if (!result.ok) return fail(404, { error: result.error ?? 'Player account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'delete-player',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { playerDeleted: true };
+	},
+
+	setPlayerEmailSubscription: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+		const subscribed = data.get('subscribed') === 'true';
+
+		const result = await setPlayerEmailOptOut(targetSessionId, !subscribed);
+		if (!result.ok) return fail(404, { error: result.error ?? 'Player account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: subscribed ? 'resubscribe-player' : 'unsubscribe-player',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { playerSubscriptionUpdated: true };
+	},
+
+	sendTestEmailPlayer: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.realSessionId || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
+
+		const token = await getOrCreateUnsubscribeToken(locals.realSessionId);
+		const { html, text } = adminBroadcastEmail(
+			subject,
+			body,
+			`${appBaseUrl()}/unsubscribe/${token}`,
+			'Player'
+		);
+		const sent = await sendMail({
+			to: TEST_EMAIL_RECIPIENT,
+			subject: `[TEST] ${subject}`,
+			html,
+			text,
+			tag: 'admin-test-player'
+		});
+		if (!sent) {
+			return fail(502, {
+				emailError: 'Postmark rejected the send — check the server logs for details.'
+			});
+		}
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: true,
+			recipientCount: 1,
+			failedCount: 0,
+			audience: 'player'
+		});
+
+		return { testSent: true, loggedEmail };
+	},
+
+	sendBroadcastPlayer: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
+
+		const recipients = await getPlayerEmailBlastRecipients();
+		const results = await Promise.allSettled(
+			recipients.map(async (r) => {
+				const token = await getOrCreatePlayerUnsubscribeToken(r.sessionId);
+				const { html, text } = adminBroadcastEmail(
+					subject,
+					body,
+					`${appBaseUrl()}/unsubscribe/${token}`,
+					'Player'
+				);
+				const sent = await sendMail({
+					to: r.email,
+					subject,
+					html,
+					text,
+					tag: 'admin-broadcast-player'
+				});
+				if (!sent) throw new Error(`Failed to send to ${r.email}`);
+			})
+		);
+		const sentCount = results.filter((r) => r.status === 'fulfilled').length;
+		const failedCount = results.length - sentCount;
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'email-player-broadcast',
+			targetEmail: `${sentCount} recipient${sentCount === 1 ? '' : 's'}`,
+			targetSessionId: 'broadcast',
+			detail: subject
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: false,
+			recipientCount: sentCount,
+			failedCount,
+			audience: 'player'
+		});
+
+		return { broadcastSent: sentCount, broadcastFailed: failedCount, loggedEmail };
+	},
+
+	// Direct message to a single player — used by the row-level "Email" action rather than the
+	// broadcast composer. Bypasses emailOptOut: this is a targeted moderation/support contact,
+	// not marketing, the same way a password reset isn't blocked by it either.
+	sendPlayerEmail: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		if (!targetSessionId || !subject || !body) {
+			return fail(400, { emailError: 'Subject and message body are required.' });
+		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
+
+		const player = await getPlayerBySessionId(targetSessionId);
+		if (!player?.email) return fail(404, { emailError: 'Player account not found.' });
+
+		const token = await getOrCreatePlayerUnsubscribeToken(targetSessionId);
+		const { html, text } = adminBroadcastEmail(
+			subject,
+			body,
+			`${appBaseUrl()}/unsubscribe/${token}`,
+			'Player'
+		);
+		const sent = await sendMail({
+			to: player.email,
+			subject,
+			html,
+			text,
+			tag: 'admin-direct-player'
+		});
+		if (!sent) {
+			return fail(502, {
+				emailError: 'Postmark rejected the send — check the server logs for details.'
+			});
+		}
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'email-player',
+			targetEmail: player.email,
+			targetSessionId,
+			detail: subject
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: false,
+			recipientCount: 1,
+			failedCount: 0,
+			audience: 'player-direct'
+		});
+
+		return { directSent: true, loggedEmail };
 	}
 };
