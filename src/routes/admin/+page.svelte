@@ -19,6 +19,7 @@
 	import { enhance } from '$app/forms';
 	import type { AdminAuditAction } from '$lib/server/dmModel';
 	import AdminEmailModal from '$lib/components/AdminEmailModal.svelte';
+	import AdminStatsPanel from '$lib/components/AdminStatsPanel.svelte';
 
 	let { data, form } = $props();
 
@@ -263,6 +264,8 @@
 				</a>
 			</div>
 		</header>
+
+		<AdminStatsPanel dms={data.dms} players={data.players} auditLog={data.auditLog} />
 
 		<!-- DMs / Players tab switcher -->
 		<div class="mb-4 flex w-fit rounded border border-gray-700 bg-gray-900 text-sm">
