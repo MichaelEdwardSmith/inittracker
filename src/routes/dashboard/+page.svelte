@@ -875,6 +875,17 @@
 				{/if}
 			</button>
 		{/if}
+		<a
+			href="https://www.buymeacoffee.com/inittracker"
+			target="_blank"
+			rel="noopener noreferrer"
+			onclick={() => (showMobileMenu = false)}
+			title="Support the project"
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-gray-500 transition hover:bg-red-900/30 hover:text-red-400"
+		>
+			<i class="fa-duotone fa-light fa-mug-hot shrink-0 text-base" aria-hidden="true"></i>
+			Buy Me A Coffee
+		</a>
 		<form method="POST" action="/logout" class="border-t border-gray-700">
 			<button
 				type="submit"

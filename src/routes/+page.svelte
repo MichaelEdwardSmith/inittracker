@@ -18,7 +18,42 @@
 		return { destroy: () => observer.disconnect() };
 	}
 
-	const features = [
+	// Tilts/shifts the node away from the cursor on hover
+	function tiltAway(node: HTMLElement) {
+		if (!browser) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		const maxRotate = 8; // deg
+		const maxOffset = 16; // px
+
+		function handleMove(e: MouseEvent) {
+			const rect = node.getBoundingClientRect();
+			const px = (e.clientX - rect.left) / rect.width - 0.5;
+			const py = (e.clientY - rect.top) / rect.height - 0.5;
+			const rotateY = -px * maxRotate * 2;
+			const rotateX = py * maxRotate * 2;
+			const translateX = -px * maxOffset;
+			const translateY = -py * maxOffset;
+			node.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate(${translateX}px, ${translateY}px)`;
+		}
+
+		function handleLeave() {
+			node.style.transform = '';
+		}
+
+		node.addEventListener('mousemove', handleMove);
+		node.addEventListener('mouseleave', handleLeave);
+
+		return {
+			destroy: () => {
+				node.removeEventListener('mousemove', handleMove);
+				node.removeEventListener('mouseleave', handleLeave);
+			}
+		};
+	}
+
+	// Core combat-tracking features — shown as full cards with screenshots
+	const coreFeatures = [
 		{
 			icon: '<i class="fa-duotone fa-light fa-swords"></i>',
 			title: 'Initiative Order',
@@ -69,61 +104,71 @@
 			screenshot: '/screenshots/SessionNotes.jpg'
 		},
 		{
-			icon: '<i class="fa-duotone fa-light fa-music"></i>',
-			title: 'Audio Mixer',
-			desc: 'Set the mood with built-in ambient soundscapes and music tracks. Mix volume levels for atmosphere without leaving the dashboard.',
-			color: 'text-pink-400',
-			screenshot: '/screenshots/AudioMixer.jpg'
-		},
-		{
 			icon: '<i class="fa-duotone fa-light fa-book-open"></i>',
 			title: 'Quick Reference',
 			desc: 'Instant access to conditions, actions, cover rules, exhaustion levels, and common DC tables — right inside the tracker.',
 			color: 'text-indigo-400',
 			screenshot: '/screenshots/QuickReference.jpg'
+		}
+	];
+
+	// Prep & worldbuilding extras — shown as a compact icon strip
+	const extraFeatures = [
+		{
+			icon: '<i class="fa-duotone fa-light fa-music"></i>',
+			title: 'Audio Mixer',
+			desc: 'Ambient soundscapes and music, mixed live from the dashboard.',
+			color: 'text-pink-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-city"></i>',
 			title: 'Town Generator',
-			desc: 'Generate fully detailed towns with unique NPCs, factions, districts, shops, and local lore — ready to drop into any campaign.',
-			color: 'text-orange-400',
-			screenshot: '/screenshots/TownGenerator.jpg'
+			desc: 'Full towns with NPCs, factions, districts, and shops.',
+			color: 'text-orange-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-map"></i>',
 			title: 'Dungeon Generator',
-			desc: 'Procedurally generate dungeon maps with interconnected rooms, traps, secret doors, encounters, and treasure hoards.',
-			color: 'text-slate-400',
-			screenshot: '/screenshots/DungeonGenerator.jpg'
+			desc: 'Procedural maps with rooms, traps, and treasure.',
+			color: 'text-slate-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-beer-mug-empty"></i>',
 			title: 'Inn Generator',
-			desc: "Generate richly detailed inns complete with staff, regulars, today's menu, rumors heard over ale, and adventure hooks.",
-			color: 'text-teal-400',
-			screenshot: '/screenshots/InnGenerator.jpg'
+			desc: 'Staff, regulars, menus, rumors, and adventure hooks.',
+			color: 'text-teal-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-cloud-sun-rain"></i>',
 			title: 'Weather & Travel',
-			desc: 'Generate season- and biome-aware weather, 7-day forecasts, weather events, travel pace, and navigation DCs for any journey.',
-			color: 'text-sky-400',
-			screenshot: '/screenshots/WeatherGenerator.jpg'
+			desc: 'Biome-aware forecasts, travel pace, and navigation DCs.',
+			color: 'text-sky-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-dice"></i>',
 			title: 'Random Encounter',
-			desc: 'Build balanced random encounters by difficulty and party size, with monster selections drawn from the full 5e bestiary.',
-			color: 'text-lime-400',
-			screenshot: '/screenshots/EncounterGenerator.jpg'
+			desc: 'Balanced encounters by difficulty and party size.',
+			color: 'text-lime-400'
 		},
 		{
 			icon: '<i class="fa-duotone fa-light fa-id-badge"></i>',
 			title: 'Name Generator',
-			desc: 'Generate names for any race and gender in seconds — humans, elves, dwarves, halflings, and more, with authentic phonetic patterns.',
-			color: 'text-rose-400',
-			screenshot: '/screenshots/NameGenerator.jpg'
+			desc: 'Authentic names for any race and gender, in seconds.',
+			color: 'text-rose-400'
+		},
+		{
+			icon: '<i class="fa-duotone fa-light fa-shop"></i>',
+			title: 'Shop Generator',
+			desc: 'Stocked shops with priced wares, from general goods to magic items.',
+			color: 'text-emerald-400'
 		}
+	];
+
+	const trustBadges = [
+		'Free forever',
+		'No credit card required',
+		'No install needed',
+		'D&D 5e & 5.5e ready'
 	];
 
 	const steps = [
@@ -259,6 +304,18 @@
 					</button>
 				</form>
 			</div>
+
+			<!-- Trust strip -->
+			<div
+				class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-gray-500"
+			>
+				{#each trustBadges as badge}
+					<div class="flex items-center gap-2">
+						<i class="fa-duotone fa-light fa-check text-green-600" aria-hidden="true"></i>
+						<span>{badge}</span>
+					</div>
+				{/each}
+			</div>
 		</div>
 
 		<!-- Player join link -->
@@ -272,9 +329,10 @@
 		</div>
 
 		<!-- Hero screenshot mockup -->
-		<div class="hero-fade relative mx-auto mt-10 w-full max-w-5xl" use:fadeIn>
+		<div class="fade-in relative mx-auto mt-10 w-full max-w-5xl" use:fadeIn>
 			<div
-				class="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/80 shadow-2xl shadow-black/60"
+				class="tilt-card overflow-hidden rounded-xl border border-gray-800 bg-gray-900/80 shadow-2xl shadow-black/60"
+				use:tiltAway
 			>
 				<!-- Mock browser chrome -->
 				<div class="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3">
@@ -291,7 +349,7 @@
 					<img
 						src="/screenshots/Dashboard.jpg"
 						alt="Initiative Tracker dashboard"
-						class="aspect-[16/9] w-full object-cover transition hover:opacity-90"
+						class="h-auto w-full object-contain transition hover:opacity-90"
 					/>
 				</a>
 			</div>
@@ -315,27 +373,19 @@
 				</p>
 			</div>
 
-			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{#each features as feature}
+			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+				{#each coreFeatures as feature}
 					<div
-						class="group rounded-xl border border-gray-800 bg-gray-900/60 p-6 transition hover:border-gray-700 hover:bg-gray-900"
+						class="fade-in group rounded-xl border border-gray-800 bg-gray-900/60 p-6 transition hover:border-gray-700 hover:bg-gray-900"
 						use:fadeIn
 					>
-						{#if feature.screenshot}
-							<a href={feature.screenshot} target="_blank" rel="noopener noreferrer">
-								<img
-									src={feature.screenshot}
-									alt={feature.title}
-									class="mb-5 aspect-video w-full rounded-lg border border-gray-800/80 object-cover transition hover:opacity-90"
-								/>
-							</a>
-						{:else}
-							<div
-								class="mb-5 flex aspect-video w-full items-center justify-center rounded-lg border border-gray-800/80 bg-gray-950/60"
-							>
-								<span class="text-4xl opacity-20 {feature.color}">{@html feature.icon}</span>
-							</div>
-						{/if}
+						<a href={feature.screenshot} target="_blank" rel="noopener noreferrer">
+							<img
+								src={feature.screenshot}
+								alt={feature.title}
+								class="mb-5 aspect-video w-full rounded-lg border border-gray-800/80 object-cover transition hover:opacity-90"
+							/>
+						</a>
 
 						<div class="mb-2 flex items-center gap-2.5">
 							<span class="text-lg {feature.color}">{@html feature.icon}</span>
@@ -344,6 +394,31 @@
 						<p class="text-sm leading-relaxed text-gray-500">{feature.desc}</p>
 					</div>
 				{/each}
+			</div>
+
+			<!-- Extras strip: prep & worldbuilding tools -->
+			<div class="mt-16" use:fadeIn>
+				<p class="mb-6 text-center text-xs font-bold tracking-[0.3em] text-gray-600 uppercase">
+					Plus prep & worldbuilding tools
+				</p>
+				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					{#each extraFeatures as feature}
+						<div
+							class="fade-in flex items-start gap-3 rounded-lg border border-gray-800/70 bg-gray-900/30 p-4"
+							use:fadeIn
+						>
+							<span class="mt-0.5 shrink-0 text-lg {feature.color}">{@html feature.icon}</span>
+							<div>
+								<h3 class="mb-0.5 text-sm font-bold text-white">{feature.title}</h3>
+								<p class="text-xs leading-relaxed text-gray-500">{feature.desc}</p>
+							</div>
+						</div>
+					{/each}
+				</div>
+
+				<p class="mt-8 text-center text-xs font-bold tracking-[0.3em] text-gray-600 uppercase">
+					And more...
+				</p>
 			</div>
 		</div>
 	</section>
@@ -401,7 +476,7 @@
 							<img
 								src="/screenshots/ViewerDisplayScreenshot.jpg"
 								alt="Live viewer display"
-								class="aspect-[4/3] w-full object-cover transition hover:opacity-90"
+								class="h-auto w-full object-contain transition hover:opacity-90"
 							/>
 						</a>
 					</div>
@@ -469,32 +544,16 @@
 		</div>
 	</section>
 
-	<!-- ── CTA ───────────────────────────────────────────────────────────────── -->
-	<section class="relative overflow-hidden border-t border-gray-800/60 px-6 py-28 text-center">
-		<div class="mx-auto max-w-2xl" use:fadeIn>
-			<i class="fa-duotone fa-light fa-swords text-4xl" aria-hidden="true"></i>
-			<h2 class="mb-4 text-3xl font-black tracking-tight text-white sm:text-4xl">
-				Ready to roll initiative?
-			</h2>
-			<p class="mb-10 text-gray-500">
-				Free to use. No subscription. Create an account and run your first encounter tonight.
-			</p>
-			<div class="flex flex-wrap items-center justify-center gap-4">
-				<a
-					href="/register"
-					class="rounded border border-amber-600 bg-amber-900/40 px-10 py-3.5 text-sm font-bold text-amber-300 transition hover:bg-amber-900/70 hover:text-amber-200"
-				>
-					Create Free Account
-				</a>
-				<form method="POST" action="/login?/guest">
-					<button
-						type="submit"
-						class="rounded border border-gray-700 bg-gray-900 px-10 py-3.5 text-sm font-semibold text-gray-400 transition hover:border-gray-600 hover:text-gray-200"
-					>
-						Try as Guest
-					</button>
-				</form>
-			</div>
+	<!-- ── Closing strip ─────────────────────────────────────────────────────── -->
+	<section class="border-t border-gray-800/60 px-6 py-14 text-center" use:fadeIn>
+		<div class="mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-4">
+			<p class="text-sm text-gray-500">Free to use, no subscription — ready when you are.</p>
+			<a
+				href="/register"
+				class="rounded border border-amber-600 bg-amber-900/40 px-6 py-2 text-sm font-bold text-amber-300 transition hover:bg-amber-900/70 hover:text-amber-200"
+			>
+				Create Free Account
+			</a>
 		</div>
 	</section>
 
@@ -611,7 +670,7 @@
 		}
 	}
 
-	:global(.hero-fade) {
+	:global(.fade-in) {
 		opacity: 0;
 		transform: translateY(24px);
 		transition:
@@ -624,8 +683,14 @@
 		transform: translateY(0);
 	}
 
+	.tilt-card {
+		transform-style: preserve-3d;
+		will-change: transform;
+		transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		:global(.hero-fade) {
+		:global(.fade-in) {
 			opacity: 1;
 			transform: none;
 		}
