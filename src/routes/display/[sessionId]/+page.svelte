@@ -478,6 +478,57 @@
 		});
 	});
 
+	// ── Idle screen ambiance (shown only while awaiting combat) ─────────
+	const IDLE_FLAVOR_LINES = [
+		'A natural 20 always hits, no matter the target’s AC.',
+		'Darkness stirs beyond the torchlight…',
+		'Even the bravest adventurer checks their spell slots twice.',
+		'A short rest restores more than you’d think.',
+		'Legends are forged in the space between turns.',
+		'Keep your dice close and your rations closer.',
+		'The dragon remembers every scar it’s given.',
+		'A locked door is just a puzzle with a lockpick-shaped answer.',
+		'Somewhere, a bard is tuning a lute for this very moment.',
+		'Advantage means roll twice, take the higher.',
+		'Every legend started as someone’s first session.',
+		'Gold spends the same whether it was earned or looted.',
+		'Dungeons & Dragons was first published in 1974.',
+		'The icosahedral die dates back to Ptolemaic Egypt.',
+		'A critical hit doubles the damage dice, not the modifiers.',
+		'The owlbear was inspired by a cheap plastic toy from Hong Kong.',
+		'Mimics exist so you never trust a chest again.',
+		'The tarrasque has ended entire campaigns single-handedly.',
+		'Vecna was once just a lich in someone’s home game.',
+		'A flat roll of 10 is neither lucky nor cursed — just average.',
+		'Inspiration doesn’t stack, so spend it before you earn more.',
+		'Death saving throws reset the instant you’re healed above zero.',
+		'A well-timed shove can end a fight faster than a blade.',
+		'The DM’s silence is rarely as empty as it sounds.',
+		'A flumph’s stench is a defense mechanism, not an accident.',
+		'“No plan survives contact with a d20.”',
+		'“The dice don’t hate you. Probably.”',
+		'Roll high, roll low, roll with it.',
+		'The first roll of the night sets the tone for the whole session.',
+		'A well-placed silence can be scarier than a monster’s roar.'
+	];
+	let idleTipIndex = $state(Math.floor(Math.random() * IDLE_FLAVOR_LINES.length));
+
+	$effect(() => {
+		const id = setInterval(() => {
+			idleTipIndex = (idleTipIndex + 1) % IDLE_FLAVOR_LINES.length;
+		}, 6500);
+		return () => clearInterval(id);
+	});
+
+	// Floating embers — positions/timing randomized once per page load; purely decorative.
+	const IDLE_EMBERS = Array.from({ length: 20 }, (_, i) => ({
+		left: Math.random() * 100,
+		delay: Math.random() * 12,
+		duration: 9 + Math.random() * 8,
+		size: 2 + Math.random() * 3,
+		drift: (Math.random() - 0.5) * 60
+	}));
+
 	const sorted = $derived(sortCombatants(combatState.combatants));
 	const players = $derived(sorted.filter((c) => c.type === 'player'));
 	const myCharacter = $derived(players.find((p) => p.id === myCharacterId) ?? null);
@@ -1241,13 +1292,35 @@
 
 	{#if !current}
 		<!-- Waiting for combat -->
-		<div class="relative z-10 flex flex-1 flex-col items-center justify-center gap-6">
-			<i class="fa-duotone fa-light fa-swords text-6xl opacity-20" aria-hidden="true"></i>
-			<div class="text-center">
+		<div
+			class="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden"
+		>
+			<!-- Floating embers -->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0">
+				{#each IDLE_EMBERS as ember, i (i)}
+					<span
+						class="ember"
+						style="left: {ember.left}%; width: {ember.size}px; height: {ember.size}px; animation-duration: {ember.duration}s; animation-delay: -{ember.delay}s; --drift: {ember.drift}px;"
+					></span>
+				{/each}
+			</div>
+			<!-- Slow-breathing glow behind the icon -->
+			<div class="idle-glow pointer-events-none absolute" aria-hidden="true"></div>
+
+			<i class="fa-duotone fa-light fa-swords relative text-6xl opacity-20" aria-hidden="true"></i>
+			<div class="relative text-center">
 				<p class="text-4xl font-black tracking-[0.2em] text-gray-700 uppercase">Awaiting Combat</p>
-				<p class="mt-3 text-sm tracking-widest text-gray-600 uppercase">
-					The Dungeon Master will begin shortly…
-				</p>
+				<div class="relative mx-auto mt-3 flex h-12 max-w-3xl items-center justify-center px-4">
+					{#key idleTipIndex}
+						<p
+							in:fade={{ duration: 700, delay: 400 }}
+							out:fade={{ duration: 400 }}
+							class="absolute inset-x-4 text-center text-sm tracking-widest whitespace-nowrap text-gray-300 italic"
+						>
+							{IDLE_FLAVOR_LINES[idleTipIndex]}
+						</p>
+					{/key}
+				</div>
 			</div>
 		</div>
 	{:else}
@@ -1969,6 +2042,57 @@
 		}
 		68% {
 			transform: translate(-5vw, 4vh) scale(1.06);
+		}
+	}
+
+	/* ── Idle screen ambiance ── */
+	.idle-glow {
+		top: 50%;
+		left: 50%;
+		width: min(50vw, 480px);
+		height: min(50vw, 480px);
+		transform: translate(-50%, -50%);
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(180, 130, 40, 0.14) 0%, transparent 70%);
+		filter: blur(20px);
+		animation: idle-glow-pulse 5s ease-in-out infinite;
+	}
+	@keyframes idle-glow-pulse {
+		0%,
+		100% {
+			opacity: 0.6;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		50% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1.08);
+		}
+	}
+
+	.ember {
+		position: absolute;
+		bottom: -10px;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, rgba(251, 191, 36, 0) 70%);
+		box-shadow: 0 0 6px 1px rgba(251, 191, 36, 0.6);
+		animation-name: ember-rise;
+		animation-timing-function: ease-in;
+		animation-iteration-count: infinite;
+	}
+	@keyframes ember-rise {
+		0% {
+			transform: translate(0, 0) scale(0.6);
+			opacity: 0;
+		}
+		10% {
+			opacity: 0.9;
+		}
+		80% {
+			opacity: 0.5;
+		}
+		100% {
+			transform: translate(var(--drift), -100vh) scale(1);
+			opacity: 0;
 		}
 	}
 </style>
