@@ -22,6 +22,7 @@
 	});
 
 	function dismiss() {
+		if (dontShow) localStorage.setItem(KEY, '1');
 		visible = false;
 		btnRect = null;
 	}
