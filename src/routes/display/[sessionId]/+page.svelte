@@ -1217,6 +1217,16 @@
 				Full Screen
 			{/if}
 		</button>
+		<a
+			href="https://www.buymeacoffee.com/inittracker"
+			target="_blank"
+			rel="noopener noreferrer"
+			onclick={() => (showMobileMenu = false)}
+			class="flex items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-sm text-red-400 transition hover:bg-red-900/30 hover:text-red-300"
+		>
+			<i class="fa-duotone fa-light fa-mug-hot shrink-0 text-base" aria-hidden="true"></i>
+			Buy Me A Coffee
+		</a>
 		{#if myPlayerName}
 			<a
 				href="/player/logout"
