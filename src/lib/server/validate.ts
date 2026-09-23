@@ -132,6 +132,28 @@ export function validateStorageState(raw: unknown): StorageState | null {
 		if (!Array.isArray(m.revealedCorridors)) return null;
 	}
 
+	// Optional chaseState — DM-run "Gap Track" chase visualization shown on player display
+	if (o.chaseState != null) {
+		const cs = o.chaseState as Record<string, unknown>;
+		if (!cs || typeof cs !== 'object') return null;
+		if (!Array.isArray(cs.bands) || cs.bands.length < 1 || cs.bands.length > 12) return null;
+		for (const b of cs.bands) {
+			if (!isStr(b, 40)) return null;
+		}
+		if (!Array.isArray(cs.participants) || cs.participants.length > 20) return null;
+		for (const p of cs.participants) {
+			if (!p || typeof p !== 'object') return null;
+			const pp = p as Record<string, unknown>;
+			if (!isStr(pp.id, 36)) return null;
+			if (!isStr(pp.name, MAX_NAME_LEN)) return null;
+			if (pp.role !== 'quarry' && pp.role !== 'pursuer') return null;
+			if (!isInt(pp.band, 0, 11)) return null;
+			if (!isInt(pp.exhaustionPips, 0, 6)) return null;
+			if (typeof pp.dropped !== 'boolean') return null;
+		}
+		if (cs.complication !== null && !isStr(cs.complication, 300)) return null;
+	}
+
 	// Optional turn timer — per-turn countdown shown on the dashboard and player display
 	if (o.turnTimerSeconds !== undefined && o.turnTimerSeconds !== null) {
 		if (!isInt(o.turnTimerSeconds, 1, 3600)) return null;

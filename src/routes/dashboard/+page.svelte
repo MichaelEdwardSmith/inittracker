@@ -198,6 +198,15 @@
 	let showDonjon = $state(false);
 	let showTown = $state(false);
 	let showInn = $state(false);
+	let showChaseTracker = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let ChaseTrackerModalComp = $state<any>(null);
+	async function openChaseTracker() {
+		showChaseTracker = true;
+		showMobileMenu = false;
+		if (!ChaseTrackerModalComp)
+			ChaseTrackerModalComp = (await import('$lib/components/ChaseTrackerModal.svelte')).default;
+	}
 
 	// Lazily-loaded heavy modal components
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -651,6 +660,14 @@
 			>
 				<i class="fa-duotone fa-light fa-file-lines shrink-0 text-base" aria-hidden="true"></i>
 				Quick Reference
+			</button>
+			<button
+				onclick={openChaseTracker}
+				title="Run a live chase visualization on the player display"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-person-running shrink-0 text-base" aria-hidden="true"></i>
+				Chase Tracker
 			</button>
 			<button
 				onclick={openLiarsDice}
@@ -1110,6 +1127,13 @@
 {#if showScheduling && SchedulingModalComp}
 	{@const Scheduling = SchedulingModalComp}
 	<Scheduling onclose={() => (showScheduling = false)} />
+{/if}
+
+{#if ChaseTrackerModalComp}
+	{@const ChaseTracker = ChaseTrackerModalComp}
+	<div style="display:{showChaseTracker ? 'block' : 'none'}">
+		<ChaseTracker onclose={() => (showChaseTracker = false)} ruleset={activeSession.ruleset} />
+	</div>
 {/if}
 
 {#if showQuickRules && QuickRulesModalComp}

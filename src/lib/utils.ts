@@ -1,7 +1,7 @@
 // Pure utility functions shared across the app. Includes HP bar colour/percentage
 // helpers, condition colour maps and descriptions, combatant sort order, CR→XP
 // conversion table, and time-formatting helpers.
-import type { Combatant } from './types';
+import type { Combatant, ChaseParticipant } from './types';
 
 export const conditionDescriptions: Record<string, string> = {
 	Blinded:
@@ -134,6 +134,16 @@ export const conditionColors: Record<string, string> = {
 	'Disadvantage For': 'bg-orange-800 text-orange-200',
 	'Disadvantage Against': 'bg-teal-700 text-teal-100'
 };
+
+/** Border/background/text classes for a chase participant's numbered badge — shared by the
+ *  DM's Chase Tracker modal, its compact preview board, and the player display's full-screen
+ *  takeover so quarry/pursuer/dropped coloring never drifts between the three. */
+export function chaseBadgeClasses(p: Pick<ChaseParticipant, 'role' | 'dropped'>): string {
+	if (p.dropped) return 'border-gray-600 bg-gray-800 text-gray-500';
+	return p.role === 'quarry'
+		? 'border-amber-500 bg-amber-900/60 text-amber-200'
+		: 'border-red-600 bg-red-900/60 text-red-200';
+}
 
 export function sortCombatants(list: Combatant[]): Combatant[] {
 	return [...list].sort((a, b) => {

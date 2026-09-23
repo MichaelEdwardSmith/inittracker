@@ -19,6 +19,7 @@
 	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
 	import PollView from '$lib/components/PollView.svelte';
 	import TurnTimer from '$lib/components/TurnTimer.svelte';
+	import ChaseTrackerOverlay from '$lib/components/ChaseTrackerOverlay.svelte';
 	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
 	import StatusIcon from '$lib/components/StatusIcon.svelte';
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
@@ -164,8 +165,28 @@
 	// ── Audio ──────────────────────────────────────────────────────────
 	let joined = $state(false);
 	let audioEnabled = $state(true);
+	// Separate mute just for the looping chase track — lets a player silence the chase without
+	// muting damage/heal/turn sounds too. Toggled from a button on ChaseTrackerOverlay itself.
+	let chaseMuted = $state(false);
 
 	const sounds: Record<string, HTMLAudioElement> = {};
+
+	// Starts/stops/mutes the looping chase track to match whether a chase is currently active —
+	// reruns whenever any of the three change, so it covers chase start/end, the global sound
+	// toggle, and the chase-specific mute button in one place instead of three call sites.
+	$effect(() => {
+		if (!joined) return;
+		const track = sounds['chase'];
+		if (!track) return;
+		const shouldPlay = !!combatState.chaseState && audioEnabled && !chaseMuted;
+		if (shouldPlay && track.paused) {
+			track.loop = true;
+			track.play().catch(() => {});
+		} else if (!shouldPlay && !track.paused) {
+			track.pause();
+			track.currentTime = 0;
+		}
+	});
 
 	// ── Mixer track storage (plain Map — managed imperatively) ─────────
 	const viewerTracks = new Map<
@@ -232,10 +253,14 @@
 			'battlestart',
 			'fanfare',
 			'sword',
-			'temphp'
+			'temphp',
+			'chase'
 		]) {
 			const a = new Audio(`/audio/${name}.mp3`);
 			a.preload = 'auto';
+			// The chase track loops for the whole encounter, so it plays quieter than the
+			// one-shot SFX to avoid drowning out everything else on the screen.
+			if (name === 'chase') a.volume = 0.5;
 			sounds[name] = a;
 		}
 		const roomReveal = new Audio('/audio/room-reveal.wav');
@@ -340,6 +365,19 @@
 				// Play sound when room description is revealed
 				if (!combatState.dungeonRoomDescription && newState.dungeonRoomDescription) {
 					playSound('room-reveal');
+				}
+
+				// Chase: a participant changed lanes or gained exhaustion. Only checked once a
+				// chase was already running locally, so this never fires on first page load into
+				// an already-active chase (every participant would look "new").
+				if (combatState.chaseState && newState.chaseState) {
+					const oldParticipants = combatState.chaseState.participants;
+					for (const np of newState.chaseState.participants) {
+						const op = oldParticipants.find((p) => p.id === np.id);
+						if (!op) continue;
+						if (op.band !== np.band) playSound('sword');
+						if (np.exhaustionPips > op.exhaustionPips) playSound('damage');
+					}
 				}
 
 				// Detect changes — skip on the very first message (empty initial state)
@@ -770,6 +808,12 @@
 		</div>
 	{/if}
 
+	<ChaseTrackerOverlay
+		chaseState={combatState.chaseState}
+		muted={chaseMuted}
+		onToggleMute={() => (chaseMuted = !chaseMuted)}
+	/>
+
 	<!-- Dungeon room description overlay - shown when DM opens a room in the dungeon generator -->
 	{#if combatState.dungeonRoomDescription}
 		{@const rd = combatState.dungeonRoomDescription}
@@ -1065,6 +1109,7 @@
 			</div>
 		</div>
 	</header>
+
 	<!-- Viewer nav dropdown â€" styled to match DM hamburger -->
 	{#if showMobileMenu}
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
