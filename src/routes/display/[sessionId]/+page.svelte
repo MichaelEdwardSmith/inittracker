@@ -132,6 +132,8 @@
 	let flashColor = $state<string | null>(null);
 	let flashKey = $state(0);
 	let flashTimer: ReturnType<typeof setTimeout> | null = null;
+	// Bumped each time combat or a chase starts; re-keys the start flash so its animation replays.
+	let startFlashKey = $state(0);
 
 	// ── Focus animation — temporarily pan to the affected combatant ────
 	let focusCombatantId = $state<string | null>(null);
@@ -174,17 +176,55 @@
 	// Starts/stops/mutes the looping chase track to match whether a chase is currently active —
 	// reruns whenever any of the three change, so it covers chase start/end, the global sound
 	// toggle, and the chase-specific mute button in one place instead of three call sites.
+	const CHASE_VOLUME = 0.5;
+	const CHASE_FADE_MS = 2500;
+	let chaseFadeTimer: ReturnType<typeof setInterval> | null = null;
+
+	function cancelChaseFade() {
+		if (chaseFadeTimer) clearInterval(chaseFadeTimer);
+		chaseFadeTimer = null;
+	}
+
+	function stopChaseTrack(track: HTMLAudioElement) {
+		cancelChaseFade();
+		track.pause();
+		track.currentTime = 0;
+		track.volume = CHASE_VOLUME;
+	}
+
+	// Ramps the chase track down to silence, then stops it. Used when the chase ends so the music
+	// trails off instead of cutting out.
+	function fadeOutChaseTrack(track: HTMLAudioElement) {
+		if (chaseFadeTimer) return;
+		const startVolume = track.volume;
+		const startTime = performance.now();
+		chaseFadeTimer = setInterval(() => {
+			const progress = (performance.now() - startTime) / CHASE_FADE_MS;
+			if (progress >= 1) stopChaseTrack(track);
+			else track.volume = startVolume * (1 - progress);
+		}, 50);
+	}
+
 	$effect(() => {
 		if (!joined) return;
 		const track = sounds['chase'];
 		if (!track) return;
-		const shouldPlay = !!combatState.chaseState && audioEnabled && !chaseMuted;
-		if (shouldPlay && track.paused) {
-			track.loop = true;
-			track.play().catch(() => {});
-		} else if (!shouldPlay && !track.paused) {
-			track.pause();
-			track.currentTime = 0;
+		const chaseActive = !!combatState.chaseState;
+		const shouldPlay = chaseActive && audioEnabled && !chaseMuted;
+		if (shouldPlay) {
+			// A chase restarting mid-fade picks the music back up at full volume.
+			if (chaseFadeTimer) {
+				cancelChaseFade();
+				track.volume = CHASE_VOLUME;
+			}
+			if (track.paused) {
+				track.loop = true;
+				track.play().catch(() => {});
+			}
+		} else if (!track.paused) {
+			// The chase ending fades out; muting (chase mute or the global toggle) cuts immediately.
+			if (!chaseActive && audioEnabled && !chaseMuted) fadeOutChaseTrack(track);
+			else stopChaseTrack(track);
 		}
 	});
 
@@ -260,7 +300,7 @@
 			a.preload = 'auto';
 			// The chase track loops for the whole encounter, so it plays quieter than the
 			// one-shot SFX to avoid drowning out everything else on the screen.
-			if (name === 'chase') a.volume = 0.5;
+			if (name === 'chase') a.volume = CHASE_VOLUME;
 			sounds[name] = a;
 		}
 		const roomReveal = new Audio('/audio/room-reveal.wav');
@@ -346,6 +386,7 @@
 					// Combat begins (null → active)
 					if (combatState.currentTurnId === null && newState.currentTurnId !== null) {
 						playSound('battlestart');
+						startFlashKey++;
 					}
 					// Combat ends (active → null)
 					if (combatState.currentTurnId !== null && newState.currentTurnId === null) {
@@ -358,6 +399,10 @@
 						combatState.currentTurnId !== newState.currentTurnId
 					) {
 						playSound('sword');
+					}
+					// Chase begins — flash over the chase takeover as it appears
+					if (!combatState.chaseState && newState.chaseState) {
+						startFlashKey++;
 					}
 				}
 				firstMessageReceived = true;
@@ -558,8 +603,8 @@
 		return () => clearInterval(id);
 	});
 
-	// Floating embers — positions/timing randomized once per page load; purely decorative.
-	const IDLE_EMBERS = Array.from({ length: 20 }, (_, i) => ({
+	// Floating embers — shown on every screen state; positions/timing randomized once per page load.
+	const EMBERS = Array.from({ length: 20 }, (_, i) => ({
 		left: Math.random() * 100,
 		delay: Math.random() * 12,
 		duration: 9 + Math.random() * 8,
@@ -769,6 +814,13 @@
 				]}; top: {pos.top}; right: {pos.right}; bottom: {pos.bottom}; left: {pos.left};"
 			></div>
 		{/each}
+		<!-- Floating embers — always visible, idle or in combat -->
+		{#each EMBERS as ember, i (i)}
+			<span
+				class="ember"
+				style="left: {ember.left}%; width: {ember.size}px; height: {ember.size}px; animation-duration: {ember.duration}s; animation-delay: -{ember.delay}s; --drift: {ember.drift}px;"
+			></span>
+		{/each}
 	</div>
 
 	<!-- Fog-of-war dungeon map — full-screen, opened via hamburger menu -->
@@ -812,6 +864,7 @@
 		chaseState={combatState.chaseState}
 		muted={chaseMuted}
 		onToggleMute={() => (chaseMuted = !chaseMuted)}
+		endFadeMs={CHASE_FADE_MS}
 	/>
 
 	<!-- Dungeon room description overlay - shown when DM opens a room in the dungeon generator -->
@@ -954,6 +1007,13 @@
 				class="flash-overlay pointer-events-none fixed inset-0 z-50"
 				style="background: {flashColor};"
 			></div>
+		{/if}
+	{/key}
+
+	<!-- Combat/chase-start flash — above the chase overlay (z-180) so it reads over the takeover -->
+	{#key startFlashKey}
+		{#if startFlashKey > 0}
+			<div class="start-flash pointer-events-none fixed inset-0 z-[185]" aria-hidden="true"></div>
 		{/if}
 	{/key}
 
@@ -1340,15 +1400,6 @@
 		<div
 			class="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden"
 		>
-			<!-- Floating embers -->
-			<div aria-hidden="true" class="pointer-events-none absolute inset-0">
-				{#each IDLE_EMBERS as ember, i (i)}
-					<span
-						class="ember"
-						style="left: {ember.left}%; width: {ember.size}px; height: {ember.size}px; animation-duration: {ember.duration}s; animation-delay: -{ember.delay}s; --drift: {ember.drift}px;"
-					></span>
-				{/each}
-			</div>
 			<!-- Slow-breathing glow behind the icon -->
 			<div class="idle-glow pointer-events-none absolute" aria-hidden="true"></div>
 
@@ -1963,6 +2014,19 @@
 	}
 	.flash-overlay {
 		animation: flash-effect 0.75s ease-out forwards;
+	}
+
+	@keyframes start-flash-effect {
+		0% {
+			opacity: 0.85;
+		}
+		100% {
+			opacity: 0;
+		}
+	}
+	.start-flash {
+		background: radial-gradient(circle, rgba(224, 242, 254, 1) 0%, rgba(56, 189, 248, 0.9) 100%);
+		animation: start-flash-effect 0.9s ease-out forwards;
 	}
 
 	/* ── Room description reveal ── */

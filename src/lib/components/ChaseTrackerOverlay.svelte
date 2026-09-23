@@ -17,8 +17,23 @@
 		chaseState: ChaseState | null | undefined;
 		muted: boolean;
 		onToggleMute: () => void;
+		/** How long the overlay takes to fade away when the DM ends the chase (matches the music fade). */
+		endFadeMs?: number;
 	}
-	let { chaseState, muted, onToggleMute }: Props = $props();
+	let { chaseState, muted, onToggleMute, endFadeMs = 400 }: Props = $props();
+
+	// The last live chase state, held onto after the DM ends the chase so the overlay can keep
+	// rendering it while it fades out (chaseState is already null by then).
+	let lastChase: ChaseState | null = null;
+	const shown = $derived.by(() => {
+		if (chaseState) lastChase = chaseState;
+		return lastChase;
+	});
+
+	// Minimizing/expanding stays snappy; only the chase ending uses the long fade. Svelte reads
+	// transition params when the transition starts, so this picks the right one each time.
+	const outFade = () => ({ duration: chaseState ? 400 : endFadeMs });
+	const pillOutFade = () => ({ duration: chaseState ? 200 : endFadeMs });
 
 	let expanded = $state(true);
 	let wasActive = false;
@@ -43,11 +58,12 @@
 	}));
 </script>
 
-{#if chaseState}
+{#if chaseState && shown}
 	{#if expanded}
 		<div
 			class="fixed inset-0 z-[180] flex flex-col overflow-hidden bg-gray-950/97 backdrop-blur-sm"
-			transition:fade={{ duration: 400 }}
+			in:fade={{ duration: 400 }}
+			out:fade|global={outFade()}
 		>
 			<!-- Speed-line particles streaking right-to-left, suggesting motion -->
 			<div aria-hidden="true" class="pointer-events-none absolute inset-0">
@@ -96,16 +112,12 @@
 			<div
 				class="relative z-10 flex min-h-0 flex-1 flex-col justify-center gap-6 overflow-y-auto px-4 pb-8 sm:px-8"
 			>
-				<ChaseTrackBoard
-					bands={chaseState.bands}
-					participants={chaseState.participants}
-					size="xl"
-				/>
+				<ChaseTrackBoard bands={shown.bands} participants={shown.participants} size="xl" />
 
 				<!-- Legend mapping the track's numbered badges back to names, with a small
 				     exhaustion-pip row under each name -->
 				<div class="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-6 gap-y-2.5">
-					{#each chaseState.participants as p, idx (p.id)}
+					{#each shown.participants as p, idx (p.id)}
 						<div class="flex items-center gap-2 {p.dropped ? 'opacity-50' : ''}">
 							<span
 								class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold {chaseBadgeClasses(
@@ -136,7 +148,7 @@
 					{/each}
 				</div>
 
-				{#if chaseState.complication}
+				{#if shown.complication}
 					<div
 						class="mx-auto flex max-w-2xl items-start gap-3 rounded-xl border border-orange-900/40 bg-orange-950/30 px-5 py-4 text-orange-300"
 					>
@@ -144,9 +156,7 @@
 							class="fa-duotone fa-light fa-triangle-exclamation mt-0.5 shrink-0"
 							aria-hidden="true"
 						></i>
-						<span class="text-sm leading-relaxed italic sm:text-base"
-							>{chaseState.complication}</span
-						>
+						<span class="text-sm leading-relaxed italic sm:text-base">{shown.complication}</span>
 					</div>
 				{/if}
 			</div>
@@ -154,7 +164,8 @@
 	{:else}
 		<button
 			onclick={() => (expanded = true)}
-			transition:fade={{ duration: 200 }}
+			in:fade={{ duration: 200 }}
+			out:fade|global={pillOutFade()}
 			class="fixed top-16 left-1/2 z-[180] flex -translate-x-1/2 items-center gap-2 rounded-full border border-amber-700/60 bg-gray-900/95 px-4 py-2 text-xs font-bold tracking-wider text-amber-300 uppercase shadow-xl backdrop-blur-sm transition hover:border-amber-500"
 		>
 			<i class="fa-duotone fa-light fa-person-running" aria-hidden="true"></i>
