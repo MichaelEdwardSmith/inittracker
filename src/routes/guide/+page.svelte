@@ -31,7 +31,8 @@
 		{ id: 'voice-commands', label: '22. Voice Commands (Beta)' },
 		{ id: 'audio-mixer', label: '23. Audio Mixer' },
 		{ id: 'session-scheduling', label: '24. Session Scheduling' },
-		{ id: 'contact', label: '25. Contact & Support' }
+		{ id: 'chase-tracker', label: '25. Chase Tracker' },
+		{ id: 'contact', label: '26. Contact & Support' }
 	];
 
 	const conditions = [
@@ -3301,8 +3302,106 @@
 			</section>
 
 			<!-- 25 ─────────────────────────────────────── -->
+			<section id="chase-tracker">
+				{@render h2('25', 'Chase Tracker')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Run the DMG chase rules with a live visual "Gap Track" on the
+					<a href="#player-display" class="text-amber-400 transition hover:text-amber-300"
+						>Player Display</a
+					>
+					— pursuers and quarry sliding between distance bands as the chase unfolds, instead of tracking
+					it by memory alone.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Starting a Chase (DM)
+				</h3>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Open the menu (<i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i>) in the
+						dashboard header and click
+						<strong class="font-semibold text-white"
+							><i class="fa-duotone fa-light fa-person-running" aria-hidden="true"></i> Chase Tracker</strong
+						>
+					</li>
+					<li>
+						Click the <strong class="font-semibold text-white">Rules</strong> bar to expand a summary
+						of the chase rules (running the chase, dashing &amp; exhaustion, escaping, complications)
+						if you need a refresher
+					</li>
+					<li>
+						Pick at least one <strong class="font-semibold text-amber-300">quarry</strong> and one
+						<strong class="font-semibold text-red-300">pursuer</strong> from the chip lists — only combatants
+						currently in the initiative order are offered, so roll initiative and add everyone to combat
+						first; a name can only be picked once, never as both roles
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Start Chase</strong> — nothing appears on the
+						player display until you do, so players never see an empty track
+					</li>
+				</ol>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Running the Chase
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Once started, the player display takes over the whole screen with the Gap Track: six
+					distance bands (Adjacent → Close → Short → Medium → Long → Out of Sight), each participant
+					shown as a numbered badge colour-coded quarry (amber) vs. pursuer (red), with a legend
+					below mapping numbers to names and a small exhaustion-pip row under each one. From the
+					DM's Chase Tracker panel:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Use the ◀ / ▶ buttons on a participant's row to slide them closer or farther along the
+						track
+					</li>
+					<li>
+						The <strong class="font-semibold text-white">Fatigue</strong> dot-tracker records exhaustion
+						pips gained from extra Dashes
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Mark Dropped</strong> flags a participant who's out
+						of the chase (exhausted, caught, or escaped) — greys them out on both screens
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Draw Complication</strong> rolls on the urban or
+						wilderness table and shows the result to players in a banner
+					</li>
+					<li>
+						<strong class="font-semibold text-white">End Chase</strong> clears the tracker from the player
+						display
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					On the Player Display
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The chase takes over the screen the moment it starts, with looping music and blue "speed
+					line" particles streaking by. Players can:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Click <strong class="font-semibold text-white">Minimize</strong> to shrink it to a small pill
+						if they need to see initiative/HP underneath — it pops back open automatically the next time
+						the DM starts a new chase
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Mute</strong> to silence just the chase music,
+						independent of the display's overall sound toggle
+					</li>
+				</ul>
+				<p class="text-sm leading-relaxed">
+					Sound effects play automatically as the chase unfolds: a sword clash when someone changes
+					bands, and a damage hit when someone gains an exhaustion pip.
+				</p>
+			</section>
+
+			<!-- 26 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('25', 'Contact & Support')}
+				{@render h2('26', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"

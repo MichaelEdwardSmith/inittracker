@@ -63,7 +63,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 21. [Voice Commands _(Beta)_](#21-voice-commands-beta)
 22. [Audio Mixer](#22-audio-mixer)
 23. [Session Scheduling](#23-session-scheduling)
-24. [Contact & Support](#24-contact--support)
+24. [Chase Tracker](#24-chase-tracker)
+25. [Contact & Support](#25-contact--support)
 
 ---
 
@@ -1326,6 +1327,38 @@ Click **Cancel Proposal** in the Schedule Session modal to withdraw an open prop
 
 ---
 
-## 24. Contact & Support
+## 24. Chase Tracker
+
+Run the DMG chase rules with a live visual "Gap Track" on the player display — pursuers and quarry sliding between distance bands as the chase unfolds, instead of tracking it by memory alone.
+
+### Starting a Chase (DM)
+
+1. Open the menu (☰) in the dashboard header and click **Chase Tracker**
+2. Click the **Rules** bar to expand a summary of the chase rules (running the chase, dashing & exhaustion, escaping, complications) if you need a refresher
+3. Pick at least one **quarry** and one **pursuer** from the chip lists — only combatants currently in the initiative order are offered, so roll initiative and add everyone to combat first; a name can only be picked once, never as both roles
+4. Click **Start Chase** — nothing appears on the player display until you do, so players never see an empty track
+
+### Running the Chase
+
+Once started, the player display takes over the whole screen with the Gap Track: six distance bands (Adjacent → Close → Short → Medium → Long → Out of Sight), each participant shown as a numbered badge colour-coded quarry (amber) vs. pursuer (red), with a legend below mapping numbers to names and a small exhaustion-pip row under each one. From the DM's Chase Tracker panel:
+
+- Use the ◀ / ▶ buttons on a participant's row to slide them closer or farther along the track
+- The **Fatigue** dot-tracker records exhaustion pips gained from extra Dashes
+- **Mark Dropped** flags a participant who's out of the chase (exhausted, caught, or escaped) — greys them out on both screens
+- **Draw Complication** rolls on the urban or wilderness table and shows the result to players in a banner
+- **End Chase** clears the tracker from the player display
+
+### On the Player Display
+
+The chase takes over the screen the moment it starts, with looping music and blue "speed line" particles streaking by. Players can:
+
+- Click **Minimize** to shrink it to a small pill if they need to see initiative/HP underneath — it pops back open automatically the next time the DM starts a new chase
+- Click **Mute** to silence just the chase music, independent of the display's overall sound toggle
+
+Sound effects play automatically as the chase unfolds: a sword clash when someone changes bands, and a damage hit when someone gains an exhaustion pip.
+
+---
+
+## 25. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
