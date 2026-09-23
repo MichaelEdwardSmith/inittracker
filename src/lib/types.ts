@@ -131,6 +131,34 @@ export interface StorageState {
 	/** Client (Date.now()) timestamp when the current turn began — clients compute their own
 	 *  countdown from this plus turnTimerSeconds rather than syncing a live ticking number. */
 	turnStartedAt?: number | null;
+	/** When set, the player display shows a live "Gap Track" chase visualization. */
+	chaseState?: ChaseState | null;
+}
+
+// ---------------------------------------------------------------------------
+// Chase Tracker — visual "Gap Track" representation of the DMG chase rules
+// (see the Chase Rules section of the Quick Reference). Distance is tracked
+// coarsely as a band index rather than exact feet, so it reads at a glance.
+// ---------------------------------------------------------------------------
+
+export interface ChaseParticipant {
+	id: string;
+	name: string;
+	role: 'quarry' | 'pursuer';
+	/** Index into ChaseState.bands — 0 is closest/adjacent. */
+	band: number;
+	/** Chase-flavor fatigue tracker (0-6), separate from the combatant's real exhaustionLevel
+	 *  since chase participants may not correspond to a tracked Combatant at all. */
+	exhaustionPips: number;
+	/** Manually marked by the DM once this participant is out of the chase (exhausted, caught, escaped). */
+	dropped: boolean;
+}
+
+export interface ChaseState {
+	bands: string[];
+	participants: ChaseParticipant[];
+	/** Currently revealed complication text, or null if none is showing. */
+	complication: string | null;
 }
 
 export interface EnemyTemplate {

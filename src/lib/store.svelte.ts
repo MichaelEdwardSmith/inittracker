@@ -8,7 +8,8 @@ import type {
 	CombatEvent,
 	CombatRecord,
 	CombatantSummary,
-	LootItem
+	LootItem,
+	ChaseParticipant
 } from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
@@ -16,6 +17,9 @@ import { ENEMY_TEMPLATES, getMonsterDetail } from './enemies';
 
 // CR lookup by template name — built once at module load
 const crByTemplateName = new Map<string, string>(ENEMY_TEMPLATES.map((t) => [t.name, t.cr]));
+
+// Default "Gap Track" bands for a new chase — see startChase() below.
+const DEFAULT_CHASE_BANDS = ['Adjacent', 'Close', 'Short', 'Medium', 'Long', 'Out of Sight'];
 
 /** Returns true if a monster's stat block text mentions lair actions. */
 function detectsLairActions(templateName: string): boolean {
@@ -96,6 +100,7 @@ function createCombatStore() {
 	let dungeonMapState = $state<StorageState['dungeonMapState']>(null);
 	let turnTimerSeconds = $state<number | null>(null);
 	let turnStartedAt = $state<number | null>(null);
+	let chaseState = $state<StorageState['chaseState']>(null);
 
 	const MAX_UNDO_STEPS = 5;
 	let undoStack = $state<UndoSnapshot[]>([]);
@@ -148,7 +153,8 @@ function createCombatStore() {
 			dungeonRoomDescription,
 			dungeonMapState,
 			turnTimerSeconds,
-			turnStartedAt
+			turnStartedAt,
+			chaseState
 		});
 	}
 
@@ -458,6 +464,76 @@ function createCombatStore() {
 			sync();
 		},
 
+		get chaseState() {
+			return chaseState;
+		},
+
+		/** Begins a new chase with the given participants already in place (the DM picks quarry
+		 *  and pursuers before this ever reaches the player display — see ChaseTrackerModal) and
+		 *  shows the "Gap Track" visualization on the player display. Resets any previous chase. */
+		startChase(participants: ChaseParticipant[] = []) {
+			chaseState = { bands: [...DEFAULT_CHASE_BANDS], participants, complication: null };
+			sync();
+		},
+
+		/** Ends the current chase and hides the tracker from the player display. */
+		endChase() {
+			chaseState = null;
+			sync();
+		},
+
+		chaseRemoveParticipant(id: string) {
+			if (!chaseState) return;
+			chaseState = {
+				...chaseState,
+				participants: chaseState.participants.filter((p) => p.id !== id)
+			};
+			sync();
+		},
+
+		/** Shifts a participant's band by `delta` (negative = closer), clamped to the track. */
+		chaseMoveParticipant(id: string, delta: number) {
+			if (!chaseState) return;
+			const maxBand = chaseState.bands.length - 1;
+			chaseState = {
+				...chaseState,
+				participants: chaseState.participants.map((p) =>
+					p.id === id ? { ...p, band: Math.max(0, Math.min(maxBand, p.band + delta)) } : p
+				)
+			};
+			sync();
+		},
+
+		chaseAddExhaustion(id: string, delta: number) {
+			if (!chaseState) return;
+			chaseState = {
+				...chaseState,
+				participants: chaseState.participants.map((p) =>
+					p.id === id
+						? { ...p, exhaustionPips: Math.max(0, Math.min(6, p.exhaustionPips + delta)) }
+						: p
+				)
+			};
+			sync();
+		},
+
+		chaseToggleDropped(id: string) {
+			if (!chaseState) return;
+			chaseState = {
+				...chaseState,
+				participants: chaseState.participants.map((p) =>
+					p.id === id ? { ...p, dropped: !p.dropped } : p
+				)
+			};
+			sync();
+		},
+
+		chaseSetComplication(text: string | null) {
+			if (!chaseState) return;
+			chaseState = { ...chaseState, complication: text };
+			sync();
+		},
+
 		/** Apply state received from an external source (e.g. SSE) without syncing back.
 		 *  The DM dashboard subscribes to its own session's SSE stream (so e.g. a
 		 *  player-rolled initiative shows up live), which means every local sync() echoes
@@ -471,6 +547,7 @@ function createCombatStore() {
 			round = s.round;
 			turnTimerSeconds = s.turnTimerSeconds ?? null;
 			turnStartedAt = s.turnStartedAt ?? null;
+			chaseState = s.chaseState ?? null;
 			if (undoFingerprint(s.combatants, s.currentTurnId, s.round) !== before) {
 				undoStack = [];
 			}
@@ -486,6 +563,7 @@ function createCombatStore() {
 				combatants = s.combatants;
 				turnTimerSeconds = s.turnTimerSeconds ?? null;
 				turnStartedAt = s.turnStartedAt ?? null;
+				chaseState = s.chaseState ?? null;
 				currentTurnId = s.currentTurnId;
 				round = s.round;
 			} catch {

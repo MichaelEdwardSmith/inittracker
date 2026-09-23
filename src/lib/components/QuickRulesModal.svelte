@@ -2,6 +2,10 @@
      right panel shows the selected category's content. -->
 <script lang="ts">
 	import { getConditionDescription } from '$lib/utils';
+	import {
+		URBAN_CHASE_COMPLICATIONS,
+		WILDERNESS_CHASE_COMPLICATIONS
+	} from '$lib/chaseComplications';
 
 	let {
 		onclose,
@@ -4162,7 +4166,7 @@
 								</h5>
 								<table class="w-full">
 									<tbody class="divide-y divide-gray-800 text-gray-300">
-										{#each [['1', 'Large obstacle (cart/horse)', 'DC 15 Dex (Acrobatics) or 10 ft. difficult terrain'], ['2', 'Crowd blocks the way', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 10 ft. difficult terrain'], ['3', 'Stained-glass window', 'DC 10 Str save or fall prone'], ['4', 'Maze of barrels/crates', 'DC 10 Dex (Acrobatics)/Int or 10 ft. difficult terrain'], ['5', 'Slippery ground', 'DC 10 Dex save or fall prone'], ['6', 'Pack of dogs', 'DC 10 Dex (Acrobatics) or 1d4 piercing + difficult terrain'], ['7', 'Brawl in progress', 'DC 15 Str/Dex/Cha or 2d4 bludgeoning + difficult terrain'], ['8', 'Beggar in the way', 'Toss a coin (auto-avoid) or DC 10 check / difficult terrain'], ['9', 'Overzealous guard', 'OA if you move 20+ ft (+3 to hit, 1d6+1)'], ['10', 'Sharp turn', 'DC 10 Dex save or 1d4 bludgeoning'], ['11–20', 'No complication', '—']] as [roll, name, effect]}
+										{#each URBAN_CHASE_COMPLICATIONS as { roll, name, effect }}
 											<tr>
 												<td class="w-10 py-1.5 pr-2 align-top font-bold text-amber-300">{roll}</td>
 												<td class="py-1.5 pr-2 align-top font-semibold text-white">{name}</td>
@@ -4178,7 +4182,7 @@
 								</h5>
 								<table class="w-full">
 									<tbody class="divide-y divide-gray-800 text-gray-300">
-										{#each [['1', 'Rough brush', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 5 ft. difficult terrain'], ['2', 'Uneven ground', 'DC 10 Dex (Acrobatics) or 10 ft. difficult terrain'], ['3', 'Insect swarm', 'OA (+3 to hit, 4d4 piercing)'], ['4', 'Stream, ravine, or rocky bed', 'DC 10 Str (Athletics)/Dex (Acrobatics) or 10 ft. difficult terrain'], ['5', 'Blinding elements', 'DC 10 CON save or blinded until end of turn, speed halved'], ['6', 'Sudden drop', 'DC 10 Dex save or fall 1d4 × 5 ft, 1d6/10 ft, prone'], ['7', "Hunter's snare", 'DC 15 Dex save or restrained (netted)'], ['8', 'Animal stampede', 'DC 10 Dex save or 1d4 bludgeoning + 1d4 piercing'], ['9', 'Razorvine patch', 'DC 15 Dex save or 1d10 slashing (or lose 10 ft. movement)'], ['10', 'Indigenous creature joins the chase', "DM's choice"], ['11–20', 'No complication', '—']] as [roll, name, effect]}
+										{#each WILDERNESS_CHASE_COMPLICATIONS as { roll, name, effect }}
 											<tr>
 												<td class="w-10 py-1.5 pr-2 align-top font-bold text-amber-300">{roll}</td>
 												<td class="py-1.5 pr-2 align-top font-semibold text-white">{name}</td>
