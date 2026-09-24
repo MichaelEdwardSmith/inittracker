@@ -361,3 +361,22 @@ export function formatNoteDate(iso: string): string {
 export function formatShortTime(ts: number): string {
 	return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
+
+/** The rendered pixel rect of an `object-fit: contain` image within its container — used by
+ *  Document Share (DocShareModal + the player display) to position an annotation `<canvas>`
+ *  exactly over the image so normalized (0–1) stroke coordinates line up regardless of the
+ *  container's size or aspect ratio. */
+export function computeContainRect(
+	containerW: number,
+	containerH: number,
+	naturalW: number,
+	naturalH: number
+): { x: number; y: number; w: number; h: number } {
+	if (containerW <= 0 || containerH <= 0 || naturalW <= 0 || naturalH <= 0) {
+		return { x: 0, y: 0, w: 0, h: 0 };
+	}
+	const scale = Math.min(containerW / naturalW, containerH / naturalH);
+	const w = naturalW * scale;
+	const h = naturalH * scale;
+	return { x: (containerW - w) / 2, y: (containerH - h) / 2, w, h };
+}
