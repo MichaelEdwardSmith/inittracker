@@ -185,6 +185,15 @@
 		showMobileMenu = false;
 		if (!PollModalComp) PollModalComp = (await import('$lib/components/PollModal.svelte')).default;
 	}
+	let showDocShare = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let DocShareModalComp = $state<any>(null);
+	async function openDocShare() {
+		showDocShare = true;
+		showMobileMenu = false;
+		if (!DocShareModalComp)
+			DocShareModalComp = (await import('$lib/components/DocShareModal.svelte')).default;
+	}
 	let showScheduling = $state(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let SchedulingModalComp = $state<any>(null);
@@ -705,6 +714,14 @@
 				<i class="fa-duotone fa-light fa-sliders shrink-0 text-base" aria-hidden="true"></i>
 				Mixer
 			</button>
+			<button
+				onclick={openDocShare}
+				title="Show an image or PDF handout to your players"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-file-image shrink-0 text-base" aria-hidden="true"></i>
+				Document Share
+			</button>
 			{#if data.showVoiceCommands}
 				<VoiceCommands mobile={true} ruleset={activeSession.ruleset} />
 			{/if}
@@ -1122,6 +1139,11 @@
 {#if showPoll && PollModalComp}
 	{@const Poll = PollModalComp}
 	<Poll sessionId={activeSession.sessionId} onclose={() => (showPoll = false)} />
+{/if}
+
+{#if showDocShare && DocShareModalComp}
+	{@const DocShare = DocShareModalComp}
+	<DocShare sessionId={activeSession.sessionId} onclose={() => (showDocShare = false)} />
 {/if}
 
 {#if showScheduling && SchedulingModalComp}

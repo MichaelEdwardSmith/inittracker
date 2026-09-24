@@ -23,6 +23,8 @@
 	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
 	import StatusIcon from '$lib/components/StatusIcon.svelte';
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
+	import AnnotationCanvas from '$lib/components/AnnotationCanvas.svelte';
+	import type { Stroke } from '$lib/docShareTypes';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -403,6 +405,61 @@
 		}
 	}
 
+	// ── Document Share — DM's local image/PDF, relayed through an in-memory-only server
+	// slot (see docShareState.ts). Single doc at a time; page images are fetched lazily and
+	// cached by page index, reset whenever the doc's id changes. ──
+	interface DocShareView {
+		id: string;
+		name: string;
+		pageCount: number;
+		currentPage: number;
+		visible: boolean;
+	}
+	let docShareView = $state<DocShareView | null>(null);
+	let docSharePageUrls = $state<(string | null)[]>([]);
+	let docShareAnnotations = $state<Record<number, Stroke[]>>({});
+	let docShareNaturalW = $state(0);
+	let docShareNaturalH = $state(0);
+
+	async function downloadDocSharePage(id: string, page: number) {
+		try {
+			const res = await fetch(`/api/docshare/page?session=${data.sessionId}&id=${id}&page=${page}`);
+			if (!res.ok) return;
+			const blob = await res.blob();
+			docSharePageUrls[page] = URL.createObjectURL(blob);
+		} catch {
+			/* ignore */
+		}
+	}
+
+	function applyDocShareState(state: DocShareView | null) {
+		if (!state) {
+			for (const u of docSharePageUrls) if (u) URL.revokeObjectURL(u);
+			docSharePageUrls = [];
+			docShareView = null;
+			docShareAnnotations = {};
+			return;
+		}
+		if (docShareView?.id !== state.id) {
+			for (const u of docSharePageUrls) if (u) URL.revokeObjectURL(u);
+			docSharePageUrls = Array(state.pageCount).fill(null);
+			docShareAnnotations = {};
+		}
+		if (docShareView?.currentPage !== state.currentPage) {
+			docShareNaturalW = 0;
+			docShareNaturalH = 0;
+		}
+		docShareView = state;
+		if (state.visible && !docSharePageUrls[state.currentPage]) {
+			downloadDocSharePage(state.id, state.currentPage);
+		}
+	}
+
+	function applyDocShareAnnotation(msg: { docId: string; page: number; strokes: Stroke[] }) {
+		if (!docShareView || msg.docId !== docShareView.id) return;
+		docShareAnnotations = { ...docShareAnnotations, [msg.page]: msg.strokes };
+	}
+
 	const JOINED_KEY = $derived(`viewer-joined-${data.sessionId}`);
 
 	function joinSession() {
@@ -440,6 +497,21 @@
 			.then((r) => (r.ok ? r.json() : []))
 			.then(async (tracks: Array<{ id: string; name: string }>) => {
 				for (const t of tracks) await downloadTrack(t.id, t.name);
+			})
+			.catch(() => {});
+		// Pick up a document already prepared/shown before this viewer joined
+		fetch(`/api/docshare/state?session=${data.sessionId}`)
+			.then((r) => (r.ok ? r.json() : null))
+			.then(async (state: DocShareView | null) => {
+				applyDocShareState(state);
+				if (!state) return;
+				const res = await fetch(`/api/docshare/annotate?session=${data.sessionId}`);
+				if (!res.ok) return;
+				const anno = (await res.json()) as {
+					docId: string;
+					pageStrokes: Record<number, Stroke[]>;
+				} | null;
+				if (anno && anno.docId === state.id) docShareAnnotations = anno.pageStrokes;
 			})
 			.catch(() => {});
 	}
@@ -793,6 +865,16 @@
 		});
 		source.addEventListener('mixer', (e) => {
 			applyMixerState(JSON.parse((e as MessageEvent).data));
+		});
+
+		source.addEventListener('docshareState', (e) => {
+			applyDocShareState(JSON.parse((e as MessageEvent).data));
+		});
+		source.addEventListener('docshareRemoved', () => {
+			applyDocShareState(null);
+		});
+		source.addEventListener('docshareAnnotation', (e) => {
+			applyDocShareAnnotation(JSON.parse((e as MessageEvent).data));
 		});
 
 		source.addEventListener('dmMessage', (e) => {
@@ -1237,6 +1319,50 @@
 					</div>
 				{/if}
 			</div>
+		</div>
+	{/if}
+
+	<!-- Document Share — DM shows a local image/PDF handout full-screen -->
+	{#if docShareView?.visible}
+		<div
+			class="fixed inset-0 z-[197] flex items-center justify-center bg-gray-950/97 p-6 backdrop-blur-sm"
+			transition:fade={{ duration: 400 }}
+		>
+			{#if docSharePageUrls[docShareView.currentPage]}
+				<div class="relative h-full w-full">
+					{#key `${docShareView.id}:${docShareView.currentPage}`}
+						<img
+							src={docSharePageUrls[docShareView.currentPage]}
+							alt={docShareView.name}
+							class="h-full w-full rounded-lg object-contain shadow-2xl"
+							transition:fade={{ duration: 250 }}
+							onload={(e) => {
+								docShareNaturalW = (e.currentTarget as HTMLImageElement).naturalWidth;
+								docShareNaturalH = (e.currentTarget as HTMLImageElement).naturalHeight;
+							}}
+						/>
+					{/key}
+					{#if docShareNaturalW > 0}
+						<AnnotationCanvas
+							naturalWidth={docShareNaturalW}
+							naturalHeight={docShareNaturalH}
+							strokes={docShareAnnotations[docShareView.currentPage] ?? []}
+						/>
+					{/if}
+				</div>
+			{:else}
+				<i
+					class="fa-duotone fa-light fa-spinner-third animate-spin text-5xl text-gray-600"
+					aria-hidden="true"
+				></i>
+			{/if}
+			{#if docShareView.pageCount > 1}
+				<div
+					class="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full border border-gray-700 bg-gray-900/90 px-4 py-1.5 text-sm font-semibold text-gray-300 shadow-lg"
+				>
+					Page {docShareView.currentPage + 1} / {docShareView.pageCount}
+				</div>
+			{/if}
 		</div>
 	{/if}
 
