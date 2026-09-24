@@ -228,6 +228,126 @@
 		}
 	});
 
+	// ── Combat music: battlestart.mp3 stinger, then warfare.mp3 loops until combat ends ──
+	const WARFARE_VOLUME = 0.5;
+	const WARFARE_FADE_MS = 2000;
+	let warfareLoopActive = $state(false);
+	let warfareFadeTimer: ReturnType<typeof setInterval> | null = null;
+	let warfareStartTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function cancelWarfareFade() {
+		if (warfareFadeTimer) clearInterval(warfareFadeTimer);
+		warfareFadeTimer = null;
+	}
+
+	function cancelWarfareStart() {
+		if (warfareStartTimer) clearTimeout(warfareStartTimer);
+		warfareStartTimer = null;
+	}
+
+	function stopWarfareTrack(track: HTMLAudioElement) {
+		cancelWarfareFade();
+		track.pause();
+		track.currentTime = 0;
+		track.volume = WARFARE_VOLUME;
+	}
+
+	function fadeOutWarfareTrack(track: HTMLAudioElement) {
+		if (warfareFadeTimer) return;
+		const startVolume = track.volume;
+		const startTime = performance.now();
+		warfareFadeTimer = setInterval(() => {
+			const progress = (performance.now() - startTime) / WARFARE_FADE_MS;
+			if (progress >= 1) stopWarfareTrack(track);
+			else track.volume = startVolume * (1 - progress);
+		}, 50);
+	}
+
+	// Waits for battlestart.mp3's runtime (however long that clip actually is) before
+	// flipping the warfare loop on, so the stinger always finishes before the loop starts.
+	// Idempotent — a redundant "combat begins" transition (e.g. an SSE reconnect racing with
+	// in-flight state) can never re-queue the stinger or restart the loop on top of itself.
+	function scheduleWarfareStart() {
+		if (warfareLoopActive || warfareStartTimer) return;
+		const bs = sounds['battlestart'];
+		const activate = () => {
+			warfareStartTimer = null;
+			warfareLoopActive = true;
+		};
+		if (bs && isFinite(bs.duration) && bs.duration > 0) {
+			warfareStartTimer = setTimeout(activate, bs.duration * 1000);
+		} else if (bs) {
+			bs.addEventListener(
+				'loadedmetadata',
+				() => {
+					warfareStartTimer = setTimeout(
+						activate,
+						(isFinite(bs.duration) ? bs.duration : 0) * 1000
+					);
+				},
+				{ once: true }
+			);
+		} else {
+			activate();
+		}
+	}
+
+	// How much to duck the warfare loop while the low-HP heartbeat is also playing, so the two
+	// ambient loops layering on top of each other doesn't read as a sudden volume jump.
+	const WARFARE_DUCK_MULTIPLIER = 0.5;
+
+	$effect(() => {
+		if (!joined) return;
+		const track = sounds['warfare'];
+		if (!track) return;
+		const shouldPlay = warfareLoopActive && audioEnabled;
+		if (shouldPlay) {
+			if (warfareFadeTimer) cancelWarfareFade();
+			track.volume = lowHpActive ? WARFARE_VOLUME * WARFARE_DUCK_MULTIPLIER : WARFARE_VOLUME;
+			if (track.paused) {
+				track.loop = true;
+				track.play().catch(() => {});
+			}
+		} else if (!track.paused) {
+			// Combat ending fades the loop out; muting (the global toggle) cuts it immediately.
+			if (warfareLoopActive) stopWarfareTrack(track);
+			else fadeOutWarfareTrack(track);
+		}
+	});
+
+	// ── Low-HP heartbeat — pulsing vignette + looping heartbeat while the spotlighted
+	// combatant is a conscious player who's critically low (same "red zone" threshold as the
+	// HP bar coloring). Tied to whoever's actually on screen, so it drops out the moment the
+	// display pans to someone else instead of droning on for the whole fight. ──
+	const HEARTBEAT_VOLUME = 0.675;
+	const lowHpActive = $derived.by(() => {
+		const dc = displayCombatant ?? current;
+		return (
+			combatState.currentTurnId !== null &&
+			!!dc &&
+			dc.type === 'player' &&
+			dc.inCombat !== false &&
+			dc.currentHp > 0 &&
+			hpPercent(dc) <= 25
+		);
+	});
+
+	$effect(() => {
+		if (!joined) return;
+		const track = sounds['heartbeat'];
+		if (!track) return;
+		const shouldPlay = lowHpActive && audioEnabled;
+		if (shouldPlay) {
+			if (track.paused) {
+				track.loop = true;
+				track.play().catch(() => {});
+			}
+		} else if (!track.paused) {
+			track.pause();
+			track.currentTime = 0;
+		}
+	});
+
 	// ── Mixer track storage (plain Map — managed imperatively) ─────────
 	const viewerTracks = new Map<
 		string,
@@ -294,18 +414,25 @@
 			'fanfare',
 			'sword',
 			'temphp',
-			'chase'
+			'chase',
+			'warfare',
+			'heartbeat'
 		]) {
 			const a = new Audio(`/audio/${name}.mp3`);
 			a.preload = 'auto';
-			// The chase track loops for the whole encounter, so it plays quieter than the
-			// one-shot SFX to avoid drowning out everything else on the screen.
+			// The chase/warfare/heartbeat tracks loop for the whole encounter, so they play quieter
+			// than the one-shot SFX to avoid drowning out everything else on the screen.
 			if (name === 'chase') a.volume = CHASE_VOLUME;
+			else if (name === 'warfare') a.volume = WARFARE_VOLUME;
+			else if (name === 'heartbeat') a.volume = HEARTBEAT_VOLUME;
 			sounds[name] = a;
 		}
 		const roomReveal = new Audio('/audio/room-reveal.wav');
 		roomReveal.preload = 'auto';
 		sounds['room-reveal'] = roomReveal;
+		const bloodied = new Audio('/audio/bloodied.wav');
+		bloodied.preload = 'auto';
+		sounds['bloodied'] = bloodied;
 		joined = true;
 		sessionStorage.setItem(JOINED_KEY, '1');
 		// Download any tracks already uploaded before this viewer joined
@@ -335,21 +462,44 @@
 		(src.cloneNode(true) as HTMLAudioElement).play().catch(() => {});
 	}
 
-	function triggerEffect(
-		soundType: 'damage' | 'heal' | 'condition',
-		color: string,
-		affectedId?: string
-	) {
-		const willPan = !!(affectedId && current && affectedId !== current.id);
-
-		// Pan to the affected combatant first; flash + sound fire after the fly-in completes
+	// Pans the spotlight to `id` if it isn't already showing, so a background event (damage
+	// on an off-screen combatant, a crit, going bloodied) still reads clearly. Returns whether
+	// a pan was started, so callers can delay their flash/sound/banner until it settles.
+	function panToCombatant(id: string): boolean {
+		const willPan = !!(current && id !== current.id);
 		if (willPan) {
 			if (focusTimer) clearTimeout(focusTimer);
-			focusCombatantId = affectedId!;
+			focusCombatantId = id;
 			focusTimer = setTimeout(() => {
 				focusCombatantId = null;
 			}, 2200);
 		}
+		return willPan;
+	}
+
+	// ── Floating damage/heal numbers — spawned over the spotlight avatar ───────
+	let floatingNumbers = $state<Array<{ key: number; text: string; positive: boolean }>>([]);
+	let floatKeyCounter = 0;
+
+	function spawnFloatingNumber(amount: number) {
+		if (!amount) return;
+		const key = ++floatKeyCounter;
+		floatingNumbers = [
+			...floatingNumbers,
+			{ key, text: amount > 0 ? `+${amount}` : `${amount}`, positive: amount > 0 }
+		];
+		setTimeout(() => {
+			floatingNumbers = floatingNumbers.filter((f) => f.key !== key);
+		}, 1400);
+	}
+
+	function triggerEffect(
+		soundType: 'damage' | 'heal' | 'condition',
+		color: string,
+		affectedId?: string,
+		amount?: number
+	) {
+		const willPan = affectedId ? panToCombatant(affectedId) : false;
 
 		// Delay flash and sound until the fly-in transition finishes (500 ms), or fire immediately
 		setTimeout(
@@ -363,8 +513,73 @@
 				if (soundType === 'damage') playSound('damage');
 				else if (soundType === 'heal') playSound('heal');
 				else playSound('condition');
+				if (amount) spawnFloatingNumber(amount);
 			},
 			willPan ? 500 : 0
+		);
+	}
+
+	// ── Big banner — bloodied/death-save stinger overlay ───────────────────────
+	let bigBanner = $state<{
+		key: number;
+		kind: 'bloodied' | 'stable' | 'dead';
+		text: string;
+		sub?: string;
+	} | null>(null);
+	let bigBannerTimer: ReturnType<typeof setTimeout> | null = null;
+
+	const BIG_BANNER_ICON: Record<NonNullable<typeof bigBanner>['kind'], string> = {
+		bloodied: 'fa-droplet',
+		stable: 'fa-heart',
+		dead: 'fa-skull'
+	};
+	const BIG_BANNER_CLASS: Record<NonNullable<typeof bigBanner>['kind'], string> = {
+		bloodied: 'border-red-600/70 shadow-red-600/30 text-red-400',
+		stable: 'border-green-600/70 shadow-green-600/30 text-green-400',
+		dead: 'border-red-800/70 shadow-red-900/40 text-red-500'
+	};
+
+	function showBigBanner(kind: NonNullable<typeof bigBanner>['kind'], text: string, sub?: string) {
+		if (bigBannerTimer) clearTimeout(bigBannerTimer);
+		bigBanner = { key: Date.now(), kind, text, sub };
+		bigBannerTimer = setTimeout(
+			() => {
+				bigBanner = null;
+			},
+			kind === 'bloodied' ? 2600 : 2000
+		);
+	}
+
+	// ── Death save pip pulse — brief flourish on the exact pip that just filled ─
+	let deathPipPulse = $state<{
+		targetId: string;
+		kind: 'success' | 'failure';
+		index: number;
+		key: number;
+	} | null>(null);
+
+	function pulseDeathPip(targetId: string, kind: 'success' | 'failure', index: number) {
+		deathPipPulse = { targetId, kind, index, key: Date.now() };
+		setTimeout(() => {
+			deathPipPulse = null;
+		}, 700);
+	}
+
+	function triggerBanner(
+		kind: NonNullable<typeof bigBanner>['kind'],
+		targetId: string | undefined,
+		text: string,
+		sub?: string,
+		extraDelay = 0
+	) {
+		const willPan = targetId ? panToCombatant(targetId) : false;
+		setTimeout(
+			() => {
+				showBigBanner(kind, text, sub);
+				// Stable/dead are death-save banners — silent, visual-only (no deathsave sounds).
+				if (kind === 'bloodied') playSound(kind);
+			},
+			(willPan ? 500 : 0) + extraDelay
 		);
 	}
 
@@ -387,10 +602,13 @@
 					if (combatState.currentTurnId === null && newState.currentTurnId !== null) {
 						playSound('battlestart');
 						startFlashKey++;
+						scheduleWarfareStart();
 					}
 					// Combat ends (active → null)
 					if (combatState.currentTurnId !== null && newState.currentTurnId === null) {
 						playSound('fanfare');
+						cancelWarfareStart();
+						warfareLoopActive = false;
 					}
 					// Turn advances (one combatant → another)
 					if (
@@ -404,8 +622,22 @@
 					if (!combatState.chaseState && newState.chaseState) {
 						startFlashKey++;
 					}
+				} else if (newState.currentTurnId !== null) {
+					// Joining mid-combat — pick up the warfare loop directly, skipping the
+					// battlestart stinger that already played for everyone else.
+					warfareLoopActive = true;
 				}
 				firstMessageReceived = true;
+
+				// Safety net: if a synced state ever says combat isn't active while we still think
+				// the warfare loop should be running, correct it. The "combat ends" branch above
+				// only fires on the exact null-transition message — if that one message is ever
+				// dropped (a flaky SSE delivery), this self-heals on the very next message instead
+				// of leaving warfare stuck looping until the page is refreshed.
+				if (newState.currentTurnId === null && warfareLoopActive) {
+					cancelWarfareStart();
+					warfareLoopActive = false;
+				}
 
 				// Play sound when room description is revealed
 				if (!combatState.dungeonRoomDescription && newState.dungeonRoomDescription) {
@@ -435,7 +667,7 @@
 						const soundType = isDamage ? 'damage' : 'heal';
 						newState.aoeEvents.forEach((ev, i) => {
 							setTimeout(() => {
-								triggerEffect(soundType, color, ev.id);
+								triggerEffect(soundType, color, ev.id, ev.delta);
 							}, i * INTERVAL);
 						});
 					} else {
@@ -444,18 +676,32 @@
 						let hadHeal = false;
 						let hadTempHp = false;
 						let affectedId: string | null = null;
+						let effAmount = 0;
 						let addedCondition: string | null = null;
 						let conditionTargetId: string | null = null;
+						let bloodiedTarget: { id: string; name: string } | null = null;
+						let deathSaveEvent: {
+							id: string;
+							name: string;
+							kind: 'success' | 'failure' | 'stable' | 'dead';
+							index?: number;
+						} | null = null;
 						for (const nc of newState.combatants) {
 							const oc = combatState.combatants.find((c) => c.id === nc.id);
 							if (!oc) continue;
 							const oldEff = oc.currentHp + (oc.tempHp ?? 0);
 							const newEff = nc.currentHp + (nc.tempHp ?? 0);
 							if (newEff < oldEff) {
-								if (!hadDamage) affectedId = nc.id;
+								if (!hadDamage) {
+									affectedId = nc.id;
+									effAmount = newEff - oldEff;
+								}
 								hadDamage = true;
 							} else if (nc.currentHp > oc.currentHp) {
-								if (!hadHeal) affectedId = nc.id;
+								if (!hadHeal) {
+									affectedId = nc.id;
+									effAmount = nc.currentHp - oc.currentHp;
+								}
 								hadHeal = true;
 							}
 							if ((nc.tempHp ?? 0) > (oc.tempHp ?? 0)) hadTempHp = true;
@@ -463,15 +709,65 @@
 								addedCondition = nc.statuses.find((s) => !oc.statuses.includes(s)) ?? null;
 								if (addedCondition) conditionTargetId = nc.id;
 							}
+
+							// Bloodied — an enemy's HP crosses from above 50% down to at/below it
+							if (!bloodiedTarget && nc.type === 'enemy' && nc.maxHp > 0 && nc.currentHp > 0) {
+								const wasAbove = oc.currentHp / oc.maxHp > 0.5;
+								const nowAtOrBelow = nc.currentHp / nc.maxHp <= 0.5;
+								if (wasAbove && nowAtOrBelow) bloodiedTarget = { id: nc.id, name: nc.name };
+							}
+
+							// Death saves — only compares once a player already has a death-save tracker
+							// (i.e. this isn't the hit that just dropped them to 0), so it only reacts
+							// to actual save rolls, not the HP change that started them.
+							if (!deathSaveEvent && nc.type === 'player' && nc.deathSaves && oc.deathSaves) {
+								const oldS = oc.deathSaves.successes;
+								const newS = nc.deathSaves.successes;
+								const oldF = oc.deathSaves.failures;
+								const newF = nc.deathSaves.failures;
+								const wasStable = oc.deathSaves.stable || oldS >= 3;
+								const nowStable = nc.deathSaves.stable || newS >= 3;
+								if (newF >= 3 && oldF < 3) {
+									deathSaveEvent = { id: nc.id, name: nc.name, kind: 'dead' };
+								} else if (nowStable && !wasStable) {
+									deathSaveEvent = { id: nc.id, name: nc.name, kind: 'stable' };
+								} else if (newF > oldF) {
+									deathSaveEvent = { id: nc.id, name: nc.name, kind: 'failure', index: newF - 1 };
+								} else if (newS > oldS) {
+									deathSaveEvent = { id: nc.id, name: nc.name, kind: 'success', index: newS - 1 };
+								}
+							}
 						}
-						if (hadDamage) triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined);
+						if (hadDamage)
+							triggerEffect('damage', 'rgba(239, 68, 68, 1)', affectedId ?? undefined, effAmount);
 						else if (hadHeal)
-							triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined);
+							triggerEffect('heal', 'rgba(34, 197, 94, 1)', affectedId ?? undefined, effAmount);
 						else if (hadTempHp) {
 							playSound('temphp');
 						} else if (addedCondition) {
 							const color = conditionFlashColors[addedCondition] ?? 'rgba(168, 85, 247, 1)';
 							triggerEffect('condition', color, conditionTargetId ?? undefined);
+						}
+						if (bloodiedTarget) {
+							triggerBanner('bloodied', bloodiedTarget.id, 'Bloodied!', bloodiedTarget.name, 400);
+						}
+						if (deathSaveEvent) {
+							if (deathSaveEvent.kind === 'dead') {
+								triggerBanner('dead', deathSaveEvent.id, 'Dead', deathSaveEvent.name);
+							} else if (deathSaveEvent.kind === 'stable') {
+								triggerBanner('stable', deathSaveEvent.id, 'Stabilized!', deathSaveEvent.name);
+							} else {
+								const willPan = panToCombatant(deathSaveEvent.id);
+								const id = deathSaveEvent.id;
+								const kind = deathSaveEvent.kind;
+								const index = deathSaveEvent.index ?? 0;
+								setTimeout(
+									() => {
+										pulseDeathPip(id, kind, index);
+									},
+									willPan ? 500 : 0
+								);
+							}
 						}
 					}
 				}
@@ -611,6 +907,24 @@
 		size: 2 + Math.random() * 3,
 		drift: (Math.random() - 0.5) * 60
 	}));
+
+	// Small sparks that briefly ignite and burst outward — a quicker, snappier accent alongside
+	// the slow-rising embers. Each spark sits dormant most of its cycle, then flashes and flies
+	// outward along its own fixed angle/distance (--dx/--dy) before fading, so bursts read as
+	// scattered and occasional rather than a constant shower.
+	const SPARKS = Array.from({ length: 12 }, () => {
+		const angle = Math.random() * Math.PI * 2;
+		const distance = 24 + Math.random() * 48;
+		return {
+			left: Math.random() * 100,
+			top: 15 + Math.random() * 65,
+			delay: Math.random() * 10,
+			duration: 6 + Math.random() * 6,
+			size: 2 + Math.random() * 2,
+			dx: Math.cos(angle) * distance,
+			dy: Math.sin(angle) * distance
+		};
+	});
 
 	const sorted = $derived(sortCombatants(combatState.combatants));
 	const players = $derived(sorted.filter((c) => c.type === 'player'));
@@ -821,6 +1135,13 @@
 				style="left: {ember.left}%; width: {ember.size}px; height: {ember.size}px; animation-duration: {ember.duration}s; animation-delay: -{ember.delay}s; --drift: {ember.drift}px;"
 			></span>
 		{/each}
+		<!-- Small sparks — occasional bursts alongside the embers -->
+		{#each SPARKS as spark, i (i)}
+			<span
+				class="spark"
+				style="left: {spark.left}%; top: {spark.top}%; width: {spark.size}px; height: {spark.size}px; animation-duration: {spark.duration}s; animation-delay: -{spark.delay}s; --dx: {spark.dx}px; --dy: {spark.dy}px;"
+			></span>
+		{/each}
 	</div>
 
 	<!-- Fog-of-war dungeon map — full-screen, opened via hamburger menu -->
@@ -1016,6 +1337,30 @@
 			<div class="start-flash pointer-events-none fixed inset-0 z-[185]" aria-hidden="true"></div>
 		{/if}
 	{/key}
+
+	<!-- Big banner — crit/fumble/bloodied/death-save stinger -->
+	{#if bigBanner}
+		<div class="pointer-events-none fixed inset-0 z-[290] flex items-center justify-center">
+			{#key bigBanner.key}
+				<div
+					in:fly={{ y: -20, duration: 350 }}
+					out:fly={{ y: 20, duration: 250 }}
+					class="flex flex-col items-center gap-2 rounded-2xl border bg-gray-950/90 px-12 py-8 text-center shadow-2xl backdrop-blur-md {BIG_BANNER_CLASS[
+						bigBanner.kind
+					]}"
+				>
+					<i
+						class="fa-duotone fa-light {BIG_BANNER_ICON[bigBanner.kind]} text-6xl"
+						aria-hidden="true"
+					></i>
+					<p class="text-4xl font-black tracking-[0.15em] uppercase">{bigBanner.text}</p>
+					{#if bigBanner.sub}
+						<p class="text-sm text-gray-400">{bigBanner.sub}</p>
+					{/if}
+				</div>
+			{/key}
+		</div>
+	{/if}
 
 	<!-- Atmospheric background glow -->
 	{#if current}
@@ -1423,6 +1768,15 @@
 		{@const dc = displayCombatant ?? current}
 		<!-- Active combatant display -->
 		<div class="relative z-10 flex flex-1 overflow-hidden">
+			<!-- Low-HP heartbeat vignette — pulses while a conscious player is critically low.
+			     Scoped to this content area (absolute, not fixed) so it stays clear of the
+			     header/footer bars above and below it. -->
+			{#if lowHpActive}
+				<div
+					class="heartbeat-vignette pointer-events-none absolute inset-0 z-40"
+					aria-hidden="true"
+				></div>
+			{/if}
 			{#key dc.id}
 				{@const pct = hpPercent(dc)}
 				{@const isBloodied = dc.type === 'enemy' && pct > 0 && pct <= 50}
@@ -1445,41 +1799,60 @@
 					</div>
 
 					<!-- Avatar token -->
-					{#if dc.type === 'enemy'}
-						{@const style = getMonsterStyle(dc.monsterType)}
-						{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
-						{#if imgUrl}
-							<button
-								onclick={() => openAvatarPreview(imgUrl, dc.name)}
-								title="View {dc.name}'s image"
-								class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {isBloodied
-									? 'bloodied-avatar ring-red-600'
-									: style.ring}"
-								style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
-							>
-								<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
-							</button>
-						{:else}
-							{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
+					<div class="relative">
+						{#if floatingNumbers.length > 0}
 							<div
-								class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {isBloodied
-									? 'bloodied-avatar ring-red-600'
-									: style.ring}"
-								style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+								class="pointer-events-none absolute inset-x-0 top-1/2 z-10 flex justify-center"
+								aria-hidden="true"
 							>
-								<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
+								{#each floatingNumbers as fn (fn.key)}
+									<span
+										class="floating-number absolute text-5xl font-black {fn.positive
+											? 'text-green-400'
+											: 'text-red-400'}"
+										style="text-shadow: 0 2px 16px rgba(0,0,0,0.85);"
+									>
+										{fn.text}
+									</span>
+								{/each}
 							</div>
 						{/if}
-					{:else if dc.avatarUrl}
-						<button
-							onclick={() => openAvatarPreview(dc.avatarUrl ?? '', dc.name)}
-							title="View {dc.name}'s avatar"
-							class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
-							style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
-						>
-							<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
-						</button>
-					{/if}
+						{#if dc.type === 'enemy'}
+							{@const style = getMonsterStyle(dc.monsterType)}
+							{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
+							{#if imgUrl}
+								<button
+									onclick={() => openAvatarPreview(imgUrl, dc.name)}
+									title="View {dc.name}'s image"
+									class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {isBloodied
+										? 'bloodied-avatar ring-red-600'
+										: style.ring}"
+									style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+								>
+									<img src={imgUrl} alt={dc.name} class="h-full w-full object-cover object-top" />
+								</button>
+							{:else}
+								{@const emoji = getMonsterEmoji(dc.templateName, dc.monsterType)}
+								<div
+									class="mb-6 flex h-44 w-44 items-center justify-center rounded-full ring-4 ring-offset-4 ring-offset-gray-950 {style.bg} {isBloodied
+										? 'bloodied-avatar ring-red-600'
+										: style.ring}"
+									style={isBloodied ? '' : 'box-shadow: 0 0 48px -8px var(--tw-ring-color);'}
+								>
+									<span class="select-none" style="font-size: 5rem; line-height: 1;">{emoji}</span>
+								</div>
+							{/if}
+						{:else if dc.avatarUrl}
+							<button
+								onclick={() => openAvatarPreview(dc.avatarUrl ?? '', dc.name)}
+								title="View {dc.name}'s avatar"
+								class="mb-6 h-44 w-44 cursor-pointer overflow-hidden rounded-full ring-4 ring-blue-500 ring-offset-4 ring-offset-gray-950"
+								style="box-shadow: 0 0 48px -8px rgba(59,130,246,0.6);"
+							>
+								<img src={dc.avatarUrl} alt={dc.name} class="h-full w-full object-cover" />
+							</button>
+						{/if}
+					</div>
 
 					<!-- Bloodied badge (enemy only, HP ≤ 50%) -->
 					{#if isBloodied}
@@ -1632,11 +2005,17 @@
 											>
 											<div class="flex gap-3">
 												{#each [0, 1, 2] as i}
+													{@const justFilled =
+														deathPipPulse?.targetId === dc.id &&
+														deathPipPulse.kind === 'failure' &&
+														deathPipPulse.index === i}
 													<div
 														class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.failures >
 														i
 															? 'border-red-600 bg-red-800/60 text-red-300'
-															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
+															: 'border-gray-700 bg-gray-900/60 text-gray-700'} {justFilled
+															? 'death-pip-pulse'
+															: ''}"
 													>
 														{#if ds.failures > i}
 															<i class="fa-duotone fa-light fa-skull" aria-hidden="true"></i>
@@ -1655,11 +2034,17 @@
 											>
 											<div class="flex gap-3">
 												{#each [0, 1, 2] as i}
+													{@const justFilled =
+														deathPipPulse?.targetId === dc.id &&
+														deathPipPulse.kind === 'success' &&
+														deathPipPulse.index === i}
 													<div
 														class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-xl {ds.successes >
 														i
 															? 'border-green-600 bg-green-800/60 text-green-300'
-															: 'border-gray-700 bg-gray-900/60 text-gray-700'}"
+															: 'border-gray-700 bg-gray-900/60 text-gray-700'} {justFilled
+															? 'death-pip-pulse'
+															: ''}"
 													>
 														{#if ds.successes > i}
 															<i class="fa-duotone fa-light fa-heart" aria-hidden="true"></i>
@@ -2029,6 +2414,59 @@
 		animation: start-flash-effect 0.9s ease-out forwards;
 	}
 
+	/* Floating damage/heal numbers — drift up off the spotlight avatar and fade */
+	@keyframes float-number-rise {
+		0% {
+			opacity: 0;
+			transform: translateY(0) scale(0.8);
+		}
+		15% {
+			opacity: 1;
+			transform: translateY(-10px) scale(1.1);
+		}
+		75% {
+			opacity: 1;
+			transform: translateY(-60px) scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: translateY(-90px) scale(1);
+		}
+	}
+	.floating-number {
+		animation: float-number-rise 1.4s ease-out forwards;
+	}
+
+	/* Low-HP heartbeat — pulsing red vignette around the screen edge */
+	@keyframes heartbeat-pulse {
+		0%,
+		100% {
+			box-shadow: inset 0 0 120px 20px rgba(220, 38, 38, 0.12);
+		}
+		50% {
+			box-shadow: inset 0 0 220px 60px rgba(220, 38, 38, 0.32);
+		}
+	}
+	.heartbeat-vignette {
+		animation: heartbeat-pulse 1.1s ease-in-out infinite;
+	}
+
+	/* Death save pip — brief punch when a save is rolled */
+	@keyframes death-pip-punch {
+		0% {
+			transform: scale(1);
+		}
+		35% {
+			transform: scale(1.4);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+	.death-pip-pulse {
+		animation: death-pip-punch 0.6s ease-out;
+	}
+
 	/* ── Room description reveal ── */
 	@keyframes word-rise {
 		from {
@@ -2201,6 +2639,37 @@
 		}
 		100% {
 			transform: translate(var(--drift), -100vh) scale(1);
+			opacity: 0;
+		}
+	}
+
+	.spark {
+		position: absolute;
+		border-radius: 50%;
+		background: radial-gradient(
+			circle,
+			rgba(255, 214, 153, 1) 0%,
+			rgba(251, 146, 60, 0.9) 55%,
+			transparent 100%
+		);
+		box-shadow: 0 0 8px 1px rgba(251, 146, 60, 0.8);
+		opacity: 0;
+		animation-name: spark-burst;
+		animation-timing-function: ease-out;
+		animation-iteration-count: infinite;
+	}
+	@keyframes spark-burst {
+		0%,
+		92% {
+			transform: translate(0, 0) scale(0.4);
+			opacity: 0;
+		}
+		94% {
+			transform: translate(0, 0) scale(1);
+			opacity: 1;
+		}
+		100% {
+			transform: translate(var(--dx), var(--dy)) scale(0.2);
 			opacity: 0;
 		}
 	}
