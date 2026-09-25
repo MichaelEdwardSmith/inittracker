@@ -28,6 +28,7 @@
 	const MAX_PAGES = 60;
 	const PDF_RENDER_SCALE = 2;
 	const PDF_JPEG_QUALITY = 0.85;
+	const MAX_PAGE_BYTES = 8_000_000; // must match server's limit in api/docshare/page/+server.ts
 
 	let viewState = $state<ViewState | null>(null);
 	let pageBlobUrls = $state<(string | null)[]>([]);
@@ -123,6 +124,30 @@
 		for (const u of pageBlobUrls) if (u) URL.revokeObjectURL(u);
 	}
 
+	// A single image can arrive well over the server's per-page limit (e.g. an unresized phone
+	// photo). Re-encode it as JPEG, shrinking dimensions a step at a time, until it fits —
+	// mirrors the compression PDF pages already get from renderPdfToPageBlobs above.
+	async function shrinkImageIfNeeded(file: File): Promise<Blob> {
+		if (file.size <= MAX_PAGE_BYTES) return file;
+
+		const bitmap = await createImageBitmap(file);
+		let scale = 1;
+		for (let attempt = 0; attempt < 6; attempt++) {
+			const canvas = document.createElement('canvas');
+			canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+			canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+			const ctx = canvas.getContext('2d');
+			if (!ctx) break;
+			ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+			const blob = await new Promise<Blob | null>((resolve) =>
+				canvas.toBlob((b) => resolve(b), 'image/jpeg', PDF_JPEG_QUALITY)
+			);
+			if (blob && blob.size <= MAX_PAGE_BYTES) return blob;
+			scale *= 0.7;
+		}
+		return file;
+	}
+
 	async function handleFileChange(e: Event) {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (!file) return;
@@ -133,7 +158,7 @@
 			if (file.type === 'application/pdf') {
 				pages = await renderPdfToPageBlobs(file);
 			} else if (file.type.startsWith('image/')) {
-				pages = [file];
+				pages = [await shrinkImageIfNeeded(file)];
 			} else {
 				error = 'Choose an image or PDF file.';
 				return;
@@ -174,7 +199,10 @@
 					},
 					body: blob
 				});
-				if (!res.ok) throw new Error('upload failed');
+				if (!res.ok) {
+					const reason = await res.text().catch(() => '');
+					throw new Error(reason || `HTTP ${res.status}`);
+				}
 				pageBlobUrls[i] = URL.createObjectURL(blob);
 				uploadProgress = { current: i + 1, total: pages.length };
 			}
@@ -185,8 +213,11 @@
 				currentPage: 0,
 				visible: false
 			};
-		} catch {
-			error = 'Upload failed partway through — try again.';
+		} catch (e) {
+			const reason = e instanceof Error ? e.message : '';
+			error = reason
+				? `Upload failed partway through: ${reason}`
+				: 'Upload failed partway through — try again.';
 			viewState = null;
 			pageBlobUrls = [];
 		} finally {
