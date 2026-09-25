@@ -33,13 +33,14 @@ export default config;*/
 
 import adapter from '@sveltejs/adapter-node';
 
+// adapter-node has no build-time body size option — the limit is set at runtime via the
+// BODY_SIZE_LIMIT env var (defaults to 512K), which must be set wherever the server process
+// is started (e.g. the systemd unit's Environment= directive). See README/deploy notes.
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter({
-			// Allow large audio file uploads from the mixer (default is 512 KB)
-			bodyLimit: 100 * 1024 * 1024 // 100 MB
-		})
+		adapter: adapter()
 	}
 };
 
