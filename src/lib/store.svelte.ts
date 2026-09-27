@@ -798,6 +798,14 @@ function createCombatStore() {
 			sync();
 		},
 
+		setMaxHp(id: string, value: number) {
+			const maxHp = Math.max(1, value);
+			combatants = combatants.map((c) =>
+				c.id === id ? { ...c, maxHp, currentHp: Math.min(c.currentHp, maxHp) } : c
+			);
+			sync();
+		},
+
 		setDeathSaves(id: string, saves: NonNullable<Combatant['deathSaves']>) {
 			combatants = combatants.map((c) => {
 				if (c.id !== id) return c;

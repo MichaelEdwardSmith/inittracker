@@ -4,10 +4,11 @@
 // multi-session schema on first access.
 import bcrypt from 'bcryptjs';
 import { randomUUID, randomBytes, createHash } from 'crypto';
-import type { WithId, Document, Filter } from 'mongodb';
+import { Binary, type WithId, type Document, type Filter } from 'mongodb';
 import { getDb } from './db';
 import { isRootAdminEmail } from './admin';
 import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
+import type { BattleMapStroke } from './battleMapState';
 import type {
 	StorageState,
 	CustomMonster,
@@ -15,7 +16,8 @@ import type {
 	GameSession,
 	NoteEntry,
 	Encounter,
-	SchedulingProposal
+	SchedulingProposal,
+	SavedBattleMap
 } from '$lib/types';
 
 // ---------------------------------------------------------------------------
@@ -675,6 +677,109 @@ export async function deleteEncounter(authSessionId: string, encounterId: string
 	await c.updateOne({ sessionId: authSessionId }, {
 		$pull: { encounters: { id: encounterId } }
 	} as never);
+}
+
+// ---------------------------------------------------------------------------
+// Saved battle maps — per DM account, reusable across game sessions. Lives in its own
+// collection (not the DM document) because map images run into the megabytes and would
+// blow past a single document's headroom if embedded alongside combat state/history.
+// ---------------------------------------------------------------------------
+
+interface SavedBattleMapDoc {
+	id: string;
+	authSessionId: string;
+	name: string;
+	mimeType: string;
+	data: Binary;
+	naturalWidth: number;
+	naturalHeight: number;
+	gridSquaresAcross: number;
+	gridSquaresDown: number;
+	feetPerSquare: number;
+	strokes: BattleMapStroke[];
+	createdAt: string;
+}
+
+// This collection is deliberately outside the size-limited DM document (see comment above) so
+// map images can run into the megabytes — but that also means it isn't self-bounding the way
+// every other DM-owned array in this file is (implicitly capped by Mongo's 16MB document limit).
+// A per-account count cap keeps storage bounded without needing a TTL/cleanup job.
+const MAX_SAVED_BATTLE_MAPS_PER_DM = 30;
+
+async function savedBattleMapsCol() {
+	const db = await getDb();
+	return db.collection<SavedBattleMapDoc>('savedBattleMaps');
+}
+
+export async function getSavedBattleMaps(authSessionId: string): Promise<SavedBattleMap[]> {
+	const c = await savedBattleMapsCol();
+	const docs = await c
+		.find(
+			{ authSessionId },
+			{ projection: { _id: 0, data: 0, authSessionId: 0 }, sort: { createdAt: -1 } }
+		)
+		.toArray();
+	return docs as unknown as SavedBattleMap[];
+}
+
+export async function saveBattleMapToLibrary(
+	authSessionId: string,
+	map: Omit<SavedBattleMap, 'id' | 'createdAt'> & { data: Uint8Array }
+): Promise<SavedBattleMap | null> {
+	const c = await savedBattleMapsCol();
+	const existingCount = await c.countDocuments({ authSessionId });
+	if (existingCount >= MAX_SAVED_BATTLE_MAPS_PER_DM) return null;
+
+	const doc: SavedBattleMapDoc = {
+		id: randomUUID(),
+		authSessionId,
+		name: map.name,
+		mimeType: map.mimeType,
+		data: new Binary(Buffer.from(map.data)),
+		naturalWidth: map.naturalWidth,
+		naturalHeight: map.naturalHeight,
+		gridSquaresAcross: map.gridSquaresAcross,
+		gridSquaresDown: map.gridSquaresDown,
+		feetPerSquare: map.feetPerSquare,
+		strokes: map.strokes,
+		createdAt: new Date().toISOString()
+	};
+	await c.insertOne(doc);
+	return {
+		id: doc.id,
+		name: doc.name,
+		mimeType: doc.mimeType,
+		naturalWidth: doc.naturalWidth,
+		naturalHeight: doc.naturalHeight,
+		gridSquaresAcross: doc.gridSquaresAcross,
+		gridSquaresDown: doc.gridSquaresDown,
+		feetPerSquare: doc.feetPerSquare,
+		strokes: doc.strokes,
+		createdAt: doc.createdAt
+	};
+}
+
+export async function getSavedBattleMapImage(
+	authSessionId: string,
+	id: string
+): Promise<{ data: Buffer; mimeType: string } | null> {
+	const c = await savedBattleMapsCol();
+	const doc = await c.findOne({ authSessionId, id }, { projection: { data: 1, mimeType: 1 } });
+	if (!doc) return null;
+	return { data: Buffer.from(doc.data.buffer), mimeType: doc.mimeType };
+}
+
+export async function getSavedBattleMapForLoad(
+	authSessionId: string,
+	id: string
+): Promise<SavedBattleMapDoc | null> {
+	const c = await savedBattleMapsCol();
+	return c.findOne({ authSessionId, id });
+}
+
+export async function deleteSavedBattleMap(authSessionId: string, id: string): Promise<void> {
+	const c = await savedBattleMapsCol();
+	await c.deleteOne({ authSessionId, id });
 }
 
 // ---------------------------------------------------------------------------

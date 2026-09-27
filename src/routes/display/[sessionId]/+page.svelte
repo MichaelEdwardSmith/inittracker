@@ -25,6 +25,13 @@
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
 	import AnnotationCanvas from '$lib/components/AnnotationCanvas.svelte';
 	import type { Stroke } from '$lib/docShareTypes';
+	import BattleGridCanvas from '$lib/components/BattleGridCanvas.svelte';
+	import type {
+		BattleMapViewState,
+		BattleMapToken,
+		BattleMapRuler,
+		BattleMapStroke
+	} from '$lib/battleMapTypes';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -460,6 +467,73 @@
 		docShareAnnotations = { ...docShareAnnotations, [msg.page]: msg.strokes };
 	}
 
+	// ── Battle Map — DM's map image + combatant tokens, relayed through an in-memory-only
+	// server slot (see battleMapState.ts). Single map at a time. Appears as a corner badge when
+	// live; players expand it full-screen to see it, same idea as the fog-of-war dungeon map. ──
+	let battleMapView = $state<BattleMapViewState | null>(null);
+	let battleMapImageUrl = $state<string | null>(null);
+	let battleMapTokens = $state<BattleMapToken[]>([]);
+	let battleMapRuler = $state<BattleMapRuler | null>(null);
+	let battleMapStrokes = $state<BattleMapStroke[]>([]);
+	let battleMapExpanded = $state(false);
+
+	// Guards against out-of-order resolution when the map switches twice in quick succession —
+	// without it, a slower fetch for an older map can resolve after a newer one and overwrite
+	// (and revoke the blob URL of) the map that's actually supposed to be showing.
+	let battleMapImageRequestId = 0;
+	async function downloadBattleMapImage(id: string) {
+		const requestId = ++battleMapImageRequestId;
+		try {
+			const res = await fetch(`/api/battlemap/image?session=${data.sessionId}&id=${id}`);
+			if (!res.ok) return;
+			const blob = await res.blob();
+			if (requestId !== battleMapImageRequestId) return;
+			if (battleMapImageUrl) URL.revokeObjectURL(battleMapImageUrl);
+			battleMapImageUrl = URL.createObjectURL(blob);
+		} catch {
+			/* ignore */
+		}
+	}
+
+	function applyBattleMapState(state: BattleMapViewState | null) {
+		if (!state) {
+			if (battleMapImageUrl) URL.revokeObjectURL(battleMapImageUrl);
+			battleMapImageUrl = null;
+			battleMapView = null;
+			battleMapTokens = [];
+			battleMapRuler = null;
+			battleMapStrokes = [];
+			battleMapExpanded = false;
+			return;
+		}
+		// A fresh viewer's battleMapView starts null even when a map already exists but is still
+		// hidden — tokens/strokes drawn before the DM hits "Show" already arrived via their own
+		// broadcasts by this point, so only wipe them when this is an actual map REPLACEMENT
+		// (we previously had a different id), not on the null → first-state transition.
+		const isDifferentMap = battleMapView !== null && battleMapView.id !== state.id;
+		if (battleMapView?.id !== state.id) {
+			downloadBattleMapImage(state.id);
+		}
+		if (isDifferentMap) {
+			battleMapTokens = [];
+			battleMapRuler = null;
+			battleMapStrokes = [];
+		}
+		battleMapView = state;
+	}
+
+	function applyBattleMapTokens(tokens: BattleMapToken[]) {
+		battleMapTokens = tokens;
+	}
+
+	function applyBattleMapRuler(ruler: BattleMapRuler | null) {
+		battleMapRuler = ruler;
+	}
+
+	function applyBattleMapDraw(strokes: BattleMapStroke[]) {
+		battleMapStrokes = strokes;
+	}
+
 	const JOINED_KEY = $derived(`viewer-joined-${data.sessionId}`);
 
 	function joinSession() {
@@ -512,6 +586,18 @@
 					pageStrokes: Record<number, Stroke[]>;
 				} | null;
 				if (anno && anno.docId === state.id) docShareAnnotations = anno.pageStrokes;
+			})
+			.catch(() => {});
+		// Pick up a battle map already prepared/shown before this viewer joined
+		fetch(`/api/battlemap/state?session=${data.sessionId}`)
+			.then((r) => (r.ok ? r.json() : null))
+			.then(async (state: BattleMapViewState | null) => {
+				applyBattleMapState(state);
+				if (!state) return;
+				const res = await fetch(`/api/battlemap/tokens?session=${data.sessionId}`);
+				if (res.ok) battleMapTokens = await res.json();
+				const dRes = await fetch(`/api/battlemap/draw?session=${data.sessionId}`);
+				if (dRes.ok) battleMapStrokes = await dRes.json();
 			})
 			.catch(() => {});
 	}
@@ -875,6 +961,22 @@
 		});
 		source.addEventListener('docshareAnnotation', (e) => {
 			applyDocShareAnnotation(JSON.parse((e as MessageEvent).data));
+		});
+
+		source.addEventListener('battleMapState', (e) => {
+			applyBattleMapState(JSON.parse((e as MessageEvent).data));
+		});
+		source.addEventListener('battleMapRemoved', () => {
+			applyBattleMapState(null);
+		});
+		source.addEventListener('battleMapTokens', (e) => {
+			applyBattleMapTokens(JSON.parse((e as MessageEvent).data));
+		});
+		source.addEventListener('battleMapRuler', (e) => {
+			applyBattleMapRuler(JSON.parse((e as MessageEvent).data));
+		});
+		source.addEventListener('battleMapDraw', (e) => {
+			applyBattleMapDraw(JSON.parse((e as MessageEvent).data));
 		});
 
 		source.addEventListener('dmMessage', (e) => {
@@ -1261,6 +1363,60 @@
 				</div>
 			{/if}
 		</div>
+	{/if}
+
+	<!-- Battle Map — full-screen, opened via the corner badge or hamburger menu -->
+	{#if battleMapView && battleMapExpanded && battleMapImageUrl}
+		<div class="fixed inset-0 z-[150] flex flex-col bg-gray-950">
+			<div
+				class="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
+			>
+				<span class="text-sm font-semibold text-gray-200">
+					<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i>
+					Battle Map
+				</span>
+				<button
+					onclick={() => (battleMapExpanded = false)}
+					class="rounded p-1 text-gray-500 hover:bg-white/10 hover:text-white"
+					aria-label="Close map"
+					><i class="fa-duotone fa-light fa-xmark" aria-hidden="true"></i></button
+				>
+			</div>
+			<div class="relative min-h-0 flex-1 overflow-hidden">
+				<BattleGridCanvas
+					imageUrl={battleMapImageUrl}
+					naturalWidth={battleMapView.naturalWidth}
+					naturalHeight={battleMapView.naturalHeight}
+					gridSquaresAcross={battleMapView.gridSquaresAcross}
+					gridSquaresDown={battleMapView.gridSquaresDown}
+					feetPerSquare={battleMapView.feetPerSquare}
+					showGrid={battleMapView.showGrid}
+					tokens={battleMapTokens}
+					combatants={combatState.combatants}
+					ruler={battleMapRuler}
+					strokes={battleMapStrokes}
+					{ruleset}
+				/>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Battle Map corner badge — appears while the DM has the map shown; tap to open full-screen -->
+	{#if battleMapView?.visible && !battleMapExpanded}
+		<button
+			onclick={() => (battleMapExpanded = true)}
+			transition:fly={{ y: 20, duration: 300 }}
+			class="fixed right-4 bottom-4 z-[140] flex items-center gap-2 rounded-full border border-blue-600/60 bg-gray-900/95 px-3 py-2 text-xs font-bold tracking-wide text-blue-300 uppercase shadow-2xl transition hover:border-blue-400 hover:text-blue-200"
+		>
+			<span class="relative flex h-2 w-2">
+				<span
+					class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"
+				></span>
+				<span class="relative inline-flex h-2 w-2 rounded-full bg-blue-400"></span>
+			</span>
+			<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i>
+			Battle Map
+		</button>
 	{/if}
 
 	<ChaseTrackerOverlay
@@ -1724,6 +1880,18 @@
 			>
 				<i class="fa-duotone fa-light fa-map shrink-0 text-base" aria-hidden="true"></i>
 				View Map
+			</button>
+		{/if}
+		{#if battleMapView}
+			<button
+				onclick={() => {
+					battleMapExpanded = true;
+					showMobileMenu = false;
+				}}
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-swords shrink-0 text-base" aria-hidden="true"></i>
+				Battle Map
 			</button>
 		{/if}
 		{#if myPlayerName && players.length > 0}

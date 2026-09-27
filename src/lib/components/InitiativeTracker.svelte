@@ -15,6 +15,7 @@
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
 	import CombatantNoteModal from '$lib/components/CombatantNoteModal.svelte';
+	import EditMaxHpModal from '$lib/components/EditMaxHpModal.svelte';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	import { tick } from 'svelte';
 	import { flip } from 'svelte/animate';
@@ -55,6 +56,7 @@
 	let infoMonster = $state<MonsterDetail | null>(null);
 	let conditionInfo = $state<string | null>(null);
 	let noteTarget = $state<import('$lib/types').Combatant | null>(null);
+	let maxHpTarget = $state<import('$lib/types').Combatant | null>(null);
 	let lootTarget = $state<import('$lib/types').Combatant | null>(null);
 	let concentrationCheck = $state<{ id: string; name: string; damage: number; dc: number } | null>(
 		null
@@ -715,6 +717,16 @@
 									<span class="text-base font-bold {hpTextColor(pct)}">{c.currentHp}</span>
 									<span class="text-xs text-gray-600">/</span>
 									<span class="text-sm text-gray-400">{c.maxHp}</span>
+									{#if c.type === 'enemy'}
+										<button
+											onclick={() => (maxHpTarget = c)}
+											title="Edit max HP"
+											class="flex items-center leading-none text-gray-600 transition hover:text-amber-400"
+										>
+											<i class="fa-duotone fa-light fa-pen-to-square text-xs" aria-hidden="true"
+											></i>
+										</button>
+									{/if}
 									{#if c.preExhaustionMaxHp !== undefined}
 										<i
 											class="fa-duotone fa-light fa-face-tired text-xs text-orange-400"
@@ -1171,6 +1183,11 @@
 	combatant={noteTarget}
 	onclose={() => (noteTarget = null)}
 	onsave={(id, note) => combat.update(id, { note })}
+/>
+<EditMaxHpModal
+	combatant={maxHpTarget}
+	onclose={() => (maxHpTarget = null)}
+	onsave={(id, maxHp) => combat.setMaxHp(id, maxHp)}
 />
 
 {#if lootTarget}
