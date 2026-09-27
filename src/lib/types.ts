@@ -314,6 +314,22 @@ export interface Encounter {
 	createdAt: string;
 }
 
+// Metadata for a battle map saved to the DM's library (image bytes fetched separately, on
+// demand, via /api/battlemap/library/image — never inlined here). Strokes ARE inlined so the
+// library picker's thumbnails can render what was drawn without a request per map.
+export interface SavedBattleMap {
+	id: string;
+	name: string;
+	mimeType: string;
+	naturalWidth: number;
+	naturalHeight: number;
+	gridSquaresAcross: number;
+	gridSquaresDown: number;
+	feetPerSquare: number;
+	strokes: { points: number[]; color: string; width: number }[];
+	createdAt: string;
+}
+
 export interface NoteEntry {
 	id: string;
 	date: string; // ISO date string

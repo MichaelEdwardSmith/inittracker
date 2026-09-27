@@ -194,6 +194,15 @@
 		if (!DocShareModalComp)
 			DocShareModalComp = (await import('$lib/components/DocShareModal.svelte')).default;
 	}
+	let showBattleMap = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let BattleMapModalComp = $state<any>(null);
+	async function openBattleMap() {
+		showBattleMap = true;
+		showMobileMenu = false;
+		if (!BattleMapModalComp)
+			BattleMapModalComp = (await import('$lib/components/BattleMapModal.svelte')).default;
+	}
 	let showScheduling = $state(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let SchedulingModalComp = $state<any>(null);
@@ -722,6 +731,14 @@
 				<i class="fa-duotone fa-light fa-file-image shrink-0 text-base" aria-hidden="true"></i>
 				Document Share
 			</button>
+			<button
+				onclick={openBattleMap}
+				title="Place tokens on a map and measure distance for your players"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-map shrink-0 text-base" aria-hidden="true"></i>
+				Battle Map
+			</button>
 			{#if data.showVoiceCommands}
 				<VoiceCommands mobile={true} ruleset={activeSession.ruleset} />
 			{/if}
@@ -1144,6 +1161,15 @@
 {#if showDocShare && DocShareModalComp}
 	{@const DocShare = DocShareModalComp}
 	<DocShare sessionId={activeSession.sessionId} onclose={() => (showDocShare = false)} />
+{/if}
+
+{#if showBattleMap && BattleMapModalComp}
+	{@const BattleMap = BattleMapModalComp}
+	<BattleMap
+		sessionId={activeSession.sessionId}
+		ruleset={activeSession.ruleset}
+		onclose={() => (showBattleMap = false)}
+	/>
 {/if}
 
 {#if showScheduling && SchedulingModalComp}
