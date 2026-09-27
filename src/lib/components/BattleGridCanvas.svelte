@@ -162,7 +162,15 @@
 		gridSquaresDown > 0 ? gridSquaresDown : squareNormY > 0 ? Math.round(1 / squareNormY) : 1
 	);
 
-	function snapToGrid(nx: number, ny: number): [number, number] {
+	// A token spanning an even number of squares (2x2 Large, 4x4 Gargantuan) has no single
+	// square at its middle — its true center sits on the intersection between squares. An
+	// odd span (1x1, 3x3 Huge) or a fractional one (0.5 Tiny) centers on a square like normal.
+	function snapToGrid(nx: number, ny: number, squares = 1): [number, number] {
+		if (squares % 2 === 0) {
+			const col = Math.max(0, Math.min(gridSquaresAcross, Math.round(nx / squareNormX)));
+			const row = Math.max(0, Math.min(effectiveRows, Math.round(ny / squareNormY)));
+			return [col * squareNormX, row * squareNormY];
+		}
 		const col = Math.max(0, Math.min(gridSquaresAcross - 1, Math.floor(nx / squareNormX)));
 		const row = Math.max(0, Math.min(effectiveRows - 1, Math.floor(ny / squareNormY)));
 		return [(col + 0.5) * squareNormX, (row + 0.5) * squareNormY];
@@ -193,6 +201,36 @@
 			emoji: getMonsterEmoji(c.templateName, c.monsterType),
 			ring: style.ring
 		};
+	}
+
+	// D&D size category → how many grid squares across the token should span. Small and Medium
+	// both occupy a single square per RAW, so they (and anything unrecognized — players, lairs,
+	// custom monsters with no stat block on file) fall through to the 1-square default.
+	const SIZE_SQUARES: Record<string, number> = {
+		tiny: 0.5,
+		large: 2,
+		huge: 3,
+		gargantuan: 4
+	};
+
+	// `c.size` is resolved once and stored on the combatant when it's added (store.svelte.ts),
+	// which is the only way a custom/bestiary-imported monster's size is known at all — it isn't
+	// in either built-in lookup map. Combatants added before that field existed fall back to
+	// resolving it here: 2024 stat blocks carry `size` directly; 2014 ones only have it embedded
+	// in the free-text `meta` string (e.g. "Large giant, chaotic evil").
+	function monsterSizeCategory(c: Combatant): string | undefined {
+		if (c.type !== 'enemy') return undefined;
+		if (c.size) return c.size;
+		if (ruleset === '2024') {
+			return getMonsterDetail2024(c.templateName ?? '')?.size;
+		}
+		return getMonsterDetail(c.templateName ?? '')?.meta?.match(
+			/^(Tiny|Small|Medium|Large|Huge|Gargantuan)/i
+		)?.[0];
+	}
+
+	function tokenSizeSquares(c: Combatant): number {
+		return SIZE_SQUARES[monsterSizeCategory(c)?.toLowerCase() ?? ''] ?? 1;
 	}
 
 	function combatantFor(id: string): Combatant | undefined {
@@ -233,7 +271,8 @@
 		const p = normalizedPoint(e);
 		if (!p) return;
 		draggingId = combatantId;
-		dragPos = snapToGrid(p[0], p[1]);
+		const c = combatantFor(combatantId);
+		dragPos = snapToGrid(p[0], p[1], c ? tokenSizeSquares(c) : 1);
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 	}
 
@@ -241,7 +280,8 @@
 		if (!draggingId) return;
 		const p = normalizedPoint(e);
 		if (!p) return;
-		dragPos = snapToGrid(p[0], p[1]);
+		const c = combatantFor(draggingId);
+		dragPos = snapToGrid(p[0], p[1], c ? tokenSizeSquares(c) : 1);
 		throttled(() => onTokenMove?.(draggingId!, dragPos![0], dragPos![1]));
 	}
 
@@ -549,7 +589,8 @@
 					{@const [px, py] = displayPos(t)}
 					{@const v = tokenVisual(c)}
 					{@const pct = hpPercent(c)}
-					{@const size = Math.min(squareNormX * rect.w, squareNormY * rect.h) * 0.8}
+					{@const size =
+						Math.min(squareNormX * rect.w, squareNormY * rect.h) * tokenSizeSquares(c) * 0.8}
 					<!-- Anchor wrapper is sized to exactly the avatar (not avatar+badge), so
 				     -translate-{x,y}-1/2 centers the picture itself on the token's true grid
 				     position — the HP badge hangs below without shifting that anchor. -->
@@ -561,7 +602,9 @@
 					>
 						<button
 							type="button"
-							title="{c.name} — {c.currentHp}/{c.maxHp} HP"
+							title={c.type === 'player' || interactive
+								? `${c.name} — ${c.currentHp}/${c.maxHp} HP`
+								: c.name}
 							class="block h-full w-full overflow-hidden rounded-full bg-gray-900 shadow-lg ring-2 transition-transform {v.ring} {draggingId ===
 							t.combatantId
 								? 'scale-110'
@@ -588,15 +631,17 @@
 								>
 							{/if}
 						</button>
-						<span
-							role="presentation"
-							class="absolute top-full left-1/2 mt-0.5 -translate-x-1/2 rounded bg-black/70 px-1 text-[10px] leading-tight font-bold whitespace-nowrap {hpTextColor(
-								pct
-							)} {interactive && tool === 'move' ? 'cursor-grab active:cursor-grabbing' : ''}"
-							onpointerdown={(e) => startTokenDrag(e, t.combatantId)}
-						>
-							{c.currentHp}/{c.maxHp}
-						</span>
+						{#if c.type === 'player' || interactive}
+							<span
+								role="presentation"
+								class="absolute top-full left-1/2 mt-0.5 -translate-x-1/2 rounded bg-black/70 px-1 text-[10px] leading-tight font-bold whitespace-nowrap {hpTextColor(
+									pct
+								)} {interactive && tool === 'move' ? 'cursor-grab active:cursor-grabbing' : ''}"
+								onpointerdown={(e) => startTokenDrag(e, t.combatantId)}
+							>
+								{c.currentHp}/{c.maxHp}
+							</span>
+						{/if}
 					</div>
 				{/if}
 			{/each}

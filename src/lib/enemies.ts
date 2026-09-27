@@ -107,6 +107,12 @@ export function getMonsterDetail(name: string): MonsterDetail | undefined {
 	return detailMap?.get(name);
 }
 
+// 2014-style stat blocks only carry size embedded in the free-text `meta` string
+// (e.g. "Large giant, chaotic evil"), rather than as its own field like the 2024 ones.
+export function parseSizeFromMeta(meta: string | undefined): string | undefined {
+	return meta?.match(/^(Tiny|Small|Medium|Large|Huge|Gargantuan)/i)?.[0];
+}
+
 // ---------------------------------------------------------------------------
 // Legendary Resistance — parsed out of the free-text traits block. Unlike legendary
 // actions (always shown as 3 pips), the daily use count genuinely varies by monster
