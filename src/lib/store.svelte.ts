@@ -4,6 +4,7 @@
 import type {
 	Combatant,
 	EnemyTemplate,
+	MonsterDetail,
 	StorageState,
 	CombatEvent,
 	CombatRecord,
@@ -13,7 +14,8 @@ import type {
 } from './types';
 import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
-import { ENEMY_TEMPLATES, getMonsterDetail } from './enemies';
+import { ENEMY_TEMPLATES, getMonsterDetail, parseSizeFromMeta } from './enemies';
+import { getMonsterDetail2024 } from './enemies2024';
 
 // CR lookup by template name — built once at module load
 const crByTemplateName = new Map<string, string>(ENEMY_TEMPLATES.map((t) => [t.name, t.cr]));
@@ -29,6 +31,22 @@ function detectsLairActions(templateName: string): boolean {
 		.filter(Boolean)
 		.join(' ');
 	return /lair action/i.test(text);
+}
+
+/** Resolves a template's D&D size category for the Battle Map token. A custom monster's own
+ *  imported stat block (bestiary imports carry `detail.meta`) takes priority over the built-in
+ *  bestiaries, since a custom monster's name won't be in either of those lookup maps. */
+function resolveEnemySize(
+	template: EnemyTemplate & { detail?: MonsterDetail }
+): string | undefined {
+	if (template.detail?.meta) {
+		const own = parseSizeFromMeta(template.detail.meta);
+		if (own) return own;
+	}
+	return (
+		getMonsterDetail2024(template.name)?.size ??
+		parseSizeFromMeta(getMonsterDetail(template.name)?.meta)
+	);
 }
 
 // Re-export so existing imports from this module still work.
@@ -603,8 +621,9 @@ function createCombatStore() {
 			sync();
 		},
 
-		addEnemies(template: EnemyTemplate, quantity: number) {
+		addEnemies(template: EnemyTemplate & { detail?: MonsterDetail }, quantity: number) {
 			const existingCount = combatants.filter((c) => c.templateName === template.name).length;
+			const size = resolveEnemySize(template);
 			const newEnemies: Combatant[] = Array.from({ length: quantity }, (_, i) => ({
 				id: crypto.randomUUID(),
 				name: `${template.name} ${existingCount + i + 1}`,
@@ -620,6 +639,7 @@ function createCombatStore() {
 				imgUrl: template.imgUrl,
 				cr: template.cr,
 				...(template.source ? { source: template.source } : {}),
+				...(size ? { size } : {}),
 				inCombat: true
 			}));
 			combatants = [...combatants, ...newEnemies];

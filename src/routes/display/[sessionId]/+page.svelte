@@ -4,7 +4,8 @@
 <script lang="ts">
 	import { conditionColors, sortCombatants, hpPercent, hpBarColor, batteryIcon } from '$lib/utils';
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
-	import { getMonsterDetail } from '$lib/enemies';
+	import { getMonsterDetail, preloadMonsterDetails } from '$lib/enemies';
+	import { getMonsterDetail2024, preloadMonsterDetails2024 } from '$lib/enemies2024';
 	import type { StorageState, Combatant } from '$lib/types';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
 	import MessageDMModal from '$lib/components/MessageDMModal.svelte';
@@ -32,6 +33,7 @@
 		BattleMapRuler,
 		BattleMapStroke
 	} from '$lib/battleMapTypes';
+	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { renderFogOfWarCanvas } from '$lib/dungeonRender';
 	import type { DungeonMapState } from '$lib/dungeonRender';
@@ -57,6 +59,21 @@
 			})
 			.catch(() => {});
 	});
+
+	// This viewer route never mounts EnemyPanel (the DM-only component that normally triggers
+	// this), so without preloading here, built-in monsters' images never resolve for a player
+	// loading the display fresh — only combatants with their own directly-stored imgUrl
+	// (custom monsters) would show a picture.
+	onMount(() => {
+		preloadMonsterDetails();
+		preloadMonsterDetails2024();
+	});
+
+	function builtinMonsterImgUrl(templateName: string | undefined): string | undefined {
+		return ruleset === '2024'
+			? getMonsterDetail2024(templateName ?? '')?.imgUrl
+			: getMonsterDetail(templateName ?? '')?.imgUrl;
+	}
 
 	// ── Logged-in player identity ────────────────────────────────────────
 	let myPlayerName = $state<string | null>(null);
@@ -2113,7 +2130,7 @@
 						{/if}
 						{#if dc.type === 'enemy'}
 							{@const style = getMonsterStyle(dc.monsterType)}
-							{@const imgUrl = dc.imgUrl ?? getMonsterDetail(dc.templateName ?? '')?.imgUrl}
+							{@const imgUrl = dc.imgUrl ?? builtinMonsterImgUrl(dc.templateName)}
 							{#if imgUrl}
 								<button
 									onclick={() => openAvatarPreview(imgUrl, dc.name)}
@@ -2419,7 +2436,7 @@
 							>
 								{#if c.type === 'enemy'}
 									{@const style = getMonsterStyle(c.monsterType)}
-									{@const imgUrl = c.imgUrl ?? getMonsterDetail(c.templateName ?? '')?.imgUrl}
+									{@const imgUrl = c.imgUrl ?? builtinMonsterImgUrl(c.templateName)}
 									{#if imgUrl}
 										<button
 											onclick={() => openAvatarPreview(imgUrl, c.name)}

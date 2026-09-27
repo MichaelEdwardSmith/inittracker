@@ -39,6 +39,10 @@ export interface Combatant {
 	source?: string;
 	// Enemies only — challenge rating string (e.g. "1/2", "5") for XP calculation
 	cr?: string;
+	// Enemies only — D&D size category (Tiny/Small/Medium/Large/Huge/Gargantuan), resolved from
+	// the stat block at add-time. Used by the Battle Map to size the token. Absent means Medium
+	// (or a combatant added before this field existed).
+	size?: string;
 	// Per-condition round countdown. Conditions absent from this map last indefinitely.
 	conditionRounds?: Record<string, number>;
 	// DM-only freeform notes
