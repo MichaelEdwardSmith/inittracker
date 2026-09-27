@@ -58,6 +58,14 @@
 	let saveNameInput = $state('');
 	let savingToLibrary = $state(false);
 
+	// ── Accordion sections — collapsed by default except Tools, the one thing a DM touches
+	// constantly mid-combat. Keeping the rest tucked away is what stops this panel from
+	// scrolling off screen. ──
+	let toolsOpen = $state(true);
+	let tokensOpen = $state(false);
+	let gridOpen = $state(false);
+	let mapLibraryOpen = $state(false);
+
 	function revokeImage() {
 		if (imageBlobUrl) URL.revokeObjectURL(imageBlobUrl);
 		imageBlobUrl = null;
@@ -541,7 +549,7 @@
 
 <!-- Panel -->
 <div
-	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-blue-800/60 bg-gray-900 shadow-2xl"
+	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-blue-800/60 bg-gray-900 shadow-2xl lg:max-w-5xl"
 >
 	<!-- Header -->
 	<div
@@ -616,435 +624,590 @@
 				</button>
 			{/if}
 		{:else}
-			<!-- ── Prepared map ──────────────────────────────────────────────────── -->
-			<div class="flex flex-col gap-4">
-				<div class="flex items-center justify-between gap-3">
-					<div class="min-w-0">
-						<p class="truncate text-sm font-semibold text-gray-200">{viewState.name}</p>
-						<p class="text-xs text-gray-500">
-							{viewState.visible ? 'Showing to players' : 'Hidden'}
-						</p>
-					</div>
-					<button
-						onclick={removeMap}
-						title="Remove this map"
-						class="shrink-0 rounded-lg p-2 text-gray-600 transition hover:bg-red-950/40 hover:text-red-400"
-					>
-						<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
-					</button>
-				</div>
-
-				<!-- Preview / interactive grid -->
-				<div
-					class="relative aspect-video w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-950"
-				>
-					{#if imageBlobUrl}
-						<BattleGridCanvas
-							imageUrl={imageBlobUrl}
-							naturalWidth={viewState.naturalWidth}
-							naturalHeight={viewState.naturalHeight}
-							gridSquaresAcross={viewState.gridSquaresAcross}
-							gridSquaresDown={viewState.gridSquaresDown}
-							feetPerSquare={viewState.feetPerSquare}
-							showGrid={viewState.showGrid}
-							{tokens}
-							combatants={combat.combatants}
-							{ruler}
-							{strokes}
-							{ruleset}
-							interactive
-							{tool}
-							{drawColor}
-							{drawWidth}
-							{snapLine}
-							onTokenMove={handleTokenMove}
-							onRulerChange={handleRulerChange}
-							onStrokeComplete={handleStrokeComplete}
-							onLiveDraw={handleLiveDraw}
-							onErase={handleErase}
-						/>
-					{:else}
-						<div class="flex h-full items-center justify-center">
-							<i
-								class="fa-duotone fa-light fa-spinner-third animate-spin text-3xl text-gray-600"
-								aria-hidden="true"
-							></i>
+			<!-- ── Prepared map — map preview + primary action on the left, the collapsible
+			     sections in a side column on wide screens; stacked below it on narrow ones. ── -->
+			<div class="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_360px] lg:items-start lg:gap-6">
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex items-center justify-between gap-3">
+						<div class="min-w-0">
+							<p class="truncate text-sm font-semibold text-gray-200">{viewState.name}</p>
+							<p class="text-xs text-gray-500">
+								{viewState.visible ? 'Showing to players' : 'Hidden'}
+							</p>
 						</div>
-					{/if}
-					{#if viewState.visible}
-						<span
-							class="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-red-600/90 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white uppercase shadow"
-						>
-							<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span> Live
-						</span>
-					{/if}
-				</div>
-
-				<!-- Grid calibration -->
-				<div class="flex flex-wrap items-end gap-3">
-					<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
-						Squares across
-						<input
-							type="number"
-							min="1"
-							max="200"
-							value={viewState.gridSquaresAcross}
-							onchange={(e) => {
-								pushState({ gridSquaresAcross: Number(e.currentTarget.value) || 20 });
-								scheduleBlankMatResize();
-							}}
-							class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
-						/>
-					</label>
-					<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
-						Squares down
-						<input
-							type="number"
-							min="1"
-							max="200"
-							value={viewState.gridSquaresDown}
-							onchange={(e) => {
-								pushState({ gridSquaresDown: Number(e.currentTarget.value) || 20 });
-								scheduleBlankMatResize();
-							}}
-							title="How many square rows the grid covers — squares stay true squares (sized from Squares Across), so this may leave part of the image ungridded rather than stretching cells"
-							class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
-						/>
-					</label>
-					<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
-						Feet / square
-						<input
-							type="number"
-							min="1"
-							max="100"
-							value={viewState.feetPerSquare}
-							onchange={(e) => pushState({ feetPerSquare: Number(e.currentTarget.value) || 5 })}
-							class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
-						/>
-					</label>
-					<button
-						onclick={() => pushState({ showGrid: !viewState!.showGrid })}
-						class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {viewState.showGrid
-							? 'border-blue-600 bg-blue-950/40 text-blue-300'
-							: 'border-gray-700 bg-gray-800 text-gray-400 hover:text-gray-200'}"
-					>
-						<i class="fa-duotone fa-light fa-table-cells" aria-hidden="true"></i> Grid
-					</button>
-				</div>
-
-				<!-- Tool selector -->
-				<div class="flex flex-wrap items-center gap-3">
-					<div class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 p-0.5">
 						<button
-							onclick={() => (tool = 'move')}
-							title="Drag tokens, or drag empty space to pan when zoomed in"
-							class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'move'
-								? 'bg-blue-600 text-white'
-								: 'text-gray-400 hover:text-gray-200'}"
-						>
-							<i class="fa-duotone fa-light fa-arrows-up-down-left-right" aria-hidden="true"></i> Move
-						</button>
-						<button
-							onclick={() => (tool = 'measure')}
-							title="Click-drag to measure distance"
-							class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'measure'
-								? 'bg-amber-600 text-white'
-								: 'text-gray-400 hover:text-gray-200'}"
-						>
-							<i class="fa-duotone fa-light fa-ruler" aria-hidden="true"></i> Measure
-						</button>
-						<button
-							onclick={() => (tool = 'pen')}
-							title="Freehand draw"
-							class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'pen'
-								? 'bg-red-600 text-white'
-								: 'text-gray-400 hover:text-gray-200'}"
-						>
-							<i class="fa-duotone fa-light fa-pen" aria-hidden="true"></i> Pen
-						</button>
-						<button
-							onclick={() => (tool = 'line')}
-							title="Draw a straight line"
-							class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'line'
-								? 'bg-red-600 text-white'
-								: 'text-gray-400 hover:text-gray-200'}"
-						>
-							<i class="fa-duotone fa-light fa-slash" aria-hidden="true"></i> Line
-						</button>
-						<button
-							onclick={() => (tool = 'erase')}
-							title="Click or drag over a line to erase just that line"
-							class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'erase'
-								? 'bg-red-600 text-white'
-								: 'text-gray-400 hover:text-gray-200'}"
-						>
-							<i class="fa-duotone fa-light fa-eraser" aria-hidden="true"></i> Erase
-						</button>
-					</div>
-
-					{#if tool === 'pen' || tool === 'line' || tool === 'erase'}
-						{#if tool === 'pen' || tool === 'line'}
-							<div class="flex items-center gap-1.5">
-								{#each DRAW_COLORS as c}
-									<button
-										onclick={() => (drawColor = c)}
-										aria-label="Pen color {c}"
-										class="h-6 w-6 rounded-full border border-gray-600 ring-2 ring-offset-2 ring-offset-gray-900 transition {drawColor ===
-										c
-											? 'ring-white'
-											: 'ring-transparent'}"
-										style="background: {c};"
-									></button>
-								{/each}
-							</div>
-							<div
-								class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 p-0.5"
-							>
-								{#each DRAW_WIDTHS as w}
-									<button
-										onclick={() => (drawWidth = w.value)}
-										class="rounded-md px-2 py-1 text-xs font-semibold transition {drawWidth ===
-										w.value
-											? 'bg-red-600 text-white'
-											: 'text-gray-400 hover:text-gray-200'}"
-									>
-										{w.label}
-									</button>
-								{/each}
-							</div>
-						{/if}
-						{#if tool === 'line'}
-							<button
-								onclick={() => (snapLine = !snapLine)}
-								title="Snap line endpoints to the nearest grid intersection"
-								class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {snapLine
-									? 'border-red-500 bg-red-950/40 text-red-300'
-									: 'border-gray-700 bg-gray-800 text-gray-400 hover:text-gray-200'}"
-							>
-								<i class="fa-duotone fa-light fa-table-cells" aria-hidden="true"></i> Snap to Grid
-							</button>
-						{/if}
-						<button
-							onclick={undoStroke}
-							disabled={strokes.length === 0}
-							title="Undo last stroke"
-							class="rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-gray-300 transition hover:border-red-700 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
-						>
-							<i class="fa-duotone fa-light fa-arrow-rotate-left text-sm" aria-hidden="true"></i>
-						</button>
-						<button
-							onclick={clearStrokes}
-							disabled={strokes.length === 0}
-							title="Clear all drawing"
-							class="rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-gray-300 transition hover:border-red-700 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+							onclick={removeMap}
+							title="Remove this map"
+							class="shrink-0 rounded-lg p-2 text-gray-600 transition hover:bg-red-950/40 hover:text-red-400"
 						>
 							<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
 						</button>
-					{/if}
-				</div>
-
-				<!-- Token roster -->
-				<div class="flex flex-col gap-2">
-					{#if placedCombatants.length > 0}
-						<div class="flex flex-wrap gap-1.5">
-							{#each placedCombatants as c (c.id)}
-								<button
-									onclick={() => removeToken(c.id)}
-									title="Remove {c.name} from the map"
-									class="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 py-1 pr-1 pl-2.5 text-xs text-gray-300 transition hover:border-red-700 hover:text-red-300"
-								>
-									{c.name}
-									<i class="fa-duotone fa-light fa-xmark text-[10px]" aria-hidden="true"></i>
-								</button>
-							{/each}
-						</div>
-					{/if}
-					{#if unplacedCombatants.length > 0}
-						<div class="flex flex-wrap gap-1.5">
-							{#each unplacedCombatants as c (c.id)}
-								<button
-									onclick={() => placeToken(c.id)}
-									title="Place {c.name} on the map"
-									class="flex items-center gap-1.5 rounded-full border border-dashed border-gray-700 bg-gray-900 px-2.5 py-1 text-xs text-gray-500 transition hover:border-blue-600 hover:text-blue-300"
-								>
-									<i class="fa-duotone fa-light fa-plus text-[10px]" aria-hidden="true"></i>
-									{c.name}
-								</button>
-							{/each}
-						</div>
-					{/if}
-				</div>
-
-				<!-- Show / Hide -->
-				{#if viewState.visible}
-					<button
-						onclick={hide}
-						class="rounded-xl bg-gray-700 py-3 font-black tracking-wider text-white uppercase transition hover:bg-gray-600 active:scale-95"
-					>
-						<i class="fa-duotone fa-light fa-eye-slash" aria-hidden="true"></i> Hide from Players
-					</button>
-				{:else}
-					<button
-						onclick={show}
-						class="rounded-xl bg-blue-600 py-3 font-black tracking-wider text-white uppercase transition hover:bg-blue-500 active:scale-95"
-					>
-						<i class="fa-duotone fa-light fa-eye" aria-hidden="true"></i> Show to Players
-					</button>
-				{/if}
-
-				<div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-					<label
-						class="cursor-pointer text-xs font-semibold text-gray-500 underline decoration-dotted transition hover:text-blue-400"
-					>
-						<input
-							type="file"
-							accept="image/*"
-							class="sr-only"
-							onchange={handleFileChange}
-							disabled={uploading}
-						/>
-						Replace with a different map
-					</label>
-					<span class="text-xs text-gray-700">·</span>
-					<button
-						onclick={useBlankBattlemat}
-						disabled={uploading}
-						title="Regenerates a blank mat sized to exactly fit the current Squares Across/Down"
-						class="cursor-pointer text-xs font-semibold text-gray-500 underline decoration-dotted transition hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
-					>
-						Use a plain battlemat
-					</button>
-					<span class="text-xs text-gray-700">·</span>
-					<button
-						onclick={() => (showSaveForm = !showSaveForm)}
-						class="cursor-pointer text-xs font-semibold text-gray-500 underline decoration-dotted transition hover:text-green-400"
-					>
-						Save to library
-					</button>
-					<span class="text-xs text-gray-700">·</span>
-					<button
-						onclick={() => (showLibrary = !showLibrary)}
-						class="cursor-pointer text-xs font-semibold text-gray-500 underline decoration-dotted transition hover:text-blue-400"
-					>
-						Load from library{savedMaps.length > 0 ? ` (${savedMaps.length})` : ''}
-					</button>
-				</div>
-
-				{#if showSaveForm}
-					<div class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2">
-						<input
-							type="text"
-							bind:value={saveNameInput}
-							placeholder="Name this map…"
-							maxlength="100"
-							onkeydown={(e) => e.key === 'Enter' && saveCurrentMapToLibrary()}
-							class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
-						/>
-						<button
-							onclick={saveCurrentMapToLibrary}
-							disabled={!saveNameInput.trim() || savingToLibrary}
-							class="shrink-0 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
-						>
-							{#if savingToLibrary}
-								<i class="fa-duotone fa-light fa-spinner-third animate-spin" aria-hidden="true"></i>
-							{:else}
-								Save
-							{/if}
-						</button>
-						<button
-							onclick={() => (showSaveForm = false)}
-							class="shrink-0 rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:text-gray-300"
-						>
-							Cancel
-						</button>
 					</div>
-				{/if}
 
-				{#if uploading}
-					<i
-						class="fa-duotone fa-light fa-spinner-third animate-spin self-center text-xl text-gray-500"
-						aria-hidden="true"
-					></i>
-				{/if}
+					<!-- Preview / interactive grid -->
+					<div
+						class="relative aspect-video w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-950"
+					>
+						{#if imageBlobUrl}
+							<BattleGridCanvas
+								imageUrl={imageBlobUrl}
+								naturalWidth={viewState.naturalWidth}
+								naturalHeight={viewState.naturalHeight}
+								gridSquaresAcross={viewState.gridSquaresAcross}
+								gridSquaresDown={viewState.gridSquaresDown}
+								feetPerSquare={viewState.feetPerSquare}
+								showGrid={viewState.showGrid}
+								{tokens}
+								combatants={combat.combatants}
+								{ruler}
+								{strokes}
+								{ruleset}
+								interactive
+								{tool}
+								{drawColor}
+								{drawWidth}
+								{snapLine}
+								onTokenMove={handleTokenMove}
+								onRulerChange={handleRulerChange}
+								onStrokeComplete={handleStrokeComplete}
+								onLiveDraw={handleLiveDraw}
+								onErase={handleErase}
+							/>
+						{:else}
+							<div class="flex h-full items-center justify-center">
+								<i
+									class="fa-duotone fa-light fa-spinner-third animate-spin text-3xl text-gray-600"
+									aria-hidden="true"
+								></i>
+							</div>
+						{/if}
+						{#if viewState.visible}
+							<span
+								class="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-red-600/90 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white uppercase shadow"
+							>
+								<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span> Live
+							</span>
+						{/if}
+					</div>
+
+					<!-- Show / Hide — the primary action, right under the preview -->
+					{#if viewState.visible}
+						<button
+							onclick={hide}
+							class="rounded-xl bg-gray-700 py-3 font-black tracking-wider text-white uppercase transition hover:bg-gray-600 active:scale-95"
+						>
+							<i class="fa-duotone fa-light fa-eye-slash" aria-hidden="true"></i> Hide from Players
+						</button>
+					{:else}
+						<button
+							onclick={show}
+							class="rounded-xl bg-blue-600 py-3 font-black tracking-wider text-white uppercase transition hover:bg-blue-500 active:scale-95"
+						>
+							<i class="fa-duotone fa-light fa-eye" aria-hidden="true"></i> Show to Players
+						</button>
+					{/if}
+				</div>
+
+				<!-- ── Everything below is a collapsible section, same header/chevron pattern, so the
+			     panel doesn't sprawl past the screen. On narrow screens this stacks below the map
+			     preview; at lg+ it sits beside it as its own column. ── -->
+				<div class="flex flex-col gap-3">
+					<!-- Tools -->
+					<div class="overflow-hidden rounded-lg border border-gray-700">
+						<button
+							onclick={() => (toolsOpen = !toolsOpen)}
+							aria-expanded={toolsOpen}
+							class="flex w-full items-center justify-between bg-gray-800/60 px-4 py-2.5 text-left transition hover:bg-gray-800"
+						>
+							<span
+								class="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-300 uppercase"
+							>
+								<i class="fa-duotone fa-light fa-pen-ruler text-blue-400" aria-hidden="true"></i>
+								Tools
+							</span>
+							<i
+								class="fa-duotone fa-light {toolsOpen
+									? 'fa-chevron-up'
+									: 'fa-chevron-down'} text-xs text-gray-500"
+								aria-hidden="true"
+							></i>
+						</button>
+						{#if toolsOpen}
+							<div class="flex flex-col gap-3 border-t border-gray-700 bg-gray-800/20 px-4 py-3">
+								<div
+									class="flex items-center gap-1 self-start rounded-lg border border-gray-700 bg-gray-800 p-0.5"
+								>
+									<button
+										onclick={() => (tool = 'move')}
+										title="Drag tokens, or drag empty space to pan when zoomed in"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool ===
+										'move'
+											? 'bg-blue-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-arrows-up-down-left-right" aria-hidden="true"
+										></i> Move
+									</button>
+									<button
+										onclick={() => (tool = 'measure')}
+										title="Click-drag to measure distance"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool ===
+										'measure'
+											? 'bg-amber-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-ruler" aria-hidden="true"></i> Measure
+									</button>
+									<button
+										onclick={() => (tool = 'pen')}
+										title="Freehand draw"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool === 'pen'
+											? 'bg-red-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-pen" aria-hidden="true"></i> Pen
+									</button>
+									<button
+										onclick={() => (tool = 'line')}
+										title="Draw a straight line"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool ===
+										'line'
+											? 'bg-red-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-slash" aria-hidden="true"></i> Line
+									</button>
+									<button
+										onclick={() => (tool = 'erase')}
+										title="Click or drag over a line to erase just that line"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool ===
+										'erase'
+											? 'bg-red-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-eraser" aria-hidden="true"></i> Erase
+									</button>
+								</div>
+
+								{#if tool === 'pen' || tool === 'line' || tool === 'erase'}
+									<div class="flex flex-wrap items-center gap-3">
+										{#if tool === 'pen' || tool === 'line'}
+											<div class="flex items-center gap-1.5">
+												{#each DRAW_COLORS as c}
+													<button
+														onclick={() => (drawColor = c)}
+														aria-label="Pen color {c}"
+														class="h-6 w-6 rounded-full border border-gray-600 ring-2 ring-offset-2 ring-offset-gray-900 transition {drawColor ===
+														c
+															? 'ring-white'
+															: 'ring-transparent'}"
+														style="background: {c};"
+													></button>
+												{/each}
+											</div>
+											<div
+												class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 p-0.5"
+											>
+												{#each DRAW_WIDTHS as w}
+													<button
+														onclick={() => (drawWidth = w.value)}
+														class="rounded-md px-2 py-1 text-xs font-semibold transition {drawWidth ===
+														w.value
+															? 'bg-red-600 text-white'
+															: 'text-gray-400 hover:text-gray-200'}"
+													>
+														{w.label}
+													</button>
+												{/each}
+											</div>
+										{/if}
+										{#if tool === 'line'}
+											<button
+												onclick={() => (snapLine = !snapLine)}
+												title="Snap line endpoints to the nearest grid intersection"
+												class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {snapLine
+													? 'border-red-500 bg-red-950/40 text-red-300'
+													: 'border-gray-700 bg-gray-800 text-gray-400 hover:text-gray-200'}"
+											>
+												<i class="fa-duotone fa-light fa-table-cells" aria-hidden="true"></i> Snap to
+												Grid
+											</button>
+										{/if}
+										<button
+											onclick={undoStroke}
+											disabled={strokes.length === 0}
+											title="Undo last stroke"
+											class="rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-gray-300 transition hover:border-red-700 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+										>
+											<i class="fa-duotone fa-light fa-arrow-rotate-left text-sm" aria-hidden="true"
+											></i>
+										</button>
+										<button
+											onclick={clearStrokes}
+											disabled={strokes.length === 0}
+											title="Clear all drawing"
+											class="rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-gray-300 transition hover:border-red-700 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+										>
+											<i class="fa-duotone fa-light fa-trash text-sm" aria-hidden="true"></i>
+										</button>
+									</div>
+								{/if}
+							</div>
+						{/if}
+					</div>
+
+					<!-- Tokens -->
+					<div class="overflow-hidden rounded-lg border border-gray-700">
+						<button
+							onclick={() => (tokensOpen = !tokensOpen)}
+							aria-expanded={tokensOpen}
+							class="flex w-full items-center justify-between bg-gray-800/60 px-4 py-2.5 text-left transition hover:bg-gray-800"
+						>
+							<span
+								class="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-300 uppercase"
+							>
+								<i class="fa-duotone fa-light fa-chess-pawn text-emerald-400" aria-hidden="true"
+								></i>
+								Tokens
+								{#if placedCombatants.length > 0}
+									<span
+										class="rounded-full bg-gray-700 px-1.5 py-0.5 text-[10px] font-bold text-gray-300 normal-case"
+									>
+										{placedCombatants.length}
+									</span>
+								{/if}
+							</span>
+							<i
+								class="fa-duotone fa-light {tokensOpen
+									? 'fa-chevron-up'
+									: 'fa-chevron-down'} text-xs text-gray-500"
+								aria-hidden="true"
+							></i>
+						</button>
+						{#if tokensOpen}
+							<div class="flex flex-col gap-2 border-t border-gray-700 bg-gray-800/20 px-4 py-3">
+								{#if placedCombatants.length > 0}
+									<div class="flex flex-wrap gap-1.5">
+										{#each placedCombatants as c (c.id)}
+											<button
+												onclick={() => removeToken(c.id)}
+												title="Remove {c.name} from the map"
+												class="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 py-1 pr-1 pl-2.5 text-xs text-gray-300 transition hover:border-red-700 hover:text-red-300"
+											>
+												{c.name}
+												<i class="fa-duotone fa-light fa-xmark text-[10px]" aria-hidden="true"></i>
+											</button>
+										{/each}
+									</div>
+								{/if}
+								{#if unplacedCombatants.length > 0}
+									<div class="flex flex-wrap gap-1.5">
+										{#each unplacedCombatants as c (c.id)}
+											<button
+												onclick={() => placeToken(c.id)}
+												title="Place {c.name} on the map"
+												class="flex items-center gap-1.5 rounded-full border border-dashed border-gray-700 bg-gray-900 px-2.5 py-1 text-xs text-gray-500 transition hover:border-blue-600 hover:text-blue-300"
+											>
+												<i class="fa-duotone fa-light fa-plus text-[10px]" aria-hidden="true"></i>
+												{c.name}
+											</button>
+										{/each}
+									</div>
+								{/if}
+								{#if placedCombatants.length === 0 && unplacedCombatants.length === 0}
+									<p class="py-2 text-center text-xs text-gray-600">
+										No combatants in this session.
+									</p>
+								{/if}
+							</div>
+						{/if}
+					</div>
+
+					<!-- Grid & Calibration -->
+					<div class="overflow-hidden rounded-lg border border-gray-700">
+						<button
+							onclick={() => (gridOpen = !gridOpen)}
+							aria-expanded={gridOpen}
+							class="flex w-full items-center justify-between bg-gray-800/60 px-4 py-2.5 text-left transition hover:bg-gray-800"
+						>
+							<span
+								class="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-300 uppercase"
+							>
+								<i class="fa-duotone fa-light fa-table-cells text-amber-400" aria-hidden="true"></i>
+								Grid & Calibration
+							</span>
+							<i
+								class="fa-duotone fa-light {gridOpen
+									? 'fa-chevron-up'
+									: 'fa-chevron-down'} text-xs text-gray-500"
+								aria-hidden="true"
+							></i>
+						</button>
+						{#if gridOpen}
+							<div
+								class="flex flex-wrap items-end gap-3 border-t border-gray-700 bg-gray-800/20 px-4 py-3"
+							>
+								<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
+									Squares across
+									<input
+										type="number"
+										min="1"
+										max="200"
+										value={viewState.gridSquaresAcross}
+										onchange={(e) => {
+											pushState({ gridSquaresAcross: Number(e.currentTarget.value) || 20 });
+											scheduleBlankMatResize();
+										}}
+										class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+									/>
+								</label>
+								<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
+									Squares down
+									<input
+										type="number"
+										min="1"
+										max="200"
+										value={viewState.gridSquaresDown}
+										onchange={(e) => {
+											pushState({ gridSquaresDown: Number(e.currentTarget.value) || 20 });
+											scheduleBlankMatResize();
+										}}
+										title="How many square rows the grid covers — squares stay true squares (sized from Squares Across), so this may leave part of the image ungridded rather than stretching cells"
+										class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+									/>
+								</label>
+								<label class="flex flex-col gap-1 text-xs text-gray-500 uppercase">
+									Feet / square
+									<input
+										type="number"
+										min="1"
+										max="100"
+										value={viewState.feetPerSquare}
+										onchange={(e) =>
+											pushState({ feetPerSquare: Number(e.currentTarget.value) || 5 })}
+										class="w-24 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+									/>
+								</label>
+								<button
+									onclick={() => pushState({ showGrid: !viewState!.showGrid })}
+									class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition {viewState.showGrid
+										? 'border-blue-600 bg-blue-950/40 text-blue-300'
+										: 'border-gray-700 bg-gray-800 text-gray-400 hover:text-gray-200'}"
+								>
+									<i class="fa-duotone fa-light fa-table-cells" aria-hidden="true"></i> Grid
+								</button>
+							</div>
+						{/if}
+					</div>
+
+					<!-- Map & Library -->
+					<div class="overflow-hidden rounded-lg border border-gray-700">
+						<button
+							onclick={() => (mapLibraryOpen = !mapLibraryOpen)}
+							aria-expanded={mapLibraryOpen}
+							class="flex w-full items-center justify-between bg-gray-800/60 px-4 py-2.5 text-left transition hover:bg-gray-800"
+						>
+							<span
+								class="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-300 uppercase"
+							>
+								<i class="fa-duotone fa-light fa-folder-open text-violet-400" aria-hidden="true"
+								></i>
+								Map & Library
+							</span>
+							<i
+								class="fa-duotone fa-light {mapLibraryOpen
+									? 'fa-chevron-up'
+									: 'fa-chevron-down'} text-xs text-gray-500"
+								aria-hidden="true"
+							></i>
+						</button>
+						{#if mapLibraryOpen}
+							<div class="flex flex-col gap-3 border-t border-gray-700 bg-gray-800/20 px-4 py-3">
+								<div class="flex flex-wrap gap-2">
+									<label
+										class="flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:border-blue-600 hover:text-blue-300 {uploading
+											? 'pointer-events-none opacity-50'
+											: ''}"
+									>
+										<input
+											type="file"
+											accept="image/*"
+											class="sr-only"
+											onchange={handleFileChange}
+											disabled={uploading}
+										/>
+										<i class="fa-duotone fa-light fa-arrows-rotate" aria-hidden="true"></i>
+										Replace Map
+									</label>
+									<button
+										onclick={useBlankBattlemat}
+										disabled={uploading}
+										title="Regenerates a blank mat sized to exactly fit the current Squares Across/Down"
+										class="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+									>
+										<i class="fa-duotone fa-light fa-border-all" aria-hidden="true"></i>
+										Plain Battlemat
+									</button>
+									<button
+										onclick={() => (showSaveForm = !showSaveForm)}
+										class="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition {showSaveForm
+											? 'border-green-600 bg-green-950/40 text-green-300'
+											: 'border-gray-700 bg-gray-800 text-gray-300 hover:border-green-600 hover:text-green-300'}"
+									>
+										<i class="fa-duotone fa-light fa-floppy-disk" aria-hidden="true"></i>
+										Save to Library
+									</button>
+									<button
+										onclick={() => (showLibrary = !showLibrary)}
+										class="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition {showLibrary
+											? 'border-blue-600 bg-blue-950/40 text-blue-300'
+											: 'border-gray-700 bg-gray-800 text-gray-300 hover:border-blue-600 hover:text-blue-300'}"
+									>
+										<i class="fa-duotone fa-light fa-folder-open" aria-hidden="true"></i>
+										Browse Library{savedMaps.length > 0 ? ` (${savedMaps.length})` : ''}
+									</button>
+								</div>
+
+								{#if showSaveForm}
+									<div
+										class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2"
+									>
+										<input
+											type="text"
+											bind:value={saveNameInput}
+											placeholder="Name this map…"
+											maxlength="100"
+											onkeydown={(e) => e.key === 'Enter' && saveCurrentMapToLibrary()}
+											class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+										/>
+										<button
+											onclick={saveCurrentMapToLibrary}
+											disabled={!saveNameInput.trim() || savingToLibrary}
+											class="shrink-0 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+										>
+											{#if savingToLibrary}
+												<i
+													class="fa-duotone fa-light fa-spinner-third animate-spin"
+													aria-hidden="true"
+												></i>
+											{:else}
+												Save
+											{/if}
+										</button>
+										<button
+											onclick={() => (showSaveForm = false)}
+											class="shrink-0 rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:text-gray-300"
+										>
+											Cancel
+										</button>
+									</div>
+								{/if}
+
+								{#if uploading}
+									<i
+										class="fa-duotone fa-light fa-spinner-third animate-spin self-center text-xl text-gray-500"
+										aria-hidden="true"
+									></i>
+								{/if}
+							</div>
+						{/if}
+					</div>
+				</div>
 			</div>
 		{/if}
 
 		{#if showLibrary}
-			<div class="mt-4 rounded-xl border border-gray-700 bg-gray-950/60 p-3">
-				<p class="mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase">Map Library</p>
-				{#if savedMaps.length === 0}
-					<p class="py-4 text-center text-sm text-gray-600">No saved maps yet.</p>
-				{:else}
-					<div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-						{#each savedMaps as m (m.id)}
-							<div
-								class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900"
-							>
-								<button
-									onclick={() => loadSavedMap(m.id)}
-									disabled={libraryBusyId === m.id}
-									title="Load {m.name} onto the map"
-									class="flex flex-col disabled:cursor-not-allowed disabled:opacity-50"
+			<div class="mt-4 overflow-hidden rounded-lg border border-gray-700">
+				<div class="flex items-center justify-between bg-gray-800/60 px-4 py-2.5">
+					<span
+						class="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-300 uppercase"
+					>
+						<i class="fa-duotone fa-light fa-folder-open text-violet-400" aria-hidden="true"></i>
+						Map Library
+					</span>
+					<button
+						onclick={() => (showLibrary = false)}
+						aria-label="Close map library"
+						class="text-gray-500 hover:text-white"
+					>
+						<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div class="border-t border-gray-700 bg-gray-800/20 p-3">
+					{#if savedMaps.length === 0}
+						<p class="py-4 text-center text-sm text-gray-600">No saved maps yet.</p>
+					{:else}
+						<div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+							{#each savedMaps as m (m.id)}
+								<div
+									class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900"
 								>
-									<div class="relative aspect-video w-full overflow-hidden">
-										<img
-											src="/api/battlemap/library/image?id={m.id}"
-											alt={m.name}
-											class="absolute inset-0 h-full w-full object-cover"
-										/>
-										{#if m.strokes.length > 0}
-											<svg
-												viewBox="0 0 {m.naturalWidth} {m.naturalHeight}"
-												preserveAspectRatio="xMidYMid slice"
-												class="pointer-events-none absolute inset-0 h-full w-full"
-											>
-												{#each m.strokes as s, i (i)}
-													{#if s.points.length >= 4}
-														<polyline
-															points={strokePreviewPointsAttr(
-																s.points,
-																m.naturalWidth,
-																m.naturalHeight
-															)}
-															fill="none"
-															stroke={s.color}
-															stroke-width={Math.max(1, s.width * m.naturalWidth)}
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														/>
-													{/if}
-												{/each}
-											</svg>
-										{/if}
-									</div>
-									<span class="truncate p-1.5 text-left text-xs font-semibold text-gray-300">
-										{m.name}
-									</span>
-									<span class="px-1.5 pb-1.5 text-left text-[10px] text-gray-600">
-										{m.gridSquaresAcross}×{m.gridSquaresDown} squares
-									</span>
-								</button>
-								{#if libraryBusyId === m.id}
-									<div class="absolute inset-0 flex items-center justify-center bg-black/50">
-										<i
-											class="fa-duotone fa-light fa-spinner-third animate-spin text-lg text-white"
-											aria-hidden="true"
-										></i>
-									</div>
-								{/if}
-								<button
-									onclick={() => deleteSavedMap(m.id)}
-									disabled={libraryBusyId === m.id}
-									aria-label="Delete {m.name}"
-									title="Delete this saved map"
-									class="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:text-red-400 disabled:cursor-not-allowed"
-								>
-									<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
-								</button>
-							</div>
-						{/each}
-					</div>
-				{/if}
+									<button
+										onclick={() => loadSavedMap(m.id)}
+										disabled={libraryBusyId === m.id}
+										title="Load {m.name} onto the map"
+										class="flex flex-col disabled:cursor-not-allowed disabled:opacity-50"
+									>
+										<div class="relative aspect-video w-full overflow-hidden">
+											<img
+												src="/api/battlemap/library/image?id={m.id}"
+												alt={m.name}
+												class="absolute inset-0 h-full w-full object-cover"
+											/>
+											{#if m.strokes.length > 0}
+												<svg
+													viewBox="0 0 {m.naturalWidth} {m.naturalHeight}"
+													preserveAspectRatio="xMidYMid slice"
+													class="pointer-events-none absolute inset-0 h-full w-full"
+												>
+													{#each m.strokes as s, i (i)}
+														{#if s.points.length >= 4}
+															<polyline
+																points={strokePreviewPointsAttr(
+																	s.points,
+																	m.naturalWidth,
+																	m.naturalHeight
+																)}
+																fill="none"
+																stroke={s.color}
+																stroke-width={Math.max(1, s.width * m.naturalWidth)}
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															/>
+														{/if}
+													{/each}
+												</svg>
+											{/if}
+										</div>
+										<span class="truncate p-1.5 text-left text-xs font-semibold text-gray-300">
+											{m.name}
+										</span>
+										<span class="px-1.5 pb-1.5 text-left text-[10px] text-gray-600">
+											{m.gridSquaresAcross}×{m.gridSquaresDown} squares
+										</span>
+									</button>
+									{#if libraryBusyId === m.id}
+										<div class="absolute inset-0 flex items-center justify-center bg-black/50">
+											<i
+												class="fa-duotone fa-light fa-spinner-third animate-spin text-lg text-white"
+												aria-hidden="true"
+											></i>
+										</div>
+									{/if}
+									<button
+										onclick={() => deleteSavedMap(m.id)}
+										disabled={libraryBusyId === m.id}
+										aria-label="Delete {m.name}"
+										title="Delete this saved map"
+										class="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:text-red-400 disabled:cursor-not-allowed"
+									>
+										<i class="fa-duotone fa-light fa-xmark text-xs" aria-hidden="true"></i>
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
 			</div>
 		{/if}
 
