@@ -64,7 +64,8 @@ A real-time D&D 5e combat management tool for Dungeon Masters and players.
 22. [Audio Mixer](#22-audio-mixer)
 23. [Session Scheduling](#23-session-scheduling)
 24. [Chase Tracker](#24-chase-tracker)
-25. [Contact & Support](#25-contact--support)
+25. [Battle Map](#25-battle-map)
+26. [Contact & Support](#26-contact--support)
 
 ---
 
@@ -1359,6 +1360,48 @@ Sound effects play automatically as the chase unfolds: a sword clash when someon
 
 ---
 
-## 25. Contact & Support
+## 25. Battle Map
+
+Show players a tactical map with draggable combatant tokens, a measuring ruler, and free-hand drawing — layered on top of the initiative order, not a replacement for it.
+
+### Preparing a Map (DM)
+
+1. Open the menu (☰) in the dashboard header and click **Battle Map**
+2. Upload a map image, click **Use a Plain Battlemat** for a blank tan grid mat sized to fit, or (once you've saved maps before) **Browse Library** to reuse one
+3. Open **Grid & Calibration** and set Squares Across, Squares Down, and Feet / Square — these control how the ruler measures distance; the **Grid** button toggles the overlay lines on and off
+4. Click **Show to Players** — nothing appears on the player display until you do
+
+The panel is organized into collapsible sections (**Tools**, **Tokens**, **Grid & Calibration**, **Map & Library**) so only what you're using takes up space; on wide windows the map preview and these sections sit side by side, and stack on narrower ones.
+
+### Tools
+
+The **Tools** section controls what dragging on the map does:
+
+- **Move** — drag tokens, or drag empty space to pan when zoomed in
+- **Measure** — click-drag to show a distance line that fades out a moment after you release
+- **Pen** / **Line** — free-hand or straight-line drawing, with a color swatch and line-thickness picker; **Line** also gets **Snap to Grid** to lock endpoints to intersections
+- **Erase** — click or drag over a line to remove just that stroke
+- **Undo** (↺) and **Clear** (trash icon) remove the last stroke or every stroke at once
+
+### Tokens
+
+The **Tokens** section lists every combatant. Click an unplaced combatant's chip to drop their token onto the map center; click a placed combatant's chip (with the ×) to remove it. Drag a placed token anywhere on the map to reposition it — the move syncs to players live.
+
+### Map & Library
+
+- **Replace Map** swaps in a new image without losing the current grid settings
+- **Plain Battlemat** regenerates the blank tan mat to match the current Squares Across/Down
+- **Save to Library** stores the current map (image, grid, and drawings) under a name you choose, reusable in any future session
+- **Browse Library** loads a saved map onto the table, or deletes one you no longer need
+
+The trash icon next to the map's name **removes** it entirely — players stop seeing it immediately.
+
+### On the Player Display
+
+While the DM has the map shown, a pulsing **Battle Map** badge appears in the bottom-right corner of the viewer screen (also reachable from its own ☰ menu). Tapping it opens the map full-screen with tokens, the DM's measuring line, and any drawings updating live — enemy tokens show no HP to players, only player characters do. Players can pan by dragging and zoom with the +/− controls in the corner, but can't move tokens or draw. Tap **×** to close and return to the initiative view.
+
+---
+
+## 26. Contact & Support
 
 Have a question, found a bug, or want to suggest a feature? Click the **✉ Contact us** link found on the login page, the join page, and in the header of both the DM dashboard and the player display, or email us directly at **dm@inittracker.com**.
