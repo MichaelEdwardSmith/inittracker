@@ -10,7 +10,8 @@
 		{ id: 'message-dm', label: '4. Message DM' },
 		{ id: 'initiative', label: '5. Roll Initiative' },
 		{ id: 'notes', label: '6. My Notes' },
-		{ id: 'dm-messages', label: '7. DM Messages' }
+		{ id: 'dm-messages', label: '7. DM Messages' },
+		{ id: 'battle-map', label: '8. Battle Map' }
 	];
 </script>
 
@@ -361,6 +362,48 @@
 				<p class="text-sm leading-relaxed">
 					Tap <strong class="text-white">Clear all</strong> in the message inbox to wipe all stored messages
 					from your screen. This only clears them from your local view — the DM's sent history is unaffected.
+				</p>
+			</section>
+
+			<!-- 8 ── Battle Map ──────────────────────── -->
+			<section id="battle-map">
+				{@render h2('8', 'Battle Map')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					When the DM prepares a tactical map, you can view combatant tokens, the DM's measuring
+					line, and any drawings live on your screen.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Opening the Map
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					While the DM has the map shown, a pulsing <strong class="text-white">Battle Map</strong>
+					badge appears in the bottom-right corner of your screen — tap it to open the map
+					full-screen. You can also open it from the
+					<strong class="text-amber-300"
+						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
+					>
+					by tapping <strong class="text-white">Battle Map</strong>.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Viewing the Map
+				</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					Drag anywhere on the map to pan, and use the <strong class="text-white">−</strong> /
+					<strong class="text-white">+</strong> buttons in the bottom-right corner to zoom (tap the percentage
+					between them to reset). Tokens, the ruler, and drawings all update live as the DM moves them
+					— enemy tokens show no HP, only your own party's do. You can look around the map, but you can't
+					move tokens or draw on it yourself.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Closing the Map
+				</h3>
+				<p class="text-sm leading-relaxed">
+					Tap the <strong class="text-white">×</strong> in the top corner to close the full-screen map
+					and return to the initiative view.
 				</p>
 			</section>
 		</main>

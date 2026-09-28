@@ -32,7 +32,8 @@
 		{ id: 'audio-mixer', label: '23. Audio Mixer' },
 		{ id: 'session-scheduling', label: '24. Session Scheduling' },
 		{ id: 'chase-tracker', label: '25. Chase Tracker' },
-		{ id: 'contact', label: '26. Contact & Support' }
+		{ id: 'battle-map', label: '26. Battle Map' },
+		{ id: 'contact', label: '27. Contact & Support' }
 	];
 
 	const conditions = [
@@ -3400,8 +3401,142 @@
 			</section>
 
 			<!-- 26 ─────────────────────────────────────── -->
+			<section id="battle-map">
+				{@render h2('26', 'Battle Map')}
+
+				<p class="mb-4 text-sm leading-relaxed">
+					Show players a tactical map with draggable combatant tokens, a measuring ruler, and
+					free-hand drawing — layered on top of the initiative order, not a replacement for it.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Preparing a Map (DM)
+				</h3>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						Open the menu (<i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i>) in the
+						dashboard header and click
+						<strong class="font-semibold text-white"
+							><i class="fa-duotone fa-light fa-map" aria-hidden="true"></i> Battle Map</strong
+						>
+					</li>
+					<li>
+						Upload a map image, click <strong class="font-semibold text-white"
+							>Use a Plain Battlemat</strong
+						>
+						for a blank tan grid mat sized to fit, or (once you've saved maps before)
+						<strong class="font-semibold text-white">Browse Library</strong> to reuse one
+					</li>
+					<li>
+						Open <strong class="font-semibold text-white">Grid &amp; Calibration</strong> and set
+						Squares Across, Squares Down, and Feet / Square — these control how the ruler measures
+						distance; the <strong class="font-semibold text-white">Grid</strong> button toggles the overlay
+						lines on and off
+					</li>
+					<li>
+						Click <strong class="font-semibold text-white">Show to Players</strong> — nothing appears
+						on the player display until you do
+					</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					The panel is organized into collapsible sections (<strong class="font-semibold text-white"
+						>Tools</strong
+					>,
+					<strong class="font-semibold text-white">Tokens</strong>,
+					<strong class="font-semibold text-white">Grid &amp; Calibration</strong>, and
+					<strong class="font-semibold text-white">Map &amp; Library</strong>) so only what you're
+					using takes up space; on wide windows the map preview and these sections sit side by side,
+					and stack on narrower ones.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tools</h3>
+				<p class="mb-2 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">Tools</strong> section controls what dragging on
+					the map does:
+				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Move</strong> — drag tokens, or drag empty space
+						to pan when zoomed in
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Measure</strong> — click-drag to show a distance
+						line that fades out a moment after you release
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Pen</strong> /
+						<strong class="font-semibold text-white">Line</strong> — free-hand or straight-line
+						drawing, with a color swatch and line-thickness picker;
+						<strong class="font-semibold text-white">Line</strong> also gets
+						<strong class="font-semibold text-white">Snap to Grid</strong> to lock endpoints to intersections
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Erase</strong> — click or drag over a line to remove
+						just that stroke
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Undo</strong> (↺) and
+						<strong class="font-semibold text-white">Clear</strong> (trash icon) remove the last stroke
+						or every stroke at once
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Tokens</h3>
+				<p class="mb-4 text-sm leading-relaxed">
+					The <strong class="font-semibold text-white">Tokens</strong> section lists every combatant.
+					Click an unplaced combatant's chip to drop their token onto the map center; click a placed combatant's
+					chip (with the ×) to remove it. Drag a placed token anywhere on the map to reposition it — the
+					move syncs to players live.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Map &amp; Library
+				</h3>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Replace Map</strong> swaps in a new image without
+						losing the current grid settings
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Plain Battlemat</strong> regenerates the blank tan
+						mat to match the current Squares Across/Down
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Save to Library</strong> stores the current map (image,
+						grid, and drawings) under a name you choose, reusable in any future session
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Browse Library</strong> loads a saved map onto the
+						table, or deletes one you no longer need
+					</li>
+				</ul>
+				<p class="mb-4 text-sm leading-relaxed">
+					The trash icon next to the map's name <strong class="font-semibold text-white"
+						>removes</strong
+					> it entirely — players stop seeing it immediately.
+				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					On the Player Display
+				</h3>
+				<p class="text-sm leading-relaxed">
+					While the DM has the map shown, a pulsing <strong class="font-semibold text-white"
+						>Battle Map</strong
+					>
+					badge appears in the bottom-right corner of the
+					<a href="#player-display" class="text-amber-400 transition hover:text-amber-300"
+						>Player Display</a
+					>
+					(also reachable from its own ☰ menu). Tapping it opens the map full-screen with tokens, the
+					DM's measuring line, and any drawings updating live — enemy tokens show no HP to players, only
+					player characters do. Players can pan by dragging and zoom with the +/− controls in the corner,
+					but can't move tokens or draw. Tap × to close and return to the initiative view.
+				</p>
+			</section>
+
+			<!-- 27 ─────────────────────────────────────── -->
 			<section id="contact">
-				{@render h2('26', 'Contact & Support')}
+				{@render h2('27', 'Contact & Support')}
 				<p class="text-sm leading-relaxed">
 					Have a question, found a bug, or want to suggest a feature? Email us at
 					<a href="mailto:dm@inittracker.com" class="text-amber-400 transition hover:text-amber-300"
