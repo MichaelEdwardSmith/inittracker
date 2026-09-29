@@ -379,8 +379,8 @@
 				</h3>
 				<p class="mb-4 text-sm leading-relaxed">
 					While the DM has the map shown, a pulsing <strong class="text-white">Battle Map</strong>
-					badge appears in the bottom-right corner of your screen — tap it to open the map
-					full-screen. You can also open it from the
+					badge appears in the bottom-right corner of your screen — tap it to open the map full-screen.
+					You can also open it from the
 					<strong class="text-amber-300"
 						><i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i> menu</strong
 					>
