@@ -23,7 +23,16 @@
 			fading = true;
 			fadeTimer = setTimeout(() => {
 				diceBox?.clearDice();
-				fading = false;
+				// clearDice() renders the now-empty scene, but that render is issued
+				// outside the browser's paint cycle. Wait two real frames so the
+				// empty frame is actually composited before we snap opacity back to
+				// 1 — otherwise the canvas can flash the old die (and its shadow)
+				// back into view for a frame.
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+						fading = false;
+					});
+				});
 			}, FADE_DURATION);
 		}, 3000);
 	}
@@ -88,6 +97,8 @@
 <div
 	id="global-dice-canvas"
 	class="pointer-events-none fixed inset-0 z-[200] transition-opacity"
-	style="opacity: {fading ? 0 : 1}; transition-duration: {fading ? FADE_DURATION : 0}ms;"
+	style="opacity: {fading ? 0 : 1}; transition-duration: {fading
+		? FADE_DURATION
+		: 0}ms; will-change: opacity;"
 	aria-hidden="true"
 ></div>
