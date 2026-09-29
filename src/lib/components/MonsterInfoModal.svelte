@@ -169,6 +169,15 @@
 		});
 	}
 
+	/** Wrap each "Str +N" entry in the saving throws string with a clickable button. */
+	function linkSavingThrows(savingThrows: string): string {
+		return savingThrows.replace(/([A-Za-z]+)\s*([+-]\d+)/g, (match, abbr, mod) => {
+			const stat = SAVE_STATS.find((s) => s.key === abbr.trim().slice(0, 3).toLowerCase());
+			if (!stat) return match;
+			return `<button class="save-btn" data-save-key="${stat.key}">${abbr.trim()} ${mod.trim()}</button>`;
+		});
+	}
+
 	/** Wrap each "Skill +N" entry in the skills string with a clickable button. */
 	function linkSkills(skills: string): string {
 		return skills.replace(/([^,]+)\s*([+-]\d+)/g, (_, name, mod) => {
@@ -197,7 +206,7 @@
 
 	function handleStatBlockClick(e: MouseEvent) {
 		const target = (e.target as HTMLElement).closest(
-			'[data-dice],[data-attack],[data-skill-mod],[data-spell]'
+			'[data-dice],[data-attack],[data-skill-mod],[data-spell],[data-save-key]'
 		) as HTMLElement | null;
 		if (!target) return;
 		e.stopPropagation();
@@ -205,7 +214,10 @@
 		else if (target.dataset.attack !== undefined) rollAttack(target.dataset.attack);
 		else if (target.dataset.skillMod !== undefined)
 			rollSkillCheck(target.dataset.skillName ?? '', target.dataset.skillMod);
-		else if (target.dataset.spell) {
+		else if (target.dataset.saveKey !== undefined) {
+			const stat = SAVE_STATS.find((s) => s.key === target.dataset.saveKey);
+			if (stat) rollSavingThrow(stat.label, stat.key, monster![stat.modKey]);
+		} else if (target.dataset.spell) {
 			const spellName = target.dataset.spell.replace(/[^a-zA-Z0-9 '\-/]/g, '').trim();
 			onclose();
 			openSpell?.(spellName);
@@ -320,7 +332,9 @@
 				<div class="mb-4 flex flex-col gap-1 border-b border-gray-700 pb-4 text-sm">
 					{#if monster.savingThrows}
 						<div>
-							<span class="text-gray-500">Saving Throws </span><span>{monster.savingThrows}</span>
+							<span class="text-gray-500">Saving Throws </span><span
+								>{@html linkSavingThrows(monster.savingThrows)}</span
+							>
 						</div>
 					{/if}
 					{#if monster.skills}
@@ -548,6 +562,22 @@
 	}
 	:global(.skill-btn:hover) {
 		color: rgb(167, 243, 208); /* emerald-200 */
+	}
+	/* Saving throw buttons injected via {@html linkSavingThrows(...)} */
+	:global(.save-btn) {
+		display: inline;
+		color: rgb(240, 171, 252); /* fuchsia-300 */
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		cursor: pointer;
+		background: transparent;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		line-height: inherit;
+	}
+	:global(.save-btn:hover) {
+		color: rgb(245, 208, 254); /* fuchsia-200 */
 	}
 	/* Spell name buttons injected via {@html linkSpells(...)} */
 	:global(.spell-btn) {
