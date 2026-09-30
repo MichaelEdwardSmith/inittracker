@@ -2,7 +2,7 @@
      $lib/server/admin.ts).
 
      Row actions:
-       Enter dashboard — impersonates that DM: sets dm_impersonate and gives full read/write
+       Dashboard — impersonates that DM: sets dm_impersonate and gives full read/write
                           control of their account until the admin exits (banner on /dashboard)
                           or the cookie expires (8h).
        Suspend/Restore — blocks/restores login + dashboard access without touching their data.
@@ -484,7 +484,7 @@
 													type="submit"
 													class="rounded border border-amber-700/60 bg-amber-900/20 px-3 py-1 text-xs font-semibold text-amber-300 transition hover:border-amber-500 hover:bg-amber-900/40"
 												>
-													Enter dashboard
+													Dashboard
 												</button>
 											</form>
 											{#if dm.suspended}
