@@ -8,14 +8,8 @@
 	import { getMonsterDetail2024, preloadMonsterDetails2024 } from '$lib/enemies2024';
 	import type { StorageState, Combatant } from '$lib/types';
 	import ConditionInfoModal from '$lib/components/ConditionInfoModal.svelte';
-	import MessageDMModal from '$lib/components/MessageDMModal.svelte';
-	import InitiativeRollerModal from '$lib/components/InitiativeRollerModal.svelte';
-	import PlayerNotesModal from '$lib/components/PlayerNotesModal.svelte';
 	import PlayerSchedulingView from '$lib/components/PlayerSchedulingView.svelte';
-	import PlayerInboxModal from '$lib/components/PlayerInboxModal.svelte';
 	import type { DmReply } from '$lib/components/PlayerInboxModal.svelte';
-	import EmojiPickerModal from '$lib/components/EmojiPickerModal.svelte';
-	import DiceRollerModal from '$lib/components/DiceRollerModal.svelte';
 	import DiceOverlay from '$lib/components/DiceOverlay.svelte';
 	import LiarsDicePlayerView from '$lib/components/LiarsDicePlayerView.svelte';
 	import PollView from '$lib/components/PollView.svelte';
@@ -24,9 +18,7 @@
 	import StatusPillBadge from '$lib/components/StatusPillBadge.svelte';
 	import StatusIcon from '$lib/components/StatusIcon.svelte';
 	import AvatarPreviewModal from '$lib/components/AvatarPreviewModal.svelte';
-	import AnnotationCanvas from '$lib/components/AnnotationCanvas.svelte';
 	import type { Stroke } from '$lib/docShareTypes';
-	import BattleGridCanvas from '$lib/components/BattleGridCanvas.svelte';
 	import type {
 		BattleMapViewState,
 		BattleMapToken,
@@ -1400,20 +1392,22 @@
 				>
 			</div>
 			<div class="relative min-h-0 flex-1 overflow-hidden">
-				<BattleGridCanvas
-					imageUrl={battleMapImageUrl}
-					naturalWidth={battleMapView.naturalWidth}
-					naturalHeight={battleMapView.naturalHeight}
-					gridSquaresAcross={battleMapView.gridSquaresAcross}
-					gridSquaresDown={battleMapView.gridSquaresDown}
-					feetPerSquare={battleMapView.feetPerSquare}
-					showGrid={battleMapView.showGrid}
-					tokens={battleMapTokens}
-					combatants={combatState.combatants}
-					ruler={battleMapRuler}
-					strokes={battleMapStrokes}
-					{ruleset}
-				/>
+				{#await import('$lib/components/BattleGridCanvas.svelte') then { default: BattleGridCanvas }}
+					<BattleGridCanvas
+						imageUrl={battleMapImageUrl}
+						naturalWidth={battleMapView.naturalWidth}
+						naturalHeight={battleMapView.naturalHeight}
+						gridSquaresAcross={battleMapView.gridSquaresAcross}
+						gridSquaresDown={battleMapView.gridSquaresDown}
+						feetPerSquare={battleMapView.feetPerSquare}
+						showGrid={battleMapView.showGrid}
+						tokens={battleMapTokens}
+						combatants={combatState.combatants}
+						ruler={battleMapRuler}
+						strokes={battleMapStrokes}
+						{ruleset}
+					/>
+				{/await}
 			</div>
 		</div>
 	{/if}
@@ -1516,11 +1510,13 @@
 						/>
 					{/key}
 					{#if docShareNaturalW > 0}
-						<AnnotationCanvas
-							naturalWidth={docShareNaturalW}
-							naturalHeight={docShareNaturalH}
-							strokes={docShareAnnotations[docShareView.currentPage] ?? []}
-						/>
+						{#await import('$lib/components/AnnotationCanvas.svelte') then { default: AnnotationCanvas }}
+							<AnnotationCanvas
+								naturalWidth={docShareNaturalW}
+								naturalHeight={docShareNaturalH}
+								strokes={docShareAnnotations[docShareView.currentPage] ?? []}
+							/>
+						{/await}
 					{/if}
 				</div>
 			{:else}
@@ -2601,22 +2597,26 @@
 
 <!-- Message DM modal -->
 {#if showMsgModal}
-	<MessageDMModal
-		{players}
-		sessionId={data.sessionId}
-		preselectedName={myCharacter?.name ?? ''}
-		onclose={() => (showMsgModal = false)}
-	/>
+	{#await import('$lib/components/MessageDMModal.svelte') then { default: MessageDMModal }}
+		<MessageDMModal
+			{players}
+			sessionId={data.sessionId}
+			preselectedName={myCharacter?.name ?? ''}
+			onclose={() => (showMsgModal = false)}
+		/>
+	{/await}
 {/if}
 
 <!-- Roll Initiative modal -->
 {#if showInitModal}
-	<InitiativeRollerModal
-		{players}
-		sessionId={data.sessionId}
-		preselectedId={myCharacterId ?? ''}
-		onclose={() => (showInitModal = false)}
-	/>
+	{#await import('$lib/components/InitiativeRollerModal.svelte') then { default: InitiativeRollerModal }}
+		<InitiativeRollerModal
+			{players}
+			sessionId={data.sessionId}
+			preselectedId={myCharacterId ?? ''}
+			onclose={() => (showInitModal = false)}
+		/>
+	{/await}
 {/if}
 
 <ConditionInfoModal condition={conditionInfo} onclose={() => (conditionInfo = null)} {ruleset} />
@@ -2627,7 +2627,9 @@
 />
 
 {#if showNotesModal && myPlayerName}
-	<PlayerNotesModal playerName={myPlayerName} onclose={() => (showNotesModal = false)} />
+	{#await import('$lib/components/PlayerNotesModal.svelte') then { default: PlayerNotesModal }}
+		<PlayerNotesModal playerName={myPlayerName} onclose={() => (showNotesModal = false)} />
+	{/await}
 {/if}
 
 <!-- Not gated behind a menu click — pops up on its own, same as PollView below, since an
@@ -2640,26 +2642,32 @@
 />
 
 {#if showDmInbox}
-	<PlayerInboxModal
-		messages={dmMessages}
-		onclose={() => (showDmInbox = false)}
-		onclear={() => {
-			dmMessages = [];
-			dmUnread = 0;
-		}}
-	/>
+	{#await import('$lib/components/PlayerInboxModal.svelte') then { default: PlayerInboxModal }}
+		<PlayerInboxModal
+			messages={dmMessages}
+			onclose={() => (showDmInbox = false)}
+			onclear={() => {
+				dmMessages = [];
+				dmUnread = 0;
+			}}
+		/>
+	{/await}
 {/if}
 
 {#if showEmojiPicker}
-	<EmojiPickerModal
-		sessionId={data.sessionId}
-		playerName={myPlayerName}
-		onclose={() => (showEmojiPicker = false)}
-	/>
+	{#await import('$lib/components/EmojiPickerModal.svelte') then { default: EmojiPickerModal }}
+		<EmojiPickerModal
+			sessionId={data.sessionId}
+			playerName={myPlayerName}
+			onclose={() => (showEmojiPicker = false)}
+		/>
+	{/await}
 {/if}
 
 {#if showDiceRoller}
-	<DiceRollerModal onclose={() => (showDiceRoller = false)} />
+	{#await import('$lib/components/DiceRollerModal.svelte') then { default: DiceRollerModal }}
+		<DiceRollerModal onclose={() => (showDiceRoller = false)} />
+	{/await}
 {/if}
 
 <LiarsDicePlayerView

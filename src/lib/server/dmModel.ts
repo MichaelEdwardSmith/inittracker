@@ -315,6 +315,22 @@ export function touchDMActivity(authSessionId: string, knownLastActiveAt?: Date 
 		.catch((err) => console.error('Failed to update DM lastActiveAt', err));
 }
 
+/** Projection returning only the one matching game session from gameSessions[]. */
+function onlySession(gameSessionId: string) {
+	return { projection: { gameSessions: { $elemMatch: { sessionId: gameSessionId } } } };
+}
+
+/** Projection for session-list lookups: skips embedded combatState/history/notes. */
+const SESSION_META_PROJECTION = {
+	projection: {
+		activeGameSessionId: 1,
+		'gameSessions.id': 1,
+		'gameSessions.sessionId': 1,
+		'gameSessions.name': 1,
+		'gameSessions.ruleset': 1
+	}
+};
+
 /** Look up a DM by their auth sessionId (cookie value). */
 export async function getDMBySessionId(sessionId: string): Promise<(WithId<Document> & DM) | null> {
 	const c = await col();
@@ -324,7 +340,10 @@ export async function getDMBySessionId(sessionId: string): Promise<(WithId<Docum
 /** Returns the name of a game session by its public 6-char ID, or null if not found. */
 export async function getGameSessionName(gameSessionId: string): Promise<string | null> {
 	const c = await col();
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const dm = await c.findOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		onlySession(gameSessionId)
+	);
 	if (!dm) return null;
 	const session = (dm.gameSessions as DMGameSession[]).find((s) => s.sessionId === gameSessionId);
 	return session?.name ?? null;
@@ -347,7 +366,7 @@ export async function getDMByGameSessionId(
 export async function getActiveGameSessionPublicId(authSessionId: string): Promise<string | null> {
 	await ensureGameSessions(authSessionId);
 	const c = await col();
-	const dm = await c.findOne({ sessionId: authSessionId });
+	const dm = await c.findOne({ sessionId: authSessionId }, SESSION_META_PROJECTION);
 	if (!dm?.gameSessions?.length) return null;
 	const active = (dm.gameSessions as DMGameSession[]).find((s) => s.id === dm.activeGameSessionId);
 	return active?.sessionId ?? (dm.gameSessions[0] as DMGameSession).sessionId;
@@ -362,7 +381,7 @@ export async function getActiveGameSession(
 ): Promise<{ publicId: string; ruleset: '2014' | '2024' } | null> {
 	await ensureGameSessions(authSessionId);
 	const c = await col();
-	const dm = await c.findOne({ sessionId: authSessionId });
+	const dm = await c.findOne({ sessionId: authSessionId }, SESSION_META_PROJECTION);
 	if (!dm?.gameSessions?.length) return null;
 	const sessions = dm.gameSessions as DMGameSession[];
 	const active = sessions.find((s) => s.id === dm.activeGameSessionId) ?? sessions[0];
@@ -383,7 +402,10 @@ export async function saveCombatState(gameSessionId: string, state: StorageState
 
 export async function getCombatState(gameSessionId: string): Promise<StorageState> {
 	const c = await col();
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const dm = await c.findOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		onlySession(gameSessionId)
+	);
 	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	return session?.combatState ?? { combatants: [], currentTurnId: null, round: 1 };
 }
@@ -396,7 +418,10 @@ export async function getCombatState(gameSessionId: string): Promise<StorageStat
  *  Migrates legacy string notes (if any) to the array format on first access. */
 export async function listNotes(gameSessionId: string): Promise<NoteEntry[]> {
 	const c = await col();
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const dm = await c.findOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		onlySession(gameSessionId)
+	);
 	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	if (!session) return [];
 
@@ -511,7 +536,10 @@ export async function saveCombatRecord(gameSessionId: string, record: CombatReco
 
 export async function getCombatHistory(gameSessionId: string): Promise<CombatRecord[]> {
 	const c = await col();
-	const dm = await c.findOne({ 'gameSessions.sessionId': gameSessionId });
+	const dm = await c.findOne(
+		{ 'gameSessions.sessionId': gameSessionId },
+		onlySession(gameSessionId)
+	);
 	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
 	return (session?.combatHistory as CombatRecord[]) ?? [];
 }
@@ -542,7 +570,7 @@ export async function clearCombatHistory(gameSessionId: string): Promise<void> {
 export async function listGameSessions(authSessionId: string): Promise<GameSession[]> {
 	await ensureGameSessions(authSessionId);
 	const c = await col();
-	const dm = await c.findOne({ sessionId: authSessionId });
+	const dm = await c.findOne({ sessionId: authSessionId }, SESSION_META_PROJECTION);
 	if (!dm?.gameSessions) return [];
 	return (dm.gameSessions as DMGameSession[]).map(({ id, sessionId, name, ruleset }) => ({
 		id,

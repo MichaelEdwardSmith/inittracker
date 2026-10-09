@@ -1,6 +1,7 @@
 // MongoDB singleton. Connects lazily on first call to getDb() and reuses the
 // connection for the lifetime of the process. Ensures unique indexes on email
-// and sessionId in the 'dms' collection of the 'initiative' database.
+// and sessionId (plus a multikey index on gameSessions.sessionId) in the 'dms'
+// collection of the 'initiative' database.
 import { MongoClient, type Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
 
@@ -28,6 +29,8 @@ async function ensureIndexes(db: Db) {
 	// Create indexes once per process startup (safe to call multiple times, but we gate it anyway)
 	await col.createIndex({ email: 1 }, { unique: true });
 	await col.createIndex({ sessionId: 1 }, { unique: true });
+	// Multikey index: viewer SSE, state saves, notes and history all look up by game session public ID
+	await col.createIndex({ 'gameSessions.sessionId': 1 });
 }
 
 export async function getDb(): Promise<Db> {
