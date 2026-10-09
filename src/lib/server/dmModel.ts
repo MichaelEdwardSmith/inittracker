@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import { Binary, type WithId, type Document, type Filter } from 'mongodb';
 import { getDb } from './db';
+import * as history from './combatHistoryStore';
 import { isRootAdminEmail } from './admin';
 import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
 import type { BattleMapStroke } from './battleMapState';
@@ -25,7 +26,8 @@ import type {
 // ---------------------------------------------------------------------------
 interface DMGameSession extends Omit<GameSession, 'ruleset'> {
 	combatState: StorageState;
-	combatHistory: CombatRecord[];
+	/** Legacy: history now lives in the 'combatHistory' collection (see combatHistoryStore.ts). */
+	combatHistory?: CombatRecord[];
 	notes?: NoteEntry[];
 	schedulingProposals?: SchedulingProposal[];
 	createdAt: Date;
@@ -138,9 +140,15 @@ export async function ensureGameSessions(authSessionId: string): Promise<void> {
 			currentTurnId: null,
 			round: 1
 		},
-		combatHistory: (dm.combatHistory as CombatRecord[]) ?? [],
 		createdAt: dm.createdAt ?? new Date()
 	};
+
+	// Pre-multi-session history goes straight to the combatHistory collection.
+	await history.insertMany(
+		await getDb(),
+		authSessionId,
+		(dm.combatHistory as CombatRecord[]) ?? []
+	);
 
 	await c.updateOne(
 		{ sessionId: authSessionId },
@@ -178,7 +186,6 @@ export async function createDM(
 		name: 'Default Session',
 		// ruleset intentionally omitted — user will choose on first login
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
-		combatHistory: [],
 		createdAt: new Date()
 	};
 
@@ -271,7 +278,6 @@ export async function findOrCreateDMByOAuth(profile: OAuthProfile): Promise<{ se
 		name: 'Default Session',
 		// ruleset intentionally omitted — user will choose on first login
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
-		combatHistory: [],
 		createdAt: new Date()
 	};
 
@@ -519,47 +525,22 @@ export async function deleteCustomMonster(sessionId: string, id: string): Promis
 }
 
 // ---------------------------------------------------------------------------
-// Combat history — keyed by game session public ID (uses MongoDB arrayFilters)
+// Combat history — keyed by game session public ID (own collection, see combatHistoryStore.ts)
 // ---------------------------------------------------------------------------
 export async function saveCombatRecord(gameSessionId: string, record: CombatRecord): Promise<void> {
-	const c = await col();
-	await c.updateOne(
-		{ 'gameSessions.sessionId': gameSessionId },
-		{
-			$push: {
-				'gameSessions.$[s].combatHistory': { $each: [record], $slice: -100 }
-			} as never
-		},
-		{ arrayFilters: [{ 's.sessionId': gameSessionId }] }
-	);
+	await history.saveRecord(await getDb(), gameSessionId, record);
 }
 
 export async function getCombatHistory(gameSessionId: string): Promise<CombatRecord[]> {
-	const c = await col();
-	const dm = await c.findOne(
-		{ 'gameSessions.sessionId': gameSessionId },
-		onlySession(gameSessionId)
-	);
-	const session = (dm?.gameSessions as DMGameSession[])?.find((s) => s.sessionId === gameSessionId);
-	return (session?.combatHistory as CombatRecord[]) ?? [];
+	return history.listRecords(await getDb(), gameSessionId);
 }
 
 export async function deleteCombatRecord(gameSessionId: string, recordId: string): Promise<void> {
-	const c = await col();
-	await c.updateOne(
-		{ 'gameSessions.sessionId': gameSessionId },
-		{ $pull: { 'gameSessions.$[s].combatHistory': { id: recordId } } } as never,
-		{ arrayFilters: [{ 's.sessionId': gameSessionId }] }
-	);
+	await history.deleteRecord(await getDb(), gameSessionId, recordId);
 }
 
 export async function clearCombatHistory(gameSessionId: string): Promise<void> {
-	const c = await col();
-	await c.updateOne(
-		{ 'gameSessions.sessionId': gameSessionId },
-		{ $set: { 'gameSessions.$[s].combatHistory': [] } },
-		{ arrayFilters: [{ 's.sessionId': gameSessionId }] }
-	);
+	await history.deleteForSessions(await getDb(), [gameSessionId]);
 }
 
 // ---------------------------------------------------------------------------
@@ -607,7 +588,6 @@ export async function createGameSession(
 		name: name.trim() || 'New Session',
 		ruleset,
 		combatState: { combatants: [], currentTurnId: null, round: 1 },
-		combatHistory: [],
 		createdAt: new Date()
 	};
 
@@ -662,7 +642,9 @@ export async function deleteGameSession(
 	await c.updateOne({ sessionId: authSessionId }, {
 		$pull: { gameSessions: { id: sessionUUID } }
 	} as never);
-	return { ok: true, deletedPublicId: (sessionToDelete as DMGameSession).sessionId };
+	const deletedPublicId = (sessionToDelete as DMGameSession).sessionId;
+	await history.deleteForSessions(await getDb(), [deletedPublicId]);
+	return { ok: true, deletedPublicId };
 }
 
 /**
@@ -897,7 +879,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					isAdmin: 1,
 					passwordHash: 1,
 					activeGameSessionId: 1,
-					gameSessions: 1,
+					'gameSessions.id': 1,
+					'gameSessions.sessionId': 1,
 					customMonsters: 1,
 					encounters: 1,
 					emailOptOut: 1
@@ -905,6 +888,7 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 			}
 		)
 		.toArray();
+	const historyCounts = await history.countBySession(await getDb());
 
 	return dms
 		.map((dm) => {
@@ -925,7 +909,10 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 				gameSessionCount: sessions.length,
 				customMonsterCount: (dm.customMonsters as CustomMonster[] | undefined)?.length ?? 0,
 				encounterCount: (dm.encounters as Encounter[] | undefined)?.length ?? 0,
-				combatHistoryCount: sessions.reduce((sum, s) => sum + (s.combatHistory?.length ?? 0), 0),
+				combatHistoryCount: sessions.reduce(
+					(sum, s) => sum + (historyCounts.get(s.sessionId) ?? 0),
+					0
+				),
 				emailOptOut: !!(dm as DM).emailOptOut
 			};
 		})
@@ -1225,6 +1212,7 @@ export async function deleteDM(
 
 	const gameSessionIds = ((dm.gameSessions as DMGameSession[]) ?? []).map((s) => s.sessionId);
 	await c.deleteOne({ sessionId: authSessionId });
+	await history.deleteForSessions(await getDb(), gameSessionIds);
 
 	return { ok: true, email: dm.email, gameSessionIds };
 }
