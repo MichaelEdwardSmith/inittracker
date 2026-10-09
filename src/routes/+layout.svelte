@@ -7,6 +7,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { browser } from '$app/environment';
 	import { theme } from '$lib/theme.svelte';
+	import { startAbbrTooltips } from '$lib/abbrTooltips';
 
 	// Sync initial state with what the no-flash inline script already applied
 	if (browser && localStorage.getItem('theme') === 'light') {
@@ -17,6 +18,8 @@
 		document.documentElement.classList.toggle('light', !theme.isDark);
 		if (browser) localStorage.setItem('theme', theme.isDark ? 'dark' : 'light');
 	});
+
+	$effect(() => startAbbrTooltips());
 
 	let { data, children } = $props();
 
