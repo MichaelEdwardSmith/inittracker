@@ -12,6 +12,7 @@
 		BattleMapStroke
 	} from '$lib/battleMapTypes';
 	import type { SavedBattleMap } from '$lib/types';
+	import { STAMPS, STAMP_CATEGORIES, getStamp } from '$lib/battleMapStamps';
 
 	interface Props {
 		sessionId: string;
@@ -35,7 +36,7 @@
 		{ label: 'Thick', value: 0.014 }
 	];
 
-	type Tool = 'move' | 'measure' | 'pen' | 'line' | 'erase';
+	type Tool = 'move' | 'measure' | 'pen' | 'line' | 'erase' | 'stamp';
 
 	let viewState = $state<BattleMapViewState | null>(null);
 	let imageBlobUrl = $state<string | null>(null);
@@ -46,6 +47,9 @@
 	let drawColor = $state(DRAW_COLORS[0]);
 	let drawWidth = $state(DRAW_WIDTHS[1].value);
 	let snapLine = $state(false);
+	let stampKind = $state(STAMPS[0].id);
+	let stampSize = $state(1);
+	let stampRotation = $state(0);
 	let uploading = $state(false);
 	let error = $state<string | null>(null);
 	let fileInput: HTMLInputElement | undefined = $state();
@@ -667,11 +671,15 @@
 								{drawColor}
 								{drawWidth}
 								{snapLine}
+								{stampKind}
+								{stampSize}
+								{stampRotation}
 								onTokenMove={handleTokenMove}
 								onRulerChange={handleRulerChange}
 								onStrokeComplete={handleStrokeComplete}
 								onLiveDraw={handleLiveDraw}
 								onErase={handleErase}
+								onStampMove={handleErase}
 							/>
 						{:else}
 							<div class="flex h-full items-center justify-center">
@@ -787,7 +795,100 @@
 									>
 										<i class="fa-duotone fa-light fa-eraser" aria-hidden="true"></i> Erase
 									</button>
+									<button
+										onclick={() => (tool = 'stamp')}
+										title="Place furniture, fences, walls and other props"
+										class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition {tool ===
+										'stamp'
+											? 'bg-amber-600 text-white'
+											: 'text-gray-400 hover:text-gray-200'}"
+									>
+										<i class="fa-duotone fa-light fa-chair" aria-hidden="true"></i> Stamps
+									</button>
 								</div>
+
+								{#if tool === 'stamp'}
+									<div class="flex flex-col gap-2">
+										{#each STAMP_CATEGORIES as cat}
+											<div>
+												<div
+													class="mb-1 text-[10px] font-bold tracking-wider text-gray-500 uppercase"
+												>
+													{cat}
+												</div>
+												<div class="flex flex-wrap gap-1">
+													{#each STAMPS.filter((d) => d.category === cat) as d (d.id)}
+														<button
+															onclick={() => (stampKind = d.id)}
+															title={d.label}
+															aria-label={d.label}
+															class="flex h-14 w-14 flex-col items-center justify-center gap-0.5 rounded-lg border p-1 transition {stampKind ===
+															d.id
+																? 'border-amber-500 bg-amber-950/40'
+																: 'border-gray-700 bg-gray-800 hover:border-gray-500'}"
+														>
+															<svg
+																viewBox="0 0 100 100"
+																preserveAspectRatio="none"
+																class="block"
+																style="width: {32 *
+																	(d.w / Math.max(d.w, d.h))}px; height: {Math.max(
+																	5,
+																	32 * (d.h / Math.max(d.w, d.h))
+																)}px;"
+															>
+																<!-- static catalog markup, no user input -->
+																{@html d.svg}
+															</svg>
+															<span
+																class="max-w-full truncate text-[9px] leading-none text-gray-400"
+																>{d.label}</span
+															>
+														</button>
+													{/each}
+												</div>
+											</div>
+										{/each}
+									</div>
+									<div class="flex flex-wrap items-center gap-3">
+										<button
+											onclick={() => (stampRotation = (stampRotation + 45) % 360)}
+											title="Rotate 45°"
+											class="rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
+										>
+											<i class="fa-duotone fa-light fa-rotate-right" aria-hidden="true"></i> Rotate
+											({stampRotation}°)
+										</button>
+										<div
+											class="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 p-0.5"
+											title={getStamp(stampKind)?.linear ? 'Length in squares' : 'Size multiplier'}
+										>
+											{#each [1, 2, 3, 4, 6, 8] as k}
+												<button
+													onclick={() => (stampSize = k)}
+													class="rounded-md px-2 py-1 text-xs font-semibold transition {stampSize ===
+													k
+														? 'bg-amber-600 text-white'
+														: 'text-gray-400 hover:text-gray-200'}"
+												>
+													{k}{getStamp(stampKind)?.linear ? '' : '×'}
+												</button>
+											{/each}
+										</div>
+										<button
+											onclick={undoStroke}
+											disabled={strokes.length === 0}
+											title="Undo last stamp or drawing"
+											class="rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-gray-300 transition hover:border-red-700 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+										>
+											<i class="fa-duotone fa-light fa-arrow-rotate-left text-sm" aria-hidden="true"
+											></i>
+										</button>
+									</div>
+									<p class="text-[11px] text-gray-500">
+										Click the map to place. Use Erase to remove a stamp.
+									</p>
+								{/if}
 
 								{#if tool === 'pen' || tool === 'line' || tool === 'erase'}
 									<div class="flex flex-wrap items-center gap-3">
@@ -1161,7 +1262,29 @@
 													class="pointer-events-none absolute inset-0 h-full w-full"
 												>
 													{#each m.strokes as s, i (i)}
-														{#if s.points.length >= 4}
+														{#if s.stamp}
+															{@const def = getStamp(s.stamp.kind)}
+															{#if def && m.gridSquaresAcross > 0}
+																{@const sq = m.naturalWidth / m.gridSquaresAcross}
+																<g
+																	transform="translate({s.points[0] * m.naturalWidth} {s.points[1] *
+																		m.naturalHeight}) rotate({s.stamp.rot})"
+																>
+																	<svg
+																		x={(-s.stamp.w * sq) / 2}
+																		y={(-s.stamp.h * sq) / 2}
+																		width={s.stamp.w * sq}
+																		height={s.stamp.h * sq}
+																		viewBox="0 0 100 100"
+																		preserveAspectRatio="none"
+																		overflow="visible"
+																	>
+																		<!-- static catalog markup, no user input -->
+																		{@html def.svg}
+																	</svg>
+																</g>
+															{/if}
+														{:else if s.points.length >= 4}
 															<polyline
 																points={strokePreviewPointsAttr(
 																	s.points,
