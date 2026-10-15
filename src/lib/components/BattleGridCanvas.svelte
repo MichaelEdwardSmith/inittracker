@@ -13,8 +13,9 @@
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
 	import type { Combatant } from '$lib/types';
 	import type { BattleMapToken, BattleMapRuler, BattleMapStroke } from '$lib/battleMapTypes';
+	import { getStamp, stampFootprint } from '$lib/battleMapStamps';
 
-	type Tool = 'move' | 'measure' | 'pen' | 'line' | 'erase';
+	type Tool = 'move' | 'measure' | 'pen' | 'line' | 'erase' | 'stamp';
 
 	interface Props {
 		imageUrl: string;
@@ -34,11 +35,15 @@
 		drawColor?: string;
 		drawWidth?: number;
 		snapLine?: boolean;
+		stampKind?: string;
+		stampSize?: number;
+		stampRotation?: number;
 		onTokenMove?: (combatantId: string, x: number, y: number) => void;
 		onRulerChange?: (ruler: BattleMapRuler | null) => void;
 		onStrokeComplete?: (stroke: BattleMapStroke) => void;
 		onLiveDraw?: (strokes: BattleMapStroke[]) => void;
 		onErase?: (strokes: BattleMapStroke[]) => void;
+		onStampMove?: (strokes: BattleMapStroke[]) => void;
 	}
 	let {
 		imageUrl,
@@ -58,11 +63,15 @@
 		drawColor = '#ef4444',
 		drawWidth = 0.006,
 		snapLine = false,
+		stampKind = 'table',
+		stampSize = 1,
+		stampRotation = 0,
 		onTokenMove,
 		onRulerChange,
 		onStrokeComplete,
 		onLiveDraw,
-		onErase
+		onErase,
+		onStampMove
 	}: Props = $props();
 
 	let containerW = $state(0);
@@ -265,9 +274,13 @@
 		return draggingId === t.combatantId && dragPos ? dragPos : [t.x, t.y];
 	}
 
+	// HP info is only shown for the token that was last clicked; clicking empty map clears it.
+	let selectedId = $state<string | null>(null);
+
 	function startTokenDrag(e: PointerEvent, combatantId: string) {
 		if (!interactive || tool !== 'move') return;
 		e.stopPropagation();
+		selectedId = combatantId;
 		const p = normalizedPoint(e);
 		if (!p) return;
 		draggingId = combatantId;
@@ -368,11 +381,106 @@
 		currentStrokePoints = [];
 	}
 
-	const previewStrokes = $derived(
-		currentStrokePoints.length >= 4
-			? [...strokes, { points: currentStrokePoints, color: drawColor, width: drawWidth }]
-			: strokes
-	);
+	const previewStrokes = $derived.by(() => {
+		const base =
+			stampDragIdx !== null && stampDragPos ? withStampAt(stampDragIdx, stampDragPos) : strokes;
+		return currentStrokePoints.length >= 4
+			? [...base, { points: currentStrokePoints, color: drawColor, width: drawWidth }]
+			: base;
+	});
+
+	// ── Stamps — a click drops the selected furniture/barrier piece, snapped to the nearest
+	// half-square so doors, fences and walls can sit on square edges as well as in cell centers. ──
+	function startStamp(e: PointerEvent) {
+		if (!interactive || tool !== 'stamp') return;
+		const def = getStamp(stampKind);
+		const p = normalizedPoint(e);
+		if (!def || !p) return;
+		const halfX = squareNormX / 2;
+		const halfY = squareNormY / 2;
+		const x = Math.max(0, Math.min(1, Math.round(p[0] / halfX) * halfX));
+		const y = Math.max(0, Math.min(1, Math.round(p[1] / halfY) * halfY));
+		const { w, h } = stampFootprint(def, stampSize);
+		onStrokeComplete?.({
+			points: [x, y],
+			color: '#000000',
+			width: 0.006,
+			stamp: { kind: def.id, w, h, rot: stampRotation }
+		});
+	}
+
+	// Stamp rendering geometry in on-screen pixels, shared by drawing and erase hit-testing.
+	function stampPx(s: BattleMapStroke) {
+		const st = s.stamp!;
+		return {
+			cx: s.points[0] * rect.w,
+			cy: s.points[1] * rect.h,
+			w: st.w * squareNormX * rect.w,
+			h: st.h * squareNormY * rect.h
+		};
+	}
+
+	function stampNearPoint(s: BattleMapStroke, px: number, py: number): boolean {
+		const { cx, cy, w, h } = stampPx(s);
+		const a = (-s.stamp!.rot * Math.PI) / 180;
+		const dx = px - cx;
+		const dy = py - cy;
+		const lx = dx * Math.cos(a) - dy * Math.sin(a);
+		const ly = dx * Math.sin(a) + dy * Math.cos(a);
+		return Math.abs(lx) <= w / 2 + 6 && Math.abs(ly) <= Math.max(h / 2, 6) + 6;
+	}
+
+	// ── Moving stamps — with the Move tool, dragging a stamp repositions it (same half-square
+	// snapping as placement). The dragged copy is shown locally; the full list is pushed live and
+	// committed on release. Tokens sit above stamps and stop propagation, so they win a tie. ──
+	let stampDragIdx = $state<number | null>(null);
+	let stampDragPos = $state<[number, number] | null>(null);
+
+	function snapStamp(p: [number, number]): [number, number] {
+		const halfX = squareNormX / 2;
+		const halfY = squareNormY / 2;
+		return [
+			Math.max(0, Math.min(1, Math.round(p[0] / halfX) * halfX)),
+			Math.max(0, Math.min(1, Math.round(p[1] / halfY) * halfY))
+		];
+	}
+
+	function withStampAt(idx: number, pos: [number, number]): BattleMapStroke[] {
+		return strokes.map((s, i) => (i === idx ? { ...s, points: [pos[0], pos[1]] } : s));
+	}
+
+	function startStampDrag(e: PointerEvent): boolean {
+		if (!interactive || tool !== 'move') return false;
+		const p = normalizedPoint(e);
+		if (!p) return false;
+		for (let i = strokes.length - 1; i >= 0; i--) {
+			const s = strokes[i];
+			if (s.stamp && stampNearPoint(s, p[0] * rect.w, p[1] * rect.h)) {
+				stampDragIdx = i;
+				stampDragPos = snapStamp(p);
+				overlay?.setPointerCapture(e.pointerId);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function moveStampDrag(e: PointerEvent) {
+		if (stampDragIdx === null) return;
+		const p = normalizedPoint(e);
+		if (!p) return;
+		stampDragPos = snapStamp(p);
+		const next = withStampAt(stampDragIdx, stampDragPos);
+		throttled(() => onLiveDraw?.(next));
+	}
+
+	function endStampDrag(e: PointerEvent) {
+		if (stampDragIdx === null) return;
+		overlay?.releasePointerCapture(e.pointerId);
+		if (stampDragPos) onStampMove?.(withStampAt(stampDragIdx, stampDragPos));
+		stampDragIdx = null;
+		stampDragPos = null;
+	}
 
 	// ── Erasing — removes whole strokes the pointer passes near, rather than clearing every
 	// drawing at once. Distance is checked in on-screen pixels (via `rect`, same scale as
@@ -398,6 +506,7 @@
 	}
 
 	function strokeNearPoint(stroke: BattleMapStroke, px: number, py: number): boolean {
+		if (stroke.stamp) return stampNearPoint(stroke, px, py);
 		const pts = stroke.points;
 		const threshold = Math.max(10, stroke.width * rect.w * 0.5 + 8);
 		for (let i = 0; i + 3 < pts.length; i += 2) {
@@ -456,16 +565,19 @@
 	// interaction is ever active at a time. Token drags start from the token's own pointerdown
 	// (below) rather than here, and stop propagation, so a token click never also starts a pan. ──
 	function handlePointerDown(e: PointerEvent) {
+		selectedId = null;
 		startMeasure(e);
 		startDraw(e);
 		startErase(e);
-		startPan(e);
+		startStamp(e);
+		if (!startStampDrag(e)) startPan(e);
 	}
 	function handlePointerMove(e: PointerEvent) {
 		moveMeasure(e);
 		moveTokenDrag(e);
 		moveDraw(e);
 		moveErase(e);
+		moveStampDrag(e);
 		movePan(e);
 	}
 	function handlePointerUp(e: PointerEvent) {
@@ -473,6 +585,7 @@
 		endTokenDrag(e);
 		endDraw(e);
 		endErase(e);
+		endStampDrag(e);
 		endPan(e);
 	}
 
@@ -542,7 +655,26 @@
 			{#if previewStrokes.length > 0}
 				<svg class="pointer-events-none absolute inset-0" width={rect.w} height={rect.h}>
 					{#each previewStrokes as s, i (i)}
-						{#if s.points.length >= 4}
+						{#if s.stamp}
+							{@const def = getStamp(s.stamp.kind)}
+							{#if def}
+								{@const g = stampPx(s)}
+								<g transform="translate({g.cx} {g.cy}) rotate({s.stamp.rot})">
+									<svg
+										x={-g.w / 2}
+										y={-g.h / 2}
+										width={g.w}
+										height={g.h}
+										viewBox="0 0 100 100"
+										preserveAspectRatio="none"
+										overflow="visible"
+									>
+										<!-- static catalog markup, no user input -->
+										{@html def.svg}
+									</svg>
+								</g>
+							{/if}
+						{:else if s.points.length >= 4}
 							<polyline
 								points={strokePointsAttr(s.points)}
 								fill="none"
@@ -599,6 +731,13 @@
 							? 'z-20'
 							: 'z-10'}"
 						style="left:{px * 100}%; top:{py * 100}%; width:{size}px; height:{size}px;"
+						role="presentation"
+						onpointerdown={(e) => {
+							// Reached only when startTokenDrag didn't claim the event (viewer, or a
+							// non-Move tool) — still select, and keep the overlay from clearing it.
+							e.stopPropagation();
+							selectedId = t.combatantId;
+						}}
 					>
 						<button
 							type="button"
@@ -609,7 +748,6 @@
 							t.combatantId
 								? 'scale-110'
 								: ''} {interactive && tool === 'move' ? 'cursor-grab active:cursor-grabbing' : ''}"
-							disabled={!interactive || tool !== 'move'}
 							onpointerdown={(e) => startTokenDrag(e, t.combatantId)}
 						>
 							{#if v.imgUrl}
@@ -631,7 +769,7 @@
 								>
 							{/if}
 						</button>
-						{#if c.type === 'player' || interactive}
+						{#if selectedId === t.combatantId && (c.type === 'player' || interactive)}
 							<span
 								role="presentation"
 								class="absolute top-full left-1/2 mt-0.5 -translate-x-1/2 rounded bg-black/70 px-1 text-[10px] leading-tight font-bold whitespace-nowrap {hpTextColor(

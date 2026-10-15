@@ -1,3 +1,4 @@
+import type { BattleMapStroke } from './battleMapTypes';
 // Shared TypeScript interfaces used across client and server. Defines the shapes for
 // Combatant, EnemyTemplate, CustomMonster, MonsterDetail, StorageState, CombatRecord,
 // CombatEvent, CombatantSummary, and related types.
@@ -330,7 +331,7 @@ export interface SavedBattleMap {
 	gridSquaresAcross: number;
 	gridSquaresDown: number;
 	feetPerSquare: number;
-	strokes: { points: number[]; color: string; width: number }[];
+	strokes: BattleMapStroke[];
 	createdAt: string;
 }
 

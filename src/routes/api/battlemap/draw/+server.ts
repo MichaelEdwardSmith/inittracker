@@ -54,6 +54,15 @@ function isValidStrokes(v: unknown): v is BattleMapStroke[] {
 			return false;
 		}
 		if (stroke.points.some((n) => typeof n !== 'number' || !Number.isFinite(n))) return false;
+		if (stroke.stamp !== undefined) {
+			const st = stroke.stamp as Record<string, unknown>;
+			if (!st || typeof st !== 'object') return false;
+			if (typeof st.kind !== 'string' || !/^[a-z0-9-]{1,32}$/.test(st.kind)) return false;
+			if (typeof st.w !== 'number' || !(st.w >= 0.1 && st.w <= 40)) return false;
+			if (typeof st.h !== 'number' || !(st.h >= 0.1 && st.h <= 40)) return false;
+			if (typeof st.rot !== 'number' || !Number.isFinite(st.rot)) return false;
+			if (stroke.points.length !== 2) return false;
+		}
 		if (typeof stroke.color !== 'string' || stroke.color.length > 20) return false;
 		if (typeof stroke.width !== 'number' || stroke.width < 0.0005 || stroke.width > 0.1) {
 			return false;

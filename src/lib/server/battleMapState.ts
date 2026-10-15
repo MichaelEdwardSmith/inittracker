@@ -53,6 +53,8 @@ export interface BattleMapStroke {
 	points: number[]; // flat [x0, y0, x1, y1, ...], each in [0, 1]
 	color: string; // hex
 	width: number; // fraction of the map image's width
+	// Furniture/barrier stamp: `points` is then just its center [x, y].
+	stamp?: { kind: string; w: number; h: number; rot: number };
 }
 
 // gameSessionId → the current map's drawn strokes
