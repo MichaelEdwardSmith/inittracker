@@ -1,5 +1,6 @@
 <!-- Town Generator — table-driven building list with flavor text -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
 	interface DiceRollResult {
@@ -1858,6 +1859,7 @@
 		? 'flex h-full flex-col bg-gray-950'
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
@@ -2113,7 +2115,15 @@
 	<!-- Shop inventory overlay -->
 	{#if selectedShop}
 		{@const inv = generateInventory(selectedShop)}
-		<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Shop inventory"
+			tabindex="-1"
+			use:focusTrap
+			onkeydown={(e) => e.key === 'Escape' && (selectedShop = null)}
+			class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+		>
 			<div
 				class="relative flex max-h-[80vh] w-full max-w-lg flex-col rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
 			>
@@ -2185,6 +2195,7 @@
 			<div
 				class="absolute inset-0 z-[70] flex items-center justify-center"
 				role="dialog"
+				use:focusTrap
 				aria-modal="true"
 				aria-label="Dice roll result"
 				tabindex="-1"
@@ -2193,9 +2204,8 @@
 					if (e.key === 'Escape') diceRollResult = null;
 				}}
 			>
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<div
+					role="presentation"
 					class="max-w-xs min-w-[14rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 					onclick={(e) => e.stopPropagation()}
 				>

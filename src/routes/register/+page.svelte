@@ -21,7 +21,12 @@
 	<title>Register — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 text-white"
+>
 	<!-- Subtle background glow -->
 	<div
 		class="pointer-events-none absolute inset-0"

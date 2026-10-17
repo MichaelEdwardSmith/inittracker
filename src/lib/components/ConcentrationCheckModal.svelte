@@ -10,8 +10,8 @@
 </script>
 
 {#if check}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		onmousedown={(e) => {
 			if (e.target === e.currentTarget) onsuccess();

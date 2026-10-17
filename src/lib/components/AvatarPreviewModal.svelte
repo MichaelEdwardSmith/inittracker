@@ -3,6 +3,7 @@
      either a player's avatar or an enemy's monster image — callers just pass whichever URL
      applies. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	interface Props {
 		imageUrl: string | null;
 		name: string;
@@ -15,6 +16,7 @@
 {#if imageUrl}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="{name} image"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

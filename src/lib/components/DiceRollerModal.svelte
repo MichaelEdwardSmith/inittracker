@@ -2,6 +2,7 @@
      Keeps the last 5 rolls in a compact history list.
      3D dice rendered via the global DiceOverlay (dice-box-threejs). -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { diceOverlay, triggerRoll, setVirtualDiceDisabled } from '$lib/diceOverlay.svelte';
 
 	interface Props {
@@ -100,6 +101,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Dice roller"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -162,6 +164,7 @@
 							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
+							aria-label="Number of dice"
 							type="number"
 							min="1"
 							max="99"
@@ -191,6 +194,7 @@
 							><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 						>
 						<input
+							aria-label="Modifier"
 							type="number"
 							min="-99"
 							max="99"

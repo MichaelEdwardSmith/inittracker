@@ -1,6 +1,7 @@
 <!-- Player notes modal. Same UX as the DM's SessionNotesModal but stored per player account.
      Left column: dated note list with search. Right column: rich-text editor. Autosaves 800ms. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import RichTextEditor from './RichTextEditor.svelte';
 	import type { NoteEntry } from '$lib/types';
 	import { exportNotesPdf } from '$lib/pdfExport';
@@ -118,6 +119,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Player notes"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -198,6 +200,7 @@
 					aria-hidden="true"
 				></i>
 				<input
+					aria-label="Search notes"
 					type="text"
 					bind:value={search}
 					placeholder="Search notes…"
@@ -222,20 +225,23 @@
 				<ul class="min-h-0 flex-1 space-y-1 overflow-y-auto p-2 pt-0">
 					{#each filteredNotes as note (note.id)}
 						<li>
-							<!-- svelte-ignore a11y_interactive_supports_focus -->
-							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<div
-								role="button"
-								onclick={() => {
-									selectedId = note.id;
-									saveStatus = 'idle';
-								}}
-								class="group flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
+								class="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition
 									{selectedId === note.id
 									? 'bg-blue-600/20 text-blue-400'
 									: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'}"
 							>
-								<span class="truncate">{formatDate(note.date)}</span>
+								<button
+									type="button"
+									onclick={() => {
+										selectedId = note.id;
+										saveStatus = 'idle';
+									}}
+									aria-current={selectedId === note.id ? 'true' : undefined}
+									class="-my-2 -ml-3 min-w-0 flex-1 truncate py-2 pl-3 text-left"
+								>
+									{formatDate(note.date)}
+								</button>
 								{#if selectedId === note.id}
 									<button
 										onclick={(e) => {

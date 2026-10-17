@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { onMount } from 'svelte';
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, getMonsterDetail } from '$lib/enemies';
@@ -3226,6 +3227,7 @@
 		? 'flex h-full flex-col overflow-hidden bg-black/80'
 		: 'fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/80 backdrop-blur-sm'}
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Donjon Test dungeon generator"
 >
@@ -3636,6 +3638,7 @@
 			<div class="min-h-0 flex-1 overflow-auto p-3">
 				<div class="mx-auto flex w-max flex-col items-center gap-4">
 					<canvas
+						aria-label="Generated dungeon map. Activate a room to read its details."
 						bind:this={canvasEl}
 						class="block cursor-pointer"
 						style="image-rendering: pixelated;{canvasPixelW
@@ -3869,6 +3872,7 @@
 			<div class="w-80 rounded-lg border border-white/10 bg-gray-900 p-5 shadow-2xl">
 				<h3 class="mb-3 font-bold text-white">Save Dungeon</h3>
 				<input
+					aria-label="Dungeon name"
 					type="text"
 					bind:value={saveName}
 					placeholder="Dungeon name…"

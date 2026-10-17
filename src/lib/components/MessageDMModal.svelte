@@ -1,5 +1,6 @@
 <!-- Message DM modal — players use this to send a text message to the DM. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { untrack } from 'svelte';
 	import type { Combatant } from '$lib/types';
 
@@ -41,6 +42,11 @@
 </script>
 
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Message the DM"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 >
 	<div class="w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">

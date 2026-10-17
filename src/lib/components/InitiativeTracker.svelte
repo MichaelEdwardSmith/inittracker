@@ -306,8 +306,8 @@
 
 			<!-- Utility buttons, tucked behind a tools menu so this row stays short -->
 			<div class="h-4 w-px bg-gray-700"></div>
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
+				role="presentation"
 				class="relative"
 				onmouseenter={cancelToolsMenuClose}
 				onmouseleave={scheduleToolsMenuClose}
@@ -320,9 +320,8 @@
 					<i class="fa-duotone fa-light fa-bars" aria-hidden="true"></i>
 				</button>
 				{#if showToolsMenu}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<div
+						role="presentation"
 						class="absolute top-full right-0 z-20 mt-1 w-60 rounded-lg border border-gray-700 bg-gray-800 py-1 shadow-xl"
 						onclick={(e) => e.stopPropagation()}
 					>
@@ -701,6 +700,7 @@
 							<div class="flex flex-col items-center gap-0.5">
 								<span class="text-xs tracking-wide text-gray-500 uppercase">Init</span>
 								<input
+									aria-label="Initiative for {c.name}"
 									type="number"
 									data-init-input
 									value={c.initiative ?? ''}
@@ -748,7 +748,15 @@
 										</span>
 									{/if}
 								</div>
-								<div class="relative h-2 w-full rounded-full bg-gray-700">
+								<div
+									role="meter"
+									aria-label="{c.name} hit points"
+									aria-valuemin={0}
+									aria-valuemax={c.maxHp}
+									aria-valuenow={c.currentHp}
+									aria-valuetext="{c.currentHp} of {c.maxHp} hit points"
+									class="relative h-2 w-full rounded-full bg-gray-700"
+								>
 									{#if c.tempHp > 0}
 										{@const total = c.maxHp + c.tempHp}
 										{@const hpW = (c.currentHp / total) * 100}
@@ -802,6 +810,7 @@
 						<!-- Damage / Heal / THP row -->
 						<div class="flex items-center gap-2">
 							<input
+								aria-label="Amount"
 								type="number"
 								placeholder="amt"
 								min="1"
@@ -968,8 +977,8 @@
 								<i class="fa-duotone fa-light fa-plus" aria-hidden="true"></i> Condition/Spell Effect
 							</button>
 							{#if openEffectMenuId === c.id}
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
 								<div
+									role="presentation"
 									class="absolute top-full left-0 z-20 mt-1 max-h-96 w-56 overflow-y-auto rounded-lg border border-gray-600 bg-gray-900 p-2 shadow-xl"
 									onmouseleave={() => (openEffectMenuId = null)}
 								>
@@ -1053,6 +1062,7 @@
 									</div>
 									<div class="flex gap-1">
 										<input
+											aria-label="Other spell / effect"
 											id="spell-effect-input-{c.id}"
 											type="text"
 											bind:value={spellEffectDraft}
@@ -1247,8 +1257,8 @@
 />
 
 {#if pendingInitChange}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		onmousedown={(e) => {
 			if (e.target === e.currentTarget) cancelInitChange();

@@ -1,6 +1,7 @@
 <!-- Read-only reference modal that shows the name, colour, and 5e rule description
      for a single condition (e.g. Blinded, Poisoned). Closed by clicking outside or pressing Escape. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { conditionColors, getConditionDescription } from '$lib/utils';
 
 	interface Props {
@@ -15,6 +16,7 @@
 {#if condition}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Condition information"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

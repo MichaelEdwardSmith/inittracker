@@ -3,6 +3,7 @@
      with the post-combat Chronicle via combatEventFormat.ts. DM-only, not persisted beyond
      the current combat (it becomes part of the CombatRecord once combat ends). -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { CombatEvent } from '$lib/types';
 	import { eventIcon, eventColor, eventDesc } from '$lib/combatEventFormat';
 
@@ -21,6 +22,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Combat Log"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"

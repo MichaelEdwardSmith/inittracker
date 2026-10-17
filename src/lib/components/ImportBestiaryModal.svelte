@@ -2,6 +2,7 @@
      dropped/selected file, maps entries to EnemyTemplate objects, and calls onImport with
      the results; reports how many were imported vs skipped (already existing). -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { EnemyTemplate, MonsterDetail } from '$lib/types';
 
 	interface Props {
@@ -601,6 +602,7 @@
 {#if open}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Import bestiary"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"

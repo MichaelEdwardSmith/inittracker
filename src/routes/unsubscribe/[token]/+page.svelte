@@ -10,7 +10,12 @@
 	<title>Unsubscribe — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 text-white">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 text-white"
+>
 	<div class="w-full max-w-sm text-center">
 		{#if !data.email}
 			<i class="fa-duotone fa-light fa-circle-xmark text-5xl text-red-500" aria-hidden="true"></i>

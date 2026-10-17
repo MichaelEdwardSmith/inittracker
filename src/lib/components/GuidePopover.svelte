@@ -61,8 +61,8 @@
 		Single full-screen container at z-[9999] so nothing on the page can appear above it.
 		Clicking anywhere on it dismisses the popover.
 	-->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[9999]"
 		onclick={dismiss}
 		onkeydown={(e) => e.key === 'Escape' && dismiss()}
@@ -77,9 +77,8 @@
 		></div>
 
 		<!-- Popover: child of the wrapper, stops propagation so clicking it doesn't also fire the wrapper's dismiss -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="presentation"
 			class="absolute w-[272px] rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
 			style="top:{popoverTop}px; left:{popoverLeft}px;"
 			onclick={(e) => e.stopPropagation()}

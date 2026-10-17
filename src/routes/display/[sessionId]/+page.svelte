@@ -2,6 +2,7 @@
      via SSE, renders the initiative order with HP bars and conditions (ADV_CONDITIONS hidden),
      and provides a form for players to send messages to the DM. No auth required. -->
 <script lang="ts">
+	import { useCombatAnnouncements } from '$lib/combatAnnouncer.svelte';
 	import { conditionColors, sortCombatants, hpPercent, hpBarColor, batteryIcon } from '$lib/utils';
 	import { getMonsterEmoji, getMonsterStyle } from '$lib/monsterAvatars';
 	import { getMonsterDetail, preloadMonsterDetails } from '$lib/enemies';
@@ -33,6 +34,10 @@
 	let { data } = $props();
 
 	let combatState: StorageState = $state({ combatants: [], currentTurnId: null, round: 1 });
+	useCombatAnnouncements(() => combatState, {
+		includeEnemyHp: false,
+		includeDmOnlyStatuses: false
+	});
 	let connected = $state(false);
 	let conditionInfo = $state<string | null>(null);
 	let ruleset = $state<'2014' | '2024'>('2014');
@@ -1309,7 +1314,11 @@
 	<title>Initiative Display</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white">
+<div
+	id="main-content"
+	tabindex="-1"
+	class="flex h-screen flex-col overflow-hidden bg-gray-950 font-sans text-white"
+>
 	<!-- Drifting atmospheric orbs -->
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 		{#each [0, 1, 2, 3] as i (i)}
@@ -1359,6 +1368,7 @@
 			<!-- canvas — fills remaining space, letterboxed to preserve aspect ratio -->
 			<div class="flex min-h-0 flex-1 items-center justify-center overflow-hidden p-2 sm:p-4">
 				<canvas
+					aria-label="Dungeon map shared by the DM"
 					bind:this={fogMapCanvas}
 					class="block max-h-full max-w-full"
 					style="image-rendering: pixelated; width: auto; height: auto;"
@@ -1812,9 +1822,11 @@
 
 	<!-- Viewer nav dropdown â€" styled to match DM hamburger -->
 	{#if showMobileMenu}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="fixed inset-0 z-[190]" onclick={() => (showMobileMenu = false)}></div>
+		<div
+			role="presentation"
+			class="fixed inset-0 z-[190]"
+			onclick={() => (showMobileMenu = false)}
+		></div>
 	{/if}
 	<div
 		class="fixed top-14 right-2 z-[200] w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu
@@ -2251,7 +2263,15 @@
 					<!-- HP bar + THP extension (players only) -->
 					{#if dc.type === 'player'}
 						{#if dc.currentHp > 0}
-							<div class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner">
+							<div
+								role="meter"
+								aria-label="{dc.name} hit points"
+								aria-valuemin={0}
+								aria-valuemax={dc.maxHp}
+								aria-valuenow={dc.currentHp}
+								aria-valuetext="{dc.currentHp} of {dc.maxHp} hit points"
+								class="relative mt-5 h-4 w-full max-w-2xl rounded-full bg-gray-800 shadow-inner"
+							>
 								{#if (dc.tempHp ?? 0) > 0}
 									{@const total = dc.maxHp + dc.tempHp}
 									{@const hpW = (dc.currentHp / total) * 100}
@@ -2522,6 +2542,12 @@
 
 									{#if c.type === 'player'}
 										<div
+											role="meter"
+											aria-label="{c.name} hit points"
+											aria-valuemin={0}
+											aria-valuemax={c.maxHp}
+											aria-valuenow={c.currentHp}
+											aria-valuetext="{c.currentHp} of {c.maxHp} hit points"
 											class="relative mt-1.5 hidden h-1.5 w-full overflow-hidden rounded-full bg-gray-800 sm:block"
 										>
 											{#if (c.tempHp ?? 0) > 0}

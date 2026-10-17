@@ -5,6 +5,7 @@
      Master volume at the top. Labels, volumes, and count persisted to localStorage.
      Audio keeps playing when the mixer is closed (parent wraps in a hidden div instead of {#if}). -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { browser } from '$app/environment';
 	import { untrack } from 'svelte';
 
@@ -644,6 +645,7 @@
 		<!-- Label + delete row -->
 		<div class="flex items-center gap-1">
 			<input
+				aria-label="Channel name"
 				type="text"
 				value={ch.label}
 				onchange={(e) => renameChannel(i, (e.target as HTMLInputElement).value)}
@@ -769,6 +771,7 @@
 						><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 					>
 					<input
+						aria-label="{ch.label} volume percent"
 						type="number"
 						min="0"
 						max="100"
@@ -801,6 +804,7 @@
 					{#if faderHeights[i] > 0}
 						<div class="relative" style="width: 28px; height: {faderHeights[i]}px;">
 							<input
+								aria-label="{ch.label} volume"
 								type="range"
 								min="0"
 								max="1"
@@ -914,6 +918,7 @@
 					><i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i></button
 				>
 				<input
+					aria-label="Master volume percent"
 					type="number"
 					min="0"
 					max="100"
@@ -961,6 +966,7 @@
 					{#if masterFaderHeight > 0}
 						<div class="relative" style="width: 28px; height: {masterFaderHeight}px;">
 							<input
+								aria-label="Master volume"
 								type="range"
 								min="0"
 								max="1"
@@ -1006,6 +1012,8 @@
 <div
 	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gray-950 text-white"
 	role="dialog"
+	use:focusTrap
+	aria-modal="true"
 	aria-label="Audio Mixer"
 >
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">

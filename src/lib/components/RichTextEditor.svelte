@@ -140,8 +140,8 @@
 				aria-label="Text color">A</button
 			>
 			{#if showColorPicker}
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
+					role="presentation"
 					class="absolute top-full left-0 z-20 mt-1 flex gap-1 rounded border border-gray-600 bg-gray-900 p-1.5 shadow-xl"
 					onmousedown={(e) => e.preventDefault()}
 				>
@@ -161,10 +161,12 @@
 	</div>
 
 	<!-- Editable area -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		bind:this={editorEl}
 		contenteditable="true"
+		role="textbox"
+		aria-multiline="true"
+		aria-label={placeholder || 'Rich text editor'}
 		oninput={handleInput}
 		data-placeholder={placeholder}
 		class="editor-area min-h-0 flex-1 overflow-y-auto px-3 py-2 text-sm text-gray-200 focus:outline-none"

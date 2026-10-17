@@ -2,7 +2,12 @@
 	<title>Privacy Policy — Initiative Tracker</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-950 text-white">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="underline-links min-h-screen bg-gray-950 text-white"
+>
 	<div class="mx-auto max-w-3xl px-6 py-16">
 		<!-- Header -->
 		<div class="mb-12">

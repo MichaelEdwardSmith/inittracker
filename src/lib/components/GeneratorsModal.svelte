@@ -1,6 +1,7 @@
 <!-- Full-screen Generators modal for DMs. Left column lists generator categories;
      right panel shows the selected generator. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { browser } from '$app/environment';
 
 	let {
@@ -5281,8 +5282,12 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Generators"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gray-950"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
@@ -5352,6 +5357,7 @@
 					<!-- Controls -->
 					<div class="flex flex-wrap items-center gap-3">
 						<select
+							aria-label="Name type"
 							bind:value={nameType}
 							onchange={() => {
 								generatedNames = [];
@@ -5845,17 +5851,22 @@
 					{/if}
 					{#if selectedShopItem}
 						<!-- Item detail overlay -->
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
+							role="presentation"
 							class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-							onclick={() => (selectedShopItem = null)}
+							onclick={(e) => {
+								if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
+									selectedShopItem = null;
+							}}
 							onkeydown={(e) => e.key === 'Escape' && (selectedShopItem = null)}
 						>
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<div
+								role="dialog"
+								aria-modal="true"
+								aria-label="Shop item details"
+								tabindex="-1"
+								use:focusTrap
 								class="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
-								onclick={(e) => e.stopPropagation()}
 							>
 								<!-- Header -->
 								<div class="mb-4 flex items-start gap-3">
@@ -5916,17 +5927,22 @@
 						</div>
 					{/if}
 					{#if showShopSaveCityModal}
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
+							role="presentation"
 							class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-							onclick={() => (showShopSaveCityModal = false)}
+							onclick={(e) => {
+								if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
+									showShopSaveCityModal = false;
+							}}
 							onkeydown={(e) => e.key === 'Escape' && (showShopSaveCityModal = false)}
 						>
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<div
+								role="dialog"
+								aria-modal="true"
+								aria-label="Save city"
+								tabindex="-1"
+								use:focusTrap
 								class="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
-								onclick={(e) => e.stopPropagation()}
 							>
 								<h4 class="mb-1 text-base font-bold text-white">Save Shop to Notes</h4>
 								<p class="mb-4 text-xs text-gray-400">
@@ -5934,6 +5950,7 @@
 									in? (optional)
 								</p>
 								<input
+									aria-label="e.g. Waterdeep, Baldur's Gate"
 									type="text"
 									bind:value={shopSaveCityInput}
 									placeholder="e.g. Waterdeep, Baldur's Gate…"

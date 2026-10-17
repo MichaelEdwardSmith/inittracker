@@ -1,5 +1,6 @@
 <!-- Session manager modal — create, rename, delete, and switch game sessions. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import type { GameSession } from '$lib/types';
@@ -96,6 +97,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Session manager"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -139,9 +141,9 @@
 					></span>
 					<div class="min-w-0 flex-1">
 						{#if isRenaming}
-							<!-- svelte-ignore a11y_autofocus -->
 							<input
-								autofocus
+								aria-label="Session name"
+								data-autofocus
 								type="text"
 								class="w-full rounded border border-amber-500 bg-gray-800 px-2 py-0.5 text-sm text-white outline-none"
 								bind:value={renameValue}

@@ -3,6 +3,7 @@
      or "made their save — unaffected" in Condition/Effect mode. Fires onconcentrationchecks
      with any concentration saves that need to be resolved after applying damage. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import { hpPercent, hpBarColor, hpTextColor, conditionColors } from '$lib/utils';
 	import { CONDITIONS, ADV_CONDITIONS, SPELL_EFFECTS } from '$lib/enemies';
@@ -121,6 +122,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	tabindex="-1"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
@@ -183,13 +185,20 @@
 		<div class="max-h-72 overflow-y-auto">
 			{#each combatants as c (c.id)}
 				{@const pct = hpPercent(c)}
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
+					role="checkbox"
+					aria-checked={isSelected(c.id)}
+					aria-label="Include {c.name}"
+					tabindex="0"
 					class="flex cursor-pointer items-center gap-3 border-b border-gray-800/50 px-4 py-2.5 transition last:border-0
 					       {isSelected(c.id) ? '' : 'opacity-50'}"
 					onclick={() => (selected[c.id] = !isSelected(c.id))}
 					onkeydown={(e) => {
-						if (e.key === ' ' || e.key === 'Enter') selected[c.id] = !isSelected(c.id);
+						if (e.target !== e.currentTarget) return;
+						if (e.key === ' ' || e.key === 'Enter') {
+							e.preventDefault();
+							selected[c.id] = !isSelected(c.id);
+						}
 					}}
 				>
 					<!-- Include checkbox -->
@@ -211,7 +220,15 @@
 						>
 							{c.name}
 						</span>
-						<div class="h-1 w-full rounded-full bg-gray-700">
+						<div
+							role="meter"
+							aria-label="{c.name} hit points"
+							aria-valuemin={0}
+							aria-valuemax={c.maxHp}
+							aria-valuenow={c.currentHp}
+							aria-valuetext="{c.currentHp} of {c.maxHp} hit points"
+							class="h-1 w-full rounded-full bg-gray-700"
+						>
 							<div class="h-1 rounded-full {hpBarColor(pct)}" style="width: {pct}%"></div>
 						</div>
 					</div>
@@ -222,14 +239,21 @@
 					>
 
 					<!-- Saved (half dmg, or no-effect in condition mode) checkbox -->
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
+						role="checkbox"
+						aria-checked={saved[c.id] && isSelected(c.id)}
+						aria-label="{mode === 'damage'
+							? 'Saved for half damage'
+							: 'Saved, no effect'}: {c.name}"
+						aria-disabled={!isSelected(c.id)}
+						tabindex="0"
 						onclick={(e) => {
 							e.stopPropagation();
 							if (isSelected(c.id)) saved[c.id] = !saved[c.id];
 						}}
 						onkeydown={(e) => {
 							if (e.key === ' ' || e.key === 'Enter') {
+								e.preventDefault();
 								e.stopPropagation();
 								if (isSelected(c.id)) saved[c.id] = !saved[c.id];
 							}
@@ -253,9 +277,9 @@
 		{#if mode === 'damage'}
 			<!-- Footer: amount input + action buttons -->
 			<div class="flex items-center gap-2 border-t border-gray-700 px-4 py-3">
-				<!-- svelte-ignore a11y_autofocus -->
 				<input
-					autofocus
+					aria-label="Amount"
+					data-autofocus
 					bind:value={amount}
 					type="number"
 					min="1"
@@ -290,9 +314,9 @@
 			<!-- Footer: condition/effect picker -->
 			<div class="flex flex-col gap-2 border-t border-gray-700 px-4 py-3">
 				<div class="flex items-center gap-2">
-					<!-- svelte-ignore a11y_autofocus -->
 					<select
-						autofocus
+						aria-label="Condition or effect"
+						data-autofocus
 						bind:value={selectedEffect}
 						class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-800 px-2 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none"
 					>
@@ -315,6 +339,7 @@
 						<option value={CUSTOM_VALUE}>Custom…</option>
 					</select>
 					<input
+						aria-label="Rounds"
 						bind:value={effectRounds}
 						type="number"
 						min="1"
@@ -336,6 +361,7 @@
 				{/if}
 				{#if selectedEffect === CUSTOM_VALUE}
 					<input
+						aria-label="Custom condition / effect name"
 						bind:value={customEffect}
 						type="text"
 						maxlength="50"

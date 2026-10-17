@@ -24,6 +24,7 @@
 	import { ENEMY_TEMPLATES } from '$lib/enemies';
 	import { batteryIcon } from '$lib/utils';
 	import { combat } from '$lib/store.svelte';
+	import { useCombatAnnouncements } from '$lib/combatAnnouncer.svelte';
 	import { theme } from '$lib/theme.svelte';
 	import { browser } from '$app/environment';
 	import { setContext } from 'svelte';
@@ -34,6 +35,15 @@
 
 	let copied = $state(false);
 	let openPanel = $state<'players' | 'enemies' | null>(null);
+
+	useCombatAnnouncements(
+		() => ({
+			combatants: combat.combatants,
+			currentTurnId: combat.currentTurnId,
+			round: combat.round
+		}),
+		{ includeEnemyHp: true, includeDmOnlyStatuses: true }
+	);
 
 	// ── Right sidebar resize (enemy panel) ──────────────────────────────────
 	const SIDEBAR_MIN = 200;
@@ -91,6 +101,21 @@
 		document.addEventListener('touchmove', onTouchMove, { passive: false });
 		document.addEventListener('touchend', onUp);
 		document.addEventListener('touchcancel', onUp);
+	}
+
+	function resizeKey(e: KeyboardEvent, which: 'player' | 'enemy') {
+		const grow = which === 'player' ? 'ArrowRight' : 'ArrowLeft';
+		const shrink = which === 'player' ? 'ArrowLeft' : 'ArrowRight';
+		if (e.key !== grow && e.key !== shrink) return;
+		e.preventDefault();
+		const delta = (e.key === grow ? 1 : -1) * (e.shiftKey ? 40 : 16);
+		if (which === 'player') {
+			playerWidth = Math.min(PLAYER_MAX, Math.max(PLAYER_MIN, playerWidth + delta));
+			if (browser) localStorage.setItem('player-panel-width', String(playerWidth));
+		} else {
+			sidebarWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, sidebarWidth + delta));
+			if (browser) localStorage.setItem('enemy-panel-width', String(sidebarWidth));
+		}
 	}
 
 	// ── Left sidebar resize (player panel) ──────────────────────────────────
@@ -498,6 +523,8 @@
 	});
 </script>
 
+<svelte:head><title>Dashboard — Initiative Tracker</title></svelte:head>
+
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 text-white">
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
@@ -604,9 +631,11 @@
 
 	<!-- Mobile nav dropdown -->
 	{#if showMobileMenu}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="fixed inset-0 z-40" onclick={() => (showMobileMenu = false)}></div>
+		<div
+			role="presentation"
+			class="fixed inset-0 z-40"
+			onclick={() => (showMobileMenu = false)}
+		></div>
 	{/if}
 	<div
 		class="fixed top-14 right-2 z-50 max-h-[calc(100vh-4rem)] w-52 overflow-y-auto rounded-xl border border-gray-700 bg-gray-800 shadow-2xl {showMobileMenu
@@ -958,13 +987,18 @@
 			style="width: {playerWidth}px"
 		>
 			<!-- Drag handle — right edge -->
-			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<div
 				class="absolute inset-y-0 right-0 z-10 flex w-3 cursor-col-resize items-center justify-center transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResizePlayer}
 				ontouchstart={startResizePlayerTouch}
-				role="separator"
-				aria-label="Drag to resize panel"
+				role="slider"
+				aria-orientation="vertical"
+				tabindex="0"
+				aria-valuemin={PLAYER_MIN}
+				aria-valuemax={PLAYER_MAX}
+				aria-valuenow={playerWidth}
+				onkeydown={(e) => resizeKey(e, 'player')}
+				aria-label="Resize panel (left and right arrow keys)"
 				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
 				oncontextmenu={(e) => e.preventDefault()}
 			>
@@ -978,7 +1012,7 @@
 		</aside>
 
 		<!-- Center: Initiative tracker -->
-		<main class="flex min-w-0 flex-1 flex-col p-4">
+		<main id="main-content" tabindex="-1" class="flex min-w-0 flex-1 flex-col p-4">
 			<InitiativeTracker ruleset={activeSession.ruleset} />
 		</main>
 
@@ -988,13 +1022,18 @@
 			style="width: {sidebarWidth}px"
 		>
 			<!-- Drag handle — left edge -->
-			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<div
 				class="absolute inset-y-0 left-0 z-10 flex w-3 cursor-col-resize items-center justify-center transition-colors hover:bg-blue-500/30 active:bg-blue-500/50"
 				onmousedown={startResize}
 				ontouchstart={startResizeTouch}
-				role="separator"
-				aria-label="Drag to resize panel"
+				role="slider"
+				aria-orientation="vertical"
+				tabindex="0"
+				aria-valuemin={SIDEBAR_MIN}
+				aria-valuemax={SIDEBAR_MAX}
+				aria-valuenow={sidebarWidth}
+				onkeydown={(e) => resizeKey(e, 'enemy')}
+				aria-label="Resize panel (left and right arrow keys)"
 				style="touch-action: none; -webkit-touch-callout: none; user-select: none"
 				oncontextmenu={(e) => e.preventDefault()}
 			>

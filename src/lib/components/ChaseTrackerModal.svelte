@@ -6,6 +6,7 @@
      bands, tracks chase-flavor exhaustion pips, marks drop-outs, and draws complications — all
      of it live-synced to the player display via combat.chaseState. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { ChaseParticipant } from '$lib/types';
 	import { combat } from '$lib/store.svelte';
 	import { chaseBadgeClasses } from '$lib/utils';
@@ -80,15 +81,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Chase Tracker"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[92vh] w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-amber-800/60 bg-gray-900 shadow-2xl"
 >
 	<!-- Header -->

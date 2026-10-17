@@ -1,5 +1,6 @@
 <!-- Festival / Local Event Generator -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	let { onclose, embedded = false }: { onclose: () => void; embedded?: boolean } = $props();
 
 	// ── Types ─────────────────────────────────────────────────────────────────────
@@ -221,6 +222,7 @@
 		? 'flex h-full flex-col bg-gray-950'
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}

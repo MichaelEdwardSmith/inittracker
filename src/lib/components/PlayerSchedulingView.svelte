@@ -7,6 +7,7 @@
      to know to look for it. `active`/`collapsed` are bindable so the parent can show a "View
      Session Times" menu entry only while a proposal exists, and reopen a minimized one. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { SchedulingAvailability, SchedulingProposal } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
 	import { formatSlot } from '$lib/utils';
@@ -94,6 +95,11 @@
 {#if proposal && !collapsed}
 	<!-- ── Full overlay — pops up when a proposal opens or is confirmed ────────── -->
 	<div
+		role="dialog"
+		aria-modal="true"
+		aria-label="Scheduling"
+		tabindex="-1"
+		use:focusTrap
 		transition:fade={{ duration: 250 }}
 		class="fixed inset-0 z-[190] flex items-center justify-center bg-gray-950/95 p-6 backdrop-blur-sm"
 	>

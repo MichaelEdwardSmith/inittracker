@@ -1,6 +1,7 @@
 <!-- Encounter Builder modal — create named encounter templates from enemies,
      view CR/XP/difficulty, load them into the initiative tracker, or delete them. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import { ENEMY_TEMPLATES, MONSTER_TYPES } from '$lib/enemies';
 	import { ENEMY_TEMPLATES_2024, MONSTER_TYPES_2024 } from '$lib/enemies2024';
@@ -273,7 +274,9 @@
 <div
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
+	aria-label="Encounter Builder"
 >
 	<div
 		class="flex h-full max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-900 shadow-2xl"
@@ -401,6 +404,7 @@
 							</p>
 							<div class="flex flex-wrap items-center gap-2">
 								<select
+									aria-label="Encounter shape"
 									bind:value={quickShape}
 									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
 								>
@@ -409,6 +413,7 @@
 									{/each}
 								</select>
 								<select
+									aria-label="Difficulty"
 									bind:value={quickDifficulty}
 									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
 								>
@@ -417,6 +422,7 @@
 									{/each}
 								</select>
 								<select
+									aria-label="Monster type"
 									bind:value={quickTypeFilter}
 									class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-200 focus:border-violet-500 focus:outline-none"
 								>
@@ -442,6 +448,7 @@
 							<div class="flex gap-2">
 								<div class="relative flex-1">
 									<input
+										aria-label="Search enemies"
 										type="text"
 										bind:value={enemySearch}
 										placeholder="Search enemies…"
@@ -468,6 +475,7 @@
 									{/if}
 								</div>
 								<input
+									aria-label="Quantity"
 									type="number"
 									min="1"
 									max="99"

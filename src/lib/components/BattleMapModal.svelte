@@ -3,6 +3,7 @@
      measure distances, then show/hide the map on the player display. Single-slot: a new upload
      replaces whatever was prepared before. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import BattleGridCanvas from './BattleGridCanvas.svelte';
 	import type {
@@ -544,15 +545,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Battle Map"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-3xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-blue-800/60 bg-gray-900 shadow-2xl lg:max-w-5xl"
 >
 	<!-- Header -->
@@ -1174,6 +1180,7 @@
 										class="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2"
 									>
 										<input
+											aria-label="Name this map"
 											type="text"
 											bind:value={saveNameInput}
 											placeholder="Name this map…"

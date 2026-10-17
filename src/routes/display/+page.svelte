@@ -10,6 +10,11 @@
 	<title>Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex h-screen items-center justify-center bg-gray-950 text-gray-600">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="flex h-screen items-center justify-center bg-gray-950 text-gray-600"
+>
 	<p class="text-sm">Redirecting to <a href="/join" class="text-amber-500">/join</a>…</p>
 </div>

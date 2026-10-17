@@ -1,5 +1,6 @@
 <!-- DM inbox modal — shows received player messages with inline reply + compose. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { formatShortTime as formatTime } from '$lib/utils';
 
 	interface DmMessage {
@@ -56,6 +57,11 @@
 </script>
 
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Messages"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
 >
 	<div
@@ -123,6 +129,7 @@
 					</select>
 				</div>
 				<textarea
+					aria-label="Type your message"
 					bind:value={composeText}
 					placeholder="Type your message…"
 					rows="3"
@@ -187,6 +194,7 @@
 										Replying to <span class="font-semibold text-amber-400">{msg.from}</span>
 									</p>
 									<textarea
+										aria-label="Type your reply"
 										bind:value={replyText}
 										placeholder="Type your reply…"
 										rows="2"

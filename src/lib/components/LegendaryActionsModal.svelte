@@ -2,6 +2,7 @@
      (or legendary resistance) text with clickable dice/attack buttons. Contains its own
      dice-result overlay. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	interface Props {
 		modal: { name: string; text: string; title?: string } | null;
 		onclose: () => void;
@@ -89,8 +90,8 @@
 </script>
 
 {#if modal}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		onmousedown={(e) => {
 			if (e.target === e.currentTarget) close();
@@ -113,8 +114,8 @@
 					<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
 				</button>
 			</div>
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<div
+				role="presentation"
 				class="monster-text max-h-[60vh] overflow-y-auto px-5 py-4 text-sm leading-relaxed text-gray-300"
 				onclick={handleDiceClick}
 			>
@@ -126,15 +127,21 @@
 
 {#if diceResult}
 	{@const r = diceResult}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center"
-		onclick={() => (diceResult = null)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role="dialog"]')) diceResult = null;
+		}}
+		onkeydown={(e) => e.key === 'Escape' && (diceResult = null)}
 	>
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Dice roll result"
+			tabindex="-1"
+			use:focusTrap
 			class="max-w-sm min-w-[18rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h4 class="font-black tracking-wide text-amber-400">

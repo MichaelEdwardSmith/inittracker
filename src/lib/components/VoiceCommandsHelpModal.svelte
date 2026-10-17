@@ -1,6 +1,7 @@
 <!-- Shown the first time per session a DM activates voice commands.
      Lists available commands and notes the beta status. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	interface Props {
 		onclose: () => void;
 	}
@@ -47,6 +48,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Voice commands reference"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

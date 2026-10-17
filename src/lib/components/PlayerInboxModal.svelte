@@ -1,5 +1,6 @@
 <!-- Read-only inbox for messages received from the DM. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { formatShortTime as formatTime } from '$lib/utils';
 
 	export interface DmReply {
@@ -27,6 +28,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Messages from DM"
 	class="fixed inset-0 z-[250] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

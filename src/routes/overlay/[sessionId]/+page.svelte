@@ -300,7 +300,7 @@
 </svelte:head>
 
 <!-- Full-screen transparent canvas — OBS browser source fills this -->
-<div class="screen" class:screen-shake={shakeScreen}>
+<div id="main-content" role="main" tabindex="-1" class="screen" class:screen-shake={shakeScreen}>
 	{#if !connected}
 		<!-- Small connecting indicator top-left -->
 		<div class="connecting-chip">
