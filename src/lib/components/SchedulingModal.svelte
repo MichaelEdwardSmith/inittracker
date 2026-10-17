@@ -3,6 +3,7 @@
      backed by /api/scheduling (persisted in Mongo, polled — not SSE) since players answer over
      hours/days rather than live in front of the DM. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { SchedulingAvailability, SchedulingProposal } from '$lib/types';
 	import type { SessionPlayerSummary } from '$lib/server/playerModel';
 	import { formatSlot } from '$lib/utils';
@@ -120,15 +121,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Scheduling"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-lg translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-teal-800/60 bg-gray-900 shadow-2xl"
 >
 	<!-- Header -->
@@ -186,11 +192,13 @@
 						{#each draftSlots as _, i}
 							<div class="flex items-center gap-2">
 								<input
+									aria-label="Start date and time"
 									type="datetime-local"
 									bind:value={draftSlots[i].start}
 									class="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-teal-500 focus:outline-none"
 								/>
 								<input
+									aria-label="Label (optional)"
 									type="text"
 									bind:value={draftSlots[i].label}
 									maxlength="100"

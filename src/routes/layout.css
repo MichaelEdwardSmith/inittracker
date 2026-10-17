@@ -76,24 +76,24 @@ html.light {
 
 	/* Amber: darken the pale shades so they're readable on light backgrounds;
 	   flip the dark badge-background shades to pale equivalents. */
-	--color-amber-300: #b45309; /* amber-700 */
-	--color-amber-400: #d97706; /* amber-600 */
+	--color-amber-300: #8a3a0c; /* deeper than amber-700 for AA on light grays */
+	--color-amber-400: #9a4107; /* deeper than amber-600 for AA on light grays */
 	--color-amber-900: #fffbeb; /* amber-50  */
 	--color-amber-950: #fef3c7; /* amber-100 */
 
 	/* Red */
-	--color-red-300: #b91c1c; /* red-700 */
-	--color-red-400: #dc2626; /* red-600 */
+	--color-red-300: #991b1b; /* a notch deeper than red-700 (AA on light grays) */
+	--color-red-400: #b91c1c; /* deeper than red-600 */
 	--color-red-900: #fef2f2; /* red-50   */
 
 	/* Blue */
-	--color-blue-300: #1d4ed8; /* blue-700 */
-	--color-blue-400: #2563eb; /* blue-600 */
+	--color-blue-300: #1e40af; /* deeper than blue-700 */
+	--color-blue-400: #1d4ed8; /* blue-700 */
 	--color-blue-900: #eff6ff; /* blue-50  */
 
 	/* Green */
-	--color-green-300: #15803d; /* green-700 */
-	--color-green-400: #16a34a; /* green-600 */
+	--color-green-300: #14532d; /* deeper than green-700 */
+	--color-green-400: #166534; /* green-800 */
 	--color-green-900: #f0fdf4; /* green-50  */
 
 	/* Indigo */
@@ -103,8 +103,54 @@ html.light {
 	/* Violet */
 	--color-violet-300: #6d28d9; /* violet-700 */
 
+	/* Remaining hues used for badges/accents: flip 300/400 to deep shades, 900/950 to pale
+	   tints so text stays AA on light surfaces. */
+	--color-orange-300: #9a3412;
+	--color-orange-400: #c2410c;
+	--color-orange-900: #fff7ed;
+	--color-orange-950: #ffedd5;
+	--color-purple-300: #6b21a8;
+	--color-purple-400: #7e22ce;
+	--color-purple-900: #faf5ff;
+	--color-purple-950: #f3e8ff;
+	--color-emerald-300: #065f46;
+	--color-emerald-400: #047857;
+	--color-emerald-900: #ecfdf5;
+	--color-emerald-950: #d1fae5;
+	--color-teal-300: #115e59;
+	--color-teal-400: #0f766e;
+	--color-teal-900: #f0fdfa;
+	--color-teal-950: #ccfbf1;
+	--color-sky-300: #075985;
+	--color-sky-400: #0369a1;
+	--color-sky-900: #f0f9ff;
+	--color-rose-300: #9f1239;
+	--color-rose-400: #be123c;
+	--color-rose-900: #fff1f2;
+	--color-pink-300: #9d174d;
+	--color-pink-400: #be185d;
+	--color-pink-900: #fdf2f8;
+	--color-pink-950: #fce7f3;
+	--color-fuchsia-300: #86198f;
+	--color-fuchsia-900: #fdf4ff;
+	--color-cyan-300: #155e75;
+	--color-cyan-400: #0e7490;
+	--color-cyan-900: #ecfeff;
+	--color-cyan-950: #cffafe;
+	--color-violet-400: #5b21b6;
+	--color-violet-900: #f5f3ff;
+	--color-violet-950: #ede9fe;
+	--color-indigo-400: #3730a3;
+	--color-indigo-950: #e0e7ff;
+	--color-yellow-400: #854d0e;
+	--color-yellow-950: #fef9c3;
+	--color-lime-400: #4d7c0f;
+	--color-red-950: #fee2e2;
+	--color-green-950: #dcfce7;
+	--color-blue-950: #dbeafe;
+
 	/* Yellow / THP */
-	--color-yellow-300: #a16207; /* yellow-700 */
+	--color-yellow-300: #854d0e; /* deeper than yellow-700 */
 	--color-yellow-700: #fef08a; /* yellow-200 */
 	--color-yellow-800: #fef9c3; /* yellow-100 */
 	--color-yellow-900: #fefce8; /* yellow-50  */
@@ -128,4 +174,168 @@ html.light *::-webkit-scrollbar-thumb:hover {
 
 html.light *::-webkit-scrollbar-corner {
 	background: #e5e7eb;
+}
+
+/* ─── Accessibility (Section 508 / WCAG 2.1 AA) ───────────────────────────── */
+
+/* Muted text: Tailwind's gray-500/600 fall below 4.5:1 on our dark surfaces
+   (and gray-600 does in light mode, where the scale is flipped). Override only
+   the text-color utilities so borders/backgrounds that use these tokens are
+   unaffected. Same layer as Tailwind's utilities, so hover:/focus: variants
+   (higher specificity) still win. */
+@layer utilities {
+	.text-gray-500 {
+		color: #949bab;
+	}
+	.text-gray-600 {
+		color: #8f96a6;
+	}
+	html.light .text-gray-500 {
+		color: #525a68;
+	}
+	html.light .text-gray-600 {
+		color: #5b6370;
+	}
+	.text-gray-700 {
+		color: #8a91a1;
+	}
+	html.light .text-gray-700 {
+		color: #5b6370;
+	}
+	.text-gray-800 {
+		color: #8a91a1;
+	}
+	html.light .text-gray-800 {
+		color: #5b6370;
+	}
+	.text-amber-700,
+	.text-amber-700\/80 {
+		color: #e08a0b;
+	}
+	html.light .text-amber-700,
+	html.light .text-amber-700\/80 {
+		color: #92400e;
+	}
+	.text-amber-600\/80 {
+		color: #f59e0b;
+	}
+	html.light .text-amber-600\/80 {
+		color: #92400e;
+	}
+}
+
+/* Visible keyboard focus everywhere (unlayered so it also covers outline-none) */
+:focus-visible {
+	outline: 2px solid #fbbf24;
+	outline-offset: 2px;
+}
+
+html.light :focus-visible {
+	outline-color: #b45309;
+}
+
+/* Skip link — hidden until focused */
+.skip-link {
+	position: absolute;
+	left: 0.5rem;
+	top: -4rem;
+	z-index: 10000;
+	padding: 0.5rem 1rem;
+	border-radius: 0.375rem;
+	background: #fbbf24;
+	color: #111827;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.skip-link:focus {
+	top: 0.5rem;
+}
+
+/* Visually hidden but available to assistive tech (live-region announcer) */
+.sr-only-live {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Respect reduced-motion preferences across the app */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* Links inside long-form text must not rely on color alone (WCAG 1.4.1) */
+.underline-links a {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Dark mode: white text on Tailwind's amber-600 is only 3.2:1, so deepen the fill.
+   (Light mode already swaps white text to near-black, which passes on amber-600.) */
+html:not(.light) .bg-amber-600.text-white {
+	background-color: #b45309;
+}
+
+html:not(.light) .bg-amber-600.text-white.hover\:bg-amber-500:hover {
+	background-color: #92400e;
+}
+
+/* Links inside running paragraphs are underlined app-wide (color alone isn't enough) */
+p a:not([class*='rounded']) {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Light mode: *-500 used as TEXT color needs a deeper shade (fills keep their normal 500). */
+html.light .text-amber-500 {
+	color: #b45309;
+}
+html.light .text-red-500 {
+	color: #b91c1c;
+}
+html.light .text-blue-500 {
+	color: #1d4ed8;
+}
+html.light .text-green-500 {
+	color: #15803d;
+}
+html.light .text-violet-500 {
+	color: #6d28d9;
+}
+html.light .text-indigo-500 {
+	color: #4338ca;
+}
+html.light .text-emerald-500 {
+	color: #047857;
+}
+html.light .text-teal-500 {
+	color: #0f766e;
+}
+html.light .text-purple-500 {
+	color: #7e22ce;
+}
+html.light .text-orange-500 {
+	color: #c2410c;
+}
+html.light .text-yellow-500 {
+	color: #a16207;
+}
+html.light .text-cyan-500 {
+	color: #0e7490;
+}
+html.light .text-fuchsia-500 {
+	color: #a21caf;
 }

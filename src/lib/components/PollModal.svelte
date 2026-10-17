@@ -2,6 +2,7 @@
      (prefilled with Yes/No) and open it to players, then shows live vote tallies
      as they come in. Subscribes to /api/poll SSE for the DM's own (voteless) view. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { PollState } from '$lib/types';
 
 	interface Props {
@@ -100,15 +101,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Poll"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-lg translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-indigo-800/60 bg-gray-900 shadow-2xl"
 >
 	<!-- Header -->
@@ -164,6 +170,7 @@
 						{#each options as _, i}
 							<div class="flex items-center gap-2">
 								<input
+									aria-label="Answer {i + 1}"
 									type="text"
 									bind:value={options[i]}
 									maxlength="100"

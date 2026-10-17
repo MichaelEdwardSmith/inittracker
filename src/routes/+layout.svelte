@@ -8,6 +8,8 @@
 	import { browser } from '$app/environment';
 	import { theme } from '$lib/theme.svelte';
 	import { startAbbrTooltips } from '$lib/abbrTooltips';
+	import { startScrollRegions } from '$lib/scrollRegions';
+	import { announcer } from '$lib/announce.svelte';
 
 	// Sync initial state with what the no-flash inline script already applied
 	if (browser && localStorage.getItem('theme') === 'light') {
@@ -20,6 +22,7 @@
 	});
 
 	$effect(() => startAbbrTooltips());
+	$effect(() => startScrollRegions());
 
 	let { data, children } = $props();
 
@@ -38,6 +41,16 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Global screen-reader announcer (see $lib/announce.svelte.ts) -->
+<div class="sr-only-live" role="status" aria-live="polite" aria-atomic="true">
+	{announcer.polite}
+</div>
+<div class="sr-only-live" role="alert" aria-live="assertive" aria-atomic="true">
+	{announcer.assertive}
+</div>
 
 {#if data.unverifiedEmail && !dismissed}
 	<div

@@ -30,7 +30,7 @@
 	</div>
 {/snippet}
 
-<div class="min-h-screen bg-gray-950 text-gray-300">
+<div class="underline-links min-h-screen bg-gray-950 text-gray-300">
 	<div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
 		<div class="bg-orb orb-2"></div>
@@ -71,7 +71,7 @@
 		</aside>
 
 		<!-- Main content -->
-		<main class="min-w-0 flex-1 space-y-16">
+		<main id="main-content" tabindex="-1" class="min-w-0 flex-1 space-y-16">
 			<!-- 1 ── Sound ─────────────────────────────── -->
 			<section id="sound">
 				{@render h2('1', 'Sound On / Off')}

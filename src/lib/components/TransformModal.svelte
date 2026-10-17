@@ -2,6 +2,7 @@
      a form (Wild Shape, Polymorph, etc.) and revert them back later. Manual entry only;
      the store keeps the original stats stashed so reverting is exact. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { Combatant } from '$lib/types';
 
 	interface Props {
@@ -34,6 +35,7 @@
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Transform"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"

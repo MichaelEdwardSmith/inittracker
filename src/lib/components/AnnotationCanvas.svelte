@@ -127,6 +127,7 @@
 	aria-hidden={!interactive}
 >
 	<canvas
+		aria-label="Annotation drawing layer"
 		bind:this={canvas}
 		style="position:absolute; left:{rect.x}px; top:{rect.y}px; width:{rect.w}px; height:{rect.h}px; touch-action:none; {interactive
 			? 'cursor:crosshair;'

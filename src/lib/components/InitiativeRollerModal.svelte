@@ -1,5 +1,6 @@
 <!-- Initiative roller modal — players use this to roll and submit their initiative. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { untrack } from 'svelte';
 	import type { Combatant } from '$lib/types';
 
@@ -67,6 +68,11 @@
 </script>
 
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Roll initiative"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 >
 	<div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">

@@ -224,7 +224,12 @@
 	<title>Admin — Initiative Tracker</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-950 px-4 py-8 text-gray-200 sm:px-8">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="min-h-screen bg-gray-950 px-4 py-8 text-gray-200 sm:px-8"
+>
 	<div class="mx-auto max-w-6xl">
 		<header class="mb-6 flex flex-wrap items-center justify-between gap-3">
 			<div>
@@ -360,6 +365,7 @@
 		<!-- Search + filter -->
 		<div class="mb-4 flex flex-wrap items-center gap-2">
 			<input
+				aria-label="Search name or email"
 				type="text"
 				bind:value={search}
 				placeholder="Search name or email…"

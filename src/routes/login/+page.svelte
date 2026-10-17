@@ -27,6 +27,9 @@
 </svelte:head>
 
 <div
+	id="main-content"
+	role="main"
+	tabindex="-1"
 	class="flex h-screen flex-col items-center justify-center overflow-hidden bg-gray-950 text-white"
 >
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">

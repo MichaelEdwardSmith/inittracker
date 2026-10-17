@@ -1,6 +1,7 @@
 <!-- Full-screen two-panel spell reference modal. Left panel: search + filter list.
      Right panel: spell card with rich description and clickable dice. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { Spell5e } from '$lib/types';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
 	import {
@@ -140,6 +141,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Spell Reference"
 	class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-10 backdrop-blur-sm"
@@ -149,8 +151,8 @@
 	}}
 	onkeydown={handleKeydown}
 >
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="flex w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
 		style="max-height: calc(100vh - 5rem);"
 		onclick={(e) => e.stopPropagation()}
@@ -175,6 +177,7 @@
 				<!-- Search -->
 				<div class="shrink-0 p-2">
 					<input
+						aria-label="Search spells"
 						type="text"
 						placeholder="Search spells…"
 						bind:value={search}
@@ -185,6 +188,7 @@
 				<!-- Filters -->
 				<div class="shrink-0 space-y-1 px-2 pb-2">
 					<select
+						aria-label="Filter by level"
 						bind:value={filterLevel}
 						class="w-full rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-300 focus:border-violet-500 focus:outline-none"
 					>
@@ -195,6 +199,7 @@
 						{/each}
 					</select>
 					<select
+						aria-label="Filter by school"
 						bind:value={filterSchool}
 						class="w-full rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-300 focus:border-violet-500 focus:outline-none"
 					>
@@ -204,6 +209,7 @@
 						{/each}
 					</select>
 					<select
+						aria-label="Filter by class"
 						bind:value={filterClass}
 						class="w-full rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-gray-300 focus:border-violet-500 focus:outline-none"
 					>
@@ -248,9 +254,11 @@
 			</div>
 
 			<!-- Right panel: spell card -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<div class="min-h-0 flex-1 overflow-y-auto p-5 text-gray-200" onclick={handleDiceClick}>
+			<div
+				role="presentation"
+				class="min-h-0 flex-1 overflow-y-auto p-5 text-gray-200"
+				onclick={handleDiceClick}
+			>
 				{#if !selectedSpell}
 					<div class="flex h-full items-center justify-center text-gray-600">
 						<p class="text-sm">Select a spell from the list</p>
@@ -339,6 +347,7 @@
 	<div
 		class="fixed inset-0 z-[60] flex items-center justify-center"
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Dice roll result"
 		tabindex="-1"
@@ -347,9 +356,8 @@
 			if (e.key === 'Escape') diceRollResult = null;
 		}}
 	>
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="presentation"
 			class="max-w-sm min-w-[18rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>

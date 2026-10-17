@@ -1,5 +1,6 @@
 <!-- NPC Generator — identity, personality, and D&D 5e stat block -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { exportNpcPdf } from '$lib/pdfExport';
 
 	let { onclose, embedded = false }: { onclose: () => void; embedded?: boolean } = $props();
@@ -1048,6 +1049,7 @@
 		? 'flex h-full flex-col bg-gray-950'
 		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	tabindex="-1"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}

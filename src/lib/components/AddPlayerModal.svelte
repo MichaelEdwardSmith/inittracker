@@ -4,6 +4,7 @@
      add so multiple players can be added in a row; closes via the ✕, Escape, or backdrop
      click. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import { parseMpmbSheet, type MpmbCharacter } from '$lib/mpmbImport';
 
@@ -150,6 +151,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Add Player"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -225,6 +227,7 @@
 					<p class="text-xs text-gray-400">Paste a D&amp;D Beyond character URL or ID.</p>
 					<div class="flex gap-2">
 						<input
+							aria-label="dndbeyond.com/characters/12345678"
 							bind:value={ddbUrl}
 							placeholder="dndbeyond.com/characters/12345678"
 							class="min-w-0 flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-xs text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
@@ -350,6 +353,7 @@
 					class="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3"
 				>
 					<input
+						aria-label="Player name"
 						bind:value={name}
 						placeholder="Player name"
 						class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"

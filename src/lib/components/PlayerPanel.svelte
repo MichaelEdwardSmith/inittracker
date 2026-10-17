@@ -107,6 +107,7 @@
 
 <!-- Hidden file input (shared across all players) -->
 <input
+	aria-label="Upload player avatar image"
 	bind:this={fileInput}
 	type="file"
 	accept="image/*"
@@ -141,6 +142,7 @@
 			{#if editingId === player.id}
 				<div class="flex flex-col gap-2 rounded-lg border border-amber-600 bg-gray-800 p-3">
 					<input
+						aria-label="Player name"
 						bind:value={editName}
 						class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
 					/>

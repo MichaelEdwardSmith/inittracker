@@ -4,6 +4,7 @@
      menu (bindable `collapsed`). `active` is bindable so the parent can show a
      "View Poll" menu entry only while a poll exists. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { PollState } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
 
@@ -91,6 +92,11 @@
 {#if poll && !collapsed}
 	<!-- ── Full overlay — pops up when a poll opens or changes ────────────────── -->
 	<div
+		role="dialog"
+		aria-modal="true"
+		aria-label="Poll"
+		tabindex="-1"
+		use:focusTrap
 		transition:fade={{ duration: 250 }}
 		class="fixed inset-0 z-[190] flex items-center justify-center bg-gray-950/95 p-6 backdrop-blur-sm"
 	>

@@ -1,5 +1,6 @@
 <!-- Embeds Watabou's Dwellings generator (watabou.github.io/dwellings) -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { untrack } from 'svelte';
 
 	let { building, onclose }: { building: { type: string; name: string }; onclose: () => void } =
@@ -51,6 +52,7 @@
 <div
 	class="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 >
 	<div

@@ -2,6 +2,7 @@
      and (if observing) all players' dice at once. If the DM joins as a player they get
      the same interface as the players on the display page. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { LiarsDiceGame, LiarsDicePlayer } from '$lib/types';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
 
@@ -207,15 +208,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Liar's Dice"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-amber-800/60 bg-gray-900 shadow-2xl"
 >
 	<!-- Header -->
@@ -270,7 +276,7 @@
 					>
 						<i class="fa-duotone fa-light fa-eye text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Observe</span>
-						<span class="text-center text-xs opacity-70">See all dice, manage the game</span>
+						<span class="text-center text-xs">See all dice, manage the game</span>
 					</button>
 					<button
 						onclick={() => (dmRole = 'player')}
@@ -281,7 +287,7 @@
 					>
 						<i class="fa-duotone fa-light fa-dice text-3xl" aria-hidden="true"></i>
 						<span class="font-bold">Play</span>
-						<span class="text-center text-xs opacity-70">Join the game as a player</span>
+						<span class="text-center text-xs">Join the game as a player</span>
 					</button>
 				</div>
 

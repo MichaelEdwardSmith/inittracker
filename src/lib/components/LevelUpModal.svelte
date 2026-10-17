@@ -4,6 +4,7 @@
      a step are saved when moving on to the next one (or on Finish/close), so progress
      isn't lost if the DM stops partway through. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 
 	interface Props {
@@ -90,6 +91,7 @@
 {#if current}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Level Up"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

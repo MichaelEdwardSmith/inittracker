@@ -1,6 +1,7 @@
 <!-- Shown on first login to let the DM choose their D&D edition.
      Cannot be dismissed — a choice must be made before using the dashboard. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { invalidateAll } from '$app/navigation';
 
 	interface Props {
@@ -48,6 +49,7 @@
 <div
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-labelledby="edition-modal-title"
 >

@@ -1,6 +1,7 @@
 <!-- Full-screen Quick Rules reference for DMs. Left column lists categories;
      right panel shows the selected category's content. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { getConditionDescription } from '$lib/utils';
 	import {
 		URBAN_CHASE_COMPLICATIONS,
@@ -3965,8 +3966,12 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Quick Rules"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gray-950"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
@@ -5165,24 +5170,28 @@
 					<!-- Controls row -->
 					<div class="flex flex-wrap gap-3">
 						<input
+							aria-label="Search items"
 							bind:value={itemSearch}
 							type="search"
 							placeholder="Search items…"
 							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
 						/>
 						<select
+							aria-label="Filter by item type"
 							bind:value={itemTypeFilter}
 							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
 						>
 							{#each itemTypes as t}<option value={t}>{t}</option>{/each}
 						</select>
 						<select
+							aria-label="Filter by rarity"
 							bind:value={itemRarityFilter}
 							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
 						>
 							{#each itemRarities as r}<option value={r}>{r}</option>{/each}
 						</select>
 						<select
+							aria-label="Sort items"
 							bind:value={itemSort}
 							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
 						>

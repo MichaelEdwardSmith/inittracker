@@ -5,6 +5,7 @@
      self-contained: handles its own POST results via use:enhance callbacks rather than the
      page's shared `form` prop, so reopening the modal never replays a stale previous result. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { enhance } from '$app/forms';
 	import { tick, untrack } from 'svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -214,6 +215,11 @@
 </script>
 
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Send email"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
 >
 	<div class="w-full max-w-lg rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">

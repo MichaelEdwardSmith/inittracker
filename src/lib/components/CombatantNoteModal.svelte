@@ -1,6 +1,7 @@
 <!-- Modal for editing a per-combatant DM note. Receives the target combatant and an
      onSave callback; renders a rich-text editor and saves the note HTML back to the caller. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { Combatant } from '$lib/types';
 	import RichTextEditor from './RichTextEditor.svelte';
 
@@ -27,6 +28,7 @@
 {#if combatant}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Combatant notes"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

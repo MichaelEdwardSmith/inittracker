@@ -2,6 +2,7 @@
      Generation: Room-placement + Prim's MST corridors (DonJon-style algorithm)
      Rendering:  HTML5 canvas, graph-paper dungeon aesthetic -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { getMonsterDetail } from '$lib/enemies';
 	import { exportDungeonPdf } from '$lib/pdfExport';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
@@ -1444,8 +1445,12 @@
 	);
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Dungeon Generator"
+	tabindex="-1"
+	use:focusTrap
 	class="fixed inset-0 z-50 flex flex-col bg-gray-950"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
@@ -1713,6 +1718,7 @@
 			<div class="sticky top-2 left-0 z-10 flex justify-end gap-2 pr-3 pb-0">
 				{#if dungeon && dungeon.floors.length > 1}
 					<select
+						aria-label="Floor"
 						bind:value={currentFloor}
 						onchange={() => {
 							selectedRoomId = null;
@@ -1774,6 +1780,7 @@
 					>
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<canvas
+							aria-label="Generated dungeon map. Activate a room to read its details."
 							bind:this={canvasEl}
 							width={CVS_W}
 							height={CVS_H}
@@ -1983,17 +1990,22 @@
 </div>
 
 {#if showSaveModal}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-		onclick={() => (showSaveModal = false)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role=\"dialog\"]')) showSaveModal = false;
+		}}
 		onkeydown={(e) => e.key === 'Escape' && (showSaveModal = false)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Save dungeon"
+			tabindex="-1"
+			use:focusTrap
 			class="relative z-10 w-full max-w-sm rounded-xl border border-blue-900/60 bg-gray-950 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div
 				class="flex items-center justify-between rounded-t-xl border-b border-blue-900/40 bg-blue-950/30 px-4 py-3"
@@ -2012,6 +2024,7 @@
 			</div>
 			<div class="space-y-3 p-4">
 				<input
+					aria-label="Dungeon name"
 					type="text"
 					bind:value={saveName}
 					placeholder="Dungeon name…"
@@ -2031,17 +2044,22 @@
 {/if}
 
 {#if showLoadModal}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-		onclick={() => (showLoadModal = false)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role=\"dialog\"]')) showLoadModal = false;
+		}}
 		onkeydown={(e) => e.key === 'Escape' && (showLoadModal = false)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Load dungeon"
+			tabindex="-1"
+			use:focusTrap
 			class="relative z-10 w-full max-w-sm rounded-xl border border-gray-700 bg-gray-950 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div
 				class="flex items-center justify-between rounded-t-xl border-b border-gray-800 bg-gray-900/60 px-4 py-3"
@@ -2104,17 +2122,22 @@
 {/if}
 
 {#if activeTrap}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-		onclick={() => (activeTrap = null)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role=\"dialog\"]')) activeTrap = null;
+		}}
 		onkeydown={(e) => e.key === 'Escape' && (activeTrap = null)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Trap details"
+			tabindex="-1"
+			use:focusTrap
 			class="relative z-10 w-full max-w-sm rounded-xl border border-red-900/60 bg-gray-950 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<!-- Modal header -->
 			<div
@@ -2157,17 +2180,22 @@
 {/if}
 
 {#if activeStair}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-		onclick={() => (activeStair = null)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role=\"dialog\"]')) activeStair = null;
+		}}
 		onkeydown={(e) => e.key === 'Escape' && (activeStair = null)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Stairs"
+			tabindex="-1"
+			use:focusTrap
 			class="relative z-10 w-full max-w-xs rounded-xl border border-gray-700 bg-gray-950 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div
 				class="flex items-center justify-between rounded-t-xl border-b border-gray-800 bg-gray-900/60 px-4 py-3"
@@ -2210,17 +2238,22 @@
 {/if}
 
 {#if activeLoot}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
+		role="presentation"
 		class="fixed inset-0 z-[60] flex items-center justify-center p-4"
-		onclick={() => (activeLoot = null)}
+		onclick={(e) => {
+			if (!(e.target as HTMLElement).closest('[role=\"dialog\"]')) activeLoot = null;
+		}}
 		onkeydown={(e) => e.key === 'Escape' && (activeLoot = null)}
 	>
 		<div class="absolute inset-0 bg-black/70"></div>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label="Loot details"
+			tabindex="-1"
+			use:focusTrap
 			class="relative z-10 w-full max-w-sm rounded-xl border border-yellow-900/50 bg-gray-950 shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div
 				class="flex items-center justify-between rounded-t-xl border-b border-yellow-900/40 bg-yellow-950/20 px-4 py-3"

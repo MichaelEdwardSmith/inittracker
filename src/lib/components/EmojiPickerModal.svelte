@@ -53,9 +53,8 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[260] flex items-end justify-center p-4 pb-8"
 	onclick={(e) => {
 		if (e.target === e.currentTarget) onclose();

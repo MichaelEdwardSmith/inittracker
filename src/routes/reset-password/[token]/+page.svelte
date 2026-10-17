@@ -20,7 +20,12 @@
 	<title>Reset Password — Initiative Tracker</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 text-white">
+<div
+	id="main-content"
+	role="main"
+	tabindex="-1"
+	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 text-white"
+>
 	<div class="w-full max-w-sm">
 		<div class="mb-8 text-center">
 			<i class="fa-duotone fa-light fa-key text-5xl" aria-hidden="true"></i>

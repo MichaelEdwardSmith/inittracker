@@ -1,6 +1,7 @@
 <!-- Modal for editing an enemy/NPC's max HP mid-combat. Receives the target combatant and an
      onsave callback; current HP is clamped down if the new max is lower. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { Combatant } from '$lib/types';
 	import { tick } from 'svelte';
 
@@ -31,6 +32,7 @@
 {#if combatant}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Edit max HP"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"

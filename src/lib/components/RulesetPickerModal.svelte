@@ -1,6 +1,7 @@
 <!-- Shown when creating a new game session. Lets the DM choose 2014 or 2024 ruleset.
      This choice is permanent and cannot be changed after the session is created. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { untrack } from 'svelte';
 
 	interface Props {
@@ -22,6 +23,7 @@
 
 <div
 	role="dialog"
+	use:focusTrap
 	aria-modal="true"
 	aria-label="Choose ruleset"
 	class="fixed inset-0 z-60 flex items-center justify-center bg-black/80 p-4"
@@ -143,6 +145,7 @@
 		<!-- Session name + actions -->
 		<div class="flex items-center gap-3 p-6">
 			<input
+				aria-label="Session name"
 				type="text"
 				placeholder="Session name…"
 				class="flex-1 rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-500"

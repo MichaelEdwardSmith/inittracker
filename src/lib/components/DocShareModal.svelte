@@ -4,6 +4,7 @@
      pdf.js before upload; the player display only ever receives plain images. Single-slot: a new
      upload replaces whatever was prepared before. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 	import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 	import AnnotationCanvas from './AnnotationCanvas.svelte';
@@ -319,15 +320,20 @@
 </script>
 
 <!-- Backdrop -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm"
 	onclick={(e) => e.target === e.currentTarget && onclose()}
 ></div>
 
 <!-- Panel -->
 <div
+	role="dialog"
+	aria-modal="true"
+	aria-label="Document Share"
+	tabindex="-1"
+	use:focusTrap
+	onkeydown={(e) => e.key === 'Escape' && onclose()}
 	class="fixed top-[50%] left-[50%] z-[151] flex max-h-[90vh] w-full max-w-lg translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-2xl border border-teal-800/60 bg-gray-900 shadow-2xl"
 >
 	<!-- Header -->

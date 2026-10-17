@@ -10,6 +10,9 @@
 </svelte:head>
 
 <div
+	id="main-content"
+	role="main"
+	tabindex="-1"
 	class="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 py-10 text-white"
 >
 	<div

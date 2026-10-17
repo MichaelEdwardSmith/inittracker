@@ -56,8 +56,8 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	role="presentation"
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 	onmousedown={(e) => {
 		if (e.target === e.currentTarget) onclose();
@@ -96,6 +96,7 @@
 			{#each items as item (item.id)}
 				<div class="flex items-center gap-2">
 					<input
+						aria-label="Quantity"
 						type="number"
 						min="0"
 						value={item.quantity}
@@ -104,6 +105,7 @@
 					/>
 					<span class="text-xs text-gray-600">×</span>
 					<input
+						aria-label="Item name"
 						type="text"
 						value={item.name}
 						oninput={(e) => updateName(item.id, (e.target as HTMLInputElement).value)}

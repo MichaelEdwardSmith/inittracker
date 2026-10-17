@@ -2,6 +2,7 @@
      custom monsters; supports adding enemies to the tracker, managing custom monsters
      (create, edit, delete, import from bestiary), and viewing monster stat blocks. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import { combat } from '$lib/store.svelte';
 	import {
 		ENEMY_TEMPLATES,
@@ -323,12 +324,14 @@
 	<!-- Filters -->
 	<div class="flex flex-col gap-2">
 		<input
+			aria-label="Search monsters"
 			bind:value={search}
 			placeholder="Search monsters..."
 			class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white placeholder-gray-500 focus:border-red-500 focus:outline-none"
 		/>
 		<div class="flex gap-2">
 			<select
+				aria-label="Filter by monster type"
 				bind:value={typeFilter}
 				class="flex-1 rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
 			>
@@ -337,6 +340,7 @@
 				{/each}
 			</select>
 			<select
+				aria-label="Sort monsters"
 				bind:value={sortBy}
 				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
 			>
@@ -346,6 +350,7 @@
 		</div>
 		{#if availableSources.length > 0}
 			<select
+				aria-label="Filter by source book"
 				bind:value={sourceFilter}
 				class="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white focus:border-red-500 focus:outline-none"
 			>
@@ -471,6 +476,7 @@
 					<i class="fa-duotone fa-light fa-minus" aria-hidden="true"></i>
 				</button>
 				<input
+					aria-label="Quantity"
 					type="number"
 					bind:value={quantity}
 					min="1"
@@ -500,6 +506,7 @@
 	<!-- Backdrop -->
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Enemy details"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-16 backdrop-blur-sm"

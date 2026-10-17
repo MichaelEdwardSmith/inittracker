@@ -199,6 +199,8 @@
 	}
 </script>
 
+<svelte:head><title>Combat Chronicle — Initiative Tracker</title></svelte:head>
+
 <div class="min-h-screen bg-gray-950 text-white">
 	<div aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
@@ -228,7 +230,7 @@
 		</a>
 	</header>
 
-	<main class="mx-auto max-w-3xl px-4 py-8">
+	<main id="main-content" tabindex="-1" class="mx-auto max-w-3xl px-4 py-8">
 		{#if records.length === 0}
 			<!-- Empty state -->
 			<div class="flex flex-col items-center justify-center py-24 text-center">
@@ -306,6 +308,7 @@
 						aria-hidden="true"
 					></i>
 					<input
+						aria-label="Search by combatant name"
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search by combatant name…"
@@ -341,6 +344,7 @@
 					<div class="ml-auto flex items-center gap-2">
 						<span class="text-xs text-gray-600">Sort:</span>
 						<select
+							aria-label="Sort chronicle"
 							bind:value={sortBy}
 							class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1.5 text-xs text-gray-300 transition outline-none focus:border-amber-700"
 						>

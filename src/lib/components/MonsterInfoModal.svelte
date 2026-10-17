@@ -1,6 +1,7 @@
 <!-- Read-only stat-block modal for a single monster. Displays ability scores, traits,
      actions, and other MonsterDetail fields; closed by clicking the backdrop or pressing Escape. -->
 <script lang="ts">
+	import { focusTrap } from '$lib/actions/focusTrap';
 	import type { MonsterDetail } from '$lib/types';
 	import { getContext } from 'svelte';
 	import { triggerRoll } from '$lib/diceOverlay.svelte';
@@ -228,6 +229,7 @@
 {#if monster}
 	<div
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Monster information"
 		class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12 backdrop-blur-sm"
@@ -266,9 +268,11 @@
 			</div>
 
 			<!-- Scrollable body — dice clicks bubble up to this handler -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<div class="overflow-y-auto p-5 text-gray-200" onclick={handleStatBlockClick}>
+			<div
+				role="presentation"
+				class="overflow-y-auto p-5 text-gray-200"
+				onclick={handleStatBlockClick}
+			>
 				<!-- Image -->
 				{#if monster.imgUrl}
 					<div class="mb-4">
@@ -431,6 +435,7 @@
 	<div
 		class="fixed inset-0 z-[60] flex items-center justify-center"
 		role="dialog"
+		use:focusTrap
 		aria-modal="true"
 		aria-label="Dice roll result"
 		tabindex="-1"
@@ -439,9 +444,8 @@
 			if (e.key === 'Escape') diceRollResult = null;
 		}}
 	>
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			role="presentation"
 			class="max-w-sm min-w-[18rem] rounded-xl border border-gray-600 bg-gray-900 p-5 shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
