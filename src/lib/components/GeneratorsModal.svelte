@@ -4018,19 +4018,56 @@
 			});
 		}
 		const allItems = [...picked, ...magicPicked];
-		generatedShop = allItems.map((item) => {
-			// Magic items keep their DMG/XGE price fixed — a wealthier town shouldn't
-			// inflate what a Potion of Healing is actually worth. Only mundane goods
-			// (no rarity tag) scale with local market conditions.
-			const base = item.rarity ? item.price : item.price * aff.mult;
-			return {
-				name: item.name,
-				liked: formatPrice(base * 0.85),
-				neutral: formatPrice(base),
-				disliked: formatPrice(base * 1.25),
-				rarity: item.rarity
-			};
-		});
+		generatedShop = allItems.map(toShopRow);
+	}
+
+	function toShopRow(item: ShopItemDef): ShopRow {
+		// Magic items keep their DMG/XGE price fixed — a wealthier town shouldn't
+		// inflate what a Potion of Healing is actually worth. Only mundane goods
+		// (no rarity tag) scale with local market conditions.
+		const base = item.rarity ? item.price : item.price * (affluenceData[shopAffluence]?.mult ?? 1);
+		return {
+			name: item.name,
+			liked: formatPrice(base * 0.85),
+			neutral: formatPrice(base),
+			disliked: formatPrice(base * 1.25),
+			rarity: item.rarity
+		};
+	}
+
+	// Swaps one row for a different item of the same kind (same rarity for magic items,
+	// any mundane item otherwise) that isn't already stocked.
+	function shopRerollCandidates(row: ShopRow): ShopItemDef[] {
+		const have = new Set(generatedShop.map((r) => r.name));
+		const pool = row.rarity
+			? (shopMagicItems[shopType] ?? []).filter((m) => m.rarity === row.rarity)
+			: (shopData[shopType]?.items ?? []);
+		return pool.filter((m) => !have.has(m.name));
+	}
+
+	function rerollShopItem(index: number) {
+		const candidates = shopRerollCandidates(generatedShop[index]);
+		if (!candidates.length) return;
+		const next = toShopRow(pickFrom(candidates));
+		generatedShop = generatedShop.map((r, i) => (i === index ? next : r));
+	}
+
+	let shopCopyStatus = $state<'idle' | 'copied' | 'error'>('idle');
+	async function copyShopAsText() {
+		const aff = affluenceData[shopAffluence]?.label ?? shopAffluence;
+		const type = shopData[shopType]?.label ?? shopType;
+		const lines = generatedShop.map(
+			(row) =>
+				`${row.name}${row.rarity ? ` (${rarityLabels[row.rarity] ?? row.rarity})` : ''} — Friendly: ${row.liked} / Neutral: ${row.neutral} / Hostile: ${row.disliked}`
+		);
+		try {
+			const header = `${generatedShopName} (${aff} ${type})`;
+			await navigator.clipboard.writeText([header, ...lines].join('\n'));
+			shopCopyStatus = 'copied';
+		} catch {
+			shopCopyStatus = 'error';
+		}
+		setTimeout(() => (shopCopyStatus = 'idle'), 2000);
 	}
 
 	// ── Random Encounter Generator ──────────────────────────────────────────────
@@ -5774,6 +5811,17 @@
 								{shopData[shopType]?.label.toLowerCase()}
 							</span>
 							<button
+								onclick={copyShopAsText}
+								disabled={generatedShop.length === 0}
+								class="rounded-lg border border-gray-600 px-4 py-1.5 text-xs font-bold text-gray-300 transition hover:border-gray-400 hover:text-white active:scale-95 disabled:opacity-50"
+							>
+								{shopCopyStatus === 'copied'
+									? 'Copied!'
+									: shopCopyStatus === 'error'
+										? 'Copy failed'
+										: 'Copy as Text'}
+							</button>
+							<button
 								onclick={promptSaveShop}
 								disabled={shopSaveStatus === 'saving'}
 								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
@@ -5806,6 +5854,7 @@
 										<th class="px-4 py-2.5 text-center font-semibold text-red-400"
 											><i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile</th
 										>
+										<th class="w-10 px-2 py-2.5"><span class="sr-only">Reroll</span></th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-800">
@@ -5836,6 +5885,20 @@
 											<td class="px-4 py-2.5 text-center font-semibold text-red-300 tabular-nums"
 												>{row.disliked}</td
 											>
+											<td class="px-2 py-2.5 text-center">
+												<button
+													onclick={(e) => {
+														e.stopPropagation();
+														rerollShopItem(i);
+													}}
+													disabled={shopRerollCandidates(row).length === 0}
+													title="Reroll this item"
+													aria-label="Reroll {row.name}"
+													class="rounded p-1 text-gray-500 transition hover:text-amber-400 disabled:opacity-30 disabled:hover:text-gray-500"
+												>
+													<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
+												</button>
+											</td>
 										</tr>
 									{/each}
 								</tbody>

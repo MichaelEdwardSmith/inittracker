@@ -11,6 +11,11 @@
 		getMonsterDetail,
 		getLegendaryResistanceInfo
 	} from '$lib/enemies';
+	import {
+		getMonsterDetail2024,
+		getLegendaryInfo2024,
+		preloadMonsterDetails2024
+	} from '$lib/enemies2024';
 	import { conditionColors, hpPercent, hpBarColor, hpTextColor } from '$lib/utils';
 	import type { Combatant, MonsterDetail } from '$lib/types';
 	import MonsterInfoModal from '$lib/components/MonsterInfoModal.svelte';
@@ -144,6 +149,31 @@
 			.catch(() => {});
 	});
 
+	// The 2024 bestiary loads lazily; this flag makes the legendary trackers re-render once it's in.
+	let details2024Ready = $state(false);
+	$effect(() => {
+		if (ruleset === '2024') preloadMonsterDetails2024().then(() => (details2024Ready = true));
+	});
+
+	type LegendaryInfo = ReturnType<typeof getLegendaryInfo2024>;
+	const NO_LEGENDARY: LegendaryInfo = { actions: null, resistance: null };
+
+	// Resolves legendary actions/resistance for either edition's stat block. Under the 2024
+	// ruleset the 2024 entry wins; custom/imported monsters still carry 2014-format details.
+	function getLegendaryForCombatant(c: Combatant): LegendaryInfo {
+		if (ruleset === '2024' && details2024Ready) {
+			const d = getMonsterDetail2024(c.templateName ?? '');
+			if (d) return getLegendaryInfo2024(d);
+		}
+		const d = getDetailForCombatant(c);
+		if (!d) return NO_LEGENDARY;
+		const lr = getLegendaryResistanceInfo(d.traits);
+		return {
+			actions: d.legendaryActions ? { max: 3, text: d.legendaryActions } : null,
+			resistance: lr
+		};
+	}
+
 	function getDetailForCombatant(c: Combatant): MonsterDetail | null {
 		if (!c.templateName) return null;
 		return getMonsterDetail(c.templateName) ?? customDetailMap.get(c.templateName) ?? null;
@@ -247,7 +277,37 @@
 		combat.setTempHp(id, val);
 		damageInputs[id] = '';
 	}
+
+	// ── Keyboard shortcuts ────────────────────────────────────────────────────
+	// N = next turn, P = previous turn, Ctrl/Cmd+Z = undo. Ignored while typing in a field
+	// or while any modal dialog is open, so they never fire behind a form.
+	function handleHotkeys(e: KeyboardEvent) {
+		if (e.defaultPrevented || e.altKey) return;
+		const t = e.target as HTMLElement | null;
+		if (t?.closest('input, textarea, select, [contenteditable="true"]')) return;
+		if (document.querySelector('[role="dialog"], [aria-modal="true"]')) return;
+
+		const key = e.key.toLowerCase();
+		if (key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+			if (!combat.canUndo) return;
+			e.preventDefault();
+			combat.undo();
+			return;
+		}
+		if (e.ctrlKey || e.metaKey || !combat.isInCombat) return;
+		if (key === 'n') {
+			e.preventDefault();
+			combat.nextTurn();
+			scrollToActive();
+		} else if (key === 'p') {
+			e.preventDefault();
+			combat.prevTurn();
+			scrollToActive();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleHotkeys} />
 
 <div class="flex h-full flex-col gap-3">
 	<!-- Header: title + turn controls + util buttons -->
@@ -282,7 +342,7 @@
 						}}
 						icon="fa-arrow-left"
 						label="Prev"
-						title="Previous turn"
+						title="Previous turn (P)"
 						colorClass="bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white"
 					/>
 					<ToolbarButton
@@ -292,6 +352,7 @@
 						}}
 						icon="fa-arrow-right"
 						label="Next"
+						title="Next turn (N)"
 						colorClass="bg-amber-600 font-bold text-white hover:bg-amber-500"
 					/>
 					<ToolbarButton
@@ -1120,28 +1181,31 @@
 							</DotTracker>
 						{/if}
 						{#if c.type === 'enemy'}
-							{@const legendaryDetail = getDetailForCombatant(c)}
-							{#if legendaryDetail?.legendaryActions}
-								{@const spent = c.legendaryActionsSpent ?? 0}
+							{@const legendary = getLegendaryForCombatant(c)}
+							{#if legendary.actions}
+								{@const laMax = legendary.actions.max}
+								{@const spent = Math.min(c.legendaryActionsSpent ?? 0, laMax)}
 								<DotTracker
 									label="Legendary Actions"
 									color="amber"
-									count={3}
-									filledCount={3 - spent}
+									count={laMax}
+									filledCount={laMax - spent}
 									dotTitle={(dotIdx, filled) => (filled ? 'Spend action' : 'Mark as available')}
 									onDotClick={(dotIdx, filled) =>
-										combat.setLegendaryActionsSpent(c.id, filled ? 3 - dotIdx : 2 - dotIdx)}
+										combat.setLegendaryActionsSpent(
+											c.id,
+											filled ? laMax - dotIdx : laMax - 1 - dotIdx
+										)}
 									infoTitle="View legendary actions"
 									onInfoClick={() =>
 										(legendaryInfoModal = {
 											name: c.name,
-											text: legendaryDetail.legendaryActions!
+											text: legendary.actions!.text
 										})}
 								/>
 							{/if}
-							{@const legendaryResistance = getLegendaryResistanceInfo(legendaryDetail?.traits)}
-							{#if legendaryResistance}
-								{@const max = legendaryResistance.max}
+							{#if legendary.resistance}
+								{@const max = legendary.resistance.max}
 								{@const used = Math.min(c.legendaryResistancesUsed ?? 0, max)}
 								<DotTracker
 									label="Legendary Resistance"
@@ -1159,7 +1223,7 @@
 									onInfoClick={() =>
 										(legendaryInfoModal = {
 											name: c.name,
-											text: legendaryResistance.text,
+											text: legendary.resistance!.text,
 											title: 'Legendary Resistance'
 										})}
 								/>
