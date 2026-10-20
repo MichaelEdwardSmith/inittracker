@@ -38,6 +38,25 @@
 		toastTimer = setTimeout(() => (toast = null), duration);
 	}
 
+	// The mobile variant is rendered inside the hamburger menu, which is display:none
+	// while closed — move the bubble to <body> so it stays visible either way.
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return { destroy: () => node.remove() };
+	}
+
+	// ── Heard transcript ──────────────────────────────────────────────────────
+	// Shown in the same bubble as the toast so the DM can see what Moonshine
+	// transcribed; once it expires the bubble falls back to "Tracker is listening…".
+	let heard = $state<string | null>(null);
+	let heardTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function showHeard(text: string, duration = 4000) {
+		if (heardTimer) clearTimeout(heardTimer);
+		heard = text;
+		heardTimer = setTimeout(() => (heard = null), duration);
+	}
+
 	// ── Hardcoded command matching ────────────────────────────────────────────
 	const COMMANDS: Array<{ pattern: RegExp; label: string; action: () => void }> = [
 		{
@@ -405,6 +424,7 @@
 		const transcript = text.trim();
 		if (!transcript) return;
 		console.log('[Moonshine] heard:', transcript);
+		showHeard(transcript);
 
 		// Strip punctuation and collapse spaces early — Moonshine often inserts
 		// commas/periods (e.g. "Tracker, start combat.") that break word-boundary matches.
@@ -755,13 +775,37 @@
 {/if}
 
 <!-- Command feedback toast -->
-{#if toast}
+{#if toast || heard || status === 'listening' || status === 'processing'}
 	<div
-		class="pointer-events-none fixed bottom-6 left-1/2 z-[9999] -translate-x-1/2 rounded-full border border-amber-600/50 bg-gray-900/95 px-5 py-2 text-sm font-semibold text-amber-300 shadow-2xl backdrop-blur"
+		use:portal
+		class="pointer-events-none fixed bottom-6 left-1/2 z-[9999] flex max-w-[90vw] -translate-x-1/2 flex-col items-center gap-0.5 rounded-3xl border border-amber-600/50 bg-gray-900/95 px-5 py-2 text-sm font-semibold text-amber-300 shadow-2xl backdrop-blur"
 		role="status"
 		aria-live="polite"
 	>
-		<i class="fa-duotone fa-light {toast.icon}" aria-hidden="true"></i>
-		{toast.message}
+		{#if heard}
+			<span>Tracker heard: "{heard}"</span>
+		{/if}
+		{#if toast}
+			<span>
+				<i class="fa-duotone fa-light {toast.icon}" aria-hidden="true"></i>
+				{toast.message}
+			</span>
+		{:else if !heard}
+			<span class="flex items-center gap-2">
+				<span class="listening-dot h-2 w-2 rounded-full bg-amber-500" aria-hidden="true"></span>
+				Tracker is listening...
+			</span>
+		{/if}
 	</div>
 {/if}
+
+<style>
+	.listening-dot {
+		animation: listening-blink 1s steps(1, end) infinite;
+	}
+	@keyframes listening-blink {
+		50% {
+			opacity: 0;
+		}
+	}
+</style>
