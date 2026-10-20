@@ -42,3 +42,37 @@ export function preloadMonsterDetails2024(): Promise<void> {
 export function getMonsterDetail2024(name: string): MonsterDetail2024 | undefined {
 	return detailByName?.get(name) ?? detailBySlug?.get(name);
 }
+
+// ---------------------------------------------------------------------------
+// Legendary Actions / Resistance — 2024 stat blocks keep these as structured fields, so
+// unlike the 2014 free-text parsing we read the counts from the trait name and preamble.
+// Counts use the out-of-lair value (e.g. "3/Day, or 4/Day in Lair" → 3).
+// ---------------------------------------------------------------------------
+
+export interface Legendary2024 {
+	actions: { max: number; text: string } | null;
+	resistance: { max: number; text: string } | null;
+}
+
+function actionHtml(a: { name: string; description: string }): string {
+	return `<p><strong>${a.name}.</strong> ${a.description}</p>`;
+}
+
+export function getLegendaryInfo2024(detail: MonsterDetail2024 | undefined): Legendary2024 {
+	const result: Legendary2024 = { actions: null, resistance: null };
+	if (!detail) return result;
+
+	const lrTrait = detail.traits.find((t) => /^Legendary Resistance/i.test(t.name));
+	const lrMax = lrTrait?.name.match(/\((\d+)\s*\/\s*Day/i)?.[1];
+	if (lrTrait && lrMax) result.resistance = { max: parseInt(lrMax, 10), text: actionHtml(lrTrait) };
+
+	const { preamble, actions } = detail.legendary;
+	if (actions.length > 0) {
+		const uses = preamble?.match(/Uses:\s*(\d+)/i)?.[1];
+		result.actions = {
+			max: uses ? parseInt(uses, 10) : 3,
+			text: (preamble ? `<p>${preamble}</p>` : '') + actions.map(actionHtml).join('')
+		};
+	}
+	return result;
+}

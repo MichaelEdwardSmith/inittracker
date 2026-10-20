@@ -768,9 +768,12 @@
 				<i class="fa-duotone fa-light fa-map shrink-0 text-base" aria-hidden="true"></i>
 				Battle Map
 			</button>
-			{#if data.showVoiceCommands}
+		{/if}
+		<!-- Always mounted (just hidden when Tools is collapsed) so voice keeps listening -->
+		{#if data.showVoiceCommands}
+			<div class={collapsedMenuSections.tools ? 'hidden' : ''}>
 				<VoiceCommands mobile={true} ruleset={activeSession.ruleset} />
-			{/if}
+			</div>
 		{/if}
 
 		<button
