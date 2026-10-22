@@ -30,6 +30,8 @@
 	import { setContext } from 'svelte';
 	import { enhance } from '$app/forms';
 	import type { GameSession } from '$lib/types';
+	import type { ActivityFeature } from '$lib/activity';
+	import { trackActivity } from '$lib/trackActivity';
 
 	let { data } = $props();
 
@@ -419,6 +421,45 @@
 		showInbox = true;
 		seenCount = messages.length;
 	}
+
+	// ── Usage log (admin) ─────────────────────────────────────────────────────────────
+	// Logs each time one of these tools goes from closed to open. Doing it here, off the state
+	// flags, covers every entry point (header, mobile menu, nested links) without touching them.
+	const trackedModals: [ActivityFeature, () => boolean][] = [
+		['dice-roller', () => showDiceRoller],
+		['mixer', () => showMixer],
+		['encounters', () => showEncounters],
+		['spells', () => showSpells],
+		['items', () => showItems],
+		['notes', () => showNotes],
+		['quick-rules', () => showQuickRules],
+		['generators', () => showGenerators],
+		['dungeon', () => showDungeon],
+		['donjon', () => showDonjon],
+		['town', () => showTown],
+		['inn', () => showInn],
+		['liars-dice', () => showLiarsDice],
+		['poll', () => showPoll],
+		['doc-share', () => showDocShare],
+		['battle-map', () => showBattleMap],
+		['scheduling', () => showScheduling],
+		['chase-tracker', () => showChaseTracker],
+		['session-manager', () => showSessionManager],
+		['inbox', () => showInbox]
+	];
+	const wasOpen = new Set<ActivityFeature>();
+	$effect(() => {
+		for (const [feature, isOpen] of trackedModals) {
+			if (isOpen()) {
+				if (!wasOpen.has(feature)) {
+					wasOpen.add(feature);
+					trackActivity(feature);
+				}
+			} else {
+				wasOpen.delete(feature);
+			}
+		}
+	});
 
 	async function clearMessages() {
 		await fetch('/api/messages', { method: 'DELETE' });

@@ -16,6 +16,7 @@ import { browser } from '$app/environment';
 import { crToXp, sortCombatants } from './utils';
 import { ENEMY_TEMPLATES, getMonsterDetail, parseSizeFromMeta } from './enemies';
 import { getMonsterDetail2024 } from './enemies2024';
+import { trackActivity } from './trackActivity';
 
 // CR lookup by template name — built once at module load
 const crByTemplateName = new Map<string, string>(ENEMY_TEMPLATES.map((t) => [t.name, t.cr]));
@@ -619,6 +620,7 @@ function createCombatStore() {
 			combatants = [...combatants, c];
 			if (combatStartedAt !== null) snapshotCombatant(c);
 			sync();
+			trackActivity('player-added', name);
 		},
 
 		addEnemies(template: EnemyTemplate & { detail?: MonsterDetail }, quantity: number) {
@@ -647,6 +649,7 @@ function createCombatStore() {
 				for (const e of newEnemies) snapshotCombatant(e);
 			}
 			sync();
+			trackActivity('enemies-added', `${quantity}× ${template.name}`);
 		},
 
 		addLairCard(templateName: string) {
@@ -952,6 +955,7 @@ function createCombatStore() {
 			participantStats = new Map();
 			for (const c of activeCombatants()) snapshotCombatant(c);
 			sync();
+			trackActivity('combat-started');
 		},
 
 		nextTurn() {
@@ -1302,6 +1306,7 @@ function createCombatStore() {
 				const record = buildRecord(new Date().toISOString());
 				saveRecordToServer(record);
 				resetTracking();
+				trackActivity('combat-ended');
 			}
 			currentTurnId = null;
 			round = 1;

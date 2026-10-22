@@ -8,6 +8,7 @@ import { Binary, type WithId, type Document, type Filter } from 'mongodb';
 import { getDb } from './db';
 import * as history from './combatHistoryStore';
 import { isRootAdminEmail } from './admin';
+import { ACTIVITY_DETAIL_MAX, type ActivityFeature } from '$lib/activity';
 import { generateToken, hashToken, PASSWORD_RESET_TTL_MS, EMAIL_VERIFY_TTL_MS } from './authTokens';
 import type { BattleMapStroke } from './battleMapState';
 import type {
@@ -1213,6 +1214,7 @@ export async function deleteDM(
 	const gameSessionIds = ((dm.gameSessions as DMGameSession[]) ?? []).map((s) => s.sessionId);
 	await c.deleteOne({ sessionId: authSessionId });
 	await history.deleteForSessions(await getDb(), gameSessionIds);
+	await deleteDMActivity(authSessionId);
 
 	return { ok: true, email: dm.email, gameSessionIds };
 }
@@ -1274,4 +1276,94 @@ export async function listAdminAudit(limit = 500): Promise<AdminAuditEntry[]> {
 			.find({}, { projection: { _id: 0 }, sort: { at: -1 }, limit })
 			.toArray()
 	);
+}
+
+// ---------------------------------------------------------------------------
+// DM usage log — major feature use per DM account, shown per-user in /admin. Separate from
+// adminAudit above (which records what *admins* did to accounts); this records what DMs do.
+// ---------------------------------------------------------------------------
+
+export interface DMActivityEntry {
+	/** Auth session ID of the DM (the stable dm_auth value). */
+	sessionId: string;
+	feature: ActivityFeature;
+	/** Optional context — which generator, which enemy, the voice transcript, etc. */
+	detail?: string;
+	at: Date;
+}
+
+const ACTIVITY_RETENTION_DAYS = 180;
+// Same feature+detail from the same DM within this window is one log line, so a modal that is
+// closed and reopened (or a double-fired effect) doesn't flood the log.
+const ACTIVITY_DEDUPE_MS = 30 * 1000;
+const recentActivity = new Map<string, number>();
+let activityIndexesReady: Promise<void> | null = null;
+
+function ensureActivityIndexes(): Promise<void> {
+	activityIndexesReady ??= getDb()
+		.then(async (db) => {
+			const c = db.collection('dmActivity');
+			await c.createIndex({ sessionId: 1, at: -1 });
+			await c.createIndex({ at: 1 }, { expireAfterSeconds: ACTIVITY_RETENTION_DAYS * 86400 });
+		})
+		.catch((err) => {
+			activityIndexesReady = null;
+			console.error('Failed to create dmActivity indexes', err);
+		});
+	return activityIndexesReady;
+}
+
+/** Best-effort usage log entry — never blocks or fails the caller. */
+export async function logDMActivity(
+	sessionId: string,
+	feature: ActivityFeature,
+	detail?: string
+): Promise<void> {
+	const trimmed = detail?.trim().slice(0, ACTIVITY_DETAIL_MAX) || undefined;
+	const key = `${sessionId}|${feature}|${trimmed ?? ''}`;
+	const now = Date.now();
+	const last = recentActivity.get(key);
+	if (last && now - last < ACTIVITY_DEDUPE_MS) return;
+	recentActivity.set(key, now);
+	if (recentActivity.size > 5000) {
+		for (const [k, t] of recentActivity) if (now - t > ACTIVITY_DEDUPE_MS) recentActivity.delete(k);
+	}
+
+	try {
+		await ensureActivityIndexes();
+		const db = await getDb();
+		await db.collection<DMActivityEntry>('dmActivity').insertOne({
+			sessionId,
+			feature,
+			...(trimmed ? { detail: trimmed } : {}),
+			at: new Date()
+		});
+	} catch (err) {
+		console.error('Failed to write DM activity log entry', err);
+	}
+}
+
+/** One DM's most recent usage entries, newest first. */
+export async function listDMActivity(
+	sessionId: string,
+	limit = 300
+): Promise<Pick<DMActivityEntry, 'feature' | 'detail' | 'at'>[]> {
+	const db = await getDb();
+	return db
+		.collection<DMActivityEntry>('dmActivity')
+		.find(
+			{ sessionId },
+			{ projection: { _id: 0, feature: 1, detail: 1, at: 1 }, sort: { at: -1 }, limit }
+		)
+		.toArray();
+}
+
+/** Removes a deleted account's usage log along with the account. */
+export async function deleteDMActivity(sessionId: string): Promise<void> {
+	try {
+		const db = await getDb();
+		await db.collection('dmActivity').deleteMany({ sessionId });
+	} catch (err) {
+		console.error('Failed to delete DM activity log', err);
+	}
 }

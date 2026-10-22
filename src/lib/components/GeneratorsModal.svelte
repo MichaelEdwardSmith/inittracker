@@ -3,6 +3,7 @@
 <script lang="ts">
 	import { focusTrap } from '$lib/actions/focusTrap';
 	import { browser } from '$app/environment';
+	import { trackActivity } from '$lib/trackActivity';
 
 	let {
 		onclose,
@@ -110,6 +111,12 @@
 	];
 
 	let selected = $state('weather');
+
+	// Usage log: each generator the DM actually views (the initial default counts — it's shown
+	// on open). Dedupe on the server absorbs rapid flipping back and forth.
+	$effect(() => {
+		trackActivity('generator', categories.find((c) => c.id === selected)?.label ?? selected);
+	});
 
 	// ── Name Generator ───────────────────────────────────────────────────────
 	type SyllableDef = {

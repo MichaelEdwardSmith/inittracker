@@ -5,7 +5,7 @@
 //   'delete'  — deletes a session; refuses if it would be the last one.
 //   'switch'  — makes a session active and updates the shared auth→session cache.
 import type { RequestHandler } from '@sveltejs/kit';
-import { resolveActingSessionId } from '$lib/server/auth';
+import { resolveActingSessionId, trackDMActivity } from '$lib/server/auth';
 import {
 	listGameSessions,
 	createGameSession,
@@ -55,6 +55,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			const rs = ruleset === '2024' ? '2024' : '2014';
 			const result = await createGameSession(authSessionId, name ?? '', rs);
 			if (!result) return new Response('Failed to create session', { status: 500 });
+			trackDMActivity(cookies, authSessionId, 'session-created', name?.trim() || undefined);
 			return Response.json(result, { status: 201 });
 		}
 

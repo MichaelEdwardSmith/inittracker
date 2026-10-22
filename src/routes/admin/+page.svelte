@@ -18,6 +18,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { AdminAuditAction } from '$lib/server/dmModel';
+	import { ACTIVITY_LABELS, type ActivityFeature } from '$lib/activity';
 	import AdminEmailModal from '$lib/components/AdminEmailModal.svelte';
 	import AdminStatsPanel from '$lib/components/AdminStatsPanel.svelte';
 
@@ -52,10 +53,31 @@
 		return new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 	}
 
+	const activityLabels: Record<string, string> = ACTIVITY_LABELS;
+
+	type UsageEntry = { feature: ActivityFeature; detail?: string; at: string };
+	let usage = $state<Record<string, { loading: boolean; error?: string; entries: UsageEntry[] }>>(
+		{}
+	);
+
+	async function loadUsage(sessionId: string) {
+		usage[sessionId] = { loading: true, entries: [] };
+		try {
+			const res = await fetch(`/admin/activity/${sessionId}`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			usage[sessionId] = { loading: false, entries: await res.json() };
+		} catch {
+			usage[sessionId] = { loading: false, entries: [], error: 'Could not load usage log.' };
+		}
+	}
+
 	function toggleExpand(sessionId: string) {
 		const next = new Set(expanded);
 		if (next.has(sessionId)) next.delete(sessionId);
-		else next.add(sessionId);
+		else {
+			next.add(sessionId);
+			loadUsage(sessionId); // refetch on every open so the log is current
+		}
 		expanded = next;
 	}
 
@@ -667,12 +689,43 @@
 												</div>
 											{/if}
 
+											<!-- Usage log — what this DM has been doing in the app (loaded on demand) -->
+											<div class="w-full min-w-[280px] flex-1 basis-full">
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+												>
+													Usage log
+												</p>
+												{#if !usage[dm.sessionId] || usage[dm.sessionId].loading}
+													<p class="text-xs text-gray-600">Loading…</p>
+												{:else if usage[dm.sessionId].error}
+													<p class="text-xs text-red-400">{usage[dm.sessionId].error}</p>
+												{:else if usage[dm.sessionId].entries.length === 0}
+													<p class="text-xs text-gray-600">No activity recorded yet.</p>
+												{:else}
+													<ul class="max-h-72 space-y-1 overflow-y-auto pr-2 text-xs text-gray-400">
+														{#each usage[dm.sessionId].entries as entry, i (i)}
+															<li class="flex flex-wrap gap-x-2">
+																<span class="w-36 shrink-0 text-gray-600"
+																	>{formatDate(entry.at)}</span
+																>
+																<span class="text-gray-300"
+																	>{activityLabels[entry.feature] ?? entry.feature}</span
+																>
+																{#if entry.detail}<span class="text-gray-500">— {entry.detail}</span
+																	>{/if}
+															</li>
+														{/each}
+													</ul>
+												{/if}
+											</div>
+
 											<!-- Activity log — this DM's slice of the admin audit trail -->
 											<div class="min-w-[240px] flex-1">
 												<p
 													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
 												>
-													Activity log
+													Admin actions
 												</p>
 												{#if auditEntries.length === 0}
 													<p class="text-xs text-gray-600">
@@ -912,7 +965,7 @@
 												<p
 													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
 												>
-													Activity log
+													Admin actions
 												</p>
 												{#if auditEntries.length === 0}
 													<p class="text-xs text-gray-600">

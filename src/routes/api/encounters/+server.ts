@@ -2,7 +2,7 @@
 // POST /api/encounters        — creates a new encounter; validates name and enemies array.
 // DELETE /api/encounters?id=  — deletes an encounter by id.
 import type { RequestEvent } from '@sveltejs/kit';
-import { resolveActingSessionId } from '$lib/server/auth';
+import { resolveActingSessionId, trackDMActivity } from '$lib/server/auth';
 import type { Encounter, EncounterEnemy } from '$lib/types';
 import { getEncounters, saveEncounter, deleteEncounter } from '$lib/server/dmModel';
 
@@ -39,6 +39,7 @@ export async function POST({ request, cookies }: RequestEvent) {
 	};
 
 	await saveEncounter(sessionId, encounter);
+	trackDMActivity(cookies, sessionId, 'encounter-saved', encounter.name);
 	return Response.json(encounter, { status: 201 });
 }
 

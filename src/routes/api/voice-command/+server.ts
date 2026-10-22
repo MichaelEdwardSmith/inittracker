@@ -6,6 +6,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '$env/dynamic/private';
+import { trackDMActivity } from '$lib/server/auth';
 
 // Key is optional — endpoint returns 503 if unconfigured rather than failing at build time.
 const client = env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY }) : null;
@@ -18,7 +19,7 @@ interface CombatantInfo {
 	maxHp: number;
 }
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, cookies }: RequestEvent) {
 	const { transcript, combatants } = (await request.json()) as {
 		transcript: string;
 		combatants: CombatantInfo[];
@@ -31,6 +32,10 @@ export async function POST({ request }: RequestEvent) {
 	if (!client) {
 		throw error(503, 'ANTHROPIC_API_KEY is not configured on this server');
 	}
+
+	// Guests have no dm_auth cookie and so aren't attributed to an account.
+	const dmSessionId = cookies.get('dm_auth');
+	if (dmSessionId) trackDMActivity(cookies, dmSessionId, 'voice-command', transcript);
 
 	const combatantList = combatants
 		.map((c) => `- "${c.name}" (id: ${c.id}, type: ${c.type}, HP: ${c.currentHp}/${c.maxHp})`)

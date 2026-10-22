@@ -1,7 +1,7 @@
 // GET  /api/monsters  — returns all custom monsters for the authenticated DM.
 // POST /api/monsters  — creates a new custom monster; validates name, AC, HP, CR, and type.
 import type { RequestHandler } from './$types';
-import { resolveActingSessionId } from '$lib/server/auth';
+import { resolveActingSessionId, trackDMActivity } from '$lib/server/auth';
 import type { CustomMonster } from '$lib/types';
 import { getCustomMonsters, addCustomMonster } from '$lib/server/dmModel';
 
@@ -53,5 +53,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	};
 
 	await addCustomMonster(sessionId, monster);
+	trackDMActivity(cookies, sessionId, 'custom-monster-saved', monster.name);
 	return Response.json(monster, { status: 201 });
 };

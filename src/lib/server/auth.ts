@@ -4,7 +4,8 @@
 // cookie is set, requests act as the impersonated DM instead — giving the admin full
 // read/write control of that account from /admin for support and debugging.
 import type { Cookies } from '@sveltejs/kit';
-import { getDMBySessionId } from './dmModel';
+import { getDMBySessionId, logDMActivity } from './dmModel';
+import type { ActivityFeature } from '$lib/activity';
 import { isAdminDM } from './admin';
 
 export async function resolveActingSessionId(cookies: Cookies): Promise<string | null> {
@@ -23,4 +24,18 @@ export async function resolveActingSessionId(cookies: Cookies): Promise<string |
 	// (e.g. a stale/tampered cookie).
 	if (!real || !isAdminDM(real) || !target) return realSessionId;
 	return impersonateId;
+}
+
+/**
+ * Records a feature use in the admin-visible DM usage log. Skipped while an admin is
+ * impersonating — that's the admin working in someone's account, not the DM using the system.
+ */
+export function trackDMActivity(
+	cookies: Cookies,
+	actingSessionId: string,
+	feature: ActivityFeature,
+	detail?: string
+): void {
+	if (cookies.get('dm_impersonate')) return;
+	void logDMActivity(actingSessionId, feature, detail);
 }
