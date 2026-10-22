@@ -4,6 +4,7 @@
      Single series, so no legend: the title names it. Same blue as the other admin charts. -->
 <script lang="ts">
 	import { ACTIVITY_LABELS } from '$lib/activity';
+	import { csvRow } from '$lib/csv';
 	import type { FeatureUsageRow } from '$lib/server/dmModel';
 
 	const BAR_COLOR = '#3987e5';
@@ -48,18 +49,10 @@
 	);
 	const bars = $derived(allRows.slice(0, SHOWN));
 
-	// Quoted, with a leading apostrophe on formula-looking cells: generator labels come from
-	// client-reported detail text, which a spreadsheet would otherwise evaluate.
-	function csvCell(value: string | number): string {
-		const text = String(value);
-		const safe = /^[=+@\t\r-]/.test(text) ? `'${text}` : text;
-		return `"${safe.replace(/"/g, '""')}"`;
-	}
-
 	function exportCsv() {
 		const lines = [
-			['Feature', 'Times used', 'Distinct DMs'].map(csvCell).join(','),
-			...allRows.map((r) => [r.label, r.count, r.dmCount].map(csvCell).join(','))
+			csvRow(['Feature', 'Times used', 'Distinct DMs']),
+			...allRows.map((r) => csvRow([r.label, r.count, r.dmCount]))
 		];
 		const url = URL.createObjectURL(new Blob([lines.join('\r\n')], { type: 'text/csv' }));
 		const a = document.createElement('a');

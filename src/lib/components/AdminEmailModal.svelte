@@ -19,15 +19,22 @@
 		/** When set, sends directly to this one DM/player instead of broadcasting — used by their
 		 *  row's Support tools "Email" action. */
 		target?: { sessionId: string; name: string; email: string };
+		/** When set (and no `target`), sends to exactly these DMs — the admin's table selection —
+		 *  instead of every subscribed DM. recipientCount should equal its length. */
+		recipients?: { sessionId: string; name: string; email: string }[];
 	}
 
-	let { audience, recipientCount, sentEmails, onclose, target }: Props = $props();
+	let { audience, recipientCount, sentEmails, onclose, target, recipients }: Props = $props();
 
 	let audienceNoun = $derived(audience === 'player' ? 'Player' : 'Dungeon Master');
 	let audienceNounPlural = $derived(audience === 'player' ? 'Players' : 'Dungeon Masters');
 	let testAction = $derived(audience === 'player' ? '?/sendTestEmailPlayer' : '?/sendTestEmail');
 	let broadcastAction = $derived(
-		audience === 'player' ? '?/sendBroadcastPlayer' : '?/sendBroadcast'
+		recipients
+			? '?/sendSegmentEmail'
+			: audience === 'player'
+				? '?/sendBroadcastPlayer'
+				: '?/sendBroadcast'
 	);
 	let directAction = $derived(audience === 'player' ? '?/sendPlayerEmail' : '?/sendEmail');
 
@@ -226,7 +233,8 @@
 		<div class="flex items-center justify-between border-b border-gray-800 px-5 py-4">
 			<h2 class="text-sm font-bold tracking-widest text-gray-200 uppercase">
 				<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i>
-				{#if target}Email {target.name}{:else}Email {audienceNounPlural}{/if}
+				{#if target}Email {target.name}{:else if recipients}Email {recipients.length} selected{:else}Email
+					{audienceNounPlural}{/if}
 			</h2>
 			<button
 				onclick={onclose}
@@ -262,6 +270,11 @@
 						Sends directly to <span class="text-gray-300">{target.name}</span> ({target.email}),
 						regardless of their broadcast subscription. Automatically wrapped in the Initiative
 						Tracker branded template.
+					{:else if recipients}
+						Sends to the <span class="text-gray-300">{recipientCount}</span> DM{recipientCount === 1
+							? ''
+							: 's'} you selected, regardless of their broadcast subscription. Automatically wrapped in
+						the Initiative Tracker branded template.
 					{:else}
 						Sends to <span class="text-gray-300">{recipientCount}</span>
 						{audienceNoun}{recipientCount === 1 ? '' : 's'} who haven't unsubscribed. Automatically wrapped
@@ -459,6 +472,9 @@
 							</button>
 						</form>
 						<form method="POST" action="/admin{broadcastAction}" use:enhance={handleSend}>
+							{#each recipients ?? [] as r (r.sessionId)}
+								<input type="hidden" name="sessionId" value={r.sessionId} />
+							{/each}
 							<input type="hidden" name="subject" value={subject} />
 							<input type="hidden" name="body" value={body} />
 							<button

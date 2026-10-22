@@ -60,6 +60,8 @@ export interface DM {
 	/** Set when an admin suspends this account; absent means active. Checked in hooks.server.ts
 	 *  to block dashboard/history access, and at login to reject the attempt outright. */
 	suspendedAt?: Date;
+	/** Private admin-only note about this account (support context). Never shown to the DM. */
+	adminNote?: string;
 	/** Set by the root admin via the /admin "Make admin" action — grants full admin access
 	 *  (see isAdminDM() in $lib/server/admin.ts). Only the root admin can set or clear this. */
 	isAdmin?: boolean;
@@ -859,6 +861,8 @@ export interface DMSummary {
 	combatHistoryCount: number;
 	/** True if this DM has unsubscribed from admin broadcast emails (see emailOptOut on DM). */
 	emailOptOut: boolean;
+	/** Private admin-only note — see setDMAdminNote(). Empty string when none. */
+	adminNote: string;
 }
 
 /** Returns every DM account in the system, most recently active first. */
@@ -884,7 +888,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					'gameSessions.sessionId': 1,
 					customMonsters: 1,
 					encounters: 1,
-					emailOptOut: 1
+					emailOptOut: 1,
+					adminNote: 1
 				}
 			}
 		)
@@ -914,7 +919,8 @@ export async function listAllDMs(): Promise<DMSummary[]> {
 					(sum, s) => sum + (historyCounts.get(s.sessionId) ?? 0),
 					0
 				),
-				emailOptOut: !!(dm as DM).emailOptOut
+				emailOptOut: !!(dm as DM).emailOptOut,
+				adminNote: (dm as DM).adminNote ?? ''
 			};
 		})
 		.sort((a, b) => {
@@ -1240,7 +1246,11 @@ export type AdminAuditAction =
 	| 'email-player'
 	| 'email-player-broadcast'
 	| 'unsubscribe-player'
-	| 'resubscribe-player';
+	| 'resubscribe-player'
+	| 'update-note'
+	| 'email-bulk'
+	| 'bulk-suspend'
+	| 'bulk-unsuspend';
 
 export interface AdminAuditEntry {
 	adminEmail: string;
@@ -1410,4 +1420,244 @@ export async function getFeatureUsage(sinceDays: number | null): Promise<Feature
 		count: r.count,
 		dmCount: r.dmCount
 	}));
+}
+
+// ---------------------------------------------------------------------------
+// Admin insights built on the dmActivity log: per-DM engagement, adoption, onboarding funnel,
+// trend, and a cross-DM feed. All read-only aggregates; "no data" always means "nothing logged
+// yet" (the log only starts when the feature shipped), not "the DM did nothing".
+// ---------------------------------------------------------------------------
+
+export type EngagementLevel = 'power' | 'casual' | 'dormant' | 'none';
+
+export interface DMEngagement {
+	total: number;
+	actions30: number;
+	activeDays: number;
+	lastActionAt: Date | null;
+	/** Count of uses per feature (all time, 'generator' lumped together). */
+	features: Partial<Record<ActivityFeature, number>>;
+	/** The three most used features, most used first. */
+	top: { feature: ActivityFeature; count: number }[];
+	level: EngagementLevel;
+}
+
+export interface AdoptionRow {
+	feature: ActivityFeature;
+	/** Distinct DMs who have ever used it. */
+	dmsEver: number;
+	/** Distinct DMs who used it in the last 7 days. */
+	dms7: number;
+}
+
+export interface EngagementReport {
+	perDm: Record<string, DMEngagement>;
+	adoption: AdoptionRow[];
+}
+
+const POWER_USER_ACTIONS_30D = 40;
+
+export async function getEngagementReport(): Promise<EngagementReport> {
+	const db = await getDb();
+	const c = db.collection<DMActivityEntry>('dmActivity');
+	const now = Date.now();
+	const cutoff30 = new Date(now - 30 * 86400 * 1000);
+	const cutoff7 = new Date(now - 7 * 86400 * 1000);
+
+	const [byFeature, byDay] = await Promise.all([
+		c
+			.aggregate<{
+				_id: { s: string; f: ActivityFeature };
+				count: number;
+				count30: number;
+				last: Date;
+			}>([
+				{
+					$group: {
+						_id: { s: '$sessionId', f: '$feature' },
+						count: { $sum: 1 },
+						count30: { $sum: { $cond: [{ $gte: ['$at', cutoff30] }, 1, 0] } },
+						last: { $max: '$at' }
+					}
+				}
+			])
+			.toArray(),
+		c
+			.aggregate<{ _id: string; days: number }>([
+				{
+					$group: {
+						_id: { s: '$sessionId', d: { $dateToString: { format: '%Y-%m-%d', date: '$at' } } }
+					}
+				},
+				{ $group: { _id: '$_id.s', days: { $sum: 1 } } }
+			])
+			.toArray()
+	]);
+
+	const perDm: Record<string, DMEngagement> = {};
+	const adoption = new Map<ActivityFeature, { ever: Set<string>; recent: Set<string> }>();
+	const ensure = (s: string): DMEngagement =>
+		(perDm[s] ??= {
+			total: 0,
+			actions30: 0,
+			activeDays: 0,
+			lastActionAt: null,
+			features: {},
+			top: [],
+			level: 'none'
+		});
+
+	for (const r of byFeature) {
+		const e = ensure(r._id.s);
+		e.total += r.count;
+		e.actions30 += r.count30;
+		e.features[r._id.f] = r.count;
+		if (!e.lastActionAt || r.last > e.lastActionAt) e.lastActionAt = r.last;
+		const a = adoption.get(r._id.f) ?? { ever: new Set<string>(), recent: new Set<string>() };
+		a.ever.add(r._id.s);
+		if (r.last >= cutoff7) a.recent.add(r._id.s);
+		adoption.set(r._id.f, a);
+	}
+	for (const r of byDay) ensure(r._id).activeDays = r.days;
+
+	for (const e of Object.values(perDm)) {
+		e.top = (Object.entries(e.features) as [ActivityFeature, number][])
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 3)
+			.map(([feature, count]) => ({ feature, count }));
+		e.level =
+			e.actions30 >= POWER_USER_ACTIONS_30D ? 'power' : e.actions30 > 0 ? 'casual' : 'dormant';
+	}
+
+	return {
+		perDm,
+		adoption: [...adoption.entries()]
+			.map(([feature, a]) => ({ feature, dmsEver: a.ever.size, dms7: a.recent.size }))
+			.sort((a, b) => b.dmsEver - a.dmsEver)
+	};
+}
+
+export interface FeatureTrend {
+	/** Start of each bucket (Sunday), oldest first, as epoch ms. */
+	weekStarts: number[];
+	series: { feature: ActivityFeature; label?: string; total: number; values: number[] }[];
+}
+
+/** Weekly uses for the five most-used features over the trailing `weeks` weeks. */
+export async function getFeatureTrend(weeks = 8): Promise<FeatureTrend> {
+	const db = await getDb();
+	const thisWeek = new Date();
+	thisWeek.setHours(0, 0, 0, 0);
+	thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
+	const weekStarts = Array.from(
+		{ length: weeks },
+		(_, i) => thisWeek.getTime() - (weeks - 1 - i) * 7 * 86400 * 1000
+	);
+
+	// Raw timestamps rather than a server-side date bucket: week boundaries then follow the
+	// server's local time exactly like the other admin charts, and this stays a plain query.
+	const rows = await db
+		.collection<DMActivityEntry>('dmActivity')
+		.find({ at: { $gte: new Date(weekStarts[0]) } }, { projection: { _id: 0, feature: 1, at: 1 } })
+		.limit(100000)
+		.toArray();
+
+	const byFeature = new Map<ActivityFeature, number[]>();
+	for (const r of rows) {
+		const idx = Math.min(
+			weeks - 1,
+			Math.floor((new Date(r.at).getTime() - weekStarts[0]) / (7 * 86400 * 1000))
+		);
+		const values = byFeature.get(r.feature) ?? new Array(weeks).fill(0);
+		values[idx]++;
+		byFeature.set(r.feature, values);
+	}
+	const series = [...byFeature.entries()]
+		.map(([feature, values]) => ({
+			feature,
+			values,
+			total: values.reduce((a, b) => a + b, 0)
+		}))
+		.sort((a, b) => b.total - a.total)
+		.slice(0, 5);
+	return { weekStarts, series };
+}
+
+export interface ActivityFeedEntry {
+	sessionId: string;
+	name: string;
+	email: string;
+	feature: ActivityFeature;
+	detail?: string;
+	at: Date;
+}
+
+/** Newest-first usage entries across all DMs (or one), with the DM's name attached. */
+export async function getActivityFeed(opts: {
+	limit?: number;
+	feature?: ActivityFeature;
+	sessionId?: string;
+}): Promise<ActivityFeedEntry[]> {
+	const db = await getDb();
+	const filter: Filter<DMActivityEntry> = {};
+	if (opts.feature) filter.feature = opts.feature;
+	if (opts.sessionId) filter.sessionId = opts.sessionId;
+	const entries = await db
+		.collection<DMActivityEntry>('dmActivity')
+		.find(filter, { projection: { _id: 0 }, sort: { at: -1 }, limit: opts.limit ?? 100 })
+		.toArray();
+
+	const ids = [...new Set(entries.map((e) => e.sessionId))];
+	const dms = await db
+		.collection('dms')
+		.find(
+			{ sessionId: { $in: ids } },
+			{ projection: { _id: 0, sessionId: 1, firstName: 1, lastName: 1, email: 1 } }
+		)
+		.toArray();
+	const byId = new Map(dms.map((d) => [d.sessionId as string, d]));
+
+	return entries.map((e) => {
+		const dm = byId.get(e.sessionId);
+		return {
+			sessionId: e.sessionId,
+			name: dm ? `${dm.firstName} ${dm.lastName}`.trim() : 'Deleted account',
+			email: dm?.email ?? '',
+			feature: e.feature,
+			...(e.detail ? { detail: e.detail } : {}),
+			at: e.at
+		};
+	});
+}
+
+/** Sets (or clears, with an empty string) the private admin note on a DM account. */
+export async function setDMAdminNote(
+	authSessionId: string,
+	note: string
+): Promise<{ ok: boolean; email?: string; error?: string }> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	if (!dm) return { ok: false, error: 'DM account not found.' };
+	const trimmed = note.trim().slice(0, 1000);
+	await c.updateOne(
+		{ sessionId: authSessionId },
+		trimmed ? { $set: { adminNote: trimmed } } : { $unset: { adminNote: '' } }
+	);
+	return { ok: true, email: dm.email };
+}
+
+/** Emails for a set of DMs, for the admin's "email selected" action. Skips accounts with no email. */
+export async function getDMsForEmail(
+	sessionIds: string[]
+): Promise<{ sessionId: string; email: string; firstName: string }[]> {
+	const c = await col();
+	const dms = await c
+		.find(
+			{ sessionId: { $in: sessionIds } },
+			{ projection: { sessionId: 1, email: 1, firstName: 1 } }
+		)
+		.toArray();
+	return dms
+		.filter((d) => !!d.email)
+		.map((d) => ({ sessionId: d.sessionId, email: d.email, firstName: d.firstName }));
 }

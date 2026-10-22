@@ -22,11 +22,13 @@
 	import AdminEmailModal from '$lib/components/AdminEmailModal.svelte';
 	import AdminStatsPanel from '$lib/components/AdminStatsPanel.svelte';
 	import AdminFeatureUsage from '$lib/components/AdminFeatureUsage.svelte';
+	import AdminInsights from '$lib/components/AdminInsights.svelte';
+	import type { EngagementLevel } from '$lib/server/dmModel';
 
 	let { data, form } = $props();
 
-	type Filter = 'all' | 'suspended' | 'stale';
-	type EntityTab = 'dms' | 'players';
+	type Filter = 'all' | 'suspended' | 'stale' | 'no-combat' | 'dormant' | 'never-active';
+	type EntityTab = 'dms' | 'players' | 'insights';
 	let entityTab = $state<EntityTab>('dms');
 	let search = $state('');
 	let filter = $state<Filter>('all');
@@ -35,6 +37,38 @@
 	let dismissedTempPassword = $state(false);
 	let showEmailModal = $state(false);
 	let showPlayerEmailModal = $state(false);
+	let segmentEmailOpen = $state(false);
+	// DM table selection (bulk suspend / restore / email) and the "most active first" sort toggle.
+	let selected = $state<Set<string>>(new Set());
+	let sortByActions = $state(false);
+
+	function setTab(tab: EntityTab) {
+		entityTab = tab;
+		// Segment filters only exist on the DMs tab.
+		if (tab !== 'dms' && !['all', 'suspended', 'stale'].includes(filter)) filter = 'all';
+	}
+
+	function toggleSelected(sessionId: string) {
+		const next = new Set(selected);
+		if (next.has(sessionId)) next.delete(sessionId);
+		else next.add(sessionId);
+		selected = next;
+	}
+
+	const LEVEL_LABELS: Record<EngagementLevel, string> = {
+		power: 'Power user',
+		casual: 'Casual',
+		dormant: 'Dormant',
+		none: 'No activity'
+	};
+	const LEVEL_CLASSES: Record<EngagementLevel, string> = {
+		power: 'border-amber-700/60 bg-amber-900/30 text-amber-300',
+		casual: 'border-blue-800 bg-blue-950/40 text-blue-300',
+		dormant: 'border-gray-700 bg-gray-800/60 text-gray-400',
+		none: 'border-gray-800 bg-gray-900 text-gray-600'
+	};
+	const engagementOf = (sessionId: string) => data.engagement.perDm[sessionId];
+	const levelOf = (sessionId: string): EngagementLevel => engagementOf(sessionId)?.level ?? 'none';
 	let dmEmailTarget = $state<{ sessionId: string; name: string; email: string } | null>(null);
 	let playerEmailTarget = $state<{ sessionId: string; name: string; email: string } | null>(null);
 
@@ -87,6 +121,12 @@
 		if (next.has(sessionId)) next.delete(sessionId);
 		else next.add(sessionId);
 		expandedPlayers = next;
+	}
+
+	function confirmBulk(message: string) {
+		return ({ cancel }: { cancel: () => void }) => {
+			if (!confirm(message)) cancel();
+		};
 	}
 
 	function confirmDelete(name: string) {
@@ -191,7 +231,11 @@
 		'email-player': 'Sent direct email',
 		'email-player-broadcast': 'Sent broadcast email',
 		'unsubscribe-player': 'Unsubscribed from admin emails',
-		'resubscribe-player': 'Resubscribed to admin emails'
+		'resubscribe-player': 'Resubscribed to admin emails',
+		'update-note': 'Updated admin note',
+		'email-bulk': 'Sent email (selected DMs)',
+		'bulk-suspend': 'Suspended account (bulk)',
+		'bulk-unsuspend': 'Restored account (bulk)'
 	};
 
 	let auditByEmail = $derived.by(() => {
@@ -205,8 +249,19 @@
 	});
 
 	let filteredDms = $derived(
-		data.dms.filter((dm) => {
+		(sortByActions
+			? [...data.dms].sort(
+					(a, b) =>
+						(engagementOf(b.sessionId)?.actions30 ?? 0) -
+						(engagementOf(a.sessionId)?.actions30 ?? 0)
+				)
+			: data.dms
+		).filter((dm) => {
 			if (filter === 'suspended' && !dm.suspended) return false;
+			const eng = engagementOf(dm.sessionId);
+			if (filter === 'never-active' && eng) return false;
+			if (filter === 'dormant' && (eng?.actions30 ?? 0) > 0) return false;
+			if (filter === 'no-combat' && eng?.features['combat-started']) return false;
 			if (filter === 'stale') {
 				const last = new Date(dm.lastActiveAt ?? dm.createdAt).getTime();
 				if (Date.now() - last < STALE_MS) return false;
@@ -236,6 +291,28 @@
 		})
 	);
 
+	// Selected DMs, in table order, for the bulk bar and the segment email modal. Never the admin.
+	let selectedDms = $derived(
+		data.dms.filter((dm) => selected.has(dm.sessionId) && dm.sessionId !== data.realSessionId)
+	);
+	let allVisibleSelected = $derived(
+		filteredDms.filter((dm) => dm.sessionId !== data.realSessionId).length > 0 &&
+			filteredDms
+				.filter((dm) => dm.sessionId !== data.realSessionId)
+				.every((dm) => selected.has(dm.sessionId))
+	);
+	function toggleSelectAllVisible() {
+		const ids = filteredDms
+			.filter((dm) => dm.sessionId !== data.realSessionId)
+			.map((dm) => dm.sessionId);
+		selected = allVisibleSelected ? new Set() : new Set(ids);
+	}
+
+	// A bulk action finished — drop the selection so a stale one can't be re-submitted.
+	$effect(() => {
+		if (form && 'bulkDone' in form) selected = new Set();
+	});
+
 	// New temp password just came back from the resetPassword action — surface it and reset the
 	// dismiss state so a second reset (for the same or a different DM) shows its own banner.
 	$effect(() => {
@@ -263,8 +340,10 @@
 					Logged in as {data.dmFirstName} ·
 					{#if entityTab === 'dms'}
 						every DM account that has accessed this system.
-					{:else}
+					{:else if entityTab === 'players'}
 						every player account that has logged in.
+					{:else}
+						how DMs are using the app, and how the system is doing.
 					{/if}
 				</p>
 			</div>
@@ -276,7 +355,7 @@
 					>
 						<i class="fa-duotone fa-light fa-envelope" aria-hidden="true"></i> Email DMs
 					</button>
-				{:else}
+				{:else if entityTab === 'players'}
 					<button
 						onclick={() => (showPlayerEmailModal = true)}
 						class="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 transition hover:border-amber-600 hover:text-amber-300"
@@ -299,7 +378,7 @@
 		<!-- DMs / Players tab switcher -->
 		<div class="mb-4 flex w-fit rounded border border-gray-700 bg-gray-900 text-sm">
 			<button
-				onclick={() => (entityTab = 'dms')}
+				onclick={() => setTab('dms')}
 				class="px-4 py-1.5 transition {entityTab === 'dms'
 					? 'bg-amber-900/40 text-amber-300'
 					: 'text-gray-400 hover:text-gray-200'}"
@@ -307,7 +386,7 @@
 				<i class="fa-duotone fa-light fa-swords" aria-hidden="true"></i> DMs ({data.dms.length})
 			</button>
 			<button
-				onclick={() => (entityTab = 'players')}
+				onclick={() => setTab('players')}
 				class="px-4 py-1.5 transition {entityTab === 'players'
 					? 'bg-amber-900/40 text-amber-300'
 					: 'text-gray-400 hover:text-gray-200'}"
@@ -315,7 +394,29 @@
 				<i class="fa-duotone fa-light fa-users" aria-hidden="true"></i> Players ({data.players
 					.length})
 			</button>
+			<button
+				onclick={() => setTab('insights')}
+				class="px-4 py-1.5 transition {entityTab === 'insights'
+					? 'bg-amber-900/40 text-amber-300'
+					: 'text-gray-400 hover:text-gray-200'}"
+			>
+				<i class="fa-duotone fa-light fa-chart-line" aria-hidden="true"></i> Insights
+			</button>
 		</div>
+
+		{#if segmentEmailOpen}
+			<AdminEmailModal
+				audience="dm"
+				recipientCount={selectedDms.length}
+				sentEmails={data.sentEmails}
+				recipients={selectedDms.map((d) => ({
+					sessionId: d.sessionId,
+					name: `${d.firstName} ${d.lastName}`,
+					email: d.email
+				}))}
+				onclose={() => (segmentEmailOpen = false)}
+			/>
+		{/if}
 
 		{#if showEmailModal}
 			<AdminEmailModal
@@ -387,32 +488,99 @@
 		{/if}
 
 		<!-- Search + filter -->
-		<div class="mb-4 flex flex-wrap items-center gap-2">
-			<input
-				aria-label="Search name or email"
-				type="text"
-				bind:value={search}
-				placeholder="Search name or email…"
-				class="w-64 rounded border border-gray-700 bg-gray-900 px-3 py-1.5 text-sm text-gray-200 placeholder:text-gray-600 focus:border-amber-600 focus:outline-none"
-			/>
-			<div class="flex rounded border border-gray-700 bg-gray-900 text-sm">
-				{#each [['all', 'All'], ['suspended', 'Suspended'], ['stale', 'Stale (90d+)']] as [value, label] (value)}
-					<button
-						onclick={() => (filter = value as Filter)}
-						class="px-3 py-1.5 transition {filter === value
-							? 'bg-amber-900/40 text-amber-300'
-							: 'text-gray-400 hover:text-gray-200'}"
-					>
-						{label}
-					</button>
-				{/each}
+		{#if entityTab !== 'insights'}
+			<div class="mb-4 flex flex-wrap items-center gap-2">
+				<input
+					aria-label="Search name or email"
+					type="text"
+					bind:value={search}
+					placeholder="Search name or email…"
+					class="w-64 rounded border border-gray-700 bg-gray-900 px-3 py-1.5 text-sm text-gray-200 placeholder:text-gray-600 focus:border-amber-600 focus:outline-none"
+				/>
+				<div class="flex rounded border border-gray-700 bg-gray-900 text-sm">
+					{#each entityTab === 'dms' ? [['all', 'All'], ['suspended', 'Suspended'], ['stale', 'Stale (90d+)'], ['dormant', 'No use in 30d'], ['never-active', 'Never active'], ['no-combat', 'Never started combat']] : [['all', 'All'], ['suspended', 'Suspended'], ['stale', 'Stale (90d+)']] as [value, label] (value)}
+						<button
+							onclick={() => (filter = value as Filter)}
+							class="px-3 py-1.5 transition {filter === value
+								? 'bg-amber-900/40 text-amber-300'
+								: 'text-gray-400 hover:text-gray-200'}"
+						>
+							{label}
+						</button>
+					{/each}
+				</div>
+				<span class="text-xs text-gray-600"
+					>{entityTab === 'dms'
+						? `${filteredDms.length} of ${data.dms.length}`
+						: `${filteredPlayers.length} of ${data.players.length}`}</span
+				>
 			</div>
-			<span class="text-xs text-gray-600"
-				>{entityTab === 'dms'
-					? `${filteredDms.length} of ${data.dms.length}`
-					: `${filteredPlayers.length} of ${data.players.length}`}</span
+		{/if}
+
+		{#if entityTab === 'dms' && selectedDms.length > 0}
+			<div
+				class="mb-3 flex flex-wrap items-center gap-2 rounded border border-amber-700/60 bg-amber-950/30 px-3 py-2 text-sm"
 			>
-		</div>
+				<span class="font-semibold text-amber-300">{selectedDms.length} selected</span>
+				<button
+					onclick={() => (segmentEmailOpen = true)}
+					class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-xs text-gray-200 transition hover:border-amber-500 hover:text-amber-300"
+				>
+					Email selected
+				</button>
+				<form
+					method="POST"
+					action="?/bulkSuspend"
+					use:enhance={confirmBulk(
+						`Suspend ${selectedDms.length} account(s)? They won't be able to log in until restored.`
+					)}
+				>
+					{#each selectedDms as dm (dm.sessionId)}<input
+							type="hidden"
+							name="sessionId"
+							value={dm.sessionId}
+						/>{/each}
+					<button
+						type="submit"
+						class="rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-xs text-gray-200 transition hover:border-gray-500"
+					>
+						Suspend selected
+					</button>
+				</form>
+				<form
+					method="POST"
+					action="?/bulkUnsuspend"
+					use:enhance={confirmBulk(`Restore ${selectedDms.length} account(s)?`)}
+				>
+					{#each selectedDms as dm (dm.sessionId)}<input
+							type="hidden"
+							name="sessionId"
+							value={dm.sessionId}
+						/>{/each}
+					<button
+						type="submit"
+						class="rounded border border-green-800/60 bg-green-950/20 px-2.5 py-1 text-xs text-green-300 transition hover:border-green-600"
+					>
+						Restore selected
+					</button>
+				</form>
+				<button
+					onclick={() => (selected = new Set())}
+					class="ml-auto text-xs text-gray-500 transition hover:text-gray-300"
+				>
+					Clear
+				</button>
+			</div>
+		{/if}
+
+		{#if form && 'bulkDone' in form}
+			<p
+				class="mb-3 rounded border border-green-800 bg-green-950/30 px-3 py-2 text-sm text-green-300"
+			>
+				{form.bulkDone} account{form.bulkDone === 1 ? '' : 's'}
+				{form.bulkAction}.
+			</p>
+		{/if}
 
 		{#if entityTab === 'dms'}
 			<div class="overflow-x-auto rounded-lg border border-gray-800">
@@ -421,6 +589,15 @@
 						<tr
 							class="border-b border-gray-800 bg-gray-900 text-left text-xs tracking-wider text-gray-500 uppercase"
 						>
+							<th class="px-4 py-3 font-medium">
+								<input
+									type="checkbox"
+									aria-label="Select all visible DMs"
+									checked={allVisibleSelected}
+									onchange={toggleSelectAllVisible}
+									class="h-4 w-4 cursor-pointer accent-amber-500"
+								/>
+							</th>
 							<th class="px-4 py-3 font-medium"></th>
 							<th class="px-4 py-3 font-medium">Name</th>
 							<th class="px-4 py-3 font-medium">Email</th>
@@ -428,6 +605,18 @@
 							<th class="px-4 py-3 text-center font-medium">Subscribed</th>
 							<th class="px-4 py-3 font-medium">Signed up</th>
 							<th class="px-4 py-3 font-medium">Last active</th>
+							<th class="px-4 py-3 font-medium">
+								<button
+									onclick={() => (sortByActions = !sortByActions)}
+									aria-pressed={sortByActions}
+									title="Sort by actions in the last 30 days"
+									class="uppercase transition hover:text-amber-400 {sortByActions
+										? 'text-amber-300'
+										: ''}"
+								>
+									Usage (30d){sortByActions ? ' ↓' : ''}
+								</button>
+							</th>
 							<th class="px-4 py-3 font-medium"></th>
 						</tr>
 					</thead>
@@ -437,6 +626,17 @@
 							{@const isExpanded = expanded.has(dm.sessionId)}
 							{@const auditEntries = auditByEmail.get(dm.email) ?? []}
 							<tr class="border-b border-gray-800/60 bg-gray-900/40 hover:bg-gray-900">
+								<td class="px-4 py-3">
+									{#if !isSelf}
+										<input
+											type="checkbox"
+											aria-label="Select {dm.firstName} {dm.lastName}"
+											checked={selected.has(dm.sessionId)}
+											onchange={() => toggleSelected(dm.sessionId)}
+											class="h-4 w-4 cursor-pointer accent-amber-500"
+										/>
+									{/if}
+								</td>
 								<td class="px-4 py-3">
 									<button
 										onclick={() => toggleExpand(dm.sessionId)}
@@ -505,6 +705,25 @@
 								</td>
 								<td class="px-4 py-3 text-gray-500">{formatDate(dm.createdAt)}</td>
 								<td class="px-4 py-3 text-gray-500">{formatDate(dm.lastActiveAt)}</td>
+								<td class="px-4 py-3">
+									<span
+										class="rounded border px-2 py-0.5 text-xs whitespace-nowrap {LEVEL_CLASSES[
+											levelOf(dm.sessionId)
+										]}">{LEVEL_LABELS[levelOf(dm.sessionId)]}</span
+									>
+									{#if engagementOf(dm.sessionId)}
+										<span class="ml-1 text-xs text-gray-500 tabular-nums"
+											>{engagementOf(dm.sessionId).actions30}</span
+										>
+									{/if}
+									{#if dm.adminNote}
+										<i
+											class="fa-duotone fa-light fa-note-sticky ml-1 text-xs text-amber-400"
+											title="Has an admin note"
+											aria-label="Has an admin note"
+										></i>
+									{/if}
+								</td>
 								<td class="px-4 py-3 text-right">
 									{#if !isSelf}
 										<div class="flex justify-end gap-2">
@@ -561,7 +780,7 @@
 							</tr>
 							{#if isExpanded}
 								<tr class="border-b border-gray-800/60 bg-black/20">
-									<td colspan="8" class="px-6 py-4">
+									<td colspan="10" class="px-6 py-4">
 										<div class="flex flex-wrap gap-6">
 											<!-- Usage stats -->
 											<div>
@@ -571,6 +790,13 @@
 													Usage
 												</p>
 												<div class="flex flex-wrap gap-1.5 text-xs">
+													{#each engagementOf(dm.sessionId)?.top ?? [] as t (t.feature)}
+														<span
+															class="rounded border border-blue-900 bg-blue-950/40 px-2 py-1 text-blue-300"
+															title="Most-used feature"
+															>{ACTIVITY_LABELS[t.feature]} ×{t.count}</span
+														>
+													{/each}
 													<span
 														class="rounded border border-gray-700 bg-gray-800 px-2 py-1 text-gray-300"
 														>{dm.gameSessionCount} session{dm.gameSessionCount === 1
@@ -691,6 +917,35 @@
 												</div>
 											{/if}
 
+											<!-- Admin note — private to admins, never shown to the DM -->
+											<div class="w-full min-w-[280px] flex-1 basis-full">
+												<p
+													class="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+												>
+													Admin note <span class="font-normal text-gray-600 normal-case"
+														>· private</span
+													>
+												</p>
+												<form method="POST" action="?/saveNote" use:enhance class="flex gap-2">
+													<input type="hidden" name="sessionId" value={dm.sessionId} />
+													<textarea
+														name="note"
+														rows="2"
+														maxlength="1000"
+														aria-label="Admin note for {dm.firstName} {dm.lastName}"
+														placeholder="Support context, e.g. reported a sync bug — follow up…"
+														class="min-w-0 flex-1 rounded border border-gray-700 bg-gray-900 px-2 py-1.5 text-xs text-gray-200 placeholder:text-gray-600 focus:border-amber-600 focus:outline-none"
+														>{dm.adminNote}</textarea
+													>
+													<button
+														type="submit"
+														class="self-start rounded border border-gray-600 bg-gray-800 px-2.5 py-1 text-xs text-gray-300 transition hover:border-amber-500 hover:text-amber-300"
+													>
+														Save note
+													</button>
+												</form>
+											</div>
+
 											<!-- Usage log — what this DM has been doing in the app (loaded on demand) -->
 											<div class="w-full min-w-[280px] flex-1 basis-full">
 												<p
@@ -698,6 +953,11 @@
 												>
 													Usage log
 												</p>
+												<a
+													href="/admin/activity/export?sessionId={dm.sessionId}"
+													class="mb-1.5 inline-block text-xs text-gray-500 transition hover:text-amber-300"
+													>Export this DM's log (CSV)</a
+												>
 												{#if !usage[dm.sessionId] || usage[dm.sessionId].loading}
 													<p class="text-xs text-gray-600">Loading…</p>
 												{:else if usage[dm.sessionId].error}
@@ -762,7 +1022,7 @@
 					{data.dms.length === 0 ? 'No DM accounts yet.' : 'No accounts match your search/filter.'}
 				</p>
 			{/if}
-		{:else}
+		{:else if entityTab === 'players'}
 			<div class="overflow-x-auto rounded-lg border border-gray-800">
 				<table class="w-full min-w-[820px] border-collapse text-sm">
 					<thead>
@@ -1004,6 +1264,8 @@
 						: 'No accounts match your search/filter.'}
 				</p>
 			{/if}
+		{:else}
+			<AdminInsights dms={data.dms} engagement={data.engagement} />
 		{/if}
 	</div>
 </div>

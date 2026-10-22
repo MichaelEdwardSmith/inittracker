@@ -37,7 +37,10 @@ import {
 	getEmailBlastRecipients,
 	logSentEmail,
 	listSentEmails,
-	setEmailOptOut
+	setEmailOptOut,
+	getEngagementReport,
+	setDMAdminNote,
+	getDMsForEmail
 } from '$lib/server/dmModel';
 import {
 	listAllPlayers,
@@ -55,16 +58,28 @@ import { sessionStates, sessionClients } from '$lib/server/sseState';
 import { sendMail, adminBroadcastEmail, appBaseUrl, isMailConfigured } from '$lib/server/mail';
 
 const TEST_EMAIL_RECIPIENT = 'dm@inittracker.com';
+const MAX_BULK_SELECTION = 200;
+
+/** Repeated `sessionId` form fields from the DM table's selection, de-duplicated and capped. */
+function selectedIds(data: FormData): string[] {
+	const ids = data
+		.getAll('sessionId')
+		.map((v) => String(v).trim())
+		.filter(Boolean);
+	return [...new Set(ids)].slice(0, MAX_BULK_SELECTION);
+}
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [dms, players, auditLog, sentEmails, playerSentEmails] = await Promise.all([
+	const [dms, players, auditLog, sentEmails, playerSentEmails, engagement] = await Promise.all([
 		listAllDMs(),
 		listAllPlayers(),
 		listAdminAudit(),
 		listSentEmails(50, 'dm'),
-		listSentEmails(50, 'player')
+		listSentEmails(50, 'player'),
+		getEngagementReport()
 	]);
 	return {
+		engagement,
 		dmFirstName: locals.dmFirstName ?? '',
 		realSessionId: locals.realSessionId,
 		isRootAdmin: locals.isRootAdmin,
@@ -449,6 +464,124 @@ export const actions: Actions = {
 		});
 
 		return { directSent: true, loggedEmail };
+	},
+
+	saveNote: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const targetSessionId = (data.get('sessionId') as string)?.trim();
+		if (!targetSessionId) return fail(400, { error: 'Missing session ID.' });
+
+		const result = await setDMAdminNote(targetSessionId, (data.get('note') as string) ?? '');
+		if (!result.ok) return fail(404, { error: result.error ?? 'DM account not found.' });
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'update-note',
+			targetEmail: result.email ?? 'unknown',
+			targetSessionId
+		});
+
+		return { noteSaved: true };
+	},
+
+	// Bulk suspend/restore for the selection checkboxes in the DM table. Same rules as the
+	// single-account actions: never touches the acting admin, and each account gets its own
+	// audit entry so the per-account "Admin actions" log stays accurate.
+	bulkSuspend: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.realSessionId || !locals.dmEmail) return fail(403);
+		const ids = selectedIds(await request.formData()).filter((id) => id !== locals.realSessionId);
+		if (ids.length === 0) return fail(400, { error: 'No accounts selected.' });
+
+		let done = 0;
+		for (const id of ids) {
+			const result = await suspendDM(id);
+			if (!result.ok) continue;
+			done++;
+			await logAdminAction({
+				adminEmail: locals.dmEmail,
+				action: 'bulk-suspend',
+				targetEmail: result.email ?? 'unknown',
+				targetSessionId: id
+			});
+		}
+		return { bulkDone: done, bulkAction: 'suspended' };
+	},
+
+	bulkUnsuspend: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+		const ids = selectedIds(await request.formData());
+		if (ids.length === 0) return fail(400, { error: 'No accounts selected.' });
+
+		let done = 0;
+		for (const id of ids) {
+			const result = await unsuspendDM(id);
+			if (!result.ok) continue;
+			done++;
+			await logAdminAction({
+				adminEmail: locals.dmEmail,
+				action: 'bulk-unsuspend',
+				targetEmail: result.email ?? 'unknown',
+				targetSessionId: id
+			});
+		}
+		return { bulkDone: done, bulkAction: 'restored' };
+	},
+
+	// Email to the DMs ticked in the table. Like a direct email, it ignores the broadcast opt-out:
+	// the admin picked these people deliberately.
+	sendSegmentEmail: async ({ request, locals }) => {
+		if (!locals.isAdmin || !locals.dmEmail) return fail(403);
+
+		const data = await request.formData();
+		const subject = (data.get('subject') as string)?.trim();
+		const body = (data.get('body') as string)?.trim();
+		const ids = selectedIds(data);
+		if (!subject || !body || ids.length === 0) {
+			return fail(400, { emailError: 'Subject, message body, and recipients are required.' });
+		}
+		if (!isMailConfigured()) {
+			return fail(502, {
+				emailError: 'Postmark is not configured (missing POSTMARK_SERVER_TOKEN or EMAIL_FROM).'
+			});
+		}
+
+		const recipients = await getDMsForEmail(ids);
+		const results = await Promise.allSettled(
+			recipients.map(async (r) => {
+				const token = await getOrCreateUnsubscribeToken(r.sessionId);
+				const { html, text } = adminBroadcastEmail(
+					subject,
+					body,
+					`${appBaseUrl()}/unsubscribe/${token}`
+				);
+				const sent = await sendMail({ to: r.email, subject, html, text, tag: 'admin-segment' });
+				if (!sent) throw new Error(`Failed to send to ${r.email}`);
+			})
+		);
+		const sentCount = results.filter((r) => r.status === 'fulfilled').length;
+		const failedCount = results.length - sentCount;
+
+		await logAdminAction({
+			adminEmail: locals.dmEmail,
+			action: 'email-bulk',
+			targetEmail: `${sentCount} recipient${sentCount === 1 ? '' : 's'}`,
+			targetSessionId: 'segment',
+			detail: subject
+		});
+
+		const loggedEmail = await logSentEmail({
+			adminEmail: locals.dmEmail,
+			subject,
+			body,
+			isTest: false,
+			recipientCount: sentCount,
+			failedCount,
+			audience: 'dm'
+		});
+
+		return { broadcastSent: sentCount, broadcastFailed: failedCount, loggedEmail };
 	},
 
 	previewEmail: async ({ request, locals }) => {
