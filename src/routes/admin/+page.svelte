@@ -330,7 +330,7 @@
 	tabindex="-1"
 	class="min-h-screen bg-gray-950 px-4 py-8 text-gray-200 sm:px-8"
 >
-	<div class="mx-auto max-w-6xl">
+	<div class="w-full">
 		<header class="mb-6 flex flex-wrap items-center justify-between gap-3">
 			<div>
 				<h1 class="text-xl font-bold tracking-widest text-amber-400 uppercase">
@@ -584,7 +584,7 @@
 
 		{#if entityTab === 'dms'}
 			<div class="overflow-x-auto rounded-lg border border-gray-800">
-				<table class="w-full min-w-[820px] border-collapse text-sm">
+				<table class="w-full min-w-[1180px] border-collapse text-sm">
 					<thead>
 						<tr
 							class="border-b border-gray-800 bg-gray-900 text-left text-xs tracking-wider text-gray-500 uppercase"
