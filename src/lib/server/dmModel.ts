@@ -1367,3 +1367,47 @@ export async function deleteDMActivity(sessionId: string): Promise<void> {
 		console.error('Failed to delete DM activity log', err);
 	}
 }
+
+export interface FeatureUsageRow {
+	feature: ActivityFeature;
+	/** Set only for 'generator' rows, which are split out per generator (the entry's detail). */
+	generator?: string;
+	count: number;
+	/** Distinct DMs who used it — separates "popular" from "one DM hammering it". */
+	dmCount: number;
+}
+
+/** Feature-use totals across all DMs, most used first. `sinceDays` null = all retained history. */
+export async function getFeatureUsage(sinceDays: number | null): Promise<FeatureUsageRow[]> {
+	const db = await getDb();
+	const since = sinceDays ? new Date(Date.now() - sinceDays * 86400 * 1000) : null;
+	const rows = await db
+		.collection<DMActivityEntry>('dmActivity')
+		.aggregate<{
+			_id: { feature: ActivityFeature; generator: string | null };
+			count: number;
+			dmCount: number;
+		}>([
+			...(since ? [{ $match: { at: { $gte: since } } }] : []),
+			{
+				$group: {
+					_id: {
+						feature: '$feature',
+						generator: { $cond: [{ $eq: ['$feature', 'generator'] }, '$detail', null] }
+					},
+					count: { $sum: 1 },
+					dms: { $addToSet: '$sessionId' }
+				}
+			},
+			{ $project: { count: 1, dmCount: { $size: '$dms' } } },
+			{ $sort: { count: -1 } },
+			{ $limit: 500 }
+		])
+		.toArray();
+	return rows.map((r) => ({
+		feature: r._id.feature,
+		...(r._id.generator ? { generator: r._id.generator } : {}),
+		count: r.count,
+		dmCount: r.dmCount
+	}));
+}

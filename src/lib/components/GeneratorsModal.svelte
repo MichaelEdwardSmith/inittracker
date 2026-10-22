@@ -110,11 +110,13 @@
 		}
 	];
 
-	let selected = $state('weather');
+	// '' = nothing picked yet; the panel shows a prompt instead of defaulting to a generator.
+	let selected = $state('');
 
-	// Usage log: each generator the DM actually views (the initial default counts — it's shown
-	// on open). Dedupe on the server absorbs rapid flipping back and forth.
+	// Usage log: each generator the DM actually views (none is shown until picked). Dedupe on
+	// the server absorbs rapid flipping back and forth.
 	$effect(() => {
+		if (!selected) return;
 		trackActivity('generator', categories.find((c) => c.id === selected)?.label ?? selected);
 	});
 
@@ -6452,6 +6454,12 @@
 				{:then { default: TempleGen }}
 					<TempleGen onclose={() => (selected = '')} embedded />
 				{/await}
+			{/if}
+
+			{#if !selected}
+				<div class="flex h-full items-center justify-center text-center text-gray-500">
+					<p>Pick a generator from the menu</p>
+				</div>
 			{/if}
 
 			{#if selected === 'festival'}

@@ -21,6 +21,7 @@
 	import { ACTIVITY_LABELS, type ActivityFeature } from '$lib/activity';
 	import AdminEmailModal from '$lib/components/AdminEmailModal.svelte';
 	import AdminStatsPanel from '$lib/components/AdminStatsPanel.svelte';
+	import AdminFeatureUsage from '$lib/components/AdminFeatureUsage.svelte';
 
 	let { data, form } = $props();
 
@@ -293,6 +294,7 @@
 		</header>
 
 		<AdminStatsPanel dms={data.dms} players={data.players} auditLog={data.auditLog} />
+		<AdminFeatureUsage />
 
 		<!-- DMs / Players tab switcher -->
 		<div class="mb-4 flex w-fit rounded border border-gray-700 bg-gray-900 text-sm">
