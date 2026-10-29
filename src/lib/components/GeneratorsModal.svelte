@@ -5413,7 +5413,7 @@
 	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gray-950"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
-	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+	<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
 		<div class="bg-orb orb-2"></div>
 		<div class="bg-orb orb-3"></div>
@@ -5436,7 +5436,9 @@
 	<!-- Body -->
 	<div class="flex min-h-0 flex-1">
 		<!-- Left nav -->
-		<nav class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-gray-900/60 py-3">
+		<nav
+			class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] py-3"
+		>
 			{#each categories as cat}
 				<button
 					onclick={() => {
@@ -5457,15 +5459,13 @@
 
 		<!-- Right content panel -->
 		<div
-			class="relative min-w-0 flex-1 {selected
-				? 'overflow-hidden bg-gray-950'
-				: 'overflow-y-auto px-8 py-6'}"
+			class="relative min-w-0 flex-1 {selected ? 'overflow-hidden' : 'overflow-y-auto px-8 py-6'}"
 		>
 			{#if selected === 'names'}
-				<div class="flex h-full flex-col overflow-hidden bg-gray-950 sm:flex-row">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
 					<div
-						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-gray-900/60 p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
 					>
 						<select
 							aria-label="Name type"
@@ -5584,10 +5584,10 @@
 					</div>
 				</div>
 			{:else if selected === 'weather'}
-				<div class="flex h-full flex-col overflow-hidden bg-gray-950 sm:flex-row">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
 					<div
-						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-gray-900/60 p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
 					>
 						<div class="flex flex-col gap-1">
 							<label
@@ -5833,9 +5833,9 @@
 				</div>
 			{/if}
 			{#if selected === 'shop'}
-				<div class="flex h-full flex-col overflow-hidden bg-gray-950 sm:flex-row">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<div
-						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-gray-900/60 p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
 					>
 						<button
 							onclick={generateShop}
@@ -6224,10 +6224,10 @@
 				</div>
 			{/if}
 			{#if selected === 'encounter'}
-				<div class="flex h-full flex-col overflow-hidden bg-gray-950 sm:flex-row">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
 					<div
-						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-gray-900/60 p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
 					>
 						<div class="flex flex-col gap-1">
 							<label

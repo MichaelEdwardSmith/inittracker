@@ -1384,9 +1384,7 @@
 
 <!-- ── Full-screen layout ─────────────────────────────────────────────────── -->
 <div
-	class={embedded
-		? 'flex h-full flex-col bg-gray-950'
-		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
+	class={embedded ? 'flex h-full flex-col' : 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	use:focusTrap
 	aria-modal="true"
@@ -1418,7 +1416,7 @@
 	<div class="relative flex min-h-0 flex-1 overflow-hidden">
 		<!-- Left panel: controls -->
 		<div
-			class="hidden w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
+			class="hidden w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:flex"
 		>
 			<button
 				onclick={randomize}
