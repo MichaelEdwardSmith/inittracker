@@ -312,6 +312,23 @@ export interface EncounterEnemy {
 	quantity: number;
 }
 
+export interface SavedShopItem {
+	name: string;
+	liked: string;
+	neutral: string;
+	disliked: string;
+	rarity?: string;
+}
+
+// A shop kept from the Shop Generator. Keyed per DM account by typeKey + name (no id).
+export interface SavedShop {
+	name: string;
+	typeKey: string;
+	affluenceKey: string;
+	items: SavedShopItem[];
+	city?: string;
+}
+
 export interface Encounter {
 	id: string;
 	name: string;

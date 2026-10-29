@@ -2578,8 +2578,8 @@
 					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Wealthy), and
 					whether it
 					<strong class="font-semibold text-white">Has Keep</strong>, then click
-					<strong class="font-semibold text-white">Randomize</strong> for a new town (or just edit the
-					fields — the town regenerates live). The output includes a prose "About [Town]" description,
+					<strong class="font-semibold text-white">Generate New Town</strong> for a new town (or just
+					edit the fields — the town regenerates live). The output includes a prose "About [Town]" description,
 					an optional Keep section, and grouped building sections (Civic &amp; Religious, Inns &amp; Taverns,
 					Trades &amp; Services, Farms &amp; Outbuildings, Residences) — each building has a name, description,
 					and NPC roster.
@@ -2612,14 +2612,20 @@
 					Shop, Jeweler, Tavern &amp; Inn, Bookshop, Herbalist, Fletcher &amp; Bowyer, Stable) and
 					town affluence (6 tiers: Impoverished
 					<i class="fa-duotone fa-light fa-arrow-right" aria-hidden="true"></i> Opulent), then click
-					<strong class="font-semibold text-white">Stock Shop</strong> to generate a random named
-					shop with items priced at three tiers (<i
+					<strong class="font-semibold text-white">Generate New Shop</strong> to generate a random
+					named shop with items priced at three tiers (<i
 						class="fa-duotone fa-light fa-face-smile"
 						aria-hidden="true"
 					></i>
 					Friendly −15%, <i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral,
 					<i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile +25%); magic items
 					appropriate to affluence are included. Click any item for a detail modal.
+				</p>
+				<p class="mb-4 text-sm leading-relaxed">
+					Click <strong class="font-semibold text-white">Save Shop</strong> (under Generate New Shop)
+					to keep the current shop in the "Previously Visited Shops" list without creating a note. Saved
+					shops are stored on your account, so they appear on every device you log in from; saving the
+					same shop again updates it in place (up to 100 saved shops).
 				</p>
 				<p class="mb-4 text-sm leading-relaxed">
 					Click <strong class="font-semibold text-white">Save to Notes</strong> to open a small

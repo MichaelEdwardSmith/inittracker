@@ -1079,8 +1079,24 @@
 	<div class="relative flex min-h-0 flex-1 overflow-hidden">
 		<!-- Left panel: controls -->
 		<div
-			class="hidden w-52 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
+			class="hidden w-56 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
 		>
+			<button
+				onclick={() => (seed = Math.floor(Math.random() * 1_000_000_000))}
+				class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
+			>
+				Generate New NPC
+			</button>
+
+			{#if npcData}
+				<button
+					onclick={saveNpc}
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
+				>
+					Save NPC
+				</button>
+			{/if}
+
 			<!-- Role -->
 			<div class="flex flex-col gap-1.5">
 				<label for="npc-role" class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
@@ -1089,7 +1105,7 @@
 				<select
 					id="npc-role"
 					bind:value={role}
-					class="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-gray-200 focus:border-amber-600 focus:outline-none"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					{#each Object.entries(ROLE_LABELS) as [id, label]}
 						<option value={id}>{label}</option>
@@ -1105,7 +1121,7 @@
 				<select
 					id="npc-gender"
 					bind:value={gender}
-					class="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-gray-200 focus:border-amber-600 focus:outline-none"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					<option value="any">Any</option>
 					<option value="male">Male</option>
@@ -1122,7 +1138,7 @@
 				<select
 					id="npc-disposition"
 					bind:value={disposition}
-					class="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-gray-200 focus:border-amber-600 focus:outline-none"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					{#each Object.entries(DISPOSITION_LABEL) as [id, label]}
 						<option value={id}>{label}</option>
@@ -1140,37 +1156,19 @@
 					id="npc-seed-input"
 					type="number"
 					bind:value={seed}
-					class="w-full rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-sm text-gray-200 focus:border-amber-600 focus:outline-none"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				/>
-				<button
-					onclick={() => (seed = Math.floor(Math.random() * 1_000_000_000))}
-					class="mt-1 w-full rounded bg-amber-700 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-amber-600"
-				>
-					Regenerate
-				</button>
-			</div>
-
-			{#if npcData}
-				<div class="flex gap-1.5">
-					<button
-						onclick={saveNpc}
-						class="flex-1 rounded border border-gray-700 bg-gray-800 px-2 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
-					>
-						Save NPC
-					</button>
+				{#if npcData}
 					<button
 						onclick={() =>
-							exportNpcPdf({
-								...npcData!,
-								disposition: DISPOSITION_LABEL[disposition]
-							})}
-						class="flex-1 rounded border border-gray-700 bg-gray-800 px-2 py-2 text-sm font-semibold text-gray-300 transition hover:border-red-600 hover:text-red-400"
+							exportNpcPdf({ ...npcData!, disposition: DISPOSITION_LABEL[disposition] })}
+						class="mt-1 w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-red-600 hover:text-red-400"
 						title="Export to PDF"
 					>
 						Export PDF
 					</button>
-				</div>
-			{/if}
+				{/if}
+			</div>
 
 			{#if savedNpcs.length}
 				<div class="flex flex-col gap-1.5">

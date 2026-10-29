@@ -1892,8 +1892,22 @@
 	<div class="relative flex min-h-0 flex-1 overflow-hidden">
 		<!-- Left panel: options -->
 		<div
-			class="hidden w-56 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
+			class="hidden w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
 		>
+			<button
+				onclick={randomize}
+				class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
+			>
+				Generate New Town
+			</button>
+
+			<button
+				onclick={saveTown}
+				class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
+			>
+				Save Town
+			</button>
+
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="town-name-input"
@@ -1904,7 +1918,7 @@
 					type="text"
 					bind:value={townName}
 					placeholder="Town name"
-					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				/>
 			</div>
 
@@ -1917,7 +1931,7 @@
 				<select
 					id="settlement-size-select"
 					bind:value={townSize}
-					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					<option value="thorp">Thorp</option>
 					<option value="hamlet">Hamlet</option>
@@ -1936,7 +1950,7 @@
 				<select
 					id="wealth-select"
 					bind:value={opulence}
-					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					<option value="poor">Poor</option>
 					<option value="modest">Modest</option>
@@ -1949,20 +1963,6 @@
 				<input type="checkbox" bind:checked={hasKeep} class="accent-amber-500" />
 				<span>Has Keep</span>
 			</label>
-
-			<button
-				onclick={randomize}
-				class="w-full rounded bg-amber-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 active:bg-amber-800"
-			>
-				Randomize
-			</button>
-
-			<button
-				onclick={saveTown}
-				class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
-			>
-				Save Town
-			</button>
 
 			{#if savedTowns.length}
 				<div class="flex flex-col gap-1.5">
