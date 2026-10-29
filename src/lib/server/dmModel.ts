@@ -18,6 +18,7 @@ import type {
 	GameSession,
 	NoteEntry,
 	Encounter,
+	SavedShop,
 	SchedulingProposal,
 	SavedBattleMap
 } from '$lib/types';
@@ -47,6 +48,8 @@ export interface DM {
 	gameSessions: DMGameSession[];
 	customMonsters: CustomMonster[];
 	encounters?: Encounter[];
+	/** Shops kept from the Shop Generator — per account, so they follow the DM across devices. */
+	savedShops?: SavedShop[];
 	/** Legacy top-level fields — may exist in documents created before migration. */
 	combatState?: StorageState;
 	combatHistory?: CombatRecord[];
@@ -689,6 +692,42 @@ export async function deleteEncounter(authSessionId: string, encounterId: string
 	const c = await col();
 	await c.updateOne({ sessionId: authSessionId }, {
 		$pull: { encounters: { id: encounterId } }
+	} as never);
+}
+
+// ---------------------------------------------------------------------------
+// Saved shops — per DM account, keyed by typeKey + name (re-saving updates in place)
+// ---------------------------------------------------------------------------
+
+export const MAX_SAVED_SHOPS = 100;
+
+export async function getSavedShops(authSessionId: string): Promise<SavedShop[]> {
+	const c = await col();
+	const dm = await c.findOne({ sessionId: authSessionId });
+	return (dm?.savedShops as SavedShop[]) ?? [];
+}
+
+/** Inserts or replaces a shop. Returns false when the account is at the cap and this is a new shop. */
+export async function upsertSavedShop(authSessionId: string, shop: SavedShop): Promise<boolean> {
+	const c = await col();
+	const existing = await getSavedShops(authSessionId);
+	const isNew = !existing.some((s) => s.name === shop.name && s.typeKey === shop.typeKey);
+	if (isNew && existing.length >= MAX_SAVED_SHOPS) return false;
+	await c.updateOne({ sessionId: authSessionId }, {
+		$pull: { savedShops: { name: shop.name, typeKey: shop.typeKey } }
+	} as never);
+	await c.updateOne({ sessionId: authSessionId }, { $push: { savedShops: shop } } as never);
+	return true;
+}
+
+export async function deleteSavedShop(
+	authSessionId: string,
+	name: string,
+	typeKey: string
+): Promise<void> {
+	const c = await col();
+	await c.updateOne({ sessionId: authSessionId }, {
+		$pull: { savedShops: { name, typeKey } }
 	} as never);
 }
 

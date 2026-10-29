@@ -1244,9 +1244,7 @@
 
 <!-- ── Layout ─────────────────────────────────────────────────────────────── -->
 <div
-	class={embedded
-		? 'flex h-full flex-col bg-gray-950'
-		: 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
+	class={embedded ? 'flex h-full flex-col' : 'fixed inset-0 z-50 flex flex-col bg-gray-950'}
 	role="dialog"
 	use:focusTrap
 	aria-modal="true"
@@ -1275,7 +1273,7 @@
 	<div class="relative flex min-h-0 flex-1 overflow-hidden">
 		<!-- Left panel -->
 		<div
-			class="hidden w-56 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-gray-900/60 p-4 sm:flex"
+			class="hidden w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:flex"
 		>
 			<!-- Terrain -->
 			<div class="flex flex-col gap-1.5">
@@ -1286,7 +1284,7 @@
 				<select
 					id="wilderness-terrain"
 					bind:value={terrain}
-					class="w-full rounded bg-gray-800 px-2.5 py-1.5 text-sm text-gray-100 outline-none focus:ring-1 focus:ring-amber-500"
+					class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 				>
 					{#each Object.entries(TERRAIN_LABELS) as [key, label]}
 						<option value={key}>{label}</option>
@@ -1302,10 +1300,10 @@
 					{#each Object.entries(TIME_LABELS) as [key, label]}
 						<button
 							onclick={() => (timeOfDay = key as TimeOfDay)}
-							class="w-full rounded px-2.5 py-1.5 text-left text-sm font-medium transition {timeOfDay ===
+							class="w-full rounded border px-3 py-2 text-left text-sm font-semibold transition {timeOfDay ===
 							key
-								? 'bg-amber-700 text-white'
-								: 'bg-gray-800 text-gray-300 hover:bg-gray-700'}"
+								? 'border-amber-600 bg-gray-800 text-amber-400'
+								: 'border-gray-700 bg-gray-800 text-gray-300 hover:border-amber-600 hover:text-amber-400'}"
 						>
 							{label}
 						</button>
@@ -1320,7 +1318,7 @@
 				<div class="flex items-center gap-2">
 					<button
 						onclick={() => (partyLevel = Math.max(1, partyLevel - 1))}
-						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
+						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 						aria-label="Decrease"
 					>
 						<i class="fa-duotone fa-light fa-minus text-xs" aria-hidden="true"></i>
@@ -1328,7 +1326,7 @@
 					<span class="min-w-[2rem] text-center text-sm font-bold text-gray-100">{partyLevel}</span>
 					<button
 						onclick={() => (partyLevel = Math.min(20, partyLevel + 1))}
-						class="flex h-7 w-7 items-center justify-center rounded bg-gray-700 text-gray-300 transition hover:bg-gray-600"
+						class="flex h-7 w-7 items-center justify-center rounded border border-gray-700 bg-gray-800 text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 						aria-label="Increase"
 					>
 						<i class="fa-duotone fa-light fa-plus text-xs" aria-hidden="true"></i>
@@ -1341,7 +1339,7 @@
 
 			<button
 				onclick={randomize}
-				class="w-full rounded bg-amber-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 active:bg-amber-800"
+				class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 			>
 				Roll Encounter
 			</button>

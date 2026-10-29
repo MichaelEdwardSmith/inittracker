@@ -1089,13 +1089,15 @@ Select a race/type — 11 options: Human (Male), Human (Female), Elf, Dwarf, Hal
 
 ### 18.5 Town Generator
 
-Set a **Town Name** (auto-filled, freely editable), **Settlement Size** (Thorp → Metropolis), **Wealth** (Poor → Wealthy), and whether it **Has Keep**, then click **Randomize** for a new town (or just edit the fields — the town regenerates live). The output includes a prose "About [Town]" description, an optional Keep section (Great Hall, Barracks, Armory, and size-dependent Chapel/Dungeon/Lord's Chambers), and grouped building sections (Civic & Religious, Inns & Taverns, Trades & Services, Farms & Outbuildings, Residences) — each building has a name, description, and NPC roster.
+Set a **Town Name** (auto-filled, freely editable), **Settlement Size** (Thorp → Metropolis), **Wealth** (Poor → Wealthy), and whether it **Has Keep**, then click **Generate New Town** for a new town (or just edit the fields — the town regenerates live). The output includes a prose "About [Town]" description, an optional Keep section (Great Hall, Barracks, Armory, and size-dependent Chapel/Dungeon/Lord's Chambers), and grouped building sections (Civic & Religious, Inns & Taverns, Trades & Services, Farms & Outbuildings, Residences) — each building has a name, description, and NPC roster.
 
 Buildings with an inventory (shops, smithies, stables, inns, taverns, temples) have a **View Inventory/Menu/Services** button showing 7–10 priced items with a **Restock** option. Every building also has a **Floor Plan** button that opens an embedded third-party floor-plan generator (seeded to that building) with its own **New Layout** reroll and an **Open ↗** link to view it full-page. Click **Save Town** to keep it in a "Saved Towns" list.
 
 ### 18.6 Shop Generator
 
-Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic Shop, Jeweler, Tavern & Inn, Bookshop, Herbalist, Fletcher & Bowyer, Stable) and town affluence (6 tiers: Impoverished → Opulent), then click **Stock Shop** to generate a random named shop with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items appropriate to affluence are included. Click any item for a detail modal.
+Choose a shop type (11 options: General Store, Weaponsmith, Armorer, Alchemist, Magic Shop, Jeweler, Tavern & Inn, Bookshop, Herbalist, Fletcher & Bowyer, Stable) and town affluence (6 tiers: Impoverished → Opulent), then click **Generate New Shop** to generate a random named shop with items priced at three tiers (😊 Friendly −15%, 😐 Neutral, 😠 Hostile +25%); magic items appropriate to affluence are included. Click any item for a detail modal.
+
+Click **Save Shop** (under **Generate New Shop**) to keep the current shop in the **"Previously Visited Shops"** list without creating a note. Saved shops are stored on your account, so they appear on every device you log in from; saving the same shop again updates it in place (up to 100 saved shops).
 
 Click **Save to Notes** to open a small prompt for which city/town the shop is in (optional), then save — the note records the shop, its city, affluence, and type, plus a full itemized inventory list. A **"Previously Visited Shops"** section with **Load from Notes** lets you pull any shop you've saved back out of your DM notes to view or reload later.
 

@@ -3037,6 +3037,24 @@
 	let shopLoadStatus = $state<'idle' | 'loading' | 'done' | 'error'>('idle');
 	let shopLoadCount = $state(0);
 
+	let shopQuickSaveStatus = $state<'idle' | 'saved' | 'error'>('idle');
+
+	// Quick save: keeps the shop in the Previously Visited Shops list, synced to the DM's
+	// account, without writing a note. Saving the same shop twice updates it in place.
+	async function saveShop() {
+		if (!generatedShopName || generatedShop.length === 0) return;
+		const ok = await addSavedShop({
+			name: generatedShopName,
+			typeKey: shopType,
+			affluenceKey: shopAffluence,
+			items: [...generatedShop]
+		});
+		shopQuickSaveStatus = ok ? 'saved' : 'error';
+		setTimeout(() => {
+			shopQuickSaveStatus = 'idle';
+		}, 2000);
+	}
+
 	function promptSaveShop() {
 		if (!generatedShopName) return;
 		shopSaveCityInput = '';
@@ -3088,7 +3106,7 @@
 					body: JSON.stringify({ action: 'create', content: line })
 				});
 			}
-			savedShops = [...savedShops, shopEntry];
+			void addSavedShop(shopEntry);
 			shopSaveStatus = 'saved';
 			setTimeout(() => {
 				shopSaveStatus = 'idle';
@@ -3122,7 +3140,7 @@
 								(s) => s.name === parsed.name && s.typeKey === parsed.typeKey
 							);
 							if (!dupe) {
-								savedShops = [...savedShops, parsed];
+								void addSavedShop(parsed);
 								added++;
 							}
 						}
@@ -3996,6 +4014,64 @@
 	$effect(() => {
 		if (browser) localStorage.setItem(SAVED_SHOPS_KEY, JSON.stringify(savedShops));
 	});
+
+	// Saved shops live on the DM's account (/api/shops) so they follow the DM across devices;
+	// localStorage above is just a fast cache. Shops are keyed by type + name.
+	const SHOPS_MIGRATED_KEY = 'initiative_saved_shops_synced';
+	const shopKey = (x: { typeKey: string; name: string }) => x.typeKey + '::' + x.name;
+
+	async function pushShop(shop: SavedShop): Promise<boolean> {
+		try {
+			const res = await fetch('/api/shops', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(shop)
+			});
+			return res.ok;
+		} catch {
+			return false;
+		}
+	}
+
+	/** Adds or updates a shop locally (keeping a known city) and syncs it to the account. */
+	function addSavedShop(entry: SavedShop): Promise<boolean> {
+		const existing = savedShops.find((x) => shopKey(x) === shopKey(entry));
+		const merged = existing?.city && !entry.city ? { ...entry, city: existing.city } : entry;
+		savedShops = existing
+			? savedShops.map((x) => (x === existing ? merged : x))
+			: [...savedShops, merged];
+		return pushShop(merged);
+	}
+
+	function removeSavedShop(index: number) {
+		const shop = savedShops[index];
+		if (!shop) return;
+		savedShops = savedShops.filter((_, j) => j !== index);
+		fetch(
+			`/api/shops?name=${encodeURIComponent(shop.name)}&type=${encodeURIComponent(shop.typeKey)}`,
+			{ method: 'DELETE' }
+		).catch(() => {});
+	}
+
+	// On open: the account's list is the source of truth. Shops that only exist in this
+	// browser (saved before syncing existed) are uploaded once, then never re-uploaded — so a
+	// shop deleted on another device can't come back from a stale cache.
+	async function pullSavedShops() {
+		try {
+			const res = await fetch('/api/shops');
+			if (!res.ok) return;
+			const remote: SavedShop[] = await res.json();
+			const remoteKeys = new Set(remote.map(shopKey));
+			const migrated = localStorage.getItem(SHOPS_MIGRATED_KEY) === '1';
+			const localOnly = migrated ? [] : savedShops.filter((x) => !remoteKeys.has(shopKey(x)));
+			savedShops = [...remote, ...localOnly];
+			for (const x of localOnly) void pushShop(x);
+			localStorage.setItem(SHOPS_MIGRATED_KEY, '1');
+		} catch {
+			// offline: keep the cached list
+		}
+	}
+	if (browser) void pullSavedShops();
 	function pickFrom<T>(arr: T[]): T {
 		return arr[Math.floor(Math.random() * arr.length)];
 	}
@@ -5337,7 +5413,7 @@
 	class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gray-950"
 	onkeydown={(e) => e.key === 'Escape' && onclose()}
 >
-	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+	<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
 		<div class="bg-orb orb-1"></div>
 		<div class="bg-orb orb-2"></div>
 		<div class="bg-orb orb-3"></div>
@@ -5360,10 +5436,16 @@
 	<!-- Body -->
 	<div class="flex min-h-0 flex-1">
 		<!-- Left nav -->
-		<nav class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-gray-900/60 py-3">
+		<nav
+			class="w-52 shrink-0 overflow-y-auto border-r border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] py-3"
+		>
 			{#each categories as cat}
 				<button
-					onclick={() => (selected = cat.id)}
+					onclick={() => {
+						selected = cat.id;
+						// Stock a shop on first open so the panel isn't empty; keep the current one on return.
+						if (cat.id === 'shop' && generatedShop.length === 0) generateShop();
+					}}
 					class="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition
 					       {selected === cat.id
 						? 'bg-amber-900/30 font-semibold text-amber-300'
@@ -5377,31 +5459,14 @@
 
 		<!-- Right content panel -->
 		<div
-			class="min-w-0 flex-1 {[
-				'town',
-				'inn',
-				'dungeon',
-				'wilderness',
-				'wizard',
-				'cult',
-				'noble',
-				'guild',
-				'caravan',
-				'blackmarket',
-				'graveyard',
-				'npc',
-				'villain',
-				'ship',
-				'temple',
-				'festival'
-			].includes(selected)
-				? 'overflow-hidden'
-				: 'overflow-y-auto px-8 py-6'}"
+			class="relative min-w-0 flex-1 {selected ? 'overflow-hidden' : 'overflow-y-auto px-8 py-6'}"
 		>
 			{#if selected === 'names'}
-				<div class="flex flex-col gap-6">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
-					<div class="flex flex-wrap items-center gap-3">
+					<div
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+					>
 						<select
 							aria-label="Name type"
 							bind:value={nameType}
@@ -5411,7 +5476,7 @@
 								selectedFirstName = '';
 								selectedLastName = '';
 							}}
-							class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 						>
 							{#each nameTypeOptions as opt}
 								<option value={opt.value}>{opt.label}</option>
@@ -5419,108 +5484,111 @@
 						</select>
 						<button
 							onclick={generateNames}
-							class="rounded-lg bg-amber-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 						>
 							First Names
 						</button>
 						<button
 							onclick={generateSurnames}
 							disabled={!surnameData[nameType]}
-							class="rounded-lg bg-gray-700 px-5 py-2 text-sm font-bold text-gray-200 transition hover:bg-gray-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							Surnames
 						</button>
 					</div>
-
-					{#if generatedNames.length === 0 && generatedSurnames.length === 0}
-						<p class="text-sm text-gray-500">
-							Select a type and click a button to generate 10 names.
-						</p>
-					{:else}
-						<div
-							class="grid gap-6 {generatedNames.length > 0 && generatedSurnames.length > 0
-								? 'sm:grid-cols-2'
-								: ''}"
-						>
-							{#if generatedNames.length > 0}
-								<div>
-									<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">
-										First Names
-									</p>
-									<div class="flex flex-col gap-1.5">
-										{#each generatedNames as name}
-											<button
-												onclick={() => {
-													selectedFirstName = selectedFirstName === name ? '' : name;
-												}}
-												class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedFirstName ===
-												name
-													? 'border-amber-500 bg-amber-900/30 text-amber-200'
-													: 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
-											>
-												{name}
-											</button>
-										{/each}
-									</div>
-								</div>
-							{/if}
-							{#if generatedSurnames.length > 0}
-								<div>
-									<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">
-										Surnames
-									</p>
-									<div class="flex flex-col gap-1.5">
-										{#each generatedSurnames as name}
-											<button
-												onclick={() => {
-													selectedLastName = selectedLastName === name ? '' : name;
-												}}
-												class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedLastName ===
-												name
-													? 'border-amber-500 bg-amber-900/30 text-amber-200'
-													: 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
-											>
-												{name}
-											</button>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
-
-					{#if selectedFirstName}
-						<div
-							class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
-						>
-							<span class="flex-1 text-sm text-gray-300">
-								Party met <strong class="text-white"
-									>{selectedFirstName}{selectedLastName ? ' ' + selectedLastName : ''}</strong
-								>{nameTypeRace[nameType] ? ', ' + nameTypeRace[nameType] : ''}
-							</span>
-							<button
-								onclick={saveNameToNotes}
-								disabled={nameSaveStatus === 'saving'}
-								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {nameSaveStatus ===
-								'saved'
-									? 'bg-green-700 text-white'
-									: nameSaveStatus === 'error'
-										? 'bg-red-700 text-white'
-										: 'bg-amber-600 text-white hover:bg-amber-500'}"
+					<div class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto p-5">
+						{#if generatedNames.length === 0 && generatedSurnames.length === 0}
+							<p class="text-sm text-gray-500">
+								Select a type and click a button to generate 10 names.
+							</p>
+						{:else}
+							<div
+								class="grid gap-6 {generatedNames.length > 0 && generatedSurnames.length > 0
+									? 'sm:grid-cols-2'
+									: ''}"
 							>
-								{nameSaveStatus === 'saved'
-									? 'Saved!'
-									: nameSaveStatus === 'error'
-										? 'Error'
-										: 'Save to Notes'}
-							</button>
-						</div>
-					{/if}
+								{#if generatedNames.length > 0}
+									<div>
+										<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">
+											First Names
+										</p>
+										<div class="flex flex-col gap-1.5">
+											{#each generatedNames as name}
+												<button
+													onclick={() => {
+														selectedFirstName = selectedFirstName === name ? '' : name;
+													}}
+													class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedFirstName ===
+													name
+														? 'border-amber-500 bg-amber-900/30 text-amber-200'
+														: 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
+												>
+													{name}
+												</button>
+											{/each}
+										</div>
+									</div>
+								{/if}
+								{#if generatedSurnames.length > 0}
+									<div>
+										<p class="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">
+											Surnames
+										</p>
+										<div class="flex flex-col gap-1.5">
+											{#each generatedSurnames as name}
+												<button
+													onclick={() => {
+														selectedLastName = selectedLastName === name ? '' : name;
+													}}
+													class="w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition {selectedLastName ===
+													name
+														? 'border-amber-500 bg-amber-900/30 text-amber-200'
+														: 'border-gray-700 bg-gray-900/60 text-white hover:border-gray-500'}"
+												>
+													{name}
+												</button>
+											{/each}
+										</div>
+									</div>
+								{/if}
+							</div>
+						{/if}
+
+						{#if selectedFirstName}
+							<div
+								class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
+							>
+								<span class="flex-1 text-sm text-gray-300">
+									Party met <strong class="text-white"
+										>{selectedFirstName}{selectedLastName ? ' ' + selectedLastName : ''}</strong
+									>{nameTypeRace[nameType] ? ', ' + nameTypeRace[nameType] : ''}
+								</span>
+								<button
+									onclick={saveNameToNotes}
+									disabled={nameSaveStatus === 'saving'}
+									class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {nameSaveStatus ===
+									'saved'
+										? 'bg-green-700 text-white'
+										: nameSaveStatus === 'error'
+											? 'bg-red-700 text-white'
+											: 'bg-amber-600 text-white hover:bg-amber-500'}"
+								>
+									{nameSaveStatus === 'saved'
+										? 'Saved!'
+										: nameSaveStatus === 'error'
+											? 'Error'
+											: 'Save to Notes'}
+								</button>
+							</div>
+						{/if}
+					</div>
 				</div>
 			{:else if selected === 'weather'}
-				<div class="flex flex-col gap-8">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
-					<div class="flex flex-wrap items-center gap-4">
+					<div
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+					>
 						<div class="flex flex-col gap-1">
 							<label
 								class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
@@ -5529,7 +5597,7 @@
 							<select
 								id="weather-season"
 								bind:value={selectedSeason}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each seasonOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
 							</select>
@@ -5542,230 +5610,255 @@
 							<select
 								id="weather-biome"
 								bind:value={selectedBiome}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each biomeOptions as opt}<option value={opt.value}>{opt.label}</option>{/each}
 							</select>
 						</div>
 						<button
 							onclick={generateWeek}
-							class="mt-5 rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 						>
 							Generate Week
 						</button>
 					</div>
-
-					<!-- 7-day weather table -->
-					{#if weekWeather.length > 0}
-						<div class="overflow-x-auto rounded-xl border border-gray-700">
-							<table class="min-w-full border-collapse text-xs">
-								<thead>
-									<tr class="border-b border-gray-700 bg-gray-900">
-										<th class="sticky left-0 z-10 w-20 bg-gray-900 px-3 py-2 text-left"></th>
-										{#each weekWeather as dw}
-											<th class="px-3 py-2 text-center font-bold tracking-wider text-amber-400"
-												>{dw.day}</th
-											>
+					<div class="flex min-w-0 flex-1 flex-col gap-8 overflow-y-auto p-5">
+						<!-- 7-day weather table -->
+						{#if weekWeather.length > 0}
+							<div class="overflow-x-auto rounded-xl border border-gray-700">
+								<table class="min-w-full border-collapse text-xs">
+									<thead>
+										<tr class="border-b border-gray-700 bg-gray-900">
+											<th class="sticky left-0 z-10 w-20 bg-gray-900 px-3 py-2 text-left"></th>
+											{#each weekWeather as dw}
+												<th class="px-3 py-2 text-center font-bold tracking-wider text-amber-400"
+													>{dw.day}</th
+												>
+											{/each}
+										</tr>
+									</thead>
+									<tbody>
+										{#each weatherTimeSlots as t}
+											<tr class="border-b border-gray-800/60">
+												<td
+													class="sticky left-0 z-10 border-r border-gray-800 bg-gray-900 px-3 py-2.5 text-[10px] font-bold tracking-widest whitespace-nowrap text-gray-400 uppercase"
+													>{timeSlotLabels[t]}</td
+												>
+												{#each weekWeather as dw}
+													{@const slot = dw.slots[t]}
+													<td
+														class="px-2.5 py-2 align-top {conditionBg[slot.condition] ??
+															'bg-gray-800/30'}"
+													>
+														<div class="leading-snug font-medium whitespace-nowrap text-white">
+															{@html slot.sky}
+														</div>
+														<div class="mt-0.5 text-[10px] whitespace-nowrap text-gray-400">
+															{slot.temp} · {slot.wind}
+														</div>
+													</td>
+												{/each}
+											</tr>
 										{/each}
+									</tbody>
+								</table>
+							</div>
+						{:else}
+							<p class="text-sm text-gray-500">
+								Select a season and biome, then click Generate Week.
+							</p>
+						{/if}
+
+						<!-- Weather Event Generator -->
+						<section>
+							<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
+								Weather Event
+							</h4>
+							<p class="mb-3 text-sm text-gray-400">
+								Generate a dramatic weather event for the current season and biome. Uses your Season
+								and Biome selections on the left.
+							</p>
+							<button
+								onclick={generateWeatherEvent}
+								class="rounded-lg border border-amber-700 bg-amber-900/30 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-800/40"
+							>
+								Generate Weather Event
+							</button>
+
+							{#if weatherEvent}
+								<div class="mt-4 rounded-lg border border-gray-700 bg-gray-800/60 p-4">
+									<div class="mb-2 flex items-center gap-3">
+										<span
+											class="rounded px-2 py-0.5 text-xs font-bold tracking-wider uppercase
+										{weatherEvent.intensity === 'minor'
+												? 'bg-green-900/60 text-green-300'
+												: weatherEvent.intensity === 'moderate'
+													? 'bg-yellow-900/60 text-yellow-300'
+													: weatherEvent.intensity === 'severe'
+														? 'bg-orange-900/60 text-orange-300'
+														: 'bg-red-900/60 text-red-300'}"
+										>
+											{weatherEvent.intensity}
+										</span>
+										<span class="text-base font-bold text-white">{weatherEvent.name}</span>
+									</div>
+									<div class="mb-3 flex gap-4 text-xs text-gray-400">
+										<span
+											><span class="font-semibold text-gray-300">Duration:</span>
+											{weatherEvent.duration}</span
+										>
+									</div>
+									<p class="mb-2 text-xs font-semibold text-amber-400/80 italic">
+										{weatherEvent.onset}
+									</p>
+									<p class="mb-3 text-sm text-gray-300">{weatherEvent.description}</p>
+									{#if weatherEvent.mechanics.length}
+										<div class="mb-3">
+											<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+												Mechanics
+											</p>
+											<ul class="space-y-0.5">
+												{#each weatherEvent.mechanics as m}
+													<li class="text-xs text-gray-400">• {m}</li>
+												{/each}
+											</ul>
+										</div>
+									{/if}
+									<div>
+										<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+											Aftermath
+										</p>
+										<p class="text-xs text-gray-400">{weatherEvent.aftermath}</p>
+									</div>
+								</div>
+							{/if}
+						</section>
+						<!-- Travel Pace -->
+						<section>
+							<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
+								Travel Pace
+							</h4>
+							{#if paceMult !== 1}
+								<div
+									class="mb-3 space-y-0.5 rounded-lg border border-amber-700/40 bg-amber-950/20 px-3 py-2 text-xs text-amber-300"
+								>
+									<p class="font-bold">
+										Pace adjusted for current conditions (×{paceMult.toFixed(2)})
+									</p>
+									{#if biomeMult !== 1}<p class="text-amber-400/70">
+											Biome ×{biomeMult} — {biomeReason}
+										</p>{/if}
+									{#if seasonMult !== 1}<p class="text-amber-400/70">
+											Season ×{seasonMult} — {seasonReason}
+										</p>{/if}
+								</div>
+							{/if}
+							<table class="w-full text-sm">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="w-20 pb-2 text-left font-semibold text-gray-400">Pace</th>
+										<th class="pb-2 text-left font-semibold text-gray-400">Speed</th>
+										<th class="pb-2 text-left font-semibold text-gray-400">Per Hour</th>
+										<th class="pb-2 text-left font-semibold text-gray-400">Per Day</th>
+										<th class="pb-2 text-left font-semibold text-gray-400">Effect</th>
 									</tr>
 								</thead>
-								<tbody>
-									{#each weatherTimeSlots as t}
-										<tr class="border-b border-gray-800/60">
+								<tbody class="divide-y divide-gray-800">
+									{#each paceRows as [pace, ftmin, mph, mpd, effect]}
+										<tr>
 											<td
-												class="sticky left-0 z-10 border-r border-gray-800 bg-gray-900 px-3 py-2.5 text-[10px] font-bold tracking-widest whitespace-nowrap text-gray-400 uppercase"
-												>{timeSlotLabels[t]}</td
+												class="py-2 pr-4 font-bold {pace === 'Fast'
+													? 'text-red-400'
+													: pace === 'Slow'
+														? 'text-green-400'
+														: 'text-white'}">{pace}</td
 											>
-											{#each weekWeather as dw}
-												{@const slot = dw.slots[t]}
-												<td
-													class="px-2.5 py-2 align-top {conditionBg[slot.condition] ??
-														'bg-gray-800/30'}"
-												>
-													<div class="leading-snug font-medium whitespace-nowrap text-white">
-														{@html slot.sky}
-													</div>
-													<div class="mt-0.5 text-[10px] whitespace-nowrap text-gray-400">
-														{slot.temp} · {slot.wind}
-													</div>
-												</td>
-											{/each}
+											<td class="py-2 pr-4 text-gray-300 tabular-nums">{ftmin}</td>
+											<td class="py-2 pr-4 text-gray-300 tabular-nums">{mph}</td>
+											<td class="py-2 pr-4 font-semibold text-amber-300 tabular-nums">{mpd}</td>
+											<td class="py-2 text-gray-400">{effect}</td>
 										</tr>
 									{/each}
 								</tbody>
 							</table>
-						</div>
-					{:else}
-						<p class="text-sm text-gray-500">
-							Select a season and biome, then click Generate Week.
-						</p>
-					{/if}
-
-					<!-- Weather Event Generator -->
-					<section>
-						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
-							Weather Event
-						</h4>
-						<p class="mb-3 text-sm text-gray-400">
-							Generate a dramatic weather event for the current season and biome. Uses your Season
-							and Biome selections above.
-						</p>
-						<button
-							onclick={generateWeatherEvent}
-							class="rounded-lg border border-amber-700 bg-amber-900/30 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-800/40"
-						>
-							Generate Weather Event
-						</button>
-
-						{#if weatherEvent}
-							<div class="mt-4 rounded-lg border border-gray-700 bg-gray-800/60 p-4">
-								<div class="mb-2 flex items-center gap-3">
-									<span
-										class="rounded px-2 py-0.5 text-xs font-bold tracking-wider uppercase
-										{weatherEvent.intensity === 'minor'
-											? 'bg-green-900/60 text-green-300'
-											: weatherEvent.intensity === 'moderate'
-												? 'bg-yellow-900/60 text-yellow-300'
-												: weatherEvent.intensity === 'severe'
-													? 'bg-orange-900/60 text-orange-300'
-													: 'bg-red-900/60 text-red-300'}"
-									>
-										{weatherEvent.intensity}
-									</span>
-									<span class="text-base font-bold text-white">{weatherEvent.name}</span>
-								</div>
-								<div class="mb-3 flex gap-4 text-xs text-gray-400">
-									<span
-										><span class="font-semibold text-gray-300">Duration:</span>
-										{weatherEvent.duration}</span
-									>
-								</div>
-								<p class="mb-2 text-xs font-semibold text-amber-400/80 italic">
-									{weatherEvent.onset}
+							<div class="mt-4 space-y-2 text-sm text-gray-400">
+								<p>
+									<strong class="text-white">Difficult terrain</strong> — halve all distances (Fast: {Math.round(
+										15 * paceMult
+									)} mi, Normal: {Math.round(12 * paceMult)} mi, Slow: {Math.round(9 * paceMult)} mi/day).
 								</p>
-								<p class="mb-3 text-sm text-gray-300">{weatherEvent.description}</p>
-								{#if weatherEvent.mechanics.length}
-									<div class="mb-3">
-										<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-											Mechanics
-										</p>
-										<ul class="space-y-0.5">
-											{#each weatherEvent.mechanics as m}
-												<li class="text-xs text-gray-400">• {m}</li>
-											{/each}
-										</ul>
-									</div>
-								{/if}
-								<div>
-									<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-										Aftermath
-									</p>
-									<p class="text-xs text-gray-400">{weatherEvent.aftermath}</p>
-								</div>
-							</div>
-						{/if}
-					</section>
-					<!-- Travel Pace -->
-					<section>
-						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
-							Travel Pace
-						</h4>
-						{#if paceMult !== 1}
-							<div
-								class="mb-3 space-y-0.5 rounded-lg border border-amber-700/40 bg-amber-950/20 px-3 py-2 text-xs text-amber-300"
-							>
-								<p class="font-bold">
-									Pace adjusted for current conditions (×{paceMult.toFixed(2)})
+								<p>
+									<strong class="text-white">Forced march</strong> — after 8 hours, each extra hour requires
+									a CON save (DC 10 + 1 per hour past 8). Fail = 1 level of exhaustion.
 								</p>
-								{#if biomeMult !== 1}<p class="text-amber-400/70">
-										Biome ×{biomeMult} — {biomeReason}
-									</p>{/if}
-								{#if seasonMult !== 1}<p class="text-amber-400/70">
-										Season ×{seasonMult} — {seasonReason}
-									</p>{/if}
+								<p>
+									<strong class="text-white">Galloping mount</strong> — a mount can gallop at 2× fast
+									pace (~8 mi/hr) for up to 1 hour before needing rest.
+								</p>
+								<p>
+									<strong class="text-white">Stealth (slow pace)</strong> — each member rolls Stealth;
+									group check = lowest individual roll.
+								</p>
 							</div>
-						{/if}
-						<table class="w-full text-sm">
-							<thead>
-								<tr class="border-b border-gray-700">
-									<th class="w-20 pb-2 text-left font-semibold text-gray-400">Pace</th>
-									<th class="pb-2 text-left font-semibold text-gray-400">Speed</th>
-									<th class="pb-2 text-left font-semibold text-gray-400">Per Hour</th>
-									<th class="pb-2 text-left font-semibold text-gray-400">Per Day</th>
-									<th class="pb-2 text-left font-semibold text-gray-400">Effect</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-gray-800">
-								{#each paceRows as [pace, ftmin, mph, mpd, effect]}
-									<tr>
-										<td
-											class="py-2 pr-4 font-bold {pace === 'Fast'
-												? 'text-red-400'
-												: pace === 'Slow'
-													? 'text-green-400'
-													: 'text-white'}">{pace}</td
-										>
-										<td class="py-2 pr-4 text-gray-300 tabular-nums">{ftmin}</td>
-										<td class="py-2 pr-4 text-gray-300 tabular-nums">{mph}</td>
-										<td class="py-2 pr-4 font-semibold text-amber-300 tabular-nums">{mpd}</td>
-										<td class="py-2 text-gray-400">{effect}</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-						<div class="mt-4 space-y-2 text-sm text-gray-400">
-							<p>
-								<strong class="text-white">Difficult terrain</strong> — halve all distances (Fast: {Math.round(
-									15 * paceMult
-								)} mi, Normal: {Math.round(12 * paceMult)} mi, Slow: {Math.round(9 * paceMult)} mi/day).
-							</p>
-							<p>
-								<strong class="text-white">Forced march</strong> — after 8 hours, each extra hour requires
-								a CON save (DC 10 + 1 per hour past 8). Fail = 1 level of exhaustion.
-							</p>
-							<p>
-								<strong class="text-white">Galloping mount</strong> — a mount can gallop at 2× fast pace
-								(~8 mi/hr) for up to 1 hour before needing rest.
-							</p>
-							<p>
-								<strong class="text-white">Stealth (slow pace)</strong> — each member rolls Stealth; group
-								check = lowest individual roll.
-							</p>
-						</div>
-					</section>
+						</section>
 
-					<!-- Navigation -->
-					<section>
-						<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
-							Navigation
-						</h4>
-						<p class="mb-3 text-sm text-gray-400">
-							One party member acts as Navigator. The DM may call for a <strong class="text-white"
-								>Wisdom (Survival)</strong
-							> check. On a fail, the party travels the wrong direction and must spend 1d6 hours reorienting.
-						</p>
-						<table class="w-full max-w-lg text-sm">
-							<thead>
-								<tr class="border-b border-gray-700">
-									<th class="pb-2 text-left font-semibold text-gray-400">Terrain</th>
-									<th class="w-12 pb-2 text-left font-semibold text-gray-400">DC</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-gray-800">
-								{#each [['Grassland, meadow, or farmland', '5'], ['Arctic, desert, hills, or open sea with clear skies', '10'], ['Forest, jungle, swamp, mountains, or open sea (overcast)', '15']] as [terrain, dc]}
-									<tr>
-										<td class="py-1.5 pr-4 text-gray-300">{terrain}</td>
-										<td class="py-1.5 text-lg font-black text-amber-300">{dc}</td>
+						<!-- Navigation -->
+						<section>
+							<h4 class="mb-3 text-sm font-black tracking-widest text-amber-400 uppercase">
+								Navigation
+							</h4>
+							<p class="mb-3 text-sm text-gray-400">
+								One party member acts as Navigator. The DM may call for a <strong class="text-white"
+									>Wisdom (Survival)</strong
+								> check. On a fail, the party travels the wrong direction and must spend 1d6 hours reorienting.
+							</p>
+							<table class="w-full max-w-lg text-sm">
+								<thead>
+									<tr class="border-b border-gray-700">
+										<th class="pb-2 text-left font-semibold text-gray-400">Terrain</th>
+										<th class="w-12 pb-2 text-left font-semibold text-gray-400">DC</th>
 									</tr>
-								{/each}
-							</tbody>
-						</table>
-					</section>
+								</thead>
+								<tbody class="divide-y divide-gray-800">
+									{#each [['Grassland, meadow, or farmland', '5'], ['Arctic, desert, hills, or open sea with clear skies', '10'], ['Forest, jungle, swamp, mountains, or open sea (overcast)', '15']] as [terrain, dc]}
+										<tr>
+											<td class="py-1.5 pr-4 text-gray-300">{terrain}</td>
+											<td class="py-1.5 text-lg font-black text-amber-300">{dc}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</section>
+					</div>
 				</div>
 			{/if}
 			{#if selected === 'shop'}
-				<div class="space-y-6 text-sm">
-					<div class="flex flex-wrap items-end gap-4">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
+					<div
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+					>
+						<button
+							onclick={generateShop}
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
+							>Generate New Shop</button
+						>
+						{#if generatedShop.length > 0}
+							<button
+								onclick={saveShop}
+								class="w-full rounded border bg-gray-800 px-3 py-2 text-sm font-semibold transition {shopQuickSaveStatus ===
+								'saved'
+									? 'border-green-700 text-green-400'
+									: shopQuickSaveStatus === 'error'
+										? 'border-red-700 text-red-400'
+										: 'border-gray-700 text-gray-300 hover:border-amber-600 hover:text-amber-400'}"
+							>
+								{shopQuickSaveStatus === 'saved'
+									? 'Saved!'
+									: shopQuickSaveStatus === 'error'
+										? 'Not synced'
+										: 'Save Shop'}
+							</button>
+						{/if}
 						<div class="flex flex-col gap-1">
 							<label
 								for="shop-type"
@@ -5776,7 +5869,7 @@
 								id="shop-type"
 								bind:value={shopType}
 								onchange={() => (generatedShop = [])}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each Object.entries(shopData) as [key, shop]}<option value={key}
 										>{shop.label}</option
@@ -5793,266 +5886,318 @@
 								id="shop-affluence"
 								bind:value={shopAffluence}
 								onchange={() => (generatedShop = [])}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each Object.entries(affluenceData) as [key, aff]}<option value={key}
 										>{aff.label}</option
 									>{/each}
 							</select>
 						</div>
-						<button
-							onclick={generateShop}
-							class="rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
-							>Stock Shop</button
-						>
 					</div>
-					{#if affluenceData[shopAffluence]}
-						<p class="text-xs text-gray-500 italic">{affluenceData[shopAffluence].note}</p>
-					{/if}
-					{#if generatedShopName}
-						<div
-							class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
-						>
-							<span class="flex-1 text-sm text-gray-300">
-								The party went to <strong class="text-white">{generatedShopName}</strong>, a {affluenceData[
-									shopAffluence
-								]?.label.toLowerCase()}
-								{shopData[shopType]?.label.toLowerCase()}
-							</span>
-							<button
-								onclick={copyShopAsText}
-								disabled={generatedShop.length === 0}
-								class="rounded-lg border border-gray-600 px-4 py-1.5 text-xs font-bold text-gray-300 transition hover:border-gray-400 hover:text-white active:scale-95 disabled:opacity-50"
-							>
-								{shopCopyStatus === 'copied'
-									? 'Copied!'
-									: shopCopyStatus === 'error'
-										? 'Copy failed'
-										: 'Copy as Text'}
-							</button>
-							<button
-								onclick={promptSaveShop}
-								disabled={shopSaveStatus === 'saving'}
-								class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
-								'saved'
-									? 'bg-green-700 text-white'
-									: shopSaveStatus === 'error'
-										? 'bg-red-700 text-white'
-										: 'bg-amber-600 text-white hover:bg-amber-500'}"
-							>
-								{shopSaveStatus === 'saved'
-									? 'Saved!'
-									: shopSaveStatus === 'error'
-										? 'Error'
-										: 'Save to Notes'}
-							</button>
-						</div>
-					{/if}
-					{#if generatedShop.length > 0}
-						<div class="overflow-x-auto rounded-xl border border-gray-700">
-							<table class="w-full text-sm">
-								<thead>
-									<tr class="border-b border-gray-700 bg-gray-800/60">
-										<th class="px-4 py-2.5 text-left font-semibold text-gray-300">Item</th>
-										<th class="px-4 py-2.5 text-center font-semibold text-green-400"
-											><i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly</th
-										>
-										<th class="px-4 py-2.5 text-center font-semibold text-gray-300"
-											><i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral</th
-										>
-										<th class="px-4 py-2.5 text-center font-semibold text-red-400"
-											><i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile</th
-										>
-										<th class="w-10 px-2 py-2.5"><span class="sr-only">Reroll</span></th>
-									</tr>
-								</thead>
-								<tbody class="divide-y divide-gray-800">
-									{#each generatedShop as row, i}
-										<tr
-											onclick={() => (selectedShopItem = row)}
-											class="cursor-pointer {i % 2 === 0
-												? 'bg-gray-900/40'
-												: ''} transition-colors hover:bg-gray-700/60"
-										>
-											<td class="px-4 py-2.5">
-												<span class="text-gray-200">{row.name}</span>
-												{#if row.rarity}
-													<span
-														class="ml-1.5 rounded border px-1.5 py-0.5 text-[10px] font-bold tracking-widest uppercase {rarityColors[
-															row.rarity
-														] ?? 'text-gray-400'} border-current/30 bg-current/10"
-														>{rarityLabels[row.rarity] ?? row.rarity}</span
-													>
-												{/if}
-											</td>
-											<td class="px-4 py-2.5 text-center font-semibold text-green-300 tabular-nums"
-												>{row.liked}</td
-											>
-											<td class="px-4 py-2.5 text-center text-gray-300 tabular-nums"
-												>{row.neutral}</td
-											>
-											<td class="px-4 py-2.5 text-center font-semibold text-red-300 tabular-nums"
-												>{row.disliked}</td
-											>
-											<td class="px-2 py-2.5 text-center">
-												<button
-													onclick={(e) => {
-														e.stopPropagation();
-														rerollShopItem(i);
-													}}
-													disabled={shopRerollCandidates(row).length === 0}
-													title="Reroll this item"
-													aria-label="Reroll {row.name}"
-													class="rounded p-1 text-gray-500 transition hover:text-amber-400 disabled:opacity-30 disabled:hover:text-gray-500"
-												>
-													<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
-												</button>
-											</td>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-						<p class="text-xs text-gray-600">
-							Friendly: −15% · Neutral: base · Hostile: +25% · Click any item for details
-						</p>
-					{:else}
-						<p class="text-sm text-gray-500">
-							Select a shop type and town affluence, then click Stock Shop.
-						</p>
-					{/if}
-					{#if selectedShopItem}
-						<!-- Item detail overlay -->
-						<div
-							role="presentation"
-							class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-							onclick={(e) => {
-								if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
-									selectedShopItem = null;
-							}}
-							onkeydown={(e) => e.key === 'Escape' && (selectedShopItem = null)}
-						>
+					<div class="min-w-0 flex-1 space-y-6 overflow-y-auto p-5 text-sm">
+						{#if affluenceData[shopAffluence]}
+							<p class="text-xs text-gray-500 italic">{affluenceData[shopAffluence].note}</p>
+						{/if}
+						{#if generatedShopName}
 							<div
-								role="dialog"
-								aria-modal="true"
-								aria-label="Shop item details"
-								tabindex="-1"
-								use:focusTrap
-								class="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
+								class="flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-900/60 px-4 py-3"
 							>
-								<!-- Header -->
-								<div class="mb-4 flex items-start gap-3">
-									<div class="flex-1">
-										<h4 class="text-base font-bold text-white">{selectedShopItem.name}</h4>
-										{#if selectedShopItem.rarity}
-											<span
-												class="mt-1 inline-block rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase {rarityColors[
-													selectedShopItem.rarity
-												] ?? 'text-gray-400'} border-current/30 bg-current/10"
-												>{rarityLabels[selectedShopItem.rarity] ?? selectedShopItem.rarity}</span
+								<span class="flex-1 text-sm text-gray-300">
+									The party went to <strong class="text-white">{generatedShopName}</strong>, a {affluenceData[
+										shopAffluence
+									]?.label.toLowerCase()}
+									{shopData[shopType]?.label.toLowerCase()}
+								</span>
+								<button
+									onclick={copyShopAsText}
+									disabled={generatedShop.length === 0}
+									class="rounded-lg border border-gray-600 px-4 py-1.5 text-xs font-bold text-gray-300 transition hover:border-gray-400 hover:text-white active:scale-95 disabled:opacity-50"
+								>
+									{shopCopyStatus === 'copied'
+										? 'Copied!'
+										: shopCopyStatus === 'error'
+											? 'Copy failed'
+											: 'Copy as Text'}
+								</button>
+								<button
+									onclick={promptSaveShop}
+									disabled={shopSaveStatus === 'saving'}
+									class="rounded-lg px-4 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 {shopSaveStatus ===
+									'saved'
+										? 'bg-green-700 text-white'
+										: shopSaveStatus === 'error'
+											? 'bg-red-700 text-white'
+											: 'bg-amber-600 text-white hover:bg-amber-500'}"
+								>
+									{shopSaveStatus === 'saved'
+										? 'Saved!'
+										: shopSaveStatus === 'error'
+											? 'Error'
+											: 'Save to Notes'}
+								</button>
+							</div>
+						{/if}
+						{#if generatedShop.length > 0}
+							<div class="overflow-x-auto rounded-xl border border-gray-700">
+								<table class="w-full text-sm">
+									<thead>
+										<tr class="border-b border-gray-700 bg-gray-800/60">
+											<th class="px-4 py-2.5 text-left font-semibold text-gray-300">Item</th>
+											<th class="px-4 py-2.5 text-center font-semibold text-green-400"
+												><i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly</th
 											>
-										{:else}
-											<span
-												class="mt-1 inline-block text-[10px] font-bold tracking-widest text-gray-500 uppercase"
-												>Mundane Item</span
+											<th class="px-4 py-2.5 text-center font-semibold text-gray-300"
+												><i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral</th
 											>
-										{/if}
+											<th class="px-4 py-2.5 text-center font-semibold text-red-400"
+												><i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile</th
+											>
+											<th class="w-10 px-2 py-2.5"><span class="sr-only">Reroll</span></th>
+										</tr>
+									</thead>
+									<tbody class="divide-y divide-gray-800">
+										{#each generatedShop as row, i}
+											<tr
+												onclick={() => (selectedShopItem = row)}
+												class="cursor-pointer {i % 2 === 0
+													? 'bg-gray-900/40'
+													: ''} transition-colors hover:bg-gray-700/60"
+											>
+												<td class="px-4 py-2.5">
+													<span class="text-gray-200">{row.name}</span>
+													{#if row.rarity}
+														<span
+															class="ml-1.5 rounded border px-1.5 py-0.5 text-[10px] font-bold tracking-widest uppercase {rarityColors[
+																row.rarity
+															] ?? 'text-gray-400'} border-current/30 bg-current/10"
+															>{rarityLabels[row.rarity] ?? row.rarity}</span
+														>
+													{/if}
+												</td>
+												<td
+													class="px-4 py-2.5 text-center font-semibold text-green-300 tabular-nums"
+													>{row.liked}</td
+												>
+												<td class="px-4 py-2.5 text-center text-gray-300 tabular-nums"
+													>{row.neutral}</td
+												>
+												<td class="px-4 py-2.5 text-center font-semibold text-red-300 tabular-nums"
+													>{row.disliked}</td
+												>
+												<td class="px-2 py-2.5 text-center">
+													<button
+														onclick={(e) => {
+															e.stopPropagation();
+															rerollShopItem(i);
+														}}
+														disabled={shopRerollCandidates(row).length === 0}
+														title="Reroll this item"
+														aria-label="Reroll {row.name}"
+														class="rounded p-1 text-gray-500 transition hover:text-amber-400 disabled:opacity-30 disabled:hover:text-gray-500"
+													>
+														<i class="fa-duotone fa-light fa-dice" aria-hidden="true"></i>
+													</button>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+							<p class="text-xs text-gray-600">
+								Friendly: −15% · Neutral: base · Hostile: +25% · Click any item for details
+							</p>
+						{:else}
+							<p class="text-sm text-gray-500">
+								Select a shop type and town affluence, then click Generate New Shop.
+							</p>
+						{/if}
+						{#if selectedShopItem}
+							<!-- Item detail overlay -->
+							<div
+								role="presentation"
+								class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+								onclick={(e) => {
+									if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
+										selectedShopItem = null;
+								}}
+								onkeydown={(e) => e.key === 'Escape' && (selectedShopItem = null)}
+							>
+								<div
+									role="dialog"
+									aria-modal="true"
+									aria-label="Shop item details"
+									tabindex="-1"
+									use:focusTrap
+									class="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
+								>
+									<!-- Header -->
+									<div class="mb-4 flex items-start gap-3">
+										<div class="flex-1">
+											<h4 class="text-base font-bold text-white">{selectedShopItem.name}</h4>
+											{#if selectedShopItem.rarity}
+												<span
+													class="mt-1 inline-block rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase {rarityColors[
+														selectedShopItem.rarity
+													] ?? 'text-gray-400'} border-current/30 bg-current/10"
+													>{rarityLabels[selectedShopItem.rarity] ?? selectedShopItem.rarity}</span
+												>
+											{:else}
+												<span
+													class="mt-1 inline-block text-[10px] font-bold tracking-widest text-gray-500 uppercase"
+													>Mundane Item</span
+												>
+											{/if}
+										</div>
+										<button
+											onclick={() => (selectedShopItem = null)}
+											aria-label="Close item detail"
+											class="rounded-lg border border-gray-700 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
+										>
+											<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
+										</button>
 									</div>
+									<!-- Prices -->
+									<div class="mb-4 flex gap-5 rounded-lg bg-gray-800/60 px-4 py-3">
+										<div class="text-center">
+											<p class="text-[10px] font-bold tracking-widest text-green-400 uppercase">
+												<i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly
+											</p>
+											<p class="mt-0.5 font-semibold text-green-300 tabular-nums">
+												{selectedShopItem.liked}
+											</p>
+										</div>
+										<div class="text-center">
+											<p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+												<i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral
+											</p>
+											<p class="mt-0.5 text-gray-300 tabular-nums">{selectedShopItem.neutral}</p>
+										</div>
+										<div class="text-center">
+											<p class="text-[10px] font-bold tracking-widest text-red-400 uppercase">
+												<i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile
+											</p>
+											<p class="mt-0.5 font-semibold text-red-300 tabular-nums">
+												{selectedShopItem.disliked}
+											</p>
+										</div>
+									</div>
+									<!-- Description -->
+									<p class="text-sm leading-relaxed text-gray-300">
+										{itemDescriptions[selectedShopItem.name] ?? 'No description available.'}
+									</p>
+								</div>
+							</div>
+						{/if}
+						{#if showShopSaveCityModal}
+							<div
+								role="presentation"
+								class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+								onclick={(e) => {
+									if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
+										showShopSaveCityModal = false;
+								}}
+								onkeydown={(e) => e.key === 'Escape' && (showShopSaveCityModal = false)}
+							>
+								<div
+									role="dialog"
+									aria-modal="true"
+									aria-label="Save city"
+									tabindex="-1"
+									use:focusTrap
+									class="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
+								>
+									<h4 class="mb-1 text-base font-bold text-white">Save Shop to Notes</h4>
+									<p class="mb-4 text-xs text-gray-400">
+										Which city or town is <strong class="text-gray-200">{generatedShopName}</strong> located
+										in? (optional)
+									</p>
+									<input
+										aria-label="e.g. Waterdeep, Baldur's Gate"
+										type="text"
+										bind:value={shopSaveCityInput}
+										placeholder="e.g. Waterdeep, Baldur's Gate…"
+										onkeydown={(e) => {
+											if (e.key === 'Enter') saveShopToNotes(shopSaveCityInput);
+											if (e.key === 'Escape') showShopSaveCityModal = false;
+										}}
+										class="mb-4 w-full rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+									/>
+									<div class="flex gap-2">
+										<button
+											onclick={() => saveShopToNotes(shopSaveCityInput)}
+											class="flex-1 rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
+											>Save</button
+										>
+										<button
+											onclick={() => (showShopSaveCityModal = false)}
+											class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 transition hover:border-gray-400 hover:text-white"
+											>Cancel</button
+										>
+									</div>
+								</div>
+							</div>
+						{/if}
+						{#if savedShops.length > 0}
+							<div class="mt-2 space-y-3">
+								<div class="flex items-center gap-3">
+									<p class="flex-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+										Previously Visited Shops
+									</p>
 									<button
-										onclick={() => (selectedShopItem = null)}
-										aria-label="Close item detail"
-										class="rounded-lg border border-gray-700 p-1.5 text-gray-400 transition hover:border-gray-500 hover:text-white"
+										onclick={loadShopsFromNotes}
+										disabled={shopLoadStatus === 'loading'}
+										class="rounded-lg border border-gray-700 px-3 py-1 text-[10px] font-bold tracking-widest text-gray-400 uppercase transition hover:border-gray-500 hover:text-white disabled:opacity-50 {shopLoadStatus ===
+										'done'
+											? 'border-green-700 text-green-400'
+											: shopLoadStatus === 'error'
+												? 'border-red-700 text-red-400'
+												: ''}"
 									>
-										<i class="fa-duotone fa-light fa-xmark text-base" aria-hidden="true"></i>
+										{shopLoadStatus === 'loading'
+											? 'Loading…'
+											: shopLoadStatus === 'done'
+												? shopLoadCount > 0
+													? `+${shopLoadCount} restored`
+													: 'Up to date'
+												: shopLoadStatus === 'error'
+													? 'Error'
+													: 'Load from Notes'}
 									</button>
 								</div>
-								<!-- Prices -->
-								<div class="mb-4 flex gap-5 rounded-lg bg-gray-800/60 px-4 py-3">
-									<div class="text-center">
-										<p class="text-[10px] font-bold tracking-widest text-green-400 uppercase">
-											<i class="fa-duotone fa-light fa-face-smile" aria-hidden="true"></i> Friendly
-										</p>
-										<p class="mt-0.5 font-semibold text-green-300 tabular-nums">
-											{selectedShopItem.liked}
-										</p>
+								{#each savedShops as shop, i}
+									<div class="flex rounded-xl border border-gray-700 bg-gray-900/60">
+										<button
+											onclick={() => {
+												generatedShopName = shop.name;
+												shopType = shop.typeKey;
+												shopAffluence = shop.affluenceKey;
+												generatedShop = [...shop.items];
+											}}
+											class="flex min-w-0 flex-1 items-center gap-3 rounded-tl-xl rounded-bl-xl px-4 py-3 text-left transition hover:bg-gray-700/40"
+										>
+											<span class="flex-1">
+												<strong class="text-white">{shop.name}</strong>
+												{#if shop.city}
+													<span class="ml-1 text-xs text-amber-400">{shop.city}</span>
+												{/if}
+												<span class="ml-2 text-xs text-gray-400">
+													{affluenceData[shop.affluenceKey]?.label}
+													{shopData[shop.typeKey]?.label}
+												</span>
+											</span>
+											<span class="text-xs text-gray-500">{shop.items.length} items</span>
+										</button>
+										<button
+											onclick={() => removeSavedShop(i)}
+											aria-label="Remove {shop.name}"
+											class="rounded-tr-xl rounded-br-xl border-l border-gray-700 px-3 py-3 text-gray-500 transition hover:bg-red-900/40 hover:text-red-400"
+											>&#x2715;</button
+										>
 									</div>
-									<div class="text-center">
-										<p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-											<i class="fa-duotone fa-light fa-face-meh" aria-hidden="true"></i> Neutral
-										</p>
-										<p class="mt-0.5 text-gray-300 tabular-nums">{selectedShopItem.neutral}</p>
-									</div>
-									<div class="text-center">
-										<p class="text-[10px] font-bold tracking-widest text-red-400 uppercase">
-											<i class="fa-duotone fa-light fa-face-angry" aria-hidden="true"></i> Hostile
-										</p>
-										<p class="mt-0.5 font-semibold text-red-300 tabular-nums">
-											{selectedShopItem.disliked}
-										</p>
-									</div>
-								</div>
-								<!-- Description -->
-								<p class="text-sm leading-relaxed text-gray-300">
-									{itemDescriptions[selectedShopItem.name] ?? 'No description available.'}
-								</p>
+								{/each}
 							</div>
-						</div>
-					{/if}
-					{#if showShopSaveCityModal}
-						<div
-							role="presentation"
-							class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-							onclick={(e) => {
-								if (!(e.target as HTMLElement).closest('[role=\"dialog\"]'))
-									showShopSaveCityModal = false;
-							}}
-							onkeydown={(e) => e.key === 'Escape' && (showShopSaveCityModal = false)}
-						>
-							<div
-								role="dialog"
-								aria-modal="true"
-								aria-label="Save city"
-								tabindex="-1"
-								use:focusTrap
-								class="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
-							>
-								<h4 class="mb-1 text-base font-bold text-white">Save Shop to Notes</h4>
-								<p class="mb-4 text-xs text-gray-400">
-									Which city or town is <strong class="text-gray-200">{generatedShopName}</strong> located
-									in? (optional)
-								</p>
-								<input
-									aria-label="e.g. Waterdeep, Baldur's Gate"
-									type="text"
-									bind:value={shopSaveCityInput}
-									placeholder="e.g. Waterdeep, Baldur's Gate…"
-									onkeydown={(e) => {
-										if (e.key === 'Enter') saveShopToNotes(shopSaveCityInput);
-										if (e.key === 'Escape') showShopSaveCityModal = false;
-									}}
-									class="mb-4 w-full rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
-								/>
-								<div class="flex gap-2">
-									<button
-										onclick={() => saveShopToNotes(shopSaveCityInput)}
-										class="flex-1 rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
-										>Save</button
-									>
-									<button
-										onclick={() => (showShopSaveCityModal = false)}
-										class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 transition hover:border-gray-400 hover:text-white"
-										>Cancel</button
-									>
-								</div>
-							</div>
-						</div>
-					{/if}
-					{#if savedShops.length > 0}
-						<div class="mt-2 space-y-3">
-							<div class="flex items-center gap-3">
-								<p class="flex-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-									Previously Visited Shops
-								</p>
+						{:else}
+							<div class="mt-2 flex justify-end">
 								<button
 									onclick={loadShopsFromNotes}
 									disabled={shopLoadStatus === 'loading'}
@@ -6068,74 +6213,22 @@
 										: shopLoadStatus === 'done'
 											? shopLoadCount > 0
 												? `+${shopLoadCount} restored`
-												: 'Up to date'
+												: 'None found in notes'
 											: shopLoadStatus === 'error'
 												? 'Error'
 												: 'Load from Notes'}
 								</button>
 							</div>
-							{#each savedShops as shop, i}
-								<div class="flex rounded-xl border border-gray-700 bg-gray-900/60">
-									<button
-										onclick={() => {
-											generatedShopName = shop.name;
-											shopType = shop.typeKey;
-											shopAffluence = shop.affluenceKey;
-											generatedShop = [...shop.items];
-										}}
-										class="flex min-w-0 flex-1 items-center gap-3 rounded-tl-xl rounded-bl-xl px-4 py-3 text-left transition hover:bg-gray-700/40"
-									>
-										<span class="flex-1">
-											<strong class="text-white">{shop.name}</strong>
-											{#if shop.city}
-												<span class="ml-1 text-xs text-amber-400">{shop.city}</span>
-											{/if}
-											<span class="ml-2 text-xs text-gray-400">
-												{affluenceData[shop.affluenceKey]?.label}
-												{shopData[shop.typeKey]?.label}
-											</span>
-										</span>
-										<span class="text-xs text-gray-500">{shop.items.length} items</span>
-									</button>
-									<button
-										onclick={() => (savedShops = savedShops.filter((_, j) => j !== i))}
-										aria-label="Remove {shop.name}"
-										class="rounded-tr-xl rounded-br-xl border-l border-gray-700 px-3 py-3 text-gray-500 transition hover:bg-red-900/40 hover:text-red-400"
-										>&#x2715;</button
-									>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<div class="mt-2 flex justify-end">
-							<button
-								onclick={loadShopsFromNotes}
-								disabled={shopLoadStatus === 'loading'}
-								class="rounded-lg border border-gray-700 px-3 py-1 text-[10px] font-bold tracking-widest text-gray-400 uppercase transition hover:border-gray-500 hover:text-white disabled:opacity-50 {shopLoadStatus ===
-								'done'
-									? 'border-green-700 text-green-400'
-									: shopLoadStatus === 'error'
-										? 'border-red-700 text-red-400'
-										: ''}"
-							>
-								{shopLoadStatus === 'loading'
-									? 'Loading…'
-									: shopLoadStatus === 'done'
-										? shopLoadCount > 0
-											? `+${shopLoadCount} restored`
-											: 'None found in notes'
-										: shopLoadStatus === 'error'
-											? 'Error'
-											: 'Load from Notes'}
-							</button>
-						</div>
-					{/if}
+						{/if}
+					</div>
 				</div>
 			{/if}
 			{#if selected === 'encounter'}
-				<div class="space-y-6 text-sm">
+				<div class="flex h-full flex-col overflow-hidden sm:flex-row">
 					<!-- Controls -->
-					<div class="flex flex-wrap items-end gap-4">
+					<div
+						class="flex w-full shrink-0 flex-col gap-4 border-b border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 sm:w-64 sm:overflow-y-auto sm:border-r sm:border-b-0"
+					>
 						<div class="flex flex-col gap-1">
 							<label
 								for="enc-biome"
@@ -6145,7 +6238,7 @@
 							<select
 								id="enc-biome"
 								bind:value={encounterBiome}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each encounterBiomeOptions as opt}<option value={opt.value}>{opt.label}</option
 									>{/each}
@@ -6160,7 +6253,7 @@
 							<select
 								id="enc-size"
 								bind:value={partySize}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each [1, 2, 3, 4, 5, 6, 7, 8] as n}<option value={n}
 										>{n} player{n !== 1 ? 's' : ''}</option
@@ -6176,7 +6269,7 @@
 							<select
 								id="enc-level"
 								bind:value={partyLevel}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each Array.from({ length: 20 }, (_, i) => i + 1) as lv}<option value={lv}
 										>Level {lv}</option
@@ -6192,7 +6285,7 @@
 							<select
 								id="enc-diff"
 								bind:value={encounterDifficulty}
-								class="rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+								class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300 transition hover:border-amber-600 focus:border-amber-600 focus:outline-none"
 							>
 								{#each difficultyOptions as opt}<option value={opt.value}>{opt.label}</option
 									>{/each}
@@ -6200,115 +6293,119 @@
 						</div>
 						<button
 							onclick={generateEncounter}
-							class="rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500 active:scale-95"
+							class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 							>Generate</button
 						>
 					</div>
+					<div class="min-w-0 flex-1 space-y-6 overflow-y-auto p-5 text-sm">
+						{#if generatedEncounter}
+							{@const enc = generatedEncounter}
+							<div class="space-y-4 rounded-xl border border-gray-700 bg-gray-900/60 p-5">
+								<!-- Title + difficulty badge -->
+								<div class="flex flex-wrap items-center gap-2">
+									<h4 class="text-sm font-black tracking-wide text-white">{enc.title}</h4>
+									<span
+										class="rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase {difficultyColors[
+											enc.actualDifficulty
+										] ?? 'border-gray-700 text-gray-400'}">{enc.actualDifficulty}</span
+									>
+								</div>
 
-					{#if generatedEncounter}
-						{@const enc = generatedEncounter}
-						<div class="space-y-4 rounded-xl border border-gray-700 bg-gray-900/60 p-5">
-							<!-- Title + difficulty badge -->
-							<div class="flex flex-wrap items-center gap-2">
-								<h4 class="text-sm font-black tracking-wide text-white">{enc.title}</h4>
-								<span
-									class="rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase {difficultyColors[
-										enc.actualDifficulty
-									] ?? 'border-gray-700 text-gray-400'}">{enc.actualDifficulty}</span
+								<!-- Scene -->
+								<p
+									class="border-l-2 border-amber-700/50 pl-3 text-xs leading-relaxed text-gray-400 italic"
 								>
-							</div>
-
-							<!-- Scene -->
-							<p
-								class="border-l-2 border-amber-700/50 pl-3 text-xs leading-relaxed text-gray-400 italic"
-							>
-								{enc.scene}
-							</p>
-
-							<!-- Description -->
-							<p class="text-sm leading-relaxed text-gray-300">{enc.description}</p>
-
-							<!-- Monsters -->
-							<div>
-								<p class="mb-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-									Monsters
+									{enc.scene}
 								</p>
-								<div class="space-y-1">
-									{#each enc.monsters as m}
-										<div class="flex items-center gap-2">
-											<span class="w-6 text-center font-black text-amber-400">{m.count}×</span>
-											<span class="font-semibold text-white">{m.name}</span>
-											<span class="text-xs text-gray-500 tabular-nums"
-												>{m.xp} XP each · {m.xp * m.count} total</span
-											>
-										</div>
-									{/each}
-								</div>
-							</div>
 
-							<!-- XP breakdown -->
-							<div
-								class="flex flex-wrap gap-4 rounded-lg bg-gray-800/60 px-4 py-3 text-xs tabular-nums"
-							>
-								<div>
-									<span class="text-gray-500">Raw XP </span><span
-										class="font-semibold text-gray-200">{enc.rawXp}</span
-									>
-								</div>
-								<div>
-									<span class="text-gray-500">Multiplier </span><span
-										class="font-semibold text-gray-200">×{enc.multiplier.toFixed(1)}</span
-									>
-								</div>
-								<div>
-									<span class="text-gray-500">Adjusted XP </span><span
-										class="font-bold text-amber-300">{enc.adjustedXp}</span
-									>
-								</div>
-								<div>
-									<span class="text-gray-500">Per Player </span><span
-										class="font-semibold text-gray-200">{enc.xpPerPlayer}</span
-									>
-								</div>
-							</div>
+								<!-- Description -->
+								<p class="text-sm leading-relaxed text-gray-300">{enc.description}</p>
 
-							<!-- Tactics -->
-							<div>
-								<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-									Tactics
-								</p>
-								<p class="text-sm leading-relaxed text-gray-300">{enc.tactics}</p>
-							</div>
+								<!-- Monsters -->
+								<div>
+									<p class="mb-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+										Monsters
+									</p>
+									<div class="space-y-1">
+										{#each enc.monsters as m}
+											<div class="flex items-center gap-2">
+												<span class="w-6 text-center font-black text-amber-400">{m.count}×</span>
+												<span class="font-semibold text-white">{m.name}</span>
+												<span class="text-xs text-gray-500 tabular-nums"
+													>{m.xp} XP each · {m.xp * m.count} total</span
+												>
+											</div>
+										{/each}
+									</div>
+								</div>
 
-							<!-- Terrain -->
-							<div>
-								<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
-									Terrain Feature
-								</p>
-								<p class="text-sm leading-relaxed text-gray-300">{enc.terrain}</p>
-							</div>
-
-							<div class="mt-1 flex flex-wrap gap-2">
-								<button
-									onclick={generateEncounter}
-									class="rounded-lg border border-gray-700 px-4 py-1.5 text-xs font-bold text-gray-400 transition hover:border-amber-700 hover:text-amber-400"
-									>Roll Again</button
+								<!-- XP breakdown -->
+								<div
+									class="flex flex-wrap gap-4 rounded-lg bg-gray-800/60 px-4 py-3 text-xs tabular-nums"
 								>
-								{#if onAddEncounter}
+									<div>
+										<span class="text-gray-500">Raw XP </span><span
+											class="font-semibold text-gray-200">{enc.rawXp}</span
+										>
+									</div>
+									<div>
+										<span class="text-gray-500">Multiplier </span><span
+											class="font-semibold text-gray-200">×{enc.multiplier.toFixed(1)}</span
+										>
+									</div>
+									<div>
+										<span class="text-gray-500">Adjusted XP </span><span
+											class="font-bold text-amber-300">{enc.adjustedXp}</span
+										>
+									</div>
+									<div>
+										<span class="text-gray-500">Per Player </span><span
+											class="font-semibold text-gray-200">{enc.xpPerPlayer}</span
+										>
+									</div>
+								</div>
+
+								<!-- Tactics -->
+								<div>
+									<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+										Tactics
+									</p>
+									<p class="text-sm leading-relaxed text-gray-300">{enc.tactics}</p>
+								</div>
+
+								<!-- Terrain -->
+								<div>
+									<p class="mb-1 text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+										Terrain Feature
+									</p>
+									<p class="text-sm leading-relaxed text-gray-300">{enc.terrain}</p>
+								</div>
+
+								<div class="mt-1 flex flex-wrap gap-2">
 									<button
-										onclick={() =>
-											onAddEncounter!(enc.monsters.map((m) => ({ name: m.name, count: m.count })))}
-										class="rounded-lg bg-emerald-700 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-600 active:scale-95"
-										>Add to Initiative</button
+										onclick={generateEncounter}
+										class="rounded-lg border border-gray-700 px-4 py-1.5 text-xs font-bold text-gray-400 transition hover:border-amber-700 hover:text-amber-400"
+										>Roll Again</button
 									>
-								{/if}
+									{#if onAddEncounter}
+										<button
+											onclick={() =>
+												onAddEncounter!(
+													enc.monsters.map((m) => ({ name: m.name, count: m.count }))
+												)}
+											class="rounded-lg bg-emerald-700 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-600 active:scale-95"
+											>Add to Initiative</button
+										>
+									{/if}
+								</div>
 							</div>
-						</div>
-					{:else}
-						<p class="text-sm text-gray-500">
-							Configure the party details above and click Generate to create a random encounter.
-						</p>
-					{/if}
+						{:else}
+							<p class="text-sm text-gray-500">
+								Configure the party details on the left and click Generate to create a random
+								encounter.
+							</p>
+						{/if}
+					</div>
 				</div>
 			{/if}
 			{#if selected === 'town'}

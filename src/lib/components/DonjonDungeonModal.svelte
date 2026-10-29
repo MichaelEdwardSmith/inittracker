@@ -3224,7 +3224,7 @@
 <!-- full-screen overlay -->
 <div
 	class={embedded
-		? 'flex h-full flex-col overflow-hidden bg-black/80'
+		? 'flex h-full flex-col overflow-hidden'
 		: 'fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/80 backdrop-blur-sm'}
 	role="dialog"
 	use:focusTrap
@@ -3348,7 +3348,7 @@
 
 		<button
 			onclick={handleGenerate}
-			class="rounded bg-indigo-600 px-3 py-1.5 font-bold text-white hover:bg-indigo-500"
+			class="w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-600 hover:text-amber-400"
 		>
 			Generate
 		</button>
@@ -3584,7 +3584,7 @@
 	<div class="flex min-h-0 flex-1">
 		<!-- left options panel -->
 		<div
-			class="hidden w-44 shrink-0 flex-col gap-3 overflow-y-auto border-r border-white/10 bg-gray-900 p-3 text-xs text-gray-300 md:flex"
+			class="hidden w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] p-4 text-xs text-gray-300 md:flex"
 		>
 			{@render optionsPanelContent()}
 		</div>
@@ -3683,7 +3683,7 @@
 
 		<!-- right encounters panel -->
 		<div
-			class="hidden w-52 shrink-0 flex-col border-l border-white/10 bg-gray-900 text-xs text-gray-300 md:flex"
+			class="hidden w-56 shrink-0 flex-col border-l border-gray-800 bg-[color-mix(in_oklab,var(--color-gray-900)_60%,var(--color-gray-950))] text-xs text-gray-300 md:flex"
 		>
 			<div
 				class="shrink-0 border-b border-white/10 px-3 py-2 font-bold tracking-wide text-gray-400 uppercase"
