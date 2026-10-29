@@ -1,18 +1,36 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+@theme {
+	/* Dark mode palette ("ink"): cleaner blue-tinted neutrals with wider steps
+	   between surface layers (page → panel → card → input → border) and brighter
+	   text, replacing Tailwind's default grays which read muddy stacked together.
+	   Light mode overrides these on html.light below. */
+	--color-gray-50: #f6f8fc;
+	--color-gray-100: #eaeef7;
+	--color-gray-200: #d6dcea;
+	--color-gray-300: #b4bdd4;
+	--color-gray-400: #8f9bb8;
+	--color-gray-500: #66728f;
+	--color-gray-600: #3b4660;
+	--color-gray-700: #28314a;
+	--color-gray-800: #182036;
+	--color-gray-900: #0f1423;
+	--color-gray-950: #070a14;
+}
+
 html,
 body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
-	background-color: #030712;
+	background-color: #070a14;
 }
 
 /* Global scrollbar styling */
 * {
 	scrollbar-width: thin;
-	scrollbar-color: #1e3a5f #111827;
+	scrollbar-color: #28314a #0f1423;
 }
 
 *::-webkit-scrollbar {
@@ -21,20 +39,20 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-	background: #111827;
+	background: #0f1423;
 }
 
 *::-webkit-scrollbar-thumb {
-	background-color: #1e3a5f;
+	background-color: #28314a;
 	border-radius: 9999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-	background-color: #2563a8;
+	background-color: #3b4660;
 }
 
 *::-webkit-scrollbar-corner {
-	background: #111827;
+	background: #0f1423;
 }
 
 /* Hide the up/down spinner on number inputs (initiative, damage/heal, etc.) —
@@ -54,7 +72,7 @@ input[type='number']::-webkit-outer-spin-button {
 
 html.light,
 html.light body {
-	background-color: #f9fafb;
+	background-color: #eceff4;
 }
 
 html.light {
@@ -67,10 +85,10 @@ html.light {
 	--color-gray-400: #4b5563;
 	--color-gray-500: #6b7280;
 	--color-gray-600: #9ca3af;
-	--color-gray-700: #d1d5db;
-	--color-gray-800: #e9ecf0;
-	--color-gray-900: #f3f4f6;
-	--color-gray-950: #f9fafb;
+	--color-gray-700: #c6ccd8;
+	--color-gray-800: #d8dde6;
+	--color-gray-900: #e3e7ee;
+	--color-gray-950: #eceff4;
 	/* "white" text → near-black */
 	--color-white: #111827;
 
