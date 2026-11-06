@@ -212,6 +212,15 @@
 		showMobileMenu = false;
 		if (!PollModalComp) PollModalComp = (await import('$lib/components/PollModal.svelte')).default;
 	}
+	let showFeedback = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let FeedbackModalComp = $state<any>(null);
+	async function openFeedback() {
+		showFeedback = true;
+		showMobileMenu = false;
+		if (!FeedbackModalComp)
+			FeedbackModalComp = (await import('$lib/components/FeedbackModal.svelte')).default;
+	}
 	let showDocShare = $state(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let DocShareModalComp = $state<any>(null);
@@ -999,6 +1008,14 @@
 				{/if}
 			</button>
 		{/if}
+		<button
+			onclick={openFeedback}
+			title="Tell me what to improve next"
+			class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+		>
+			<i class="fa-duotone fa-light fa-comment-dots shrink-0 text-base" aria-hidden="true"></i>
+			Send Feedback
+		</button>
 		<a
 			href="https://www.buymeacoffee.com/inittracker"
 			target="_blank"
@@ -1239,6 +1256,11 @@
 {#if showPoll && PollModalComp}
 	{@const Poll = PollModalComp}
 	<Poll sessionId={activeSession.sessionId} onclose={() => (showPoll = false)} />
+{/if}
+
+{#if showFeedback && FeedbackModalComp}
+	{@const Feedback = FeedbackModalComp}
+	<Feedback onclose={() => (showFeedback = false)} />
 {/if}
 
 {#if showDocShare && DocShareModalComp}

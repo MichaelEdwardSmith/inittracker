@@ -26,6 +26,8 @@ interface MailMessage {
 	text: string;
 	/** Postmark tag — groups messages in the Activity view (e.g. 'password-reset'). */
 	tag: string;
+	/** Optional Reply-To, so hitting Reply goes somewhere other than the From address. */
+	replyTo?: string;
 }
 
 /** True if Postmark is configured to actually send (token + from address both present). Callers
@@ -60,7 +62,8 @@ export async function sendMail(msg: MailMessage): Promise<boolean> {
 			HtmlBody: msg.html,
 			TextBody: msg.text,
 			MessageStream: 'outbound',
-			Tag: msg.tag
+			Tag: msg.tag,
+			...(msg.replyTo ? { ReplyTo: msg.replyTo } : {})
 		});
 		return true;
 	} catch (err) {
@@ -126,6 +129,27 @@ function formatDateTime(iso: string, timeZone: string): string {
 		minute: '2-digit',
 		timeZone
 	});
+}
+
+/** Notification to the site owner when a DM submits the dashboard's "Send Feedback" form. The
+ *  subject carries the sender and the start of their message so the inbox is scannable. */
+export function feedbackNotificationEmail(
+	fromEmail: string,
+	message: string
+): { subject: string; html: string; text: string } {
+	const oneLine = message.replace(/\s+/g, ' ').trim();
+	const snippet = oneLine.length > 60 ? `${oneLine.slice(0, 60).trimEnd()}…` : oneLine;
+	const subject = `Initiative Tracker feedback from ${fromEmail}: "${snippet}"`;
+	const html = wrapper(
+		'New feedback',
+		`<p style="margin:0 0 6px;font-size:12px;color:#888;">From</p>
+		<p style="margin:0 0 20px;font-size:14px;color:#fbbf24;">${escapeHtml(fromEmail)}</p>
+		<p style="margin:0 0 6px;font-size:12px;color:#888;">Message</p>
+		<p style="margin:0;font-size:14px;line-height:1.6;color:#e5e5e5;white-space:pre-wrap;">${escapeHtml(message)}</p>
+		<p style="margin:20px 0 0;font-size:12px;color:#777;">Reply to this email to answer them directly.</p>`
+	);
+	const text = `Feedback from ${fromEmail}\n\n${message}\n\n(Reply to this email to answer them directly.)`;
+	return { subject, html, text };
 }
 
 export function passwordResetEmail(link: string): { subject: string; html: string; text: string } {

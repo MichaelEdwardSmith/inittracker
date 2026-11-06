@@ -7,6 +7,7 @@
 	import { ACTIVITY_LABELS, type ActivityFeature } from '$lib/activity';
 	import type { DMSummary, EngagementReport, FeatureTrend } from '$lib/server/dmModel';
 	import AdminActivityFeed from './AdminActivityFeed.svelte';
+	import AdminFeedback from './AdminFeedback.svelte';
 	import AdminSystemHealth from './AdminSystemHealth.svelte';
 
 	let { dms, engagement }: { dms: DMSummary[]; engagement: EngagementReport } = $props();
@@ -243,6 +244,7 @@
 		{/if}
 	</section>
 
+	<AdminFeedback />
 	<AdminActivityFeed />
 	<AdminSystemHealth />
 </div>
