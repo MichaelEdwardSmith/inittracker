@@ -543,6 +543,25 @@
 		activeSession = data.activeSession;
 	});
 
+	let toastMessage = $state<string | null>(null);
+	let toastTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function showToast(message: string) {
+		clearTimeout(toastTimer);
+		toastMessage = message;
+		toastTimer = setTimeout(() => (toastMessage = null), 2500);
+	}
+
+	// Copies the full OBS browser-source overlay URL for the active game session.
+	function copyOverlayUrl() {
+		showMobileMenu = false;
+		const url = `${location.origin}/overlay/${activeSession.sessionId}`;
+		navigator.clipboard.writeText(url).then(
+			() => showToast('Overlay URL copied to clipboard'),
+			() => showToast("Couldn't copy the Overlay URL")
+		);
+	}
+
 	function copySessionId() {
 		navigator.clipboard.writeText(activeSession.sessionId).then(() => {
 			copied = true;
@@ -879,6 +898,14 @@
 				<i class="fa-duotone fa-light fa-book-open shrink-0 text-base" aria-hidden="true"></i>
 				Chronicle
 			</a>
+			<button
+				onclick={copyOverlayUrl}
+				title="Copy the OBS browser-source overlay URL to your clipboard"
+				class="flex w-full items-center gap-3 border-t border-gray-700 px-4 py-2.5 text-left text-sm text-gray-300 transition hover:bg-gray-700 hover:text-white"
+			>
+				<i class="fa-duotone fa-light fa-link shrink-0 text-base" aria-hidden="true"></i>
+				Overlay URL
+			</button>
 			<a
 				href="/display/{activeSession.sessionId}"
 				target="_blank"
@@ -1372,6 +1399,16 @@
 	{@const InnModal = InnModalComp}
 	<div style="display:{showInn ? 'block' : 'none'}">
 		<InnModal onclose={() => (showInn = false)} />
+	</div>
+{/if}
+
+{#if toastMessage}
+	<div
+		role="status"
+		aria-live="polite"
+		class="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-100 shadow-xl"
+	>
+		{toastMessage}
 	</div>
 {/if}
 

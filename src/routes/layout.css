@@ -25,6 +25,11 @@ body {
 	padding: 0;
 	height: 100%;
 	background-color: #070a14;
+	/* Default text color for anything that doesn't set its own. Modals render outside the page
+	   wrappers that carry text-white, so without this their icons (which only have a size class
+	   like text-2xl) and bare text fell back to the browser default of black on a dark panel.
+	   gray-100 flips with the theme (near-white in dark mode, near-black in light mode). */
+	color: var(--color-gray-100);
 }
 
 /* Global scrollbar styling */
