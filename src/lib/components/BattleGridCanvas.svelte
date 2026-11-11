@@ -6,6 +6,7 @@
      full-screen display at any size. Non-interactive instances (the player display) just render
      props as they change. -->
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { computeContainRect } from '$lib/utils';
 	import { hpPercent, hpTextColor } from '$lib/utils';
 	import { getMonsterDetail } from '$lib/enemies';
@@ -30,6 +31,18 @@
 		ruler: BattleMapRuler | null;
 		strokes: BattleMapStroke[];
 		ruleset?: '2014' | '2024';
+		/** Hide the zoom control (e.g. the OBS overlay, where nobody can click it). */
+		showZoomControls?: boolean;
+		/** Auto-camera: each time `nonce` changes, glide in on the normalized (0-1) point (x, y),
+		 *  hold for `focusHoldMs`, then glide back out. Used by the OBS overlay to call attention
+		 *  to a token that was just added or moved. */
+		focus?: { x: number; y: number; nonce: number } | null;
+		/** Feather the map image's edges into the backdrop, but only on sides where the map stops
+		 *  short of the container edge (letterbox/pillarbox bars) — sides that run edge-to-edge
+		 *  stay crisp. Used by the OBS overlay. */
+		fadeEdges?: boolean;
+		focusZoom?: number;
+		focusHoldMs?: number;
 		interactive?: boolean;
 		tool?: Tool;
 		drawColor?: string;
@@ -58,6 +71,11 @@
 		ruler,
 		strokes,
 		ruleset = '2014',
+		showZoomControls = true,
+		focus = null,
+		fadeEdges = false,
+		focusZoom = 2.5,
+		focusHoldMs = 4000,
 		interactive = false,
 		tool = 'move',
 		drawColor = '#ef4444',
@@ -111,6 +129,38 @@
 		panY = 0;
 	}
 
+	// ── Auto-camera (see the `focus` prop). The CSS transition is only applied while a focus
+	// sequence is running, so manual zoom/pan stays instant. ──
+	const FOCUS_GLIDE_MS = 900;
+	let autoCam = $state(false);
+
+	$effect(() => {
+		const f = focus;
+		if (!f) return;
+		let holdTimer: ReturnType<typeof setTimeout> | undefined;
+		let settleTimer: ReturnType<typeof setTimeout> | undefined;
+		untrack(() => {
+			if (containerW <= 0 || containerH <= 0) return;
+			autoCam = true;
+			zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, focusZoom));
+			// Content point P maps to centre + (P - centre) * zoom + pan, so putting P at the
+			// centre needs pan = -(P - centre) * zoom (then clamped to avoid dead space).
+			const px = rect.x + f.x * rect.w - containerW / 2;
+			const py = rect.y + f.y * rect.h - containerH / 2;
+			[panX, panY] = clampPan(-px * zoom, -py * zoom);
+			holdTimer = setTimeout(() => {
+				zoom = 1;
+				panX = 0;
+				panY = 0;
+				settleTimer = setTimeout(() => (autoCam = false), FOCUS_GLIDE_MS + 100);
+			}, FOCUS_GLIDE_MS + focusHoldMs);
+		});
+		return () => {
+			clearTimeout(holdTimer);
+			clearTimeout(settleTimer);
+		};
+	});
+
 	// A new map replaces the old one entirely — start it unzoomed/uncentered rather than
 	// carrying over whatever zoom/pan was set for the previous image.
 	$effect(() => {
@@ -153,6 +203,22 @@
 	}
 
 	const rect = $derived(computeContainRect(containerW, containerH, naturalWidth, naturalHeight));
+
+	// Edge feather: a CSS mask (two crossed linear gradients, intersected) sized to the rendered
+	// map rect. A side only fades when there's a visible gap between it and the container edge.
+	const edgeMask = $derived.by(() => {
+		if (!fadeEdges || rect.w <= 0 || rect.h <= 0) return '';
+		const GAP = 2; // px — treat anything closer than this as touching the edge
+		const fade = Math.min(90, Math.min(rect.w, rect.h) * 0.08);
+		const left = rect.x > GAP ? fade : 0;
+		const right = containerW - rect.x - rect.w > GAP ? fade : 0;
+		const top = rect.y > GAP ? fade : 0;
+		const bottom = containerH - rect.y - rect.h > GAP ? fade : 0;
+		if (!left && !right && !top && !bottom) return '';
+		const h = `linear-gradient(to right, transparent 0, #000 ${left}px, #000 calc(100% - ${right}px), transparent 100%)`;
+		const v = `linear-gradient(to bottom, transparent 0, #000 ${top}px, #000 calc(100% - ${bottom}px), transparent 100%)`;
+		return `-webkit-mask-image: ${h}, ${v}; -webkit-mask-composite: source-in; mask-image: ${h}, ${v}; mask-composite: intersect;`;
+	});
 
 	// Grid cell size, normalized (0-1) relative to the image's own width/height respectively.
 	// The square's real size is ALWAYS derived from the width alone (gridSquaresAcross), so cells
@@ -611,9 +677,22 @@
 >
 	<div
 		class="absolute inset-0"
-		style="transform: translate({panX}px, {panY}px) scale({zoom}); transform-origin: 50% 50%;"
+		style="transform: translate({panX}px, {panY}px) scale({zoom}); transform-origin: 50% 50%;{autoCam
+			? ` transition: transform ${FOCUS_GLIDE_MS}ms cubic-bezier(0.45, 0, 0.2, 1);`
+			: ''}"
 	>
-		<img src={imageUrl} alt="Battle map" class="h-full w-full object-contain" draggable="false" />
+		{#if edgeMask}
+			<!-- Sized exactly to the map rect so the feather hugs the picture, not the letterbox -->
+			<img
+				src={imageUrl}
+				alt="Battle map"
+				class="absolute"
+				style="left:{rect.x}px; top:{rect.y}px; width:{rect.w}px; height:{rect.h}px; {edgeMask}"
+				draggable="false"
+			/>
+		{:else}
+			<img src={imageUrl} alt="Battle map" class="h-full w-full object-contain" draggable="false" />
+		{/if}
 
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
@@ -628,7 +707,12 @@
 			onpointercancel={handlePointerUp}
 		>
 			{#if showGrid && rect.w > 0}
-				<svg class="pointer-events-none absolute inset-0" width={rect.w} height={rect.h}>
+				<svg
+					class="pointer-events-none absolute inset-0"
+					width={rect.w}
+					height={rect.h}
+					style={edgeMask}
+				>
 					{#each vLines as f (f)}
 						<line
 							x1={f * rect.w}
@@ -789,33 +873,35 @@
 
 <!-- Zoom control — a per-viewer preference, so it's identical on the DM's preview and the
      player's full-screen view. Sits above the scaled/clipped content, always at its own size. -->
-<div
-	class="absolute right-2 bottom-2 z-30 flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 p-1 shadow-lg"
->
-	<button
-		type="button"
-		onclick={zoomOut}
-		disabled={zoom <= ZOOM_MIN}
-		aria-label="Zoom out"
-		class="flex h-7 w-7 items-center justify-center rounded text-gray-300 transition hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+{#if showZoomControls}
+	<div
+		class="absolute right-2 bottom-2 z-30 flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-900/90 p-1 shadow-lg"
 	>
-		<i class="fa-duotone fa-light fa-magnifying-glass-minus text-sm" aria-hidden="true"></i>
-	</button>
-	<button
-		type="button"
-		onclick={resetZoom}
-		title="Reset zoom & pan"
-		class="w-10 rounded px-1 text-center text-xs font-semibold text-gray-400 tabular-nums transition hover:bg-gray-700 hover:text-white"
-	>
-		{Math.round(zoom * 100)}%
-	</button>
-	<button
-		type="button"
-		onclick={zoomIn}
-		disabled={zoom >= ZOOM_MAX}
-		aria-label="Zoom in"
-		class="flex h-7 w-7 items-center justify-center rounded text-gray-300 transition hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-	>
-		<i class="fa-duotone fa-light fa-magnifying-glass-plus text-sm" aria-hidden="true"></i>
-	</button>
-</div>
+		<button
+			type="button"
+			onclick={zoomOut}
+			disabled={zoom <= ZOOM_MIN}
+			aria-label="Zoom out"
+			class="flex h-7 w-7 items-center justify-center rounded text-gray-300 transition hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+		>
+			<i class="fa-duotone fa-light fa-magnifying-glass-minus text-sm" aria-hidden="true"></i>
+		</button>
+		<button
+			type="button"
+			onclick={resetZoom}
+			title="Reset zoom & pan"
+			class="w-10 rounded px-1 text-center text-xs font-semibold text-gray-400 tabular-nums transition hover:bg-gray-700 hover:text-white"
+		>
+			{Math.round(zoom * 100)}%
+		</button>
+		<button
+			type="button"
+			onclick={zoomIn}
+			disabled={zoom >= ZOOM_MAX}
+			aria-label="Zoom in"
+			class="flex h-7 w-7 items-center justify-center rounded text-gray-300 transition hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+		>
+			<i class="fa-duotone fa-light fa-magnifying-glass-plus text-sm" aria-hidden="true"></i>
+		</button>
+	</div>
+{/if}

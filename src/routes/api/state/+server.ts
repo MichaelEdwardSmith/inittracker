@@ -11,7 +11,12 @@ import { saveCombatState, getCombatState, getDMByGameSessionId } from '$lib/serv
 import { isValidSessionId, validateStorageState } from '$lib/server/validate';
 import { resolveGameSessionId } from '$lib/server/sessionCache';
 
-import { sessionStates, sessionClients, broadcastToSession } from '$lib/server/sseState';
+import {
+	sessionStates,
+	sessionClients,
+	broadcastToSession,
+	redactForViewers
+} from '$lib/server/sseState';
 
 const encoder = new TextEncoder();
 
@@ -118,7 +123,9 @@ export const GET: RequestHandler = async ({ request, url, cookies }) => {
 		initialState = await getCombatState(sessionId);
 		if (initialState) sessionStates.set(sessionId, initialState);
 	}
-	const snapshot = initialState ?? { combatants: [], currentTurnId: null, round: 1 };
+	const snapshot = redactForViewers(
+		initialState ?? { combatants: [], currentTurnId: null, round: 1 }
+	);
 
 	let ctrl: ReadableStreamDefaultController<Uint8Array>;
 	let keepAlive: ReturnType<typeof setInterval>;

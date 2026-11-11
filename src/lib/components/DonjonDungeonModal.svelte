@@ -1323,6 +1323,15 @@
 		const row = Math.floor(((e.clientY - rect.top) * scaleY) / TILE);
 		const cell = floors[currentFloor].cell[row]?.[col] ?? 0;
 		const trap = floorTrapMaps[currentFloor]?.get(`${row},${col}`);
+		// Clicking a room on the map reveals it through the fog (and opens its doorways) — same as
+		// marking it visited in the room list. Reveal-only: clicking again never hides it; use the
+		// list's check button to un-visit. Syncs to players only while the map is shared.
+		if (cell & ROOM) {
+			const clickedRoomId = (cell & ROOM_ID) >> 6;
+			if (clickedRoomId > 0 && !(floorVisitedRooms[currentFloor] ?? new Set()).has(clickedRoomId)) {
+				toggleVisited(clickedRoomId);
+			}
+		}
 		if (trap) {
 			activeTrap = { trap, x: e.clientX, y: e.clientY };
 		} else {
@@ -1347,6 +1356,12 @@
 			}
 			if (changed) {
 				floorRevealedCorridors = floorRevealedCorridors.map((v, i) => (i === currentFloor ? s : v));
+				// Repaint so the green "revealed" tint shows up immediately
+				renderDungeon(
+					floors[currentFloor],
+					floorBossRoomIds[currentFloor],
+					currentFloor === 0 ? 1 : 0
+				);
 				syncMapState();
 			}
 		}
@@ -2581,6 +2596,18 @@
 			ctx.fillText(String(id), lc * TILE + TILE / 2, lr * TILE + TILE / 2);
 		}
 
+		// ── Revealed corridors: a green tint on every corridor/door cell the players can see, so the
+		// DM can tell at a glance which hallways have been shown (rooms use the visited dimming).
+		const revealedCells = floorRevealedCorridors[currentFloor];
+		if (revealedCells && revealedCells.size > 0) {
+			ctx.fillStyle = 'rgba(52, 211, 153, 0.45)';
+			for (const key of revealedCells) {
+				const [rr, cc] = key.split(',').map(Number);
+				if (Number.isFinite(rr) && Number.isFinite(cc))
+					ctx.fillRect(cc * TILE, rr * TILE, TILE, TILE);
+			}
+		}
+
 		// ── Visited overlay ────────────────────────────────────────────────────
 		const visited = floorVisitedRooms[currentFloor] ?? new Set<number>();
 		if (visited.size > 0) {
@@ -3385,7 +3412,9 @@
 				else combat.setDungeonMapState(null);
 			}}
 			disabled={floors.length === 0}
-			title={mapPushed ? 'Stop sharing map with players' : 'Share fog-of-war map with players'}
+			title={mapPushed
+				? 'Stop sharing map with players (green = corridors revealed to them)'
+				: 'Share fog-of-war map with players'}
 			class="rounded px-2 py-1.5 text-xs font-semibold transition disabled:opacity-40 {mapPushed
 				? 'bg-green-700 text-white hover:bg-green-600'
 				: 'bg-gray-700 text-gray-200 hover:bg-gray-600'}"

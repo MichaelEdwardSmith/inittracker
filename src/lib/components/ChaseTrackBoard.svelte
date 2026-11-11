@@ -9,14 +9,16 @@
 	import type { ChaseParticipant } from '$lib/types';
 	import { chaseBadgeClasses } from '$lib/utils';
 
-	type Size = 'sm' | 'lg' | 'xl';
+	type Size = 'sm' | 'lg' | 'md' | 'xl';
 
 	interface Props {
 		bands: string[];
 		participants: ChaseParticipant[];
 		size?: Size;
+		/** Lift the default max-w-5xl cap so the board can span a full-width stream overlay. */
+		wide?: boolean;
 	}
-	let { bands, participants, size = 'lg' }: Props = $props();
+	let { bands, participants, size = 'lg', wide = false }: Props = $props();
 
 	const SIZE_CLASSES: Record<Size, { text: string; lane: string; header: string; badge: string }> =
 		{
@@ -32,6 +34,14 @@
 				header: 'mb-1.5',
 				badge: 'h-7 w-7 text-xs'
 			},
+			// Between lg and xl — used by the stream overlay's lower third, where xl's 44px badges
+			// clipped against the strip's fixed height.
+			md: {
+				text: 'text-sm',
+				lane: 'p-2 sm:min-w-[7.5rem]',
+				header: 'mb-1.5',
+				badge: 'h-8 w-8 text-sm'
+			},
 			xl: {
 				text: 'text-sm sm:text-base',
 				lane: 'p-3 sm:min-w-[9.5rem]',
@@ -46,9 +56,9 @@
 </script>
 
 <div
-	class="mx-auto flex w-full max-w-5xl flex-col gap-1.5 sm:flex-row sm:overflow-x-auto {SIZE_CLASSES[
-		size
-	].text}"
+	class="mx-auto flex w-full {wide
+		? 'max-w-[1700px]'
+		: 'max-w-5xl'} flex-col gap-1.5 sm:flex-row sm:overflow-x-auto {SIZE_CLASSES[size].text}"
 >
 	{#each bands as band, i (band + i)}
 		<div
