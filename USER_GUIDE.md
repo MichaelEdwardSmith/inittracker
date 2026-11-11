@@ -1190,16 +1190,39 @@ An Observing DM sees every player's dice face-up at all times, the current bid, 
 
 ## 20. Stream Overlay
 
-`/overlay/[sessionId]` is a separate, transparent view designed to be added as an **OBS (or similar) browser source** for streaming your combat sessions — it is not part of the normal DM/player workflow and has no Liar's Dice content.
+`/overlay/[sessionId]` is a separate, transparent view designed to be added as an **OBS (or similar) browser source** for streaming your games — it is not part of the normal DM/player workflow and has no Liar's Dice content.
 
-It subscribes to the same live combat-state feed as the player display and shows:
+It subscribes to the same live feed as the player display and layers the action over your stream.
+
+### Setting it up
+
+1. In the DM dashboard, open the menu and click **Overlay URL** — a toast confirms the link is copied
+2. In OBS, add a **Browser Source** and paste the URL
+3. Set the width and height to your stream resolution (e.g. 1920×1080)
+
+The overlay is tied to your active game session. If you switch sessions, copy the URL again. The background is fully transparent and the overlay ignores mouse/click input, so it composites cleanly over your other sources without blocking anything underneath.
+
+### Combat
 
 - A **"Now Acting"** panel — portrait, HP bar, condition badges, and the current round number. Badges cover every standard condition plus Exhausted (with level), Transformed, Inspired, Readied, and Surprised.
 - A scrolling **combat event ticker** — damage, healing, and condition changes as they happen
 - An **"Up Next"** bar across the bottom showing upcoming turns, with a wrap marker at the end of the round
-- A full-screen **"COMBAT"** banner — a flash, expanding shockwave ring, and a brief screen-shake — the instant you click **Start Combat**, and a calmer **"COMBAT ENDED"** fade when you click **End Combat**
+- A full-screen **"COMBAT"** banner — a flash, expanding shockwave ring, and a brief screen-shake — the instant you click **Start Combat**, and a calmer **"COMBAT ENDED"** fade when you click **End Combat**. These are driven by the actual Start/End Combat action, so opening the overlay mid-fight won't replay the start animation.
+- **Stinger banners** — a short **"Bloodied!"** when an enemy's HP drops to half or below, **"Stabilized!"** when a downed player reaches three successful death saves, and **"Dead"** at three failures
 
-The background is fully transparent and the overlay ignores mouse/click input, so it composites cleanly over your other stream sources without blocking anything underneath. The start/end banners are driven by the actual Start/End Combat action, not just whether combatants exist, so opening the overlay mid-fight won't replay the start animation.
+### Maps, handouts, and chases
+
+These appear automatically when you use the matching feature — there is nothing to switch on in the overlay.
+
+- **Battle Map** — while you have a map set to **Show to Players**, it takes over the whole frame with tokens, the distance ruler, and your drawn strokes. When you add or move a token, the camera glides in on it, holds for a few seconds, then glides back out.
+- **Dungeon map** — when you click a room on a shared Donjon fog-of-war map, the map slides up in the bottom third, zooms in on the room you just revealed, then zooms back out and slides away. Revealing another room restarts the timer. Un-sharing the map drops it immediately.
+- **Room descriptions** — when a room description is shown to players, a panel types it out word by word over a dimmed frame
+- **Chase** — a running [Chase Tracker](#24-chase-tracker) chase appears as a lower-third strip with speed-line effects, and fades out when you end the chase
+- **Document Share** — a shown handout (image or PDF page) takes over the frame, with your live annotations drawn on top
+
+### What stays private
+
+The overlay never shows DM-only information. **Advantage/Disadvantage reminder conditions** and per-combatant **notes** are stripped out before data reaches the overlay or any player display, and exact HP numbers are shown for players only.
 
 ---
 
