@@ -2971,12 +2971,32 @@
 					>
 					is a separate, transparent view designed to be added as an
 					<strong class="font-semibold text-white">OBS (or similar) browser source</strong> for streaming
-					your combat sessions — it is not part of the normal DM/player workflow and has no Liar's Dice
-					content.
+					your games — it is not part of the normal DM/player workflow and has no Liar's Dice content.
+					It subscribes to the same live feed as the player display and layers the action over your stream.
 				</p>
-				<p class="mb-3 text-sm leading-relaxed">
-					It subscribes to the same live combat-state feed as the player display and shows:
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Setting it up
+				</h3>
+				<ol class="mb-4 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed">
+					<li>
+						In the DM dashboard, open the menu and click <strong class="font-semibold text-white"
+							>Overlay URL</strong
+						> — a toast confirms the link is copied
+					</li>
+					<li>
+						In OBS, add a <strong class="font-semibold text-white">Browser Source</strong> and paste the
+						URL
+					</li>
+					<li>Set the width and height to your stream resolution (e.g. 1920×1080)</li>
+				</ol>
+				<p class="mb-4 text-sm leading-relaxed">
+					The overlay is tied to your active game session. If you switch sessions, copy the URL
+					again. The background is fully transparent and the overlay ignores mouse/click input, so
+					it composites cleanly over your other sources without blocking anything underneath.
 				</p>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">Combat</h3>
 				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
 					<li>
 						A <strong class="font-semibold text-white">"Now Acting"</strong> panel — portrait, HP bar,
@@ -2995,17 +3015,67 @@
 						A full-screen <strong class="font-semibold text-amber-300">"COMBAT"</strong> banner — a
 						flash, expanding shockwave ring, and a brief screen-shake — the instant you click
 						<strong class="font-semibold text-white">Start Combat</strong>, and a calmer
-						<strong class="font-semibold text-white">"COMBAT ENDED"</strong> fade when you click
-						<strong class="font-semibold text-white">End Combat</strong>
+						<strong class="font-semibold text-white">"COMBAT ENDED"</strong>
+						fade when you click
+						<strong class="font-semibold text-white">End Combat</strong>. These are driven by the
+						actual Start/End Combat action, so opening the overlay mid-fight won't replay the start
+						animation.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Stinger banners</strong> — a short
+						<strong class="font-semibold text-white">"Bloodied!"</strong>
+						when an enemy's HP drops to half or below,
+						<strong class="font-semibold text-white">"Stabilized!"</strong> when a downed player
+						reaches three successful death saves, and
+						<strong class="font-semibold text-white">"Dead"</strong> at three failures
 					</li>
 				</ul>
-				<p class="mb-4 text-sm leading-relaxed">
-					The background is fully transparent and the overlay ignores mouse/click input, so it
-					composites cleanly over your other stream sources without blocking anything underneath.
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					Maps, handouts, and chases
+				</h3>
+				<p class="mb-3 text-sm leading-relaxed">
+					These appear automatically when you use the matching feature — there is nothing to switch
+					on in the overlay.
 				</p>
+				<ul class="mb-4 ml-4 list-disc space-y-1.5 text-sm leading-relaxed">
+					<li>
+						<strong class="font-semibold text-white">Battle Map</strong> — while you have a map set
+						to <strong class="font-semibold text-white">Show to Players</strong>, it takes over the
+						whole frame with tokens, the distance ruler, and your drawn strokes. When you add or
+						move a token, the camera glides in on it, holds for a few seconds, then glides back out.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Dungeon map</strong> — when you click a room on a
+						shared Donjon fog-of-war map, the map slides up in the bottom third, zooms in on the room
+						you just revealed, then zooms back out and slides away. Revealing another room restarts the
+						timer. Un-sharing the map drops it immediately.
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Room descriptions</strong> — when a room description
+						is shown to players, a panel types it out word by word over a dimmed frame
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Chase</strong> — a running
+						<a href="#chase-tracker" class="text-amber-300 hover:underline">Chase Tracker</a>
+						chase appears as a lower-third strip with speed-line effects, and fades out when you end the
+						chase
+					</li>
+					<li>
+						<strong class="font-semibold text-white">Document Share</strong> — a shown handout (image
+						or PDF page) takes over the frame, with your live annotations drawn on top
+					</li>
+				</ul>
+
+				<h3 class="mt-5 mb-2 text-sm font-bold tracking-widest text-gray-200 uppercase">
+					What stays private
+				</h3>
 				<p class="text-sm leading-relaxed">
-					The start/end banners are driven by the actual Start/End Combat action, not just whether
-					combatants exist, so opening the overlay mid-fight won't replay the start animation.
+					The overlay never shows DM-only information. <strong class="font-semibold text-white"
+						>Advantage/Disadvantage reminder conditions</strong
+					>
+					and per-combatant <strong class="font-semibold text-white">notes</strong> are stripped out before
+					data reaches the overlay or any player display, and exact HP numbers are shown for players only.
 				</p>
 			</section>
 
