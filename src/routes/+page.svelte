@@ -62,6 +62,10 @@
 
 	let roll = $state<number | null>(null);
 	let rolling = $state(false);
+	// A settled natural 1 turns the die red until the next roll begins
+	const fumble = $derived(roll === 1 && !rolling);
+	// A settled natural 20 cycles the die through the rainbow until the next roll begins
+	const crit = $derived(roll === 20 && !rolling);
 	let quip = $state('Go on. Click the die. We know you want to.');
 
 	// Picks a random line for the roll, avoiding an immediate repeat
@@ -80,6 +84,182 @@
 		return options[Math.floor(Math.random() * options.length)];
 	}
 
+	// Synthesized "ta-da" fanfare (no audio file needed): a quick pickup note, then a bright held chord
+	function playTaDa() {
+		if (!browser) return;
+		try {
+			const AudioCtx =
+				window.AudioContext ||
+				(window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+			if (!AudioCtx) return;
+			const ctx = new AudioCtx();
+			const now = ctx.currentTime;
+
+			const note = (freq: number, at: number, dur: number, vol: number) => {
+				const osc = ctx.createOscillator();
+				const gain = ctx.createGain();
+				osc.type = 'triangle';
+				osc.frequency.value = freq;
+				gain.gain.setValueAtTime(0.0001, now + at);
+				gain.gain.exponentialRampToValueAtTime(vol, now + at + 0.02);
+				gain.gain.exponentialRampToValueAtTime(0.0001, now + at + dur);
+				osc.connect(gain).connect(ctx.destination);
+				osc.start(now + at);
+				osc.stop(now + at + dur + 0.05);
+			};
+
+			// "Ta" — short G4
+			note(392.0, 0, 0.14, 0.18);
+			// "Daaa" — held C major chord (C5, E5, G5, C6)
+			note(523.25, 0.17, 1.1, 0.16);
+			note(659.25, 0.17, 1.1, 0.12);
+			note(783.99, 0.17, 1.1, 0.12);
+			note(1046.5, 0.17, 1.1, 0.08);
+
+			setTimeout(() => ctx.close().catch(() => {}), 1600);
+		} catch {
+			// Audio is a nice-to-have; ignore any failure
+		}
+	}
+
+	// Synthesized "wah wah wah wahhh" sad trombone for a natural 1
+	function playWompWomp() {
+		if (!browser) return;
+		try {
+			const AudioCtx =
+				window.AudioContext ||
+				(window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+			if (!AudioCtx) return;
+			const ctx = new AudioCtx();
+			const now = ctx.currentTime;
+
+			// Each "wah": a muted sawtooth whose filter opens then closes, with a slight downward slide
+			const wah = (freq: number, at: number, dur: number, slide = 0.97) => {
+				const osc = ctx.createOscillator();
+				const filter = ctx.createBiquadFilter();
+				const gain = ctx.createGain();
+				osc.type = 'sawtooth';
+				osc.frequency.setValueAtTime(freq, now + at);
+				osc.frequency.exponentialRampToValueAtTime(freq * slide, now + at + dur);
+				filter.type = 'lowpass';
+				filter.Q.value = 4;
+				filter.frequency.setValueAtTime(300, now + at);
+				filter.frequency.exponentialRampToValueAtTime(1200, now + at + dur * 0.3);
+				filter.frequency.exponentialRampToValueAtTime(300, now + at + dur);
+				gain.gain.setValueAtTime(0.0001, now + at);
+				gain.gain.exponentialRampToValueAtTime(0.2, now + at + 0.04);
+				gain.gain.setValueAtTime(0.2, now + at + dur * 0.7);
+				gain.gain.exponentialRampToValueAtTime(0.0001, now + at + dur);
+				osc.connect(filter).connect(gain).connect(ctx.destination);
+				osc.start(now + at);
+				osc.stop(now + at + dur + 0.05);
+			};
+
+			wah(233.08, 0, 0.35); // Bb3
+			wah(220.0, 0.4, 0.35); // A3
+			wah(207.65, 0.8, 0.35); // Ab3
+			// The long, wobbling final "wahhh"
+			const long = ctx.createOscillator();
+			const vibrato = ctx.createOscillator();
+			const vibratoGain = ctx.createGain();
+			const filter = ctx.createBiquadFilter();
+			const gain = ctx.createGain();
+			long.type = 'sawtooth';
+			long.frequency.setValueAtTime(196.0, now + 1.2);
+			long.frequency.exponentialRampToValueAtTime(155.56, now + 2.3);
+			vibrato.frequency.value = 6;
+			vibratoGain.gain.value = 5;
+			vibrato.connect(vibratoGain).connect(long.frequency);
+			filter.type = 'lowpass';
+			filter.Q.value = 4;
+			filter.frequency.setValueAtTime(300, now + 1.2);
+			filter.frequency.exponentialRampToValueAtTime(1000, now + 1.5);
+			filter.frequency.exponentialRampToValueAtTime(250, now + 2.3);
+			gain.gain.setValueAtTime(0.0001, now + 1.2);
+			gain.gain.exponentialRampToValueAtTime(0.2, now + 1.25);
+			gain.gain.setValueAtTime(0.2, now + 1.9);
+			gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.3);
+			long.connect(filter).connect(gain).connect(ctx.destination);
+			long.start(now + 1.2);
+			vibrato.start(now + 1.2);
+			long.stop(now + 2.4);
+			vibrato.stop(now + 2.4);
+
+			setTimeout(() => ctx.close().catch(() => {}), 2800);
+		} catch {
+			// Audio is a nice-to-have; ignore any failure
+		}
+	}
+
+	// Natural 20 celebration: a short burst of canvas confetti from the d20
+	function launchConfetti() {
+		if (!browser) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		const canvas = document.createElement('canvas');
+		canvas.setAttribute('aria-hidden', 'true');
+		canvas.style.cssText =
+			'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+		const dpr = window.devicePixelRatio || 1;
+		canvas.width = window.innerWidth * dpr;
+		canvas.height = window.innerHeight * dpr;
+		document.body.appendChild(canvas);
+		const ctx = canvas.getContext('2d');
+		if (!ctx) {
+			canvas.remove();
+			return;
+		}
+		ctx.scale(dpr, dpr);
+
+		const colors = ['#fbbf24', '#f59e0b', '#a855f7', '#22c55e', '#38bdf8', '#f43f5e', '#ffffff'];
+		const d20 = document.querySelector('.d20')?.getBoundingClientRect();
+		const originX = d20 ? d20.left + d20.width / 2 : window.innerWidth / 2;
+		const originY = d20 ? d20.top + d20.height / 2 : window.innerHeight / 3;
+
+		const pieces = Array.from({ length: 160 }, () => {
+			const angle = Math.random() * Math.PI * 2;
+			const speed = 6 + Math.random() * 12;
+			return {
+				x: originX,
+				y: originY,
+				vx: Math.cos(angle) * speed,
+				vy: Math.sin(angle) * speed - 6,
+				size: 5 + Math.random() * 6,
+				rot: Math.random() * Math.PI * 2,
+				vr: (Math.random() - 0.5) * 0.4,
+				color: colors[Math.floor(Math.random() * colors.length)]
+			};
+		});
+
+		const start = performance.now();
+		const duration = 3200;
+
+		function frame(now: number) {
+			const elapsed = now - start;
+			if (!ctx || elapsed > duration) {
+				canvas.remove();
+				return;
+			}
+			ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+			ctx.globalAlpha = Math.min(1, (duration - elapsed) / 800);
+			for (const p of pieces) {
+				p.vy += 0.35;
+				p.vx *= 0.99;
+				p.x += p.vx;
+				p.y += p.vy;
+				p.rot += p.vr;
+				ctx.save();
+				ctx.translate(p.x, p.y);
+				ctx.rotate(p.rot);
+				ctx.fillStyle = p.color;
+				ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+				ctx.restore();
+			}
+			requestAnimationFrame(frame);
+		}
+		requestAnimationFrame(frame);
+	}
+
 	function rollD20() {
 		if (rolling) return;
 		rolling = true;
@@ -90,6 +270,12 @@
 				clearInterval(timer);
 				rolling = false;
 				quip = pickQuip(roll);
+				if (roll === 20) {
+					playTaDa();
+					launchConfetti();
+				} else if (roll === 1) {
+					playWompWomp();
+				}
 			}
 		}, 60);
 	}
@@ -564,23 +750,31 @@
 						aria-label="Roll a d20"
 						class="d20 group relative flex h-56 w-56 items-center justify-center transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400 active:scale-95 {rolling
 							? 'is-rolling'
-							: ''}"
+							: ''} {crit ? 'is-crit' : ''}"
 					>
 						<svg viewBox="0 0 100 100" class="absolute inset-0 h-full w-full" aria-hidden="true">
 							<polygon
 								points="50,4 92,28 92,72 50,96 8,72 8,28"
-								class="fill-amber-950/70 stroke-amber-500"
+								class="transition-colors duration-700 {fumble
+									? 'fill-red-950/80 stroke-red-500'
+									: 'fill-amber-950/70 stroke-amber-500'}"
 								stroke-width="2.5"
 								stroke-linejoin="round"
 							/>
 							<polyline
 								points="50,4 50,34 8,72 M50,34 92,72 M8,28 50,34 92,28 M50,96 50,66 8,28 M50,66 92,28 M8,72 50,66 92,72"
-								class="fill-none stroke-amber-700/70"
+								class="fill-none transition-colors duration-700 {fumble
+									? 'stroke-red-800/70'
+									: 'stroke-amber-700/70'}"
 								stroke-width="1.2"
 								stroke-linejoin="round"
 							/>
 						</svg>
-						<span class="relative text-6xl font-black text-amber-300 tabular-nums">
+						<span
+							class="relative text-6xl font-black tabular-nums transition-colors duration-700 {fumble
+								? 'text-red-400'
+								: 'text-amber-300'}"
+						>
 							{roll ?? '20'}
 						</span>
 					</button>
@@ -606,6 +800,13 @@
 					</div>
 				{/each}
 			</div>
+
+			<p class="mt-6 text-center text-sm text-gray-500" use:fadeIn>
+				<a href="/letter" class="text-amber-500 transition hover:text-amber-400"
+					>A short letter from the person who built this</a
+				>
+				(no mimics, we checked).
+			</p>
 		</section>
 
 		<!-- ── Features by phase of the game ─────────────────────────────────────── -->
@@ -885,6 +1086,7 @@
 				<span class="ml-2 text-xs text-gray-700">No dragons were harmed. Several were rolled.</span>
 			</div>
 			<div class="flex items-center gap-6 text-xs text-gray-700">
+				<a href="/letter" class="transition hover:text-gray-400">A Letter</a>
 				<a href="/privacy" class="transition hover:text-gray-400">Privacy Policy</a>
 				<a href="/guide?back=/" class="transition hover:text-gray-400">User Guide</a>
 				<a href="/login" class="transition hover:text-gray-400">Sign In</a>
@@ -1005,6 +1207,20 @@
 		}
 	}
 
+	/* ── natural 20: amber die cycles through every hue ── */
+	.d20.is-crit {
+		animation: d20-rainbow 2.4s linear infinite;
+	}
+
+	@keyframes d20-rainbow {
+		from {
+			filter: hue-rotate(0deg) saturate(1.8) brightness(1.25);
+		}
+		to {
+			filter: hue-rotate(360deg) saturate(1.8) brightness(1.25);
+		}
+	}
+
 	:global(.fade-in) {
 		opacity: 0;
 		transform: translateY(24px);
@@ -1025,6 +1241,10 @@
 		}
 		.d20.is-rolling svg {
 			animation: none;
+		}
+		.d20.is-crit {
+			animation: none;
+			filter: hue-rotate(280deg) saturate(1.8) brightness(1.25);
 		}
 	}
 </style>
