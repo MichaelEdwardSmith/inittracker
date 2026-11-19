@@ -17,6 +17,11 @@
 
 <svelte:head>
 	<title>Player Guide — Initiative Tracker</title>
+	<meta
+		name="description"
+		content="How players join a D&D session on Initiative Tracker: enter the code from your DM, follow the turn order live, and see your HP and conditions."
+	/>
+	<link rel="canonical" href="https://inittracker.com/player-guide" />
 </svelte:head>
 
 {#snippet h2(n: string, title: string)}

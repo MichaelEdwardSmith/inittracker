@@ -1,5 +1,9 @@
 <svelte:head>
 	<title>Privacy Policy — Initiative Tracker</title>
+	<meta
+		name="description"
+		content="What data Initiative Tracker collects, how it is used, and how to delete your account."
+	/>
 </svelte:head>
 
 <div
