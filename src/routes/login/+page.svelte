@@ -24,6 +24,7 @@
 
 <svelte:head>
 	<title>DM Login — Initiative Tracker</title>
+	<meta name="description" content="Sign in to your Initiative Tracker Dungeon Master account." />
 </svelte:head>
 
 <div

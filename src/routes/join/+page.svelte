@@ -18,6 +18,10 @@
 
 <svelte:head>
 	<title>Join Session — Initiative Tracker</title>
+	<meta
+		name="description"
+		content="Players: enter the 6-character code from your Dungeon Master to follow the initiative order live."
+	/>
 </svelte:head>
 
 <div

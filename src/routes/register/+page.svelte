@@ -18,7 +18,11 @@
 </script>
 
 <svelte:head>
-	<title>Register — Initiative Tracker</title>
+	<title>Create a Free DM Account — Initiative Tracker</title>
+	<meta
+		name="description"
+		content="Create a free Dungeon Master account and start running D&D 5e and 5.5e combat with a live player display in minutes."
+	/>
 </svelte:head>
 
 <div

@@ -592,7 +592,10 @@
 	});
 </script>
 
-<svelte:head><title>Dashboard — Initiative Tracker</title></svelte:head>
+<svelte:head>
+	<title>Dashboard — Initiative Tracker</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
 
 <div class="flex h-screen flex-col overflow-hidden bg-gray-950 text-white">
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0 overflow-hidden">

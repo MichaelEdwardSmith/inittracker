@@ -105,6 +105,11 @@
 
 <svelte:head>
 	<title>User Guide — Initiative Tracker</title>
+	<meta
+		name="description"
+		content="Step-by-step guide for Dungeon Masters: run initiative, track HP and conditions, share a live player display, and use the monster library and generators."
+	/>
+	<link rel="canonical" href="https://inittracker.com/guide" />
 </svelte:head>
 
 <div class="underline-links min-h-screen bg-gray-950 text-gray-300">

@@ -1312,6 +1312,7 @@
 
 <svelte:head>
 	<title>Initiative Display</title>
+	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <div

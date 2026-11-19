@@ -629,14 +629,64 @@
 			a: 'Yes, both the 2014 and 2024 rules. Pick one in settings and argue about the other at the table.'
 		}
 	];
+
+	// ── SEO ──
+	const siteUrl = 'https://inittracker.com';
+	const seoTitle = 'Initiative Tracker — D&D 5e Combat Manager';
+	const seoDescription =
+		"Free D&D 5e and 5.5e initiative tracker with a live player display, monster library, and 16 generators to cover for you when you didn't prep.";
+	const ogImage = `${siteUrl}/screenshots/Dashboard.jpg`;
+
+	// JSON-LD describing the app and the FAQ shown on this page. "<" is escaped so the text can
+	// never close the surrounding <script> tag.
+	const structuredData = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'SoftwareApplication',
+				'@id': `${siteUrl}/#app`,
+				name: 'Initiative Tracker',
+				url: siteUrl + '/',
+				description: seoDescription,
+				applicationCategory: 'GameApplication',
+				operatingSystem: 'Any (web browser)',
+				image: ogImage,
+				offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+			},
+			{
+				'@type': 'FAQPage',
+				mainEntity: faqs.map((f) => ({
+					'@type': 'Question',
+					name: f.q,
+					acceptedAnswer: { '@type': 'Answer', text: f.a }
+				}))
+			}
+		]
+	}).replace(/</g, '\\u003c');
 </script>
 
 <svelte:head>
-	<title>Initiative Tracker — D&D 5e Combat Manager</title>
-	<meta
-		name="description"
-		content="Free D&D 5e and 5.5e initiative tracker with a live player display, monster library, and 16 generators to cover for you when you didn't prep."
-	/>
+	<title>{seoTitle}</title>
+	<meta name="description" content={seoDescription} />
+	<link rel="canonical" href={siteUrl + '/'} />
+
+	<!-- Open Graph / Twitter: link previews on Discord, Slack, Reddit, etc. -->
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Initiative Tracker" />
+	<meta property="og:title" content={seoTitle} />
+	<meta property="og:description" content={seoDescription} />
+	<meta property="og:url" content={siteUrl + '/'} />
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="1917" />
+	<meta property="og:image:height" content="957" />
+	<meta property="og:image:alt" content="The Initiative Tracker DM dashboard mid-combat" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={seoTitle} />
+	<meta name="twitter:description" content={seoDescription} />
+	<meta name="twitter:image" content={ogImage} />
+
+	<!-- Structured data: lets search engines show this as a free software application -->
+	{@html '<script type="application/ld+json">' + structuredData + '</scr' + 'ipt>'}
 </svelte:head>
 
 <div class="min-h-screen bg-gray-950 text-white">
@@ -727,7 +777,9 @@
 						>
 							<img
 								src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png"
-								alt="Buy Me A Coffee"
+								alt="Support Initiative Tracker on Buy Me A Coffee"
+								width="163"
+								height="45"
 								style="height: 45px; width: 163px;"
 							/>
 						</a>
@@ -916,6 +968,8 @@
 										<img
 											src={featuredFeature.screenshot}
 											alt="{featuredFeature.title} screenshot"
+											loading="lazy"
+											decoding="async"
 											class="w-full transition hover:opacity-90 {featuredFeature.strip
 												? 'h-auto'
 												: 'aspect-video object-cover object-top'}"
@@ -982,7 +1036,11 @@
 							>
 								<img
 									src="/screenshots/ViewerDisplayScreenshot.jpg"
-									alt="Live viewer display"
+									alt="Initiative Tracker's live player display showing the turn order, HP and conditions during combat"
+									width="1918"
+									height="957"
+									loading="lazy"
+									decoding="async"
 									class="h-auto w-full object-contain transition hover:opacity-90"
 								/>
 							</a>
@@ -1075,7 +1133,10 @@
 					>
 						<img
 							src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png"
-							alt="Buy Me A Coffee"
+							alt="Support Initiative Tracker on Buy Me A Coffee"
+							width="163"
+							height="45"
+							loading="lazy"
 							style="height: 45px; width: 163px;"
 						/>
 					</a>

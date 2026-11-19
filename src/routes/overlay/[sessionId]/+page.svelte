@@ -722,6 +722,7 @@
 </script>
 
 <svelte:head>
+	<meta name="robots" content="noindex, nofollow" />
 	<style>
 		html,
 		body {
