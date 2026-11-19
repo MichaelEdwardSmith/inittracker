@@ -95,6 +95,7 @@
 			const ctx = new AudioCtx();
 			const now = ctx.currentTime;
 
+			// Held notes sustain at full level for most of their length, then fade out slowly
 			const note = (freq: number, at: number, dur: number, vol: number) => {
 				const osc = ctx.createOscillator();
 				const gain = ctx.createGain();
@@ -102,21 +103,29 @@
 				osc.frequency.value = freq;
 				gain.gain.setValueAtTime(0.0001, now + at);
 				gain.gain.exponentialRampToValueAtTime(vol, now + at + 0.02);
+				gain.gain.setValueAtTime(vol, now + at + dur * 0.55);
 				gain.gain.exponentialRampToValueAtTime(0.0001, now + at + dur);
 				osc.connect(gain).connect(ctx.destination);
 				osc.start(now + at);
 				osc.stop(now + at + dur + 0.05);
 			};
 
-			// "Ta" — short G4
-			note(392.0, 0, 0.14, 0.18);
-			// "Daaa" — held C major chord (C5, E5, G5, C6)
-			note(523.25, 0.17, 1.1, 0.16);
-			note(659.25, 0.17, 1.1, 0.12);
-			note(783.99, 0.17, 1.1, 0.12);
-			note(1046.5, 0.17, 1.1, 0.08);
+			// "Taaa" — held G major pickup chord (G3, G4, B4, D5) that resolves into the C major below
+			// Ring on past the C chord's entrance (0.5s) so the two chords overlap with no gap of silence
+			note(196.0, 0, 0.8, 0.12);
+			note(392.0, 0, 0.8, 0.14);
+			note(493.88, 0, 0.8, 0.1);
+			note(587.33, 0, 0.8, 0.1);
+			// "Daaa" — long held C major chord (C5, E5, G5, C6)
+			note(523.25, 0.5, 2.8, 0.16);
+			note(659.25, 0.5, 2.8, 0.12);
+			note(783.99, 0.5, 2.8, 0.12);
+			note(1046.5, 0.5, 2.8, 0.08);
+			// A bright shimmer (E6, G6) that arrives a beat later and lingers
+			note(1318.5, 0.9, 2.2, 0.04);
+			note(1568.0, 1.1, 2.0, 0.035);
 
-			setTimeout(() => ctx.close().catch(() => {}), 1600);
+			setTimeout(() => ctx.close().catch(() => {}), 3700);
 		} catch {
 			// Audio is a nice-to-have; ignore any failure
 		}
@@ -750,7 +759,7 @@
 						aria-label="Roll a d20"
 						class="d20 group relative flex h-56 w-56 items-center justify-center transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400 active:scale-95 {rolling
 							? 'is-rolling'
-							: ''} {crit ? 'is-crit' : ''}"
+							: ''} {crit ? 'is-crit' : ''} {fumble ? 'is-fumble' : ''}"
 					>
 						<svg viewBox="0 0 100 100" class="absolute inset-0 h-full w-full" aria-hidden="true">
 							<polygon
@@ -1221,6 +1230,82 @@
 		}
 	}
 
+	/* ── natural 20: the die draws itself up tall and proud (the opposite of the sag) ──
+	   The number is a sibling of the svg, so it gets a matching copy with the same pivot. */
+	.d20.is-crit svg {
+		transform-origin: 50% 90%;
+		animation: d20-proud 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) forwards;
+	}
+
+	.d20.is-crit span {
+		transform-origin: 50% calc(50% + 5.6rem);
+		animation: d20-proud-number 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) forwards;
+	}
+
+	@keyframes d20-proud {
+		0% {
+			transform: translateY(0) scale(1, 1);
+		}
+		45% {
+			/* puff up past the final pose, then settle back */
+			transform: translateY(-8%) scale(0.94, 1.18);
+		}
+		100% {
+			transform: translateY(-4%) scale(0.98, 1.1);
+		}
+	}
+
+	@keyframes d20-proud-number {
+		0% {
+			transform: translateY(0) scale(1, 1);
+		}
+		45% {
+			transform: translateY(-1.12rem) scale(0.94, 1.18);
+		}
+		100% {
+			transform: translateY(-0.56rem) scale(0.98, 1.1);
+		}
+	}
+
+	/* ── natural 1: the die slumps, squashes and tilts like it's sad ── */
+	.d20.is-fumble svg {
+		transform-origin: 50% 90%;
+		animation: d20-sag 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+		filter: saturate(0.6) brightness(0.85);
+	}
+
+	@keyframes d20-sag {
+		0% {
+			transform: translateY(0) scale(1, 1) rotate(0deg);
+		}
+		35% {
+			/* a quick wobble upward-left before giving up */
+			transform: translateY(-2%) scale(1.02, 1.02) rotate(-3deg);
+		}
+		100% {
+			transform: translateY(7%) scale(1.06, 0.86) rotate(4deg);
+		}
+	}
+
+	/* The number is a sibling of the svg, so it needs its own copy of the sag. The origin sits
+	   at the same point as the svg's (90% down the 14rem die), measured from the number's centre. */
+	.d20.is-fumble span {
+		transform-origin: 50% calc(50% + 5.6rem);
+		animation: d20-sag-number 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+	}
+
+	@keyframes d20-sag-number {
+		0% {
+			transform: translateY(0) scale(1, 1) rotate(0deg);
+		}
+		35% {
+			transform: translateY(-0.28rem) scale(1.02, 1.02) rotate(-3deg);
+		}
+		100% {
+			transform: translateY(0.98rem) scale(1.06, 0.86) rotate(4deg);
+		}
+	}
+
 	:global(.fade-in) {
 		opacity: 0;
 		transform: translateY(24px);
@@ -1245,6 +1330,22 @@
 		.d20.is-crit {
 			animation: none;
 			filter: hue-rotate(280deg) saturate(1.8) brightness(1.25);
+		}
+		.d20.is-crit svg {
+			animation: none;
+			transform: translateY(-4%) scale(0.98, 1.1);
+		}
+		.d20.is-crit span {
+			animation: none;
+			transform: translateY(-0.56rem) scale(0.98, 1.1);
+		}
+		.d20.is-fumble svg {
+			animation: none;
+			transform: translateY(7%) scale(1.06, 0.86) rotate(4deg);
+		}
+		.d20.is-fumble span {
+			animation: none;
+			transform: translateY(0.98rem) scale(1.06, 0.86) rotate(4deg);
 		}
 	}
 </style>
