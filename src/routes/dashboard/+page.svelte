@@ -204,6 +204,15 @@
 		if (!LiarsDiceModalComp)
 			LiarsDiceModalComp = (await import('$lib/components/LiarsDiceModal.svelte')).default;
 	}
+	// Easter egg: clicking the header clock opens a solo mini adventure.
+	let showMiniAdventure = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let MiniAdventureModalComp = $state<any>(null);
+	async function openMiniAdventure() {
+		showMiniAdventure = true;
+		if (!MiniAdventureModalComp)
+			MiniAdventureModalComp = (await import('$lib/components/MiniAdventureModal.svelte')).default;
+	}
 	let showPoll = $state(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let PollModalComp = $state<any>(null);
@@ -658,7 +667,12 @@
 			<!-- Time + battery -->
 			{#if currentTime}
 				<div class="flex items-center gap-1.5 text-xs text-gray-400">
-					<span class="font-mono tabular-nums">{currentTime}</span>
+					<button
+						type="button"
+						onclick={openMiniAdventure}
+						class="cursor-default font-mono tabular-nums"
+						aria-label="Current time {currentTime}">{currentTime}</button
+					>
 					{#if isTouchDevice && batteryLevel !== null}
 						<span
 							class="flex items-center gap-0.5 {batteryLevel <= 20
@@ -1281,6 +1295,11 @@
 		dmName={data.dmFirstName || 'Dungeon Master'}
 		onclose={() => (showLiarsDice = false)}
 	/>
+{/if}
+
+{#if showMiniAdventure && MiniAdventureModalComp}
+	{@const MiniAdventure = MiniAdventureModalComp}
+	<MiniAdventure onclose={() => (showMiniAdventure = false)} />
 {/if}
 
 {#if showPoll && PollModalComp}
