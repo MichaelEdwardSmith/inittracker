@@ -1,6 +1,7 @@
 ﻿<!-- Public landing page for Initiative Tracker -->
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { onDestroy, untrack } from 'svelte';
 
 	// Simple intersection-observer fade-in for sections
 	function fadeIn(node: HTMLElement) {
@@ -66,6 +67,23 @@
 	const fumble = $derived(roll === 1 && !rolling);
 	// A settled natural 20 cycles the die through the rainbow until the next roll begins
 	const crit = $derived(roll === 20 && !rolling);
+	// A beat after a natural 1 sags the headline, it cracks in two
+	let cracked = $state(false);
+	// On the next roll the cracked copies stay up briefly while they knit back together
+	let mending = $state(false);
+	$effect(() => {
+		if (fumble) {
+			mending = false;
+			const t = setTimeout(() => (cracked = true), 1300);
+			return () => clearTimeout(t);
+		}
+		if (untrack(() => cracked)) {
+			cracked = false;
+			mending = true;
+			const t = setTimeout(() => (mending = false), 1000);
+			return () => clearTimeout(t);
+		}
+	});
 	let quip = $state('Go on. Click the die. We know you want to.');
 
 	// Picks a random line for the roll, avoiding an immediate repeat
@@ -201,8 +219,14 @@
 	}
 
 	// Natural 20 celebration: a short burst of canvas confetti from the d20
+	let stopConfetti: (() => void) | null = null;
+	// Next roll: confetti resting on the page gets caught by a gust and blows away
+	let blowAwayConfetti: (() => void) | null = null;
+	onDestroy(() => stopConfetti?.());
+
 	function launchConfetti() {
 		if (!browser) return;
+		stopConfetti?.();
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 		const canvas = document.createElement('canvas');
@@ -240,37 +264,178 @@
 			};
 		});
 
+		// Pieces that land on a page element are attached to it (element + x offset),
+		// so they ride along with scrolling/layout changes and stay until the next roll.
+		type Piece = (typeof pieces)[number] & {
+			key?: string;
+			dx?: number;
+			freeAt?: number; // when a gust lifts this landed piece off its ledge
+			born?: number; // when it started blowing away
+		};
+		let flying: Piece[] = pieces;
+		const landed: Piece[] = [];
+		const blown: Piece[] = [];
+		let blowing = false;
+
+		// Landing surfaces: buttons, rounded links and the stats strip (not the d20 itself)
+		const skip = '[aria-hidden="true"], .d20';
+		const sources: { node: Element; host: Element }[] = [];
+		for (const el of document.querySelectorAll('button, a.rounded, [data-confetti-ledge]')) {
+			if (!el.closest(skip)) sources.push({ node: el, host: el });
+		}
+
+		const onResize = () => {
+			canvas.width = window.innerWidth * dpr;
+			canvas.height = window.innerHeight * dpr;
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		};
+		window.addEventListener('resize', onResize);
+
+		let raf = 0;
+		let stopped = false;
+		const finish = () => {
+			stopped = true;
+			cancelAnimationFrame(raf);
+			window.removeEventListener('resize', onResize);
+			canvas.remove();
+		};
+		stopConfetti = () => {
+			finish();
+			stopConfetti = null;
+			blowAwayConfetti = null;
+		};
+		blowAwayConfetti = () => {
+			// Detach from the page-level handles so a new roll's confetti is independent;
+			// this layer cleans itself up once everything has blown off screen.
+			stopConfetti = null;
+			blowAwayConfetti = null;
+			blowing = true;
+			const t = performance.now();
+			// Staggered gusts so the pieces peel off in a wave rather than all at once
+			for (const p of landed) p.freeAt = t + Math.random() * 500;
+		};
+
 		const start = performance.now();
 		const duration = 3200;
 
+		function drawPiece(p: Piece, x: number, y: number) {
+			ctx!.save();
+			ctx!.translate(x, y);
+			ctx!.rotate(p.rot);
+			ctx!.fillStyle = p.color;
+			ctx!.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+			ctx!.restore();
+		}
+
 		function frame(now: number) {
+			if (stopped || !ctx) return;
 			const elapsed = now - start;
-			if (!ctx || elapsed > duration) {
-				canvas.remove();
-				return;
-			}
 			ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-			ctx.globalAlpha = Math.min(1, (duration - elapsed) / 800);
-			for (const p of pieces) {
+
+			// Current on-screen ledges (top edges of visible elements)
+			const rects = new Map<string, DOMRect>();
+			const vh = window.innerHeight;
+			sources.forEach((s, i) => {
+				if (!s.node.isConnected) return;
+				const hr = s.host.getBoundingClientRect();
+				if (hr.width <= 0 || hr.height <= 0 || hr.bottom < 0 || hr.top > vh) return;
+				rects.set(`${i}:0`, hr);
+			});
+
+			// Landed pieces: follow their ledge; drop if it was removed from the page
+			for (let i = landed.length - 1; i >= 0; i--) {
+				const p = landed[i];
+				const r = rects.get(p.key!);
+				const gone = p.freeAt !== undefined && now >= p.freeAt;
+				if (!r) {
+					// Off-screen or relaid-out: keep attached unless the node is gone (or it's blowing away)
+					if (gone || !sources[Number(p.key!.split(':')[0])].node.isConnected) landed.splice(i, 1);
+					continue;
+				}
+				const px = r.left + p.dx!;
+				const py = r.top - p.size / 4;
+				if (gone) {
+					// A gust catches it: lift off and tumble away to the right
+					p.x = px;
+					p.y = py;
+					p.vx = 3 + Math.random() * 5;
+					p.vy = -(1 + Math.random() * 3);
+					p.vr = (Math.random() - 0.5) * 0.6;
+					p.born = now;
+					blown.push(p);
+					landed.splice(i, 1);
+					continue;
+				}
+				drawPiece(p, px, py);
+			}
+
+			// Flying pieces
+			ctx.globalAlpha = Math.min(1, Math.max(0, (duration - elapsed) / 800));
+			const next: Piece[] = [];
+			for (const p of flying) {
+				const prevY = p.y;
 				p.vy += 0.35;
 				p.vx *= 0.99;
 				p.x += p.vx;
 				p.y += p.vy;
 				p.rot += p.vr;
-				ctx.save();
-				ctx.translate(p.x, p.y);
-				ctx.rotate(p.rot);
-				ctx.fillStyle = p.color;
-				ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
-				ctx.restore();
+
+				if (p.vy > 0) {
+					let hit: string | null = null;
+					for (const [k, r] of rects) {
+						if (p.x >= r.left && p.x <= r.right && prevY <= r.top && p.y >= r.top) {
+							hit = k;
+							break;
+						}
+					}
+					if (hit) {
+						const r = rects.get(hit)!;
+						p.key = hit;
+						p.dx = p.x - r.left;
+						p.rot = (Math.random() - 0.5) * 0.6; // settle nearly flat
+						if (blowing) p.freeAt = now + Math.random() * 300;
+						landed.push(p);
+						continue;
+					}
+				}
+				if (elapsed <= duration && p.y < window.innerHeight + 40) {
+					drawPiece(p, p.x, p.y);
+					next.push(p);
+				}
 			}
-			requestAnimationFrame(frame);
+			flying = next;
+
+			// Pieces blowing away: wind accelerates them sideways, with a little flutter,
+			// while they fade out
+			for (let i = blown.length - 1; i >= 0; i--) {
+				const p = blown[i];
+				const life = 1 - (now - p.born!) / 1300;
+				if (life <= 0 || p.x > window.innerWidth + 40) {
+					blown.splice(i, 1);
+					continue;
+				}
+				p.vx = Math.min(p.vx + 0.35, 22);
+				p.vy += 0.03;
+				p.x += p.vx;
+				p.y += p.vy + Math.sin(now / 90 + p.dx!) * 1.4;
+				p.rot += p.vr;
+				ctx.globalAlpha = Math.min(1, life * 1.5);
+				drawPiece(p, p.x, p.y);
+			}
+			ctx.globalAlpha = 1;
+
+			if (blowing && !landed.length && !flying.length && !blown.length) {
+				finish();
+				return;
+			}
+			raf = requestAnimationFrame(frame);
 		}
-		requestAnimationFrame(frame);
+		raf = requestAnimationFrame(frame);
 	}
 
 	function rollD20() {
 		if (rolling) return;
+		blowAwayConfetti?.(); // confetti left sitting on the page blows away
 		rolling = true;
 		let ticks = 0;
 		const timer = setInterval(() => {
@@ -745,12 +910,38 @@
 						The D&D combat tracker for people with other things to do
 					</p>
 
-					<h1
-						class="mb-6 text-5xl leading-[1.05] font-black tracking-tight text-white sm:text-6xl lg:text-7xl"
-					>
-						Herding adventurers<br />
-						<span class="text-amber-400">since round one.</span>
-					</h1>
+					<div class="relative">
+						<h1
+							class="hero-title mb-6 text-5xl leading-[1.05] font-black tracking-tight text-white sm:text-6xl lg:text-7xl"
+							class:is-crit={crit}
+							class:is-fumble={fumble}
+							class:is-cracked={cracked || mending}
+						>
+							Herding adventurers<br />
+							<span class="hero-accent text-amber-400">since round one.</span>
+						</h1>
+
+						<!-- Natural 1: after it sags, the headline splits along a jagged crack.
+						     Decorative copies only; the real h1 above stays in the accessibility tree. -->
+						{#if cracked || mending}
+							<div
+								class="crack-layer pointer-events-none absolute inset-0"
+								class:is-mending={mending}
+								aria-hidden="true"
+							>
+								{#each ['top', 'bottom'] as half}
+									<div class="crack-half crack-{half}">
+										<div
+											class="crack-copy text-5xl leading-[1.05] font-black tracking-tight sm:text-6xl lg:text-7xl"
+										>
+											Herding adventurers<br />
+											<span class="crack-copy-accent">since round one.</span>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</div>
 
 					<p class="mx-auto mb-8 max-w-xl text-lg leading-relaxed text-gray-400 lg:mx-0">
 						Initiative, HP, conditions, and a live screen for your players, so you can stop shouting
@@ -851,6 +1042,7 @@
 
 			<!-- Stats strip -->
 			<div
+				data-confetti-ledge
 				class="fade-in mx-auto mt-20 grid max-w-5xl gap-px overflow-hidden rounded-xl border border-gray-800 bg-gray-800 sm:grid-cols-2 lg:grid-cols-4"
 				use:fadeIn
 			>
@@ -1291,6 +1483,37 @@
 		}
 	}
 
+	/* ── natural 20: the hero headline cycles through the rainbow too ── */
+	.hero-title.is-crit {
+		animation: title-rainbow 2.4s linear infinite;
+	}
+
+	.hero-title.is-crit .hero-accent {
+		animation: title-rainbow 2.4s linear -0.8s infinite;
+	}
+
+	@keyframes title-rainbow {
+		0%,
+		100% {
+			color: hsl(0 90% 65%);
+		}
+		17% {
+			color: hsl(60 90% 60%);
+		}
+		33% {
+			color: hsl(120 80% 60%);
+		}
+		50% {
+			color: hsl(180 90% 60%);
+		}
+		67% {
+			color: hsl(240 90% 70%);
+		}
+		83% {
+			color: hsl(300 90% 68%);
+		}
+	}
+
 	/* ── natural 20: the die draws itself up tall and proud (the opposite of the sag) ──
 	   The number is a sibling of the svg, so it gets a matching copy with the same pivot. */
 	.d20.is-crit svg {
@@ -1367,6 +1590,177 @@
 		}
 	}
 
+	/* ── natural 1: the hero headline wilts and loses its colour ── */
+	.hero-title.is-fumble {
+		transform-origin: 50% 90%;
+		color: #6b7280;
+		animation: title-sag 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+		transition: color 1.4s ease;
+	}
+
+	.hero-title.is-fumble .hero-accent {
+		display: inline-block;
+		transform-origin: 0% 0%;
+		color: #4b5563;
+		animation: title-accent-sag 1.6s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+		transition: color 1.4s ease;
+	}
+
+	@keyframes title-sag {
+		0% {
+			transform: translateY(0) scale(1, 1) rotate(0deg);
+		}
+		35% {
+			transform: translateY(-0.2%) scale(1.01, 1.01) rotate(-0.4deg);
+		}
+		100% {
+			transform: translateY(2.5%) scale(1.02, 0.93) rotate(0.6deg);
+		}
+	}
+
+	/* the second line droops a bit further, like it's hanging its head */
+	@keyframes title-accent-sag {
+		0% {
+			transform: translateY(0) rotate(0deg);
+		}
+		35% {
+			transform: translateY(-1%) rotate(-0.5deg);
+		}
+		100% {
+			transform: translateY(8%) rotate(1.8deg);
+		}
+	}
+
+	/* ── natural 1, part two: the sagging headline cracks in two ──
+	   Two clipped copies (same jagged edge, complementary sides) swap in for the real h1
+	   at its slumped end state, then pull apart along the crack. */
+	.hero-title.is-cracked {
+		opacity: 0;
+	}
+
+	.crack-half {
+		position: absolute;
+		inset: 0;
+	}
+
+	.crack-top {
+		clip-path: polygon(
+			-10% -20%,
+			110% -20%,
+			110% 38%,
+			86% 46%,
+			72% 41%,
+			58% 55%,
+			43% 50%,
+			30% 62%,
+			14% 57%,
+			-10% 66%
+		);
+		transform-origin: 100% 40%;
+		animation: crack-part-top 0.9s ease-out 0.25s both;
+	}
+
+	.crack-bottom {
+		clip-path: polygon(
+			-10% 66%,
+			14% 57%,
+			30% 62%,
+			43% 50%,
+			58% 55%,
+			72% 41%,
+			86% 46%,
+			110% 38%,
+			110% 130%,
+			-10% 130%
+		);
+		transform-origin: 0% 60%;
+		animation: crack-part-bottom 0.9s ease-out 0.25s both;
+	}
+
+	/* Copy of the headline in its final slumped state (matches the h1's sag end frame) */
+	.crack-copy {
+		color: #6b7280;
+		transform-origin: 50% 90%;
+		transform: translateY(2.5%) scale(1.02, 0.93);
+	}
+
+	.crack-copy-accent {
+		display: inline-block;
+		color: #4b5563;
+		transform-origin: 0% 0%;
+		transform: translateY(8%) rotate(1.8deg);
+	}
+
+	/* Next roll: the halves slide back together and the text heals to white/amber,
+	   ending identical to the real headline, which then fades in underneath. */
+	.is-mending .crack-top {
+		animation: crack-join-top 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+	}
+
+	.is-mending .crack-bottom {
+		animation: crack-join-bottom 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+	}
+
+	.is-mending .crack-copy {
+		animation: crack-heal 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+	}
+
+	.is-mending .crack-copy-accent {
+		animation: crack-heal-accent 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+	}
+
+	@keyframes crack-join-top {
+		from {
+			transform: translate(0.3%, -5px) rotate(-0.7deg);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes crack-join-bottom {
+		from {
+			transform: translate(-0.3%, 7px) rotate(0.9deg);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes crack-heal {
+		from {
+			color: #6b7280;
+			transform: translateY(2.5%) scale(1.02, 0.93);
+		}
+		to {
+			color: #fff;
+			transform: none;
+		}
+	}
+
+	@keyframes crack-heal-accent {
+		from {
+			color: #4b5563;
+			transform: translateY(8%) rotate(1.8deg);
+		}
+		to {
+			color: #fbbf24;
+			transform: none;
+		}
+	}
+
+	@keyframes crack-part-top {
+		to {
+			transform: translate(0.3%, -5px) rotate(-0.7deg);
+		}
+	}
+
+	@keyframes crack-part-bottom {
+		to {
+			transform: translate(-0.3%, 7px) rotate(0.9deg);
+		}
+	}
+
 	:global(.fade-in) {
 		opacity: 0;
 		transform: translateY(24px);
@@ -1387,6 +1781,32 @@
 		}
 		.d20.is-rolling svg {
 			animation: none;
+		}
+		.hero-title.is-crit,
+		.hero-title.is-crit .hero-accent {
+			animation: none;
+		}
+		.hero-title.is-fumble,
+		.hero-title.is-fumble .hero-accent {
+			animation: none;
+			transition: none;
+		}
+		.hero-title.is-fumble {
+			transform: translateY(2.5%) scale(1.02, 0.93);
+		}
+		.hero-title.is-fumble .hero-accent {
+			transform: translateY(8%) rotate(1.8deg);
+		}
+		.crack-layer.is-mending {
+			display: none;
+		}
+		.crack-top {
+			animation: none;
+			transform: translate(0.3%, -5px) rotate(-0.7deg);
+		}
+		.crack-bottom {
+			animation: none;
+			transform: translate(-0.3%, 7px) rotate(0.9deg);
 		}
 		.d20.is-crit {
 			animation: none;
